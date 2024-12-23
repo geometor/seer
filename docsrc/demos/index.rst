@@ -1,0 +1,6 @@
+demos
+=====
+
+.. toctree::
+
+   demo

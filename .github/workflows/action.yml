@@ -1,0 +1,20 @@
+name: Build and Deploy Sphinx
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: actions/checkout@v3
+      uses: actions/checkout@v3
+
+    - name: photon-platform/action-deploy-sphinx-gh-pages
+      uses: photon-platform/action-deploy-sphinx-gh-pages@v15
+      with:
+        modules_repo_urls: 'https://github.com/geometor/seer.git'
+        python_version: '3.10'  

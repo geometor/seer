@@ -1,0 +1,39 @@
+[project]
+name = "geometor-seer"
+dynamic = ["version"]
+authors = [
+  { name="phi ARCHITECT", email="github@phiarchitect.com" },
+]
+description = "perception and discernment"
+readme = "README.rst"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "textual",
+    "rich",
+    "jinja2",
+]
+
+[project.scripts]
+seer = "geometor.seer.__main__:run"
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["geometor"]
+namespaces = true
+
+[tool.setuptools.dynamic]
+version = {attr = "geometor.seer.__version__"}
+
+[project.urls]
+"Website" = "https://geometor.github.io/seer"
+"Repository" = "https://github.com/geometor/seer"
+"Issues" = "https://github.com/geometor/seer/issues"
