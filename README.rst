@@ -3,7 +3,7 @@ seer
 
 perception and discernment
 
-.. image:: ./seer.png
+.. image:: ./seer_resized.png
 
 Features
 --------
