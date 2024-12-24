@@ -1,8 +1,9 @@
 seer
 ====
 
-
 perception and discernment
+
+.. image:: ./seer.png
 
 Features
 --------
