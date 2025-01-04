@@ -5,5 +5,6 @@ from .seer import Seer
 
 
 def run() -> None:
-    reply = Seer().run()
+    seer = Seer()
+    reply = seer.run()
     print(reply)
