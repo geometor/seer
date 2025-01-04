@@ -27,7 +27,24 @@ You can install **seer** using pip:
 Usage
 -----
 
-After installation, you can use the system.
+.. code-block:: python
+
+   from rich import print
+   from datetime import datetime
+   from pathlib import Path
+   import json
+   import os
+
+   from geometor.seer.app import Seer
+
+
+   def run():
+       seer = Seer()
+       print(f"Seer initialized")
+
+
+   if __name__ == "__main__":
+       run()
 
 .. todo:: TODO: list arguments and usage examples
 
