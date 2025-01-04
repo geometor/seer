@@ -5,8 +5,10 @@ seer
 PHOTON platform
 ---------------
 
+The seer package provides tools for geometric analysis and solving.
 
-
+Modules:
+    solvers: Collection of geometric problem solvers
 """
 __author__ = "PHOTON platform"
 __maintainer__ = "PHOTON platform"
