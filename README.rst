@@ -27,11 +27,7 @@ You can install **seer** using pip:
 Usage
 -----
 
-After installation, you can use the ``seer`` command to interact with the system:
-
-.. code-block:: bash
-
-   seer
+After installation, you can use the system.
 
 .. todo:: TODO: list arguments and usage examples
 
