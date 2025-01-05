@@ -84,3 +84,47 @@ class GeminiClient(Client):
         except Exception as e:
             # TODO: Handle exceptions as needed
             raise e
+import google.generativeai as genai
+from google.api_core import retry
+from geometor.seer.client import Client
+import os
+from typing import List, Callable, Any
+
+class GeminiClient(Client):
+    """
+    Client for interacting with the Gemini API.
+    """
+
+    def __init__(self, model_name: str, api_key: str = None):
+        if api_key is None:
+            api_key = os.environ.get("GEMINI_API_KEY")
+        genai.configure(api_key=api_key)
+        self.model_name = model_name
+        self.model = genai.GenerativeModel(model_name)
+
+    def generate_content(self, prompt: List[str], tools: List[Callable] = None) -> Any:
+        """
+        Generates content from the Gemini model based on the provided prompt.
+
+        Parameters
+        ----------
+        prompt : List[str]
+            The prompt to send to the model.
+        tools : List[Callable], optional
+            Optional tools or functions the model can use.
+
+        Returns
+        -------
+        Any
+            The model's response.
+        """
+        try:
+            response = self.model.generate_content(
+                prompt,
+                tools=tools,
+                request_options={"retry": retry.Retry()},
+            )
+            return response
+        except Exception as e:
+            # TODO: Handle exceptions as needed
+            raise e
