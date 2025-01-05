@@ -7,7 +7,8 @@ class Seer:
     The Seer class.
     """
     def __init__(self):
-        pass
+    def __init__(self, client):
+        self.client = client
 
-    def run(self):
-        return "Seer is running"
+    def run(self, prompt):
+        return self.client.generate_content(prompt)
