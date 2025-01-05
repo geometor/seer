@@ -10,9 +10,7 @@ def main():
     Initializes the Seer and GeminiClient and demonstrates generating content.
     """
     model_name = "gemini-pro"  # Replace with your desired Gemini model
-    api_key = "YOUR_API_KEY"  # Set your API key in the environment
-
-    client = GeminiClient(model_name, api_key)
+    client = GeminiClient(model_name)
     seer = Seer(client)
 
     prompt = "Tell me a story about a robot learning to solve ARC puzzles."
