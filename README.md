@@ -18,7 +18,11 @@ and problem-solving.
 
 using multi-modal models capable of reasoning and code execution
 
+Gemini
 
+> the first task is not to reason
+>
+> it's to build a reasonable context
 
 ## Best Practices for Developing Natural Language Programs
 
