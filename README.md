@@ -80,6 +80,8 @@ When developing coaching for SEER's system instructions to help it discern well-
 > Notes from Chollet Interview
 > https://youtu.be/w9WE1aOPjHc
 
+> **life long distributed learning**
+
 - **Focus on Object Relationships and Properties:** 
 
   The program should identify and describe the objects within the input grid,
