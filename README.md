@@ -4,10 +4,12 @@ The next generation of ARC challenge investigations.
 
 ![seer](./seer_resized.png)
 
-**seer** is an artificial intelligence entity focused on perception and discernment, building upon our
-previous work with the Abstraction and Reasoning Corpus (ARC) challenge. It aims
-to provide a flexible and extensible framework for exploring geometric reasoning
-and problem-solving.
+**seer** is an artificial intelligence entity focused on perception and
+discernment, building upon our previous work with the Abstraction and Reasoning
+Corpus (ARC) challenge. 
+
+It aims to provide a flexible and extensible framework for exploring geometric
+reasoning and problem-solving.
 
 
 - understand the nature of problem based on the context or requirements
