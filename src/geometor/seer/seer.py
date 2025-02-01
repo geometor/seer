@@ -6,7 +6,6 @@ class Seer:
     """
     The Seer class.
     """
-    def __init__(self):
     def __init__(self, client):
         self.client = client
 
