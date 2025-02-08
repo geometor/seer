@@ -1,0 +1,60 @@
+{{ title }}
+{{ "=" * title|length }}
+
+:puzzle_id: {{ puzzle_id }}
+:description: {{description}}
+:timestamp: {{ timestamp }}
+:call_count: {{ call_count }}
+{% if usage_data and usage_data.model %}
+:model: {{ usage_data.model }}
+{% endif %}
+
+
+{% for part in log_list %}
+{%    if part.type == 'code' %}
+.. code-block::
+
+{{ part.content | indent(4) }}
+
+{%    elif part.type == 'markdown' %}
+{{ part.content }}
+
+{%    elif part.type == 'image' %}
+.. image:: {{ part.path }}
+   :align: left
+   :width: 45%
+
+{%    else %}
+[{{ part.type }}]
+{%    endif %}
+{% endfor %}
+
+{% if timing %}
+.. list-table:: time
+   :header-rows: 1
+
+   * - response time
+     - total elapsed
+   * - {{ timing.response_time|round(3) }} 
+     - {{ timing.total_elapsed|round(3) }} 
+
+{% endif %}
+{% if token_usage %}
+.. list-table:: usage
+   :header-rows: 1
+
+   * - token type
+     - call count
+     - total used
+{%     for row in token_usage %}
+   * - {{ row.label }} 
+     - {{ row.current }} 
+     - {{ row.total }} 
+{%     endfor %}
+{% endif %}
+
+.. seealso::
+
+   - :doc:`{{ '%03d' % call_count }}-history`
+   - :doc:`{{ '%03d' % call_count }}-response`
+

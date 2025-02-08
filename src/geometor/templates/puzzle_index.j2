@@ -1,0 +1,39 @@
+{{ title }}
+{{ "=" * title|length }}
+
+.. image:: _images/000-example_1_input.png
+   :width: 45%
+   :align: left
+
+.. image:: _images/000-example_1_output.png
+   :width: 45%
+
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+{% for step in steps %}
+   {{ step.call_num }}-prompt
+   {{ step.call_num }}-response
+{% endfor %}
+
+.. list-table:: steps
+   :header-rows: 1
+   :widths: 5 45 25 25
+
+   * - #
+     - Description
+     - Response Time
+     - Tokens Used
+   {% for step in steps %}
+   * - :doc:`{{ step.call_num }} <{{ step.call_num }}-prompt>`
+     - {{ step.description }}
+     - {{ step.response_time }}
+     - {{ step.tokens_used }}
+   {% endfor %}
+   * - **TOTAL**
+     -
+     - {{ total_response_time }}
+     - {{ total_tokens}}
+
+

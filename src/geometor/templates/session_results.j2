@@ -1,0 +1,20 @@
+{{ title }}
+{{ "=" * title|length }}
+
+.. list-table::
+   :header-rows: 1
+
+   * - Puzzle
+     - Submission
+     - Size
+     - Colors
+     - Color Count Diff
+     - Pixel Accuracy
+{% for puzzle in puzzles %}
+   * - {{ puzzle.id }}
+     - {{ "Yes" if puzzle.submitted else "No" }}
+     - {{ puzzle.size_correct }}
+     - {{ puzzle.colors_correct }}
+     - {{ puzzle.color_diff }}
+     - {{ puzzle.pixel_accuracy }}
+{% endfor %}

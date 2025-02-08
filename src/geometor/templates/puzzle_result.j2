@@ -1,0 +1,66 @@
+Results for {{ puzzle_id }}
+{{ "=" * ("Results for "  + puzzle_id|length) }}
+
+Test Input
+----------
+
+.. image:: _images/{{ test_input_image }}
+   :align: center
+
+Submitted Output
+----------------
+
+.. image:: _images/{{ submitted_output_image }}
+   :align: center
+
+Expected Output
+---------------
+
+.. image:: _images/{{ expected_output_image }}
+   :align: center
+
+Performance Metrics
+-------------------
+
+.. list-table::
+   :header-rows: 0
+
+   * - Steps Taken
+     - {{ steps }}
+   * - Total Time
+     - {{ total_time }}
+   * - Total Tokens
+     - {{ total_tokens }}
+   * - Size Check
+     - {{ "✅ Pass" if size_correct else "❌ Fail" }}
+   * - Color Check
+     - {{ "✅ Pass" if colors_correct else "❌ Fail" }}
+   * - Pixel Accuracy
+     - {{ pixel_accuracy }}
+
+Color Distribution
+------------------
+
+.. list-table::
+   :header-rows: 1
+
+   * - Color
+     - Expected Count
+     - Submitted Count
+     - Difference
+{% for color, counts in color_counts.items() %}
+   * - {{ color }}
+     - {{ counts.expected }}
+     - {{ counts.submitted }}
+     - {{ counts.difference }}
+{% endfor %}
+
+Interaction Summary
+-------------------
+
+{{ interaction_summary }}
+
+Final Exchange
+--------------
+
+{{ final_history }}
