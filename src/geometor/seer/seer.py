@@ -117,7 +117,7 @@ class Seer:
 
             #  instructions = [INST.example_instructions]
             self._investigate_examples()
-            self._review_programs()
+            #  self._review_programs()
             #  self._show_test_input()
             #  self._initialize_working_grid()
             #  self._run_solution_loop()
