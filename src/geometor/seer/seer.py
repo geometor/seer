@@ -31,14 +31,9 @@ import os
 
 from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 
-from geometor.arcprize.solvers.gemini_client import GeminiClient as Client
-from geometor.seer.session import Session
-#  import geometor.seer.gemini_solver_instructions as INST
+from geometor.seer.gemini_client import GeminiClient as Client
 
-#  DEFAULT_MODEL = "models/gemini-1.5-flash"
-#  DEFAULT_MODEL = "models/gemini-1.5-flash-002"
-#  DEFAULT_MODEL = "models/gemini-1.5-pro-002"
-#  DEFAULT_INSTRUCTIONS_FILE = "gemini_instructions.md"
+#  from geometor.seer.session import Session
 
 
 class Seer:
@@ -46,89 +41,74 @@ class Seer:
     Initialize the Seer with all necessary components for solving and logging.
 
     Seer expects tasks to input/output pairs of training examples - and test inputs
-
-
     """
 
     def __init__(
         self,
-        nlp_model: str,
-        code_model: str,
-        system_context: str,
-        task_context: str,
-        output_dir: str = "./sessions",
+        session: object,
+        config: dict,
         max_iterations: int = 5,
-        timestamp: str = None,
-        session: Session,
     ):
         self.start_time = datetime.now()
         self.response_times = []  # Track individual response times
 
-        self.nlp_model = nlp_model
-        self.code_model = code_model
+        self.nlp_model = config["nlp_model"]
+        self.code_model = config["code_model"]
 
-        self.system_context = system_context
-        self.task_context = task_context
+        with open(config["system_context_file"], "r") as f:
+            self.system_context = f.read().strip()
+        with open(config["task_context_file"], "r") as f:
+            self.task_context = f.read().strip()
 
-        self.max_iterations = max_iterations
+        self.max_iterations = config["max_iterations"]
         self.call_count = 0
         self.current_iteration = 0
 
         # Initialize GeminiClient
-        self.nlp_client = Client(nlp_model, instructions_file)
-        self.code_client = Client(code_model, instructions_file)
+        self.nlp_client = Client(
+            self.nlp_model, f"{self.system_context}\n\n{self.task_context}"
+        )
+        self.code_client = Client(
+            self.code_model, f"{self.system_context}\n\n{self.task_context}"
+        )
 
         # Initialize timestamp
-        self.timestamp = timestamp or datetime.now().strftime("%y.%j.%H%M%S")
+        self.timestamp = session.timestamp
 
         self.session = session
-
-        self.history = []
-
-        # Initialize metadata for logging
-        #  self.metadata = {
-            #  "task_id": task.id,
-            #  "model": model_name,
-            #  "timestamp": self.timestamp,
-            #  "max_iterations": max_iterations,
-            #  "history": [],
-            #  "grid_states": [],
-            #  "function_calls": [],
-            #  "start_time": self.start_time.isoformat(),
-            #  "response_times": [],
-            #  "total_elapsed": None,
-        #  }
 
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
 
-        
-    def solve_task(self, task: Puzzle,):
+    def solve_task(
+        self,
+        task: Puzzle,
+    ):
         """
         Main method to orchestrate the task solving workflow.
         Returns the working grid if solution is found, None otherwise.
         """
-        try:
-            # Initialize solving state
-            self.history = [f"Begin task: {self.task.id}\n\n"]
+        history = [""]
 
-            #  instructions = [INST.example_instructions]
-            self._investigate_examples()
-            #  self._review_programs()
-            #  self._show_test_input()
-            #  self._initialize_working_grid()
-            #  self._run_solution_loop()
+        self._investigate_examples(task.train)
+        #  self._review_programs()
+        #  self._show_test_input()
+        #  self._initialize_working_grid()
+        #  self._run_solution_loop()
 
-        except Exception as e:
-            print(f"Solve failed: {str(e)}")
-            self.session.log_error(f"Solve failed: {str(e)}", self.history)
-            raise
+        #  except Exception as e:
+            #  print(f"Solve failed: {str(e)}")
+            #  self.session.log_error(f"Solve failed: {str(e)}")
+            #  raise
 
-    def _investigate_examples(self, instructions, include_images=True):
+    def _investigate_examples(self, examples, include_images=True):
         """
         investigate all training pairs
         """
-        for i, pair in enumerate(self.task.train, 1):
+        instructions = [""]
+        history = [""]
+
+        for i, pair in enumerate(examples, 1):
             prompt = [
                 f"""
 ```python
@@ -136,7 +116,8 @@ example_{i}_input = {str(pair.input.grid)}
 
 example_{i}_output = {str(pair.output.grid)}
 ```
-"""]
+"""
+            ]
             if include_images:
                 self.session.save_grid_image(
                     pair.input.to_image(), self.call_count, f"example_{i}_input"
@@ -155,10 +136,12 @@ example_{i}_output = {str(pair.output.grid)}
                 )
 
             # nlp prompt
-            self._generate_content(
+            # TODO: instructions
+            response = self._generate_content(
+                history,
                 prompt,
                 instructions,
-                #  tools="code_execution",
+                tools="code_execution",
                 description=f"example_{i}",
             )
 
@@ -201,22 +184,21 @@ example_{i}_output = {str(pair.output.grid)}
             "\n",
             "\n**observations**\n",
         ]
-        instructions = [INST.test_input_instructions]
+
         self._generate_content(
+            history,
             prompt,
             instructions,
             #  tools="code_execution",
             description=f"test input",
         )
 
-
     def _generate_content(
-        self, prompt, instructions, tools=None, functions=None, description=""
+        self, history, prompt, instructions, tools=None, functions=None, description=""
     ):
         """
         Generate content from the model with standardized logging and function call handling.
         """
-        MAX_RETRIES = 3
         self.call_count += 1
 
         print(f"{self.call_count} • PROMPT")
@@ -225,26 +207,27 @@ example_{i}_output = {str(pair.output.grid)}
         for part in prompt:
             print(part)
 
-        instructions.insert(0, "\nINSTRUCTIONS:\n\n")
+        #  instructions.insert(0, "\nINSTRUCTIONS:\n\n")
         for part in instructions:
             print(part)
 
         # write the prompt file
-        self.session.log_task_prompt(
-            prompt + instructions, "prompt", self.call_count, description=description
-        )
+        #  self.session.log_task_prompt(
+        #  prompt + instructions, "prompt", self.call_count, description=description
+        #  )
 
         # write history file
-        total_prompt = self.history + prompt + ["\n\n====\n\n"] + instructions
-        self.history = self.history + prompt
-        self.session.log_task_history(
-            total_prompt, "history", self.call_count, description=description
-        )
+        total_prompt = []
+        total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
+        history = history + prompt
+        #  self.session.log_task_history(
+        #  total_prompt, "history", self.call_count, description=description
+        #  )
 
-        for attempt in range(MAX_RETRIES):
+        for attempt in range(self.max_iterations):
             try:
                 response_start = datetime.now()
-                response = self.client.generate_content(
+                response = self.nlp_client.generate_content(
                     total_prompt,
                     tools=tools,
                 )
@@ -275,7 +258,8 @@ example_{i}_output = {str(pair.output.grid)}
                     "response_times": self.response_times.copy(),
                 }
 
-                self.session.log_response(response_data, self.call_count)
+                #  self.session.log_response(response_data, self.call_count)
+                #  print(response_data)
 
                 response_parts = []
                 function_call_found = False
@@ -336,23 +320,24 @@ example_{i}_output = {str(pair.output.grid)}
                 print("-" * 80)
                 for part in response_parts:
                     print(part)
-                self.history = self.history + response_parts
+                history = history + response_parts
 
-                self.session.log_response(
-                    response_parts,
-                    "response",
-                    self.call_count,
-                    {
-                        "current": metadata,
-                        "totals": self.token_counts,
-                        "timing": {
-                            "response_time": response_time,
-                            "total_elapsed": total_elapsed,
-                        },
-                        "model": self.model_name,
-                    },
-                    description=description,
-                )
+                #  print(response_parts)
+                #  self.session.log_response(
+                    #  response_parts,
+                    #  "response",
+                    #  self.call_count,
+                    #  {
+                        #  "current": metadata,
+                        #  "totals": self.token_counts,
+                        #  "timing": {
+                            #  "response_time": response_time,
+                            #  "total_elapsed": total_elapsed,
+                        #  },
+                        #  "model": self.model_name,
+                    #  },
+                    #  description=description,
+                #  )
 
                 return last_result
 
@@ -368,20 +353,19 @@ example_{i}_output = {str(pair.output.grid)}
                     continue
                 else:
                     print(f"\nERROR: {str(e)} - Max retries exceeded")
-                    self.logger.log_error(str(e), prompt)
+                    self.session.log_error(str(e), prompt)
                     raise
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
-                self.logger.log_error(str(e), prompt)
+                self.session.log_error(str(e), prompt)
                 raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.logger.log_error(error_msg, prompt)
+        self.session.log_error(error_msg, prompt)
         raise MaxRetriesExceededError(error_msg)
-
 
     def _evaluate_accuracy(self, working_grid: Grid, expected_grid: Grid) -> dict:
         """
