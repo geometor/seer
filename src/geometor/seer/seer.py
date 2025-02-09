@@ -32,7 +32,7 @@ import os
 from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 
 from geometor.arcprize.solvers.gemini_client import GeminiClient as Client
-from geometor.seer.logger import Logger
+from geometor.seer.session import Session
 #  import geometor.seer.gemini_solver_instructions as INST
 
 #  DEFAULT_MODEL = "models/gemini-1.5-flash"
@@ -56,9 +56,10 @@ class Seer:
         code_model: str,
         system_context: str,
         task_context: str,
-        output_dir: str = ".",
+        output_dir: str = "./sessions",
         max_iterations: int = 5,
         timestamp: str = None,
+        session: Session,
     ):
         self.start_time = datetime.now()
         self.response_times = []  # Track individual response times
@@ -80,11 +81,7 @@ class Seer:
         # Initialize timestamp
         self.timestamp = timestamp or datetime.now().strftime("%y.%j.%H%M%S")
 
-        # Initialize Logger
-        self.logger = Logger(
-            output_dir,
-            self
-        )
+        self.session = session
 
         self.history = []
 
@@ -124,7 +121,7 @@ class Seer:
 
         except Exception as e:
             print(f"Solve failed: {str(e)}")
-            self.logger.log_error(f"Solve failed: {str(e)}", self.history)
+            self.session.log_error(f"Solve failed: {str(e)}", self.history)
             raise
 
     def _investigate_examples(self, instructions, include_images=True):
@@ -141,10 +138,10 @@ example_{i}_output = {str(pair.output.grid)}
 ```
 """]
             if include_images:
-                self.logger.save_grid_image(
+                self.session.save_grid_image(
                     pair.input.to_image(), self.call_count, f"example_{i}_input"
                 )
-                self.logger.save_grid_image(
+                self.session.save_grid_image(
                     pair.output.to_image(), self.call_count, f"example_{i}_output"
                 )
                 prompt.extend(
@@ -184,7 +181,7 @@ example_{i}_output = {str(pair.output.grid)}
         step 3 - show test input for eval
         """
         test_pair = self.task.test[0]
-        self.logger.save_grid_image(
+        self.session.save_grid_image(
             test_pair.input.to_image(), self.call_count, f"test_input"
         )
         prompt = [
@@ -233,14 +230,14 @@ example_{i}_output = {str(pair.output.grid)}
             print(part)
 
         # write the prompt file
-        self.logger.write_rst_log(
+        self.session.log_task_prompt(
             prompt + instructions, "prompt", self.call_count, description=description
         )
 
         # write history file
         total_prompt = self.history + prompt + ["\n\n====\n\n"] + instructions
         self.history = self.history + prompt
-        self.logger.write_rst_log(
+        self.session.log_task_history(
             total_prompt, "history", self.call_count, description=description
         )
 
@@ -278,7 +275,7 @@ example_{i}_output = {str(pair.output.grid)}
                     "response_times": self.response_times.copy(),
                 }
 
-                self.logger.save_response(response_data, self.call_count)
+                self.session.log_response(response_data, self.call_count)
 
                 response_parts = []
                 function_call_found = False
@@ -341,7 +338,7 @@ example_{i}_output = {str(pair.output.grid)}
                     print(part)
                 self.history = self.history + response_parts
 
-                self.logger.write_rst_log(
+                self.session.log_response(
                     response_parts,
                     "response",
                     self.call_count,
@@ -385,94 +382,6 @@ example_{i}_output = {str(pair.output.grid)}
         self.logger.log_error(error_msg, prompt)
         raise MaxRetriesExceededError(error_msg)
 
-    def _call_function(self, function_call, functions):
-        """Execute a function call with improved error handling."""
-        if not functions:
-            raise ValueError("No functions provided")
-
-        function_name = function_call.name
-        function_args = function_call.args
-
-        if function_name not in functions:
-            raise UnknownFunctionError(f"Unknown function: {function_name}")
-
-        try:
-            result = functions[function_name](**function_args)
-            return result
-        except TypeError as e:
-            raise FunctionArgumentError(
-                f"Invalid arguments for {function_name}: {str(e)}"
-            )
-        except Exception as e:
-            raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
-
-    # TEST FUNCTIONS to call from model #################################
-    def initialize_output_from_input(self) -> str:
-        """
-        Initialize the test output grid with a copy of the input grid.
-        """
-        from copy import deepcopy
-
-        self.working_grid = deepcopy(self.task.test[0].input)
-        print(str(self.working_grid.grid))
-
-        return True, "initialize_output_from_input()"
-
-    def initialize_output_by_size(self, width: int, height: int, color: int = 0) -> str:
-        """
-        Initialize the test output grid with specific dimensions.
-        """
-        width, height, color = int(width), int(height), int(color)
-        new_grid = np.full((height, width), color)
-        self.working_grid = Grid(new_grid, self.task.id, "test", 0, "output")
-        print(str(self.working_grid.grid))
-
-        return True, f"initialize_output_by_size({width=}, {height=}, {color=})"
-
-    def set_pixel(self, row: int, column: int, color: int) -> str:
-        """
-        Set grid value at a specific coordinate.
-        """
-        return self.working_grid.set_pixel(row, column, color)
-
-    def set_range(
-        self, row1: int, column1: int, row2: int, column2: int, color: int
-    ) -> str:
-        """
-        Set grid values for a range of pixels.
-        """
-        return self.working_grid.set_range(row1, column1, row2, column2, color)
-
-    def submit(self) -> str:
-        """
-        Submit the working grid and check for correctness against the expected output.
-        """
-        if self.working_grid is None:
-            raise ValueError("No working grid to submit")
-
-        expected_output = self.task.test[0].output
-
-        # Perform the comparison and score each part
-        score = self._evaluate_accuracy(self.working_grid, expected_output)
-
-        # Create a log entry for the result
-        final_log = [ f"""
-**Final Submission Results**
-
-:Size Correct: {score['size_correct']}
-:Colors Correct: {score['colors_correct']}
-:Unique Color Count Diff: {score['unique_color_difference']}
-:Pixel Accuracy: {score['pixel_accuracy']}%
-
-"""
-        ]
-
-        description = "final"
-        self.logger.write_rst_log(
-            final_log, "submission", self.call_count, description=description
-        )
-
-        return True, "submit"
 
     def _evaluate_accuracy(self, working_grid: Grid, expected_grid: Grid) -> dict:
         """
