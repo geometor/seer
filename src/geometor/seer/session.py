@@ -16,6 +16,10 @@ class Session:
 
         self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write system and task context to files
+        self._write_context_files(config["system_context_file"], config["task_context_file"])
+
         #  self.images_dir = self.task_dir / "_images"
         #  self.images_dir.mkdir(parents=True, exist_ok=True)
         #  self.responses_dir = self.task_dir / "_responses"
@@ -28,8 +32,18 @@ class Session:
             session=self,
         )
 
+    def _write_context_files(self, system_context_file: str, task_context_file: str):
+        """Write system and task context to files in the session directory."""
+        with open(system_context_file, "r") as f:
+            system_context = f.read().strip()
+        with open(task_context_file, "r") as f:
+            task_context = f.read().strip()
+
+        (self.session_dir / "system_context.md").write_text(system_context)
+        (self.session_dir / "task_context.md").write_text(task_context)
+
     def run(self):
-    
+
         for task in self.tasks.puzzles:
             self.task_dir = self.session_dir / task.id
             self.task_dir.mkdir(parents=True, exist_ok=True)
