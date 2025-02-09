@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 from geometor.seer.seer import Seer
-from markdown2 import convert
+#  from markdown2 import convert
 
 
 class Session:
