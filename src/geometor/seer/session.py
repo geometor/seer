@@ -1,22 +1,40 @@
+from pathlib import Path
+from datetime import datetime
+
+from geometor.seer.seer import Seer
+
 
 class Session:
-    def __init__(self, output_dir: str, puzzle_id: str, timestamp: str):
-        self.output_dir = Path(output_dir)
+    def __init__(self, config: dict, tasks: list):
+        self.config = config
+        self.tasks = tasks
+
+        self.output_dir = Path(config["output_dir"])
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.timestamp = timestamp
+        self.timestamp = datetime.now().strftime("%y.%j.%H%M%S") # Generate timestamp
 
-        self.session_dir = self.sessions_dir / self.timestamp
+        self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
-        self.puzzle_dir = self.session_dir / self.puzzle_id
-        self.images_dir = self.puzzle_dir / "_images"
-        self.responses_dir = self.puzzle_dir / "_responses"
-
-        self.puzzle_dir.mkdir(parents=True, exist_ok=True)
-        self.images_dir.mkdir(parents=True, exist_ok=True)
-        self.responses_dir.mkdir(parents=True, exist_ok=True)
+        #  self.images_dir = self.task_dir / "_images"
+        #  self.images_dir.mkdir(parents=True, exist_ok=True)
+        #  self.responses_dir = self.task_dir / "_responses"
+        #  self.responses_dir.mkdir(parents=True, exist_ok=True)
 
         self.image_registry = {}
+
+        self.seer = Seer(
+            config=config,
+            session=self,
+        )
+
+    def run(self):
+    
+        for task in self.tasks.puzzles:
+            self.task_dir = self.session_dir / task.id
+            self.task_dir.mkdir(parents=True, exist_ok=True)
+            self.seer.solve_task(task)
+
 
     def save_response(self, response: dict, call_count: int):
         """Save raw response data as JSON."""
@@ -53,11 +71,11 @@ class Session:
 
         # Create new file if image hasn't been saved before
         filename = f"{call_count:03d}-{context}.png"
-        image_path = self.images_dir / filename
+        image_path = self.task_dir / filename
         grid_image.save(image_path)
 
         # Store relative path for RST references
-        rel_path = image_path.relative_to(self.puzzle_dir)
+        rel_path = image_path.relative_to(self.task_dir)
         self.image_registry[image_bytes] = rel_path
 
         #  self.indexer.update_indices()
@@ -146,7 +164,7 @@ class Session:
         template = self.indexer.env.get_template("log_entry.j2")
         title = f"{call_count:03d} • {log_type.title()}"
         content = template.render(
-            puzzle_id=self.puzzle_id,
+            task_id=self.task_id,
             timestamp=self.timestamp,
             call_count=call_count,
             title=title,
@@ -158,7 +176,7 @@ class Session:
         )
 
         # Write the rendered content to the file
-        log_file = self.puzzle_dir / f"{call_count:03d}-{log_type}.rst"
+        log_file = self.task_dir / f"{call_count:03d}-{log_type}.rst"
         with open(log_file, "w") as f:
             f.write(content)
 
