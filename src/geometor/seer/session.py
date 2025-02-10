@@ -68,30 +68,21 @@ class Session:
 
         return rel_path
 
-    def log_prompt(self, prompt: list, description: str = ""):
-        prompt_file = self.session_dir / "prompt_log.txt"
-        with open(prompt_file, "a") as f:
-            f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
-            if description:
-                f.write(f"Description: {description}")
-            f.write("\n")
-            f.write(str(prompt))  # Log the actual prompt
-            f.write("\n")
 
-    def log_task_prompt(self, prompt: list, history: list, prompt_count: int, description: str = ""):
-        prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.txt"
+    def log_prompt(self, prompt: list, instructions: list, prompt_count: int, description: str = ""):
+        prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.md"
         with open(prompt_file, "w") as f:
             f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
             if description:
                 f.write(f"Description: {description}\n")
             f.write("-" * 80)
             f.write("\n")
-            for part in history:
+            for part in prompt:
                 f.write(str(part))
             f.write("\n")
             f.write("=" * 80)
             f.write("\n")
-            for part in prompt:
+            for part in instructions:
                 f.write(str(part))
             f.write("\n")
 
@@ -101,6 +92,8 @@ class Session:
 
         with open(response_file, "w") as f:
             json.dump(response, f, indent=2)
+
+        # now unpack the response and write the elements to a markdown file AI!
 
     def log_error(self, error_message: str, context: str = ""):
         """Log an error message to a file.
