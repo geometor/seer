@@ -105,6 +105,16 @@ class Seer:
         #      self.session.log_error(f"Solve failed: {str(e)}")
         #      raise
 
+    def _convert_grid_to_python(self, grid: Grid) -> str:
+        """
+        Converts a Grid object to a Python list representation string.
+        """
+        grid_str = "[\n"
+        for row in grid.grid:
+            grid_str += "    [" + ", ".join(map(str, row)) + "],\n"
+        grid_str += "]"
+        return grid_str
+
     def _investigate_examples(self, examples, include_images=True):
         """
         investigate all training pairs
@@ -113,8 +123,9 @@ class Seer:
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            input_grid_str = "[\n" + "".join(f"    {str(row)},\n" for row in pair.input.grid) + "]"
-            output_grid_str = "[\n" + "".join(f"    {str(row)},\n" for row in pair.output.grid) + "]"
+            input_grid_str = self._convert_grid_to_python(pair.input)
+            output_grid_str = self._convert_grid_to_python(pair.output)
+
             prompt = [
                 f"""
 ```python
