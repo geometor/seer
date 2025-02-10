@@ -23,6 +23,7 @@ for cumulative understanding and step-by-step solution development.
 """
 
 from rich import print
+from rich.markdown import Markdown
 from datetime import datetime
 from pathlib import Path
 import json
@@ -213,15 +214,27 @@ example_{i}_output = {output_grid_str}
         )
 
     def _display_prompt(self, prompt, instructions):
-        """Displays the prompt and instructions."""
-        print(f"{self.prompt_count} • PROMPT")
-        print("=" * 80)
-
+        """Displays the prompt and instructions using rich.markdown.Markdown."""
+        markdown_text = f"# PROMPT {self.prompt_count}\n\n"
+        markdown_text += "## Prompt\n\n"
         for part in prompt:
-            print(part)
+            markdown_text += str(part) + "\n"
 
+        markdown_text += "\n## Instructions\n\n"
         for part in instructions:
-            print(part)
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print(markdown)
+
+    def _display_response(self, response_parts):
+        """Displays the response using rich.markdown.Markdown."""
+        markdown_text = f"# RESPONSE {self.prompt_count}\n\n"
+        for part in response_parts:
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print(markdown)
 
     def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
@@ -298,10 +311,8 @@ example_{i}_output = {output_grid_str}
                     continue
 
                 # Log the response
-                print(f"{self.prompt_count} • RESPONSE")
-                print("-" * 80)
-                for part in response_parts:
-                    print(part)
+                self._display_response(response_parts)
+
                 history = history + response_parts
 
                 return last_result
