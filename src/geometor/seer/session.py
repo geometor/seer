@@ -142,13 +142,13 @@ class Session:
             f.write("\n")
 
             # Include token totals and timing information
-            if "token_totals" in response:
+            if "token_totals" in response_
                 f.write("Token Totals:\n")
                 f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
                 f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")
                 f.write(f"  Total: {response_data['token_totals']['total']}\n")
                 f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
-            if "timing" in response:
+            if "timing" in response_
                 f.write("Timing:\n")
                 f.write(f"  Response Time: {response_data['timing']['response_time']}s\n")
                 f.write(f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n")
