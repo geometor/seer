@@ -113,12 +113,15 @@ class Seer:
         history = [""]
 
         for i, pair in enumerate(examples, 1):
+            input_grid_str = "[\n" + "".join(f"    {str(row)}\n" for row in pair.input.grid) + "]"
+            output_grid_str = "[\n" + "".join(f"    {str(row)}\n" for row in pair.output.grid) + "]"
+
             prompt = [
                 f"""
 ```python
-example_{i}_input = {str(pair.input.grid)}
+example_{i}_input = {input_grid_str}
 
-example_{i}_output = {str(pair.output.grid)}
+example_{i}_output = {output_grid_str}
 ```
 """
             ]
