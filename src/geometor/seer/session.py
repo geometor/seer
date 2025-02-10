@@ -13,7 +13,7 @@ class Session:
         self.output_dir = Path(config["output_dir"])
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.timestamp = datetime.now().strftime("%y.%j.%H%M%S") # Generate timestamp
+        self.timestamp = datetime.now().strftime("%y.%j.%H%M%S")  # Generate timestamp
 
         self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
@@ -47,7 +47,6 @@ class Session:
             self.task_dir.mkdir(parents=True, exist_ok=True)
             self.seer.solve_task(task)
 
-
     def save_grid_image(self, grid_image, call_count: int, context: str) -> Path:
         """
         Save a grid image with deduplication.
@@ -67,38 +66,44 @@ class Session:
         rel_path = image_path.relative_to(self.task_dir)
         self.image_registry[image_bytes] = rel_path
 
-        #  self.indexer.update_indices()
         return rel_path
 
-
-    def _get_image_count(self, call_count: int) -> int:
-        """
-        Get the next available image number for this call.
-
-        parameters
-        ----------
-
-        """
-        pattern = f"{call_count:03d}-*.png"
-        existing_images = list(self.images_dir.glob(pattern))
-        return len(existing_images) + 1
-
-
     def log_prompt(self, prompt: list, description: str = ""):
-        prompt_file = self.session_dir / "error_log.txt"
+        prompt_file = self.session_dir / "prompt_log.txt"
         with open(prompt_file, "a") as f:
-            f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}")
-            if context:
-                f.write(f"Context: {context}")
-            f.write(" ")
+            f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
+            if description:
+                f.write(f"Description: {description}")
+            f.write("\n")
+            f.write(str(prompt))  # Log the actual prompt
+            f.write("\n")
+
+    def log_task_prompt(self, prompt: list, history: list, call_count: int, description: str = ""):
+        self.prompts_dir = self.task_dir / "prompts"
+        self.prompts_dir.mkdir(parents=True, exist_ok=True)
+        prompt_file = self.prompts_dir / f"{call_count:03d}-prompt.txt"
+        with open(prompt_file, "w") as f:
+            f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
+            if description:
+                f.write(f"Description: {description}\n")
+            f.write("-" * 80)
+            f.write("\n")
+            for part in history:
+                f.write(str(part))
+            f.write("\n")
+            f.write("=" * 80)
+            f.write("\n")
+            for part in prompt:
+                f.write(str(part))
+            f.write("\n")
 
     def log_response(self, response: dict, call_count: int):
+        self.responses_dir = self.task_dir / "responses"
+        self.responses_dir.mkdir(parents=True, exist_ok=True)
         response_file = self.responses_dir / f"{call_count:03d}-response.json"
 
         with open(response_file, "w") as f:
             json.dump(response, f, indent=2)
-
-        #  self.indexer.update_indices()
 
     def log_error(self, error_message: str, context: str = ""):
         """Log an error message to a file.
@@ -113,7 +118,7 @@ class Session:
         """
         error_log_file = self.session_dir / "error_log.txt"
         with open(error_log_file, "a") as f:
-            f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}")
+            f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}\n")
             if context:
-                f.write(f"Context: {context}")
-            f.write(" ")
+                f.write(f"Context: {context}\n")
+            f.write("\n")

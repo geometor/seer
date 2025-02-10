@@ -79,6 +79,9 @@ class Seer:
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
 
+        # Initialize call count
+        self.call_count = 0
+
     def solve_task(
         self,
         task: Puzzle,
@@ -96,9 +99,9 @@ class Seer:
         #  self._run_solution_loop()
 
         #  except Exception as e:
-        #  print(f"Solve failed: {str(e)}")
-        #  self.session.log_error(f"Solve failed: {str(e)}")
-        #  raise
+        #      print(f"Solve failed: {str(e)}")
+        #      self.session.log_error(f"Solve failed: {str(e)}")
+        #      raise
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -173,7 +176,7 @@ example_{i}_output = {str(pair.output.grid)}
 **input**
 
 ```
-{ str(test_pair.input.grid) }
+{str(test_pair.input.grid)}
 ```
 
 **image**
@@ -212,7 +215,7 @@ example_{i}_output = {str(pair.output.grid)}
 
         # write the prompt file
         self.session.log_task_prompt(
-            prompt + instructions, "prompt", self.call_count, description=description
+            prompt, history, self.call_count, description=description
         )
 
         # write history file
@@ -220,7 +223,7 @@ example_{i}_output = {str(pair.output.grid)}
         total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
         history = history + prompt
         #  self.session.log_task_history(
-        #  total_prompt, "history", self.call_count, description=description
+        #      total_prompt, "history", self.call_count, description=description
         #  )
 
         for attempt in range(self.max_iterations):
@@ -257,7 +260,7 @@ example_{i}_output = {str(pair.output.grid)}
                     "response_times": self.response_times.copy(),
                 }
 
-                #  self.session.log_response(response_data, self.call_count)
+                self.session.log_response(response_data, self.call_count)
                 #  print(response_data)
 
                 response_parts = []
@@ -281,7 +284,6 @@ example_{i}_output = {str(pair.output.grid)}
                                 f"```\n{part.code_execution_result.output}\n```\n"
                             )
                         if part.function_call:
-
                             function_call_found = True
                             response_parts.append("function_call:\n")
                             response_parts.append(part.function_call.name + "\n")
@@ -299,13 +301,13 @@ example_{i}_output = {str(pair.output.grid)}
                                 break
 
                 # If functions were provided but no function call was found
-                if functions and not function_call_found and attempt < MAX_RETRIES - 1:
+                if functions and not function_call_found and attempt < self.max_iterations - 1:
                     retry_prompt = total_prompt + [
                         "\nNo function call found in your response. Please provide exactly one function call using the available functions.\n"
                     ]
                     total_prompt = retry_prompt
                     print(
-                        f"\nRetrying function call request (attempt {attempt + 2}/{MAX_RETRIES})"
+                        f"\nRetrying function call request (attempt {attempt + 2}/{self.max_iterations})"
                     )
                     continue
 
@@ -318,16 +320,15 @@ example_{i}_output = {str(pair.output.grid)}
 
                 return last_result
 
-
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
-                self.session.log_error(str(e), prompt)
+                self.session.log_error(str(e), total_prompt)
                 raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.session.log_error(error_msg, prompt)
+        self.session.log_error(error_msg, total_prompt)
         raise MaxRetriesExceededError(error_msg)
 
     def _evaluate_accuracy(self, working_grid: Grid, expected_grid: Grid) -> dict:
