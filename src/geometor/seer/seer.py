@@ -113,9 +113,8 @@ class Seer:
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            input_grid_str = "[\n" + "".join(f"    {str(row)}\n" for row in pair.input.grid) + "]"
-            output_grid_str = "[\n" + "".join(f"    {str(row)}\n" for row in pair.output.grid) + "]"
-
+            input_grid_str = "[\n" + "".join(f"    {str(row)},\n" for row in pair.input.grid) + "]"
+            output_grid_str = "[\n" + "".join(f"    {str(row)},\n" for row in pair.output.grid) + "]"
             prompt = [
                 f"""
 ```python
