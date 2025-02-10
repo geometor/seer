@@ -1,0 +1,49 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_summary: \"The task involves transforming an input grid by expanding colored objects (red and blue in this example) into adjacent white cells with specific colors (yellow for red, orange for blue). Magenta objects remain unchanged.\"\ninput_objects:\n  - type: \"block\"\n    color: 2 # red\n    position: [2, 2]\n  - type: \"block\"\n    color: 6 # magenta\n    position: [5, 6]\n  - type: \"block\"\n    color: 1 # blue\n    position: [7, 3]\noutput_objects:\n  - type: \"block\"\n    color: 2 # red\n    position: [2, 2]\n    expansion:\n      color: 4 # yellow\n      adjacent_positions: [[1, 2], [3, 2], [2, 1], [2, 3]] # up, down, left, right relative to [2,2]\n  - type: \"block\"\n    color: 6 # magenta\n    position: [5, 6] # no change, no expansion\n  - type: \"block\"\n    color: 1 # blue\n    position: [7, 3]\n    expansion:\n      color: 7 # orange\n      adjacent_positions: [[6, 3], [8, 3], [7, 2], [7, 4], [7, 1], [7, 5]] # up, down, left, right relative to [7,3] - actually only up, down, left, right are filled in this example\n\ntransformation_rule: \"For each non-white object in the input grid, expand into adjacent white cells in the output grid with a specific color mapping: red objects expand to yellow, and blue objects expand to orange. Magenta objects do not expand.\"\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by expanding certain colored objects into adjacent white cells.\n\nTransformation Rule:\n1. Initialize the output grid as a copy of the input grid.\n2. Iterate through each cell of the input grid.\n3. If a cell is not white (color 0):\n    a. Identify the color of the cell.\n    b. Determine the expansion color based on the cell's color according to the following mapping:\n        - Red (2) expands to Yellow (4).\n        - Blue (1) expands to Orange (7).\n        - Other non-white colors do not expand in this example (e.g., Magenta (6)).\n    c. For each adjacent cell (up, down, left, right) that is white (0) in the input grid:\n        i. Set the color of the corresponding cell in the output grid to the expansion color.\n4. Return the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform_grid(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n\n    Args:\n        input_grid (list of lists of int): The input grid.\n\n    Returns:\n        list of lists of int: The transformed output grid.\n    \"\"\"\n    input_np = np.array(input_grid)\n    output_np = np.copy(input_np)\n    rows, cols = input_np.shape\n\n    expansion_colors = {\n        2: 4, # red to yellow\n        1: 7  # blue to orange\n    }\n\n    for r in range(rows):\n        for c in range(cols):\n            color = input_np[r, c]\n            if color != 0 and color in expansion_colors:\n                expansion_color = expansion_colors[color]\n                # Define adjacent positions (up, down, left, right)\n                adjacent_positions = [\n                    (r-1, c), (r+1, c), (r, c-1), (r, c+1)\n                ]\n                for adj_r, adj_c in adjacent_positions:\n                    if 0 <= adj_r < rows and 0 <= adj_c < cols and input_np[adj_r, adj_c] == 0:\n                        output_np[adj_r, adj_c] = expansion_color\n    return output_np.tolist()\n\n# Example Usage with provided input and output\nexample_3_input = [[0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 2, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 6, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 1, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0]]\n\nexample_3_output_expected = [[0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 4, 0, 4, 0, 0, 0, 0, 0],\n [0, 0, 2, 0, 0, 0, 0, 0, 0],\n [0, 4, 0, 4, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 0, 0, 0],\n [0, 0, 0, 0, 0, 0, 6, 0, 0],\n [0, 0, 0, 7, 0, 0, 0, 0, 0],\n [0, 0, 7, 1, 7, 0, 0, 0, 0],\n [0, 0, 0, 7, 0, 0, 0, 0, 0]]\n\n\nexample_3_output_actual = transform_grid(example_3_input)\n\nprint(\"Expected Output:\")\nfor row in example_3_output_expected:\n    print(row)\n\nprint(\"\\nActual Output:\")\nfor row in example_3_output_actual:\n    print(row)\n\nassert example_3_output_actual == example_3_output_expected\nprint(\"\\nTest Passed!\")\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1791,
+    "candidates_token_count": 1569,
+    "total_token_count": 3360,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 8683,
+    "candidates": 6453,
+    "total": 15136,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 11.864721,
+    "total_elapsed": 89.992578,
+    "response_times": [
+      9.246841,
+      9.53803,
+      8.468336,
+      50.385223,
+      11.864721
+    ]
+  }
+}

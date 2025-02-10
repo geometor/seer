@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\nobservations:\n  input_grid:\n    colors: [0, 8]\n    objects:\n      - type: block\n        color: 8\n        contiguous: true\n      - type: background\n        color: 0\n  output_grid:\n    colors: [0, 1, 8]\n    objects:\n      - type: block\n        color: 8\n        contiguous: true\n      - type: block\n        color: 1\n        new: true\n        within_object_8: true\n      - type: background\n        color: 0\n  transformation:\n    type: color_change\n    condition: within_contiguous_object_8\n    from_color: 0\n    to_color: 1\n    object_color: 8\n\nnatural_language_program: |\n  The task is to identify contiguous regions of color 8 (azure) in the input grid.\n  Within each of these regions, locate any cells that are currently color 0 (white).\n  Change the color of these color 0 cells to color 1 (blue) if they are enclosed or surrounded by the color 8 region.\n  Cells of color 0 that are not within or enclosed by a color 8 region should remain color 0.\n  Cells of color 8 should remain color 8.\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\nimport numpy as np\n\ndef identify_connected_regions(grid, color):\n    \"\"\"\n    Identifies connected regions of a given color in a grid.\n\n    Args:\n        grid (np.ndarray): The input grid.\n        color (int): The color to identify regions for.\n\n    Returns:\n        list: A list of lists, where each inner list contains the coordinates (row, col)\n              of cells belonging to a connected region of the specified color.\n    \"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                region_cells = []\n                stack = [(r, c)]\n                visited[r, c] = True\n                while stack:\n                    row, col = stack.pop()\n                    region_cells.append((row, col))\n                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]: # 4-connectivity\n                        nr, nc = row + dr, col + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color and not visited[nr, nc]:\n                            visited[nr, nc] = True\n                            stack.append((nr, nc))\n                regions.append(region_cells)\n    return regions\n\ndef is_enclosed_by_region(grid, cell, region_cells):\n    \"\"\"\n    Checks if a cell is enclosed by a given region in the grid.\n\n    Args:\n        grid (np.ndarray): The input grid.\n        cell (tuple): The coordinates (row, col) of the cell to check.\n        region_cells (list): A list of coordinates (row, col) defining the region.\n\n    Returns:\n        bool: True if the cell is enclosed, False otherwise.\n    \"\"\"\n    rows, cols = grid.shape\n    r, c = cell\n\n    if grid[r, c] != 0: # Only check for color 0 cells\n        return False\n\n    region_set = set(region_cells)\n    visited = np.zeros_like(grid, dtype=bool)\n    stack = [(r, c)]\n    visited[r, c] = True\n\n    while stack:\n        row, col = stack.pop()\n        if row == 0 or row == rows - 1 or col == 0 or col == cols - 1:\n            return False # Reached boundary, not enclosed\n\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]: # 4-connectivity\n            nr, nc = row + dr, col + dc\n            if 0 <= nr < rows and 0 <= nc < cols and not visited[nr, nc]:\n                if (nr, nc) not in region_set: # Not part of the region\n                    visited[nr, nc] = True\n                    stack.append((nr, nc))\n    return True # Could not reach boundary without hitting the region, enclosed\n\n\ndef transform_grid(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    Rule: Change color 0 to color 1 if it is enclosed by a contiguous region of color 8.\n\n    Args:\n        input_grid (list of lists): The input grid as a list of lists.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    grid = np.array(input_grid)\n    output_grid = np.copy(grid)\n    azure_regions = identify_connected_regions(grid, 8)\n\n    for region_cells in azure_regions:\n        for r in range(grid.shape[0]):\n            for c in range(grid.shape[1]):\n                if output_grid[r, c] == 0:\n                    if is_enclosed_by_region(grid, (r, c), region_cells):\n                        output_grid[r, c] = 1\n    return output_grid.tolist()\n\n\n# Apply the transformation to the example input\ntransformed_example_output = transform_grid(example_2_input)\n\nassert transformed_example_output == example_2_output\n\nprint(\"Transformation successful on example input.\")\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1655,
+    "candidates_token_count": 1304,
+    "total_token_count": 2959,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3310,
+    "candidates": 2999,
+    "total": 6309,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 16.802678,
+    "total_elapsed": 34.000366,
+    "response_times": [
+      17.047159,
+      16.802678
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\nobservations:\n  - The input grid primarily consists of colors 0 (white) and 8 (azure).\n  - The output grid introduces color 1 (blue) in addition to colors 0 and 8.\n  - Color 1 appears to replace color 0 in the vicinity of color 8 blocks.\n  - There are three distinct, disconnected blocks of color 8 in the input grid.\n  - For each block of color 8, exactly one cell adjacent to it is transformed from color 0 to color 1 in the output.\ntransformation_rule:\n  - Identify all connected components of color 8 in the input grid. Components are defined by 4-way (up, down, left, right) adjacency.\n  - For each connected component of color 8:\n    - For each cell in the component, find its neighboring cells that have color 0 in the input grid.\n    - Compute the intersection of all these sets of 0-neighboring cells for all cells within the current color 8 component.\n    - If this intersection is not empty, choose the cell from the intersection that has the smallest row index. If there's a tie in row indices, choose the one with the smallest column index.\n    - Change the color of this selected cell to 1 in the output grid.\n  - All cells in the output grid that are not modified by the above step retain their original color from the input grid.\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\nThe transformation process involves identifying connected regions of color 8 in the input grid.\nFor each such region, we find the set of cells with color 0 that are neighbors to each cell within the region.\nWe then compute the intersection of these sets of 0-neighboring cells.\nIf this intersection is not empty, we select the cell from this intersection that has the smallest row index,\nand in case of a tie, the smallest column index.\nWe then change the color of this selected cell to 1 in the output grid, while keeping all other cells the same as in the input grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_connected_components(input_grid, color):\n    rows, cols = np.shape(input_grid)\n    visited = np.zeros_like(input_grid, dtype=bool)\n    components = []\n\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == color and not visited[r, c]:\n                component = []\n                queue = [(r, c)]\n                visited[r, c] = True\n                while queue:\n                    row, col = queue.pop(0)\n                    component.append((row, col))\n                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                        nr, nc = row + dr, col + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and input_grid[nr, nc] == color and not visited[nr, nc]:\n                            visited[nr, nc] = True\n                            queue.append((nr, nc))\n                components.append(component)\n    return components\n\ndef get_zero_neighbors(grid, cell):\n    r, c = cell\n    rows, cols = np.shape(grid)\n    neighbors = []\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == 0:\n            neighbors.append((nr, nc))\n    return set(neighbors)\n\ndef transform_grid(input_grid):\n    input_grid_np = np.array(input_grid)\n    output_grid = np.copy(input_grid_np)\n    components = get_connected_components(input_grid_np, 8)\n\n    for component in components:\n        zero_neighbor_sets = []\n        for cell in component:\n            zero_neighbor_sets.append(get_zero_neighbors(input_grid_np, cell))\n\n        if not zero_neighbor_sets:\n            continue\n\n        intersection_neighbors = set.intersection(*zero_neighbor_sets)\n\n        if intersection_neighbors:\n            sorted_neighbors = sorted(list(intersection_neighbors), key=lambda cell: (cell[0], cell[1]))\n            cell_to_change = sorted_neighbors[0]\n            output_grid[cell_to_change[0], cell_to_change[1]] = 1\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1655,
+    "candidates_token_count": 1047,
+    "total_token_count": 2702,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3310,
+    "candidates": 2114,
+    "total": 5424,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000363,
+    "total_elapsed": 71.0918,
+    "response_times": [
+      0.000231,
+      0.000363
+    ]
+  }
+}

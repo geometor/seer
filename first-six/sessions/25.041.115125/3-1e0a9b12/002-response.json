@@ -1,0 +1,51 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_summary: \"Move non-bottom-row objects to the bottom of their respective columns\"\ninput_grid_properties:\n  dimensions: [6, 6]\n  colors: [0, 4, 7, 8, 9]\noutput_grid_properties:\n  dimensions: [6, 6]\n  colors: [0, 4, 7, 8, 9]\ntransformation_rule: \"For each column, move non-zero values from non-bottom rows to the lowest available empty cell in the same column.\"\nobjects:\n  - type: numerical values\n    persistence: yes, values are moved not removed.\npredicates:\n  - is_non_zero: checks if cell value is not zero\n  - is_not_bottom_row: checks if cell is not in the last row\nactions:\n  - move_value_to_bottom_empty_cell: moves a value to the first empty cell from bottom in the same column.\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\ndef transform_grid(input_grid):\n    \"\"\"\n    Natural Language Program:\n    For each column in the input grid, iterate through the cells from top to bottom.\n    If a cell contains a non-zero value and is not in the bottom row, find the\n    first zero cell in the same column in the output grid, searching from bottom to top.\n    If such a zero cell is found and it's not the same as the original cell,\n    move the value from the original cell to the found zero cell in the output grid\n    and set the original cell in the output grid to zero.\n    \"\"\"\n    import copy\n\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = copy.deepcopy(input_grid)\n\n    for j in range(cols): # Iterate through each column\n        for i in range(rows): # Iterate through each row from top to bottom\n            if i < rows - 1: # Check if not in the bottom row\n                if output_grid[i][j] != 0: # Check if non-zero\n                    value_to_move = output_grid[i][j]\n                    output_grid[i][j] = 0 # Set original position to 0 immediately\n                    found_empty_cell = False\n                    for k in range(rows - 1, -1, -1): # Iterate from bottom to top in the same column\n                        if output_grid[k][j] == 0: # Find first zero cell from bottom\n                            output_grid[k][j] = value_to_move\n                            found_empty_cell = True\n                            break\n                    if not found_empty_cell:\n                        # if no empty cell is found below, it means all cells below are non-zero,\n                        # in this case, we should put the value back to the original position as no move is possible in this column.\n                        # however, based on the example, it seems there will always be empty cells in bottom rows.\n                        # For now, we assume there's always an empty cell to move to.\n                        pass # do nothing if no empty cell found below.\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1599,
+    "candidates_token_count": 722,
+    "total_token_count": 2321,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 11793,
+    "candidates": 8107,
+    "total": 19900,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 27.773704,
+    "total_elapsed": 128.391697,
+    "response_times": [
+      9.246841,
+      9.53803,
+      8.468336,
+      50.385223,
+      11.864721,
+      10.47519,
+      27.773704
+    ]
+  }
+}

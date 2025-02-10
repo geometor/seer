@@ -1,0 +1,52 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_summary: \"The task involves transforming a grid by shifting all non-zero elements in each column downwards, effectively applying gravity to the grid column by column.\"\nobservation_summary: |\n  - Input and output grids are of the same size (5x5 in the example).\n  - For each column, the non-zero values in the input grid are collected and moved to the bottom of the column in the output grid, maintaining their original relative order.\n  - Zero values fill the top positions in each column of the output grid.\n  - Effectively, it looks like gravity is applied to each column independently, causing non-zero objects to fall to the lowest possible positions within their respective columns.\ntransformation_rule: \"For each column in the input grid, extract all non-zero numbers from top to bottom, maintaining their order. Then, create a new column of the same height filled with zeros. Finally, place the extracted non-zero numbers at the bottom of this new column, in the same order they were extracted. Replace the original column with this new column in the output grid. Repeat this process for every column.\"\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\nimport numpy as np\n\ndef transform_grid_example_3(input_grid):\n    \"\"\"\n    Transforms the input grid by shifting non-zero elements downwards in each column.\n\n    For each column in the input grid:\n    1. Extract all non-zero values from top to bottom, preserving their order.\n    2. Create a new column of the same height filled with zeros.\n    3. Place the extracted non-zero values at the bottom of the new column, maintaining their order.\n    4. Replace the original column in the input grid with this new column to form the output grid.\n    Repeat this process for every column.\n\n    Args:\n        input_grid (list of lists of int): The input grid.\n\n    Returns:\n        list of lists of int: The transformed output grid.\n    \"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = [[0] * cols for _ in range(rows)]\n\n    for j in range(cols):\n        non_zero_values = []\n        for i in range(rows):\n            if input_grid[i][j] != 0:\n                non_zero_values.append(input_grid[i][j])\n\n        non_zero_count = len(non_zero_values)\n        for i in range(non_zero_count):\n            output_grid[rows - non_zero_count + i][j] = non_zero_values[i]\n\n    return output_grid\n\n# Example usage with the provided input\nexample_3_input = [[0, 0, 0, 1, 0],\n                   [0, 3, 0, 0, 0],\n                   [0, 3, 0, 1, 2],\n                   [6, 0, 0, 0, 0],\n                   [0, 3, 0, 0, 0]]\n\nexample_3_output = transform_grid_example_3(example_3_input)\n\nprint(\"Input Grid:\")\nfor row in example_3_input:\n    print(row)\n\nprint(\"\\nOutput Grid:\")\nfor row in example_3_output:\n    print(row)\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1551,
+    "candidates_token_count": 755,
+    "total_token_count": 2306,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 13344,
+    "candidates": 9341,
+    "total": 22685,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 47.734743,
+    "total_elapsed": 163.943675,
+    "response_times": [
+      17.047159,
+      16.802678,
+      10.463017,
+      14.826045,
+      9.220353,
+      6.790706,
+      40.376554,
+      47.734743
+    ]
+  }
+}

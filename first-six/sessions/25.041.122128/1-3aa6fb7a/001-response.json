@@ -1,0 +1,45 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_context: \"The task is to transform a grid by identifying connected regions of color 8 (azure) and modifying cells adjacent to these regions based on their shape.\"\nobservations:\n  input_grid_structure: \"7x7 grid with values 0, 8\"\n  output_grid_structure: \"7x7 grid with values 0, 1, 8\"\n  color_change: \"Color 8 (azure) regions in the input grid influence the placement of color 1 (blue) in the output grid. Some cells that were 0 in the input become 1 in the output, specifically adjacent to regions of 8.\"\n  transformation_rule: \"For each connected region of color 8 that forms an 'L' shape, cells adjacent to the 'L' are changed to color 1.\"\n  hypothesis: \"For each connected region of color 8, if a cell in the region has a neighbor of color 8 directly below it, and the cell to its right is 0, change the cell to its right to 1. Similarly, if a cell in the region has a neighbor of color 8 directly above it, and the cell to its left is 0, change the cell to its left to 1.\"\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\ndef transform_grid(input_grid):\n  \"\"\"\n  Transforms the input grid based on connected regions of color 8.\n\n  Natural Language Program:\n  1. Identify all connected regions of color 8 in the input grid.\n  2. For each region, iterate through each cell (r, c) in the region.\n  3. For each cell (r, c), check if there is a cell with color 8 at (r+1, c) (directly below) that is also part of the same region.\n  4. If condition in step 3 is true, and if the cell immediately to the right (r, c+1) in the original grid is 0, change the color of cell (r, c+1) to 1 in the output grid.\n  5. For each cell (r, c), check if there is a cell with color 8 at (r-1, c) (directly above) that is also part of the same region.\n  6. If condition in step 5 is true, and if the cell immediately to the left (r, c-1) in the original grid is 0, change the color of cell (r, c-1) to 1 in the output grid.\n  7. Keep all other cells unchanged.\n\n  Args:\n      input_grid: A list of lists representing the input grid.\n\n  Returns:\n      A list of lists representing the transformed output grid.\n  \"\"\"\n  rows = len(input_grid)\n  cols = len(input_grid[0]) if rows > 0 else 0\n  output_grid = [list(row) for row in input_grid] # Create a copy to modify\n\n  def get_connected_regions(grid, color):\n    regions = []\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n\n    def explore_region(r, c, current_region):\n      if r < 0 or r >= rows or c < 0 or c >= cols or visited[r][c] or grid[r][c] != color:\n        return\n      visited[r][c] = True\n      current_region.append((r, c))\n      explore_region(r + 1, c, current_region)\n      explore_region(r - 1, c, current_region)\n      explore_region(r, c + 1, current_region)\n      explore_region(r, c - 1, current_region)\n\n    for r in range(rows):\n      for c in range(cols):\n        if grid[r][c] == color and not visited[r][c]:\n          current_region = []\n          explore_region(r, c, current_region)\n          regions.append(current_region)\n    return regions\n\n  regions_8 = get_connected_regions(input_grid, 8)\n\n  for region in regions_8:\n    for r, c in region:\n      # Check below\n      if (r + 1, c) in region:\n        if c + 1 < cols and output_grid[r][c + 1] == 0:\n          output_grid[r][c + 1] = 1\n      # Check above\n      if (r - 1, c) in region:\n        if c - 1 >= 0 and output_grid[r][c - 1] == 0:\n          output_grid[r][c - 1] = 1\n\n  return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1655,
+    "candidates_token_count": 1067,
+    "total_token_count": 2722,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1655,
+    "candidates": 1067,
+    "total": 2722,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000231,
+    "total_elapsed": 24.546822,
+    "response_times": [
+      0.000231
+    ]
+  }
+}

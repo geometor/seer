@@ -1,0 +1,45 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_description: \"Replace the top-rightmost pixel of each object of color 8 with color 1.\"\ninput_objects:\n  color_8_objects:\n    count: 2\n    description: \"Two distinct objects of color 8 are present.\"\noutput_changes:\n  color_change:\n    target_color: 8\n    new_color: 1\n    rule: \"For each object of color 8, the pixel that is both topmost and rightmost within the object is changed to color 1.\"\n```"
+          },
+          {
+            "text": "\n\n**Natural Language Program:**\n\nThe transformation process involves identifying distinct objects of color 8 within the input grid. For each identified object, we locate the pixel that is simultaneously the topmost (smallest row index) and rightmost (largest column index) within the object's boundaries.  The color of this specific pixel is then changed from 8 to 1 in the output grid. All other pixels and colors in the grid remain unchanged.\n\n"
+          },
+          {
+            "text": "```python\nimport numpy as np\n\ndef solve_task(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    - Identifies objects of color 8.\n    - For each object, finds the top-most and right-most cell.\n    - Changes the color of that cell to 1.\n\n    Args:\n        input_grid (list of lists of int): The input grid.\n\n    Returns:\n        list of lists of int: The transformed output grid.\n    \"\"\"\n\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = [row[:] for row in input_grid]  # Create a copy to modify\n\n    color_to_find = 8\n    replacement_color = 1\n\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n\n    def get_neighbors(r, c):\n        neighbors = []\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]: #, (1, 1), (1, -1), (-1, 1), (-1, -1)]: only consider orthogonal neighbors\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols:\n                neighbors.append((nr, nc))\n        return neighbors\n\n    def find_objects(r, c, current_object):\n        if r < 0 or r >= rows or c < 0 or c >= cols or visited[r][c] or input_grid[r][c] != color_to_find:\n            return\n\n        visited[r][c] = True\n        current_object.append((r, c))\n\n        for nr, nc in get_neighbors(r, c):\n            find_objects(nr, nc, current_object)\n\n\n    objects = []\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r][c] == color_to_find and not visited[r][c]:\n                current_object = []\n                find_objects(r, c, current_object)\n                objects.append(current_object)\n\n    for obj in objects:\n        if not obj:\n            continue # should not happen, but to be safe\n        top_row = min(r for r, c in obj)\n        top_right_cell = None\n        max_col_for_top_row = -1\n\n        for r, c in obj:\n            if r == top_row:\n                if c > max_col_for_top_row:\n                    max_col_for_top_row = c\n                    top_right_cell = (r,c)\n\n        if top_right_cell:\n            tr_r, tr_c = top_right_cell\n            output_grid[tr_r][tr_c] = replacement_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1655,
+    "candidates_token_count": 900,
+    "total_token_count": 2555,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1655,
+    "candidates": 900,
+    "total": 2555,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 9.246841,
+    "total_elapsed": 9.299066,
+    "response_times": [
+      9.246841
+    ]
+  }
+}

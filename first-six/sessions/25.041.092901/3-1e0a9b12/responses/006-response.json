@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_context: \"The task involves transforming a grid by moving all non-zero numbers to the last row, maintaining their order from left to right.\"\ntransformation_rule: \"Move all non-zero numbers from the input grid to the last row of the output grid, preserving their order. Fill the rest of the output grid with zeros.\"\ninput_objects:\n  - grid: \"A 2D array of integers representing colors.\"\n  - non_zero_numbers: \"Integers greater than 0 in the input grid.\"\noutput_objects:\n  - grid: \"A transformed 2D array where non-zero numbers are relocated to the last row.\"\n  - zero_grid: \"The grid initialized with zeros before placing the non-zero numbers.\"\npredicates:\n  - non-zero: \"Checks if a number is not equal to zero.\"\n  - last_row: \"Identifies the last row of the grid.\"\nactions:\n  - extract: \"Collect all non-zero numbers from the input grid.\"\n  - relocate: \"Place the extracted non-zero numbers in the last row of the output grid, maintaining order.\"\n  - initialize: \"Create a grid filled with zeros.\"\n```"
+          },
+          {
+            "text": "\n\n**Natural Language Program:**\n\nThe transformation rule is to collect all non-zero numbers from the input grid, row by row from top to bottom, and within each row from left to right. Then, create an output grid of the same size as the input grid, initialized with all zeros. Finally, place the collected non-zero numbers into the last row of the output grid, from left to right, maintaining their original order.\n\n"
+          },
+          {
+            "text": "```python\nimport numpy as np\n\ndef transform_grid(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero numbers to the last row,\n    preserving their order.\n\n    Natural Language Program:\n    1. Initialize an empty list to store non-zero numbers from the input grid.\n    2. Iterate through the input grid row by row, and then cell by cell.\n    3. If a cell value is not zero, append it to the list.\n    4. Create a new output grid with the same dimensions as the input grid, filled with zeros initially.\n    5. Fill the last row of the output grid with the non-zero numbers collected in step 3, from left to right.\n       If there are fewer non-zero numbers than the width of the grid, the remaining cells in the last row will remain zero.\n\n    Args:\n        input_grid (list of lists of int): The input grid.\n\n    Returns:\n        list of lists of int: The transformed output grid.\n    \"\"\"\n    non_zero_numbers = []\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n\n    # 1. & 2. Extract non-zero numbers in order\n    for row in input_grid:\n        for cell in row:\n            if cell != 0:\n                non_zero_numbers.append(cell)\n\n    # 3. Initialize output grid with zeros\n    output_grid = [[0 for _ in range(cols)] for _ in range(rows)]\n\n    # 4. Fill the last row with non-zero numbers\n    last_row_index = rows - 1\n    for i in range(min(cols, len(non_zero_numbers))): # handle cases where there are more non-zero numbers than columns\n        output_grid[last_row_index][i] = non_zero_numbers[i]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1511,
+    "candidates_token_count": 793,
+    "total_token_count": 2304,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 10194,
+    "candidates": 7175,
+    "total": 17369,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 6.790706,
+    "total_elapsed": 75.673534,
+    "response_times": [
+      17.047159,
+      16.802678,
+      10.463017,
+      14.826045,
+      9.220353,
+      6.790706
+    ]
+  }
+}
