@@ -61,7 +61,6 @@ class Seer:
             self.task_context = f.read().strip()
 
         self.max_iterations = config["max_iterations"]
-        self.call_count = 0
         self.current_iteration = 0
 
         # Initialize GeminiClient
@@ -97,9 +96,9 @@ class Seer:
         #  self._run_solution_loop()
 
         #  except Exception as e:
-            #  print(f"Solve failed: {str(e)}")
-            #  self.session.log_error(f"Solve failed: {str(e)}")
-            #  raise
+        #  print(f"Solve failed: {str(e)}")
+        #  self.session.log_error(f"Solve failed: {str(e)}")
+        #  raise
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -127,9 +126,9 @@ example_{i}_output = {str(pair.output.grid)}
                 )
                 prompt.extend(
                     [
-                        "\nimages\n\ninput\n",
+                        "\n**images**\n\ninput:\n",
                         pair.input.to_image(),
-                        "\noutput\n",
+                        "\noutput:\n",
                         pair.output.to_image(),
                         "\n",
                     ]
@@ -212,9 +211,9 @@ example_{i}_output = {str(pair.output.grid)}
             print(part)
 
         # write the prompt file
-        #  self.session.log_task_prompt(
-        #  prompt + instructions, "prompt", self.call_count, description=description
-        #  )
+        self.session.log_task_prompt(
+            prompt + instructions, "prompt", self.call_count, description=description
+        )
 
         # write history file
         total_prompt = []
@@ -282,11 +281,6 @@ example_{i}_output = {str(pair.output.grid)}
                                 f"```\n{part.code_execution_result.output}\n```\n"
                             )
                         if part.function_call:
-                            #  if function_call_found:
-                            #  # More than one function call found - this should trigger a retry
-                            #  raise MultipleFunctionCallsError(
-                            #  "Multiple function calls detected"
-                            #  )
 
                             function_call_found = True
                             response_parts.append("function_call:\n")
@@ -322,39 +316,8 @@ example_{i}_output = {str(pair.output.grid)}
                     print(part)
                 history = history + response_parts
 
-                #  print(response_parts)
-                #  self.session.log_response(
-                    #  response_parts,
-                    #  "response",
-                    #  self.call_count,
-                    #  {
-                        #  "current": metadata,
-                        #  "totals": self.token_counts,
-                        #  "timing": {
-                            #  "response_time": response_time,
-                            #  "total_elapsed": total_elapsed,
-                        #  },
-                        #  "model": self.model_name,
-                    #  },
-                    #  description=description,
-                #  )
-
                 return last_result
 
-            except MultipleFunctionCallsError as e:
-                if attempt < MAX_RETRIES - 1:
-                    retry_prompt = total_prompt + [
-                        "\nPlease provide exactly one function call in your response.\n"
-                    ]
-                    total_prompt = retry_prompt
-                    print(
-                        f"\nRetrying due to multiple function calls (attempt {attempt + 2}/{MAX_RETRIES})"
-                    )
-                    continue
-                else:
-                    print(f"\nERROR: {str(e)} - Max retries exceeded")
-                    self.session.log_error(str(e), prompt)
-                    raise
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
