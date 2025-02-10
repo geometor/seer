@@ -68,7 +68,6 @@ class Session:
 
         return rel_path
 
-
     def log_prompt(self, prompt: list, instructions: list, prompt_count: int, description: str = ""):
         prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.md"
         with open(prompt_file, "w") as f:
@@ -86,14 +85,50 @@ class Session:
                 f.write(str(part))
             f.write("\n")
 
-
     def log_response(self, response: dict, prompt_count: int):
         response_file = self.task_dir / f"{prompt_count:03d}-response.json"
-
         with open(response_file, "w") as f:
             json.dump(response, f, indent=2)
 
-        # now unpack the response and write the elements to a markdown file AI!
+        # Unpack the response and write elements to a markdown file
+        response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
+        with open(response_md_file, "w") as f:
+            f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
+            f.write("-" * 80 + "\n")
+
+            if "candidates" in response:
+                for candidate in response["candidates"]:
+                    if "content" in candidate:
+                        if "parts" in candidate["content"]:
+                            for part in candidate["content"]["parts"]:
+                                if "text" in part:
+                                    f.write(part["text"] + "\n")
+                                if "function_call" in part:
+                                    f.write("Function Call:\n")
+                                    f.write(
+                                        f"`{part['function_call']['name']}({json.dumps(part['function_call']['args'])})`\n"
+                                    )
+                                if "executable_code" in part:
+                                     f.write("Executable Code:\n")
+                                     f.write(f"```python\n{part['executable_code']['code']}\n```\n")
+                                if "code_execution_result" in part:
+                                     f.write("Code Execution Result:\n")
+                                     f.write(f"Outcome: {part['code_execution_result']['outcome']}\n")
+                                     f.write(f"```\n{part['code_execution_result']['output']}\n```\n")
+
+            f.write("\n")
+
+            # Include token totals and timing information
+            if "token_totals" in response:
+                f.write("Token Totals:\n")
+                f.write(f"  Prompt: {response['token_totals']['prompt']}\n")
+                f.write(f"  Candidates: {response['token_totals']['candidates']}\n")
+                f.write(f"  Total: {response['token_totals']['total']}\n")
+                f.write(f"  Cached: {response['token_totals']['cached']}\n")
+            if "timing" in response:
+                f.write("Timing:\n")
+                f.write(f"  Response Time: {response['timing']['response_time']}s\n")
+                f.write(f"  Total Elapsed: {response['timing']['total_elapsed']}s\n")
 
     def log_error(self, error_message: str, context: str = ""):
         """Log an error message to a file.
