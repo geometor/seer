@@ -82,8 +82,8 @@ class Seer:
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
 
-        # Initialize call count
-        self.call_count = 0
+        # Initialize prompt count
+        self.prompt_count = 0
 
     def solve_task(
         self,
@@ -93,7 +93,7 @@ class Seer:
         Main method to orchestrate the task solving workflow.
         Returns the working grid if solution is found, None otherwise.
         """
-        self.call_count = 0  # Reset call count for each task
+        self.prompt_count = 0  # Reset prompt count for each task
         history = [""]
 
         self._investigate_examples(task.train)
@@ -126,10 +126,10 @@ example_{i}_output = {str(pair.output.grid)}
             ]
             if include_images:
                 self.session.save_grid_image(
-                    pair.input.to_image(), self.call_count, f"example_{i}_input"
+                    pair.input.to_image(), self.prompt_count, f"example_{i}_input"
                 )
                 self.session.save_grid_image(
-                    pair.output.to_image(), self.call_count, f"example_{i}_output"
+                    pair.output.to_image(), self.prompt_count, f"example_{i}_output"
                 )
                 prompt.extend(
                     [
@@ -171,7 +171,7 @@ example_{i}_output = {str(pair.output.grid)}
         """
         test_pair = self.task.test[0]
         self.session.save_grid_image(
-            test_pair.input.to_image(), self.call_count, f"test_input"
+            test_pair.input.to_image(), self.prompt_count, f"test_input"
         )
         history = [""]
         instructions = [""]
@@ -207,9 +207,9 @@ example_{i}_output = {str(pair.output.grid)}
         """
         Generate content from the model with standardized logging and function call handling.
         """
-        self.call_count += 1
+        self.prompt_count += 1
 
-        print(f"{self.call_count} • PROMPT")
+        print(f"{self.prompt_count} • PROMPT")
         print("=" * 80)
 
         for part in prompt:
@@ -221,7 +221,7 @@ example_{i}_output = {str(pair.output.grid)}
 
         # write the prompt file
         self.session.log_task_prompt(
-            prompt, history, self.call_count, description=description
+            prompt, history, self.prompt_count, description=description
         )
 
         # write history file
@@ -229,7 +229,7 @@ example_{i}_output = {str(pair.output.grid)}
         total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
         history = history + prompt
         #  self.session.log_task_history(
-        #      total_prompt, "history", self.call_count, description=description
+        #      total_prompt, "history", self.prompt_count, description=description
         #  )
 
         for attempt in range(self.max_iterations):
@@ -266,7 +266,7 @@ example_{i}_output = {str(pair.output.grid)}
                     "response_times": self.response_times.copy(),
                 }
 
-                self.session.log_response(response_data, self.call_count)
+                self.session.log_response(response_data, self.prompt_count)
                 #  print(response_data)
 
                 response_parts = []
@@ -318,7 +318,7 @@ example_{i}_output = {str(pair.output.grid)}
                     continue
 
                 # Log the response
-                print(f"{self.call_count} • RESPONSE")
+                print(f"{self.prompt_count} • RESPONSE")
                 print("-" * 80)
                 for part in response_parts:
                     print(part)

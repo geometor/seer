@@ -47,7 +47,7 @@ class Session:
             self.task_dir.mkdir(parents=True, exist_ok=True)
             self.seer.solve_task(task)
 
-    def save_grid_image(self, grid_image, call_count: int, context: str) -> Path:
+    def save_grid_image(self, grid_image, prompt_count: int, context: str) -> Path:
         """
         Save a grid image with deduplication.
         """
@@ -58,7 +58,7 @@ class Session:
             return self.image_registry[image_bytes]
 
         # Create new file if image hasn't been saved before
-        filename = f"{call_count:03d}-{context}.png"
+        filename = f"{prompt_count:03d}-{context}.png"
         image_path = self.task_dir / filename
         grid_image.save(image_path)
 
@@ -78,10 +78,8 @@ class Session:
             f.write(str(prompt))  # Log the actual prompt
             f.write("\n")
 
-    def log_task_prompt(self, prompt: list, history: list, call_count: int, description: str = ""):
-        self.prompts_dir = self.task_dir / "prompts"
-        self.prompts_dir.mkdir(parents=True, exist_ok=True)
-        prompt_file = self.prompts_dir / f"{call_count:03d}-prompt.txt"
+    def log_task_prompt(self, prompt: list, history: list, prompt_count: int, description: str = ""):
+        prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.txt"
         with open(prompt_file, "w") as f:
             f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
             if description:
@@ -97,10 +95,9 @@ class Session:
                 f.write(str(part))
             f.write("\n")
 
-    def log_response(self, response: dict, call_count: int):
-        self.responses_dir = self.task_dir / "responses"
-        self.responses_dir.mkdir(parents=True, exist_ok=True)
-        response_file = self.responses_dir / f"{call_count:03d}-response.json"
+
+    def log_response(self, response: dict, prompt_count: int):
+        response_file = self.task_dir / f"{prompt_count:03d}-response.json"
 
         with open(response_file, "w") as f:
             json.dump(response, f, indent=2)
