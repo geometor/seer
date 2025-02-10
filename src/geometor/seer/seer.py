@@ -223,7 +223,7 @@ example_{i}_output = {str(pair.output.grid)}
         self._display_prompt(prompt, instructions)
 
         # let's have one log_prompt function in session - it should include instructions instead of history AI!
-        self.session.log_task_prompt(
+        self.session.log_prompt(
             prompt, instructions, self.prompt_count, description=description
         )  # Pass instructions
 
