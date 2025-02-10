@@ -33,7 +33,7 @@ from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
 
-#  from geometor.seer.session import Session
+# from geometor.seer.session import Session
 
 
 class Seer:
@@ -201,6 +201,17 @@ example_{i}_output = {str(pair.output.grid)}
             description=f"test input",
         )
 
+    def _display_prompt(self, prompt, instructions):
+        """Displays the prompt and instructions."""
+        print(f"{self.prompt_count} • PROMPT")
+        print("=" * 80)
+
+        for part in prompt:
+            print(part)
+
+        for part in instructions:
+            print(part)
+
     def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
     ):
@@ -209,29 +220,18 @@ example_{i}_output = {str(pair.output.grid)}
         """
         self.prompt_count += 1
 
-        # move these print functions to display prompt function AI!
-        print(f"{self.prompt_count} • PROMPT")
-        print("=" * 80)
-
-        for part in prompt:
-            print(part)
-
-        #  instructions.insert(0, "\nINSTRUCTIONS:\n\n")
-        for part in instructions:
-            print(part)
+        self._display_prompt(prompt, instructions)
 
         # let's have one log_prompt function in session - it should include instructions instead of history AI!
         self.session.log_task_prompt(
-            prompt, history, self.prompt_count, description=description
-        )
+            prompt, instructions, self.prompt_count, description=description
+        )  # Pass instructions
 
         # write history file
         total_prompt = []
         total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
         history = history + prompt
-        #  self.session.log_task_history(
-        #      total_prompt, "history", self.prompt_count, description=description
-        #  )
+        # Removed the separate history logging
 
         for attempt in range(self.max_iterations):
             try:
