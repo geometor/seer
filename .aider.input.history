@@ -16,3 +16,141 @@
 
 # 2025-02-09 19:28:08.247652
 +let's simplify the function call logic and `MultipleFunctionCallsError`
+
+# 2025-02-10 04:02:27.284626
++n
+
+# 2025-02-10 04:09:26.797493
++/add src/*
+
+# 2025-02-10 04:12:45.184970
++/ask I am still struggling with a bunch of code from our port from the geometor.arcprize project. provide recommendations to cleaning and refactoring.
+
+# 2025-02-10 07:36:27.012360
++d
+
+# 2025-02-10 07:36:58.411405
++/add src/*
+
+# 2025-02-10 09:24:48.434663
++we need to update our log methods in Session, they were cobbled together and have many errors. we also need to update Seer to call these functions from the right places.
+
+# 2025-02-10 09:25:57.924464
++d
+
+# 2025-02-10 09:26:09.510646
++n
+
+# 2025-02-10 09:53:03.905476
++/save
+
+# 2025-02-10 09:53:18.131952
++/save seercode.txt
+
+# 2025-02-10 09:54:11.619882
++D
+
+# 2025-02-10 09:55:14.180984
++/load seercode.txt
+
+# 2025-02-10 11:19:41.146453
++ok - let's start working on `_generate_content` - a few things to start with - first rename to `_generate` and update everywhere - next the call_count should be reset for each task
+
+# 2025-02-10 11:40:03.854669
++let's rename call_count to prompt_count - and this applies to the total number of prompts called to solve the problem - this is also the index for the files - session files should all be in the task folder, remove the prompt and response folders
+
+# 2025-02-10 11:40:56.414280
++d
+
+# 2025-02-10 11:50:08.688170
++check comments in seer
+
+# 2025-02-10 12:01:19.291947
++follow instructions in session
+
+# 2025-02-10 12:06:00.225121
++/ask - `_generate` and log_response are doing a lot of the same things - perhaps a place to help reduce `_generate` is to move all the metrics processing to `log_response`
+
+# 2025-02-10 12:07:12.669514
++do it
+
+# 2025-02-10 12:19:09.927710
++the response.md from log_response are empty after the banner
+
+# 2025-02-10 12:22:55.138497
++n
+
+# 2025-02-10 12:23:21.031894
++/editor
+
+# 2025-02-10 12:26:28.686152
++when the grids are written in the example prompt - they are not in actual python
++
++and let's wrap the all the rows with he same indent after the first bracket
++
++```python
++example_1_input = [[0 0 0 0 0 0 0]
++ [0 8 0 0 0 0 0]
++ [0 8 8 0 0 0 0]
++ [0 0 0 0 8 8 0]
++ [0 0 0 0 0 8 0]
++ [0 0 0 0 0 0 0]
++ [0 0 0 0 0 0 0]]
++
++example_1_output = [[0 0 0 0 0 0 0]
++ [0 8 1 0 0 0 0]
++ [0 8 8 0 0 0 0]
++ [0 0 0 0 8 8 0]
++ [0 0 0 0 1 8 0]
++ [0 0 0 0 0 0 0]
++ [0 0 0 0 0 0 0]]
++```
++so - we should construct the output of the grid in the prompt construction
+
+# 2025-02-10 12:39:31.852186
++D
+
+# 2025-02-10 12:39:40.557200
++when the grids are written in the example prompt - they are not in actual python
++
++and let's wrap the all the rows with he same indent after the first bracket
++
++```python
++example_1_input = [[0 0 0 0 0 0 0]
++ [0 8 0 0 0 0 0]
++ [0 8 8 0 0 0 0]
++ [0 0 0 0 8 8 0]
++ [0 0 0 0 0 8 0]
++ [0 0 0 0 0 0 0]
++ [0 0 0 0 0 0 0]]
++
++example_1_output = [[0 0 0 0 0 0 0]
++ [0 8 1 0 0 0 0]
++ [0 8 8 0 0 0 0]
++ [0 0 0 0 8 8 0]
++ [0 0 0 0 1 8 0]
++ [0 0 0 0 0 0 0]
++ [0 0 0 0 0 0 0]]
++```
++so - we should construct the output of the grid in the prompt construction
+
+# 2025-02-10 12:45:34.645928
++better but the grid should look like this:
+
+# 2025-02-10 12:47:58.277205
++/editor 
+
+# 2025-02-10 12:49:34.451424
++create a function `_convert_grid_to_python` like below:
++
++```
++example_2_input = [
++    [0, 0, 0, 0, 8, 8, 0],
++    [0, 0, 0, 0, 0, 8, 0],
++    [0, 0, 8, 0, 0, 0, 0],
++    [0, 0, 8, 8, 0, 0, 0],
++    [0, 0, 0, 0, 0, 0, 0],
++    [0, 0, 0, 0, 8, 0, 0],
++    [0, 0, 0, 8, 8, 0, 0]
++]
++```

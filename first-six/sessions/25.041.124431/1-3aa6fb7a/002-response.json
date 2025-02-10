@@ -1,0 +1,52 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\nobservations:\n  input_grid:\n    shape: (7, 7)\n    colors: [0, 8]\n    objects_color_8:\n      - type: line\n        positions: [(0, 4), (0, 5), (1, 5)]\n      - type: line\n        positions: [(2, 2), (3, 2), (3, 3)]\n      - type: single_cell\n        positions: [(5, 4)]\n      - type: line\n        positions: [(6, 3), (6, 4)]\n  output_grid:\n    shape: (7, 7)\n    colors: [0, 1, 8]\n    objects_color_8_and_1:\n      - type: line_modified\n        positions: [(0, 4), (0, 5), (1, 5)] # No change\n      - type: line_modified\n        positions: [(2, 2), (3, 2), (3, 3), (2,3)] # Cell (2,3) changed from 8 to 1\n      - type: single_cell_modified\n        positions: [(5, 4), (5, 3)] # Cell (5,3) changed from 0 to 1? No, from 8 to 1, my mistake in initial observation.\n      - type: line_modified\n        positions: [(6, 3), (6, 4)] # No change\n    changes:\n      - from: 8\n        to: 1\n        positions: [(2, 3), (5, 3)] # Assuming (5,3) because (5,4) is still 8. Double check!\n\nnatural_language_program: |\n  The transformation rule operates on objects of color 8 (azure).\n  For each object of color 8, identify if it is a line of length 2 or more.\n  If an object of color 8 is a line and has a neighbor cell with color 0 (white) that is adjacent (horizontally or vertically),\n  change the neighbor cell to color 1 (blue).\n  Specifically, it looks like it's changing the cell immediately to the left of the vertical line segment of color 8 if that cell is color 0.\n\npython_implementation:\n```"
+          },
+          {
+            "text": "python\nimport numpy as np\n\ndef transform_grid(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule.\n    Rule: For each object of color 8, if it's a vertical line segment of length 2 or more,\n          and there is a white (0) cell immediately to its left, change that white cell to blue (1).\n    \"\"\"\n    grid = np.array(input_grid)\n    output_grid = np.copy(grid)\n    rows, cols = grid.shape\n\n    # Find objects of color 8 (azure)\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 8:\n                # Check for vertical line segment of length 2 or more starting at (r, c)\n                if r + 1 < rows and grid[r+1, c] == 8:\n                    line_length = 0\n                    line_positions = []\n                    current_r = r\n                    while current_r < rows and grid[current_r, c] == 8:\n                        line_length += 1\n                        line_positions.append((current_r, c))\n                        current_r += 1\n\n                    if line_length >= 2:\n                        # Check cell to the left\n                        left_c = c - 1\n                        if left_c >= 0:\n                            for line_r, line_c in line_positions:\n                                if output_grid[line_r, left_c] == 0:\n                                    output_grid[line_r, left_c] = 1\n    return output_grid.tolist()\n\n\nexample_2_input = [\n    [0, 0, 0, 0, 8, 8, 0],\n    [0, 0, 0, 0, 0, 8, 0],\n    [0, 0, 8, 0, 0, 0, 0],\n    [0, 0, 8, 8, 0, 0, 0],\n    [0, 0, 0, 0, 0, 0, 0],\n    [0, 0, 0, 0, 8, 0, 0],\n    [0, 0, 0, 8, 8, 0, 0]\n]\n\nexample_2_output_expected = [\n    [0, 0, 0, 0, 8, 8, 0],\n    [0, 0, 0, 0, 1, 8, 0],\n    [0, 0, 8, 1, 0, 0, 0],\n    [0, 0, 8, 8, 0, 0, 0],\n    [0, 0, 0, 0, 0, 0, 0],\n    [0, 0, 0, 1, 8, 0, 0],\n    [0, 0, 0, 8, 8, 0, 0]\n]\n\n\nexample_2_output_predicted = transform_grid(example_2_input)\n\nassert example_2_output_predicted == example_2_output_expected, \"Output does not match expected output\"\nprint(\"Test passed!\")\n"
+          },
+          {
+            "text": "```\n```"
+          },
+          {
+            "text": "tool_code\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport matplotlib.image as mpimg\n\ndef display_grids(input_grid, output_grid):\n    \"\"\"Displays the input and output grids as images.\"\"\"\n    cmap = {\n        0: [238/255, 238/255, 238/255, 1],  # white\n        1: [30/255, 147/255, 255/255, 1],   # blue\n        2: [220/255, 50/255, 40/255, 1],    # red\n        3: [79/255, 204/255, 48/255, 1],    # green\n        4: [230/255, 200/255, 0/255, 1],    # yellow\n        5: [85/255, 85/255, 85/255, 1],     # gray\n        6: [229/255, 58/255, 163/255, 1],   # magenta\n        7: [230/255, 120/255, 20/255, 1],   # orange\n        8: [135/255, 216/255, 241/255, 1],  # azure\n        9: [146/255, 18/255, 49/255, 1]     # maroon\n    }\n    color_list = [cmap[i] for i in range(10)]\n    my_cmap = plt.cm.colors.ListedColormap(color_list)\n\n    fig, axes = plt.subplots(1, 2)\n\n    axes[0].imshow(input_grid, cmap=my_cmap, vmin=0, vmax=9)\n    axes[0].set_title('Input Grid')\n    axes[0].grid(False)\n    axes[0].set_xticks([])\n    axes[0].set_yticks([])\n\n    axes[1].imshow(output_grid, cmap=my_cmap, vmin=0, vmax=9)\n    axes[1].set_title('Output Grid')\n    axes[1].grid(False)\n    axes[1].set_xticks([])\n    axes[1].set_yticks([])\n\n    plt.tight_layout()\n    plt.show()\n\nexample_2_input_np = np.array(example_2_input)\nexample_2_output_predicted_np = np.array(example_2_output_predicted)\n\ndisplay_grids(example_2_input_np, example_2_output_predicted_np)\n\n\ninput_image = mpimg.imread('input_file_0.jpeg')\noutput_image = mpimg.imread('input_file_1.jpeg')\n\ndisplay_grids(input_image, output_image)\n"
+          },
+          {
+            "text": "```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1677,
+    "candidates_token_count": 2039,
+    "total_token_count": 3716,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3354,
+    "candidates": 3535,
+    "total": 6889,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000471,
+    "total_elapsed": 26.336981,
+    "response_times": [
+      0.000345,
+      0.000471
+    ]
+  }
+}

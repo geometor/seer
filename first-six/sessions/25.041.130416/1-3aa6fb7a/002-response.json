@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_summary: \"Transform grid by adding color 1 cells adjacent to color 8 objects\"\ninput_grid_properties:\n  colors_present: [0, 8]\n  object_color_8_count: 4\noutput_grid_properties:\n  colors_present: [0, 1, 8]\n  added_color_1_cells_count: 3\ntransformation_rule: \"For each connected component of color 8, for each cell (r, c) in the component, if grid[r][c-1] is 0 (within bounds), set output[r][c-1] = 1; if grid[r][c+1] is 0 (within bounds), set output[r][c+1] = 1.\"\n```"
+          },
+          {
+            "text": "\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\nFor each connected region of color 8 in the input grid,\niterate through each cell of the region.\nFor each cell (r, c) in the region, check the cell immediately to its left (r, c-1) and right (r, c+1).\nIf the left cell is within the grid boundaries and has color 0,\nchange the corresponding cell in the output grid to color 1.\nSimilarly, if the right cell is within the grid boundaries and has color 0,\nchange the corresponding cell in the output grid to color 1.\n\"\"\"\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef identify_color_objects(grid, color):\n    \"\"\"\n    Identifies connected components of a given color in the grid.\n\n    Args:\n        grid (list of lists): Input grid.\n        color (int): Color to identify objects for.\n\n    Returns:\n        tuple: Labeled array and number of objects.\n    \"\"\"\n    labeled_grid, num_objects = label(np.array(grid) == color)\n    return labeled_grid, num_objects\n\ndef transform_grid_example_2(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule described in the docstring.\n\n    Args:\n        input_grid (list of lists): Input grid.\n\n    Returns:\n        list of lists: Output grid.\n    \"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = [row[:] for row in input_grid] # Create a copy\n\n    labeled_grid, num_objects = identify_color_objects(input_grid, 8)\n\n    for object_index in range(1, num_objects + 1):\n        object_cells = np.argwhere(labeled_grid == object_index)\n        for r, c in object_cells:\n            # Check left neighbor\n            if c > 0 and input_grid[r][c - 1] == 0:\n                output_grid[r][c - 1] = 1\n            # Check right neighbor\n            if c < cols - 1 and input_grid[r][c + 1] == 0:\n                output_grid[r][c + 1] = 1\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1761,
+    "candidates_token_count": 710,
+    "total_token_count": 2471,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3522,
+    "candidates": 710,
+    "total": 4232,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000382,
+    "total_elapsed": 51.811363,
+    "response_times": [
+      0.000787,
+      0.000382
+    ]
+  }
+}
