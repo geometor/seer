@@ -34,6 +34,11 @@ class Session:
             session=self,
         )
 
+        # Log the configuration
+        with open(self.session_dir / "config.json", "w") as f:
+            json.dump(config, f, indent=2)
+
+
     def _write_context_files(self, system_context_file: str, task_context_file: str):
         """Write system and task context to files in the session directory."""
         with open(system_context_file, "r") as f:
