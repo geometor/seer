@@ -5,10 +5,10 @@ with LLMs, focusing on building understanding before attempting solutions.
 
 The solver follows a systematic process:
 
-1. Examine training examples individually
-2. Build comprehensive observations
-3. Validate understanding through pre-testing
-4. Implement solution through standard operations
+1.  Examine training examples individually
+2.  Build comprehensive observations
+3.  Validate understanding through pre-testing
+4.  Implement solution through standard operations
 
 Key Features:
 
@@ -32,8 +32,6 @@ import os
 from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
-
-# from geometor.seer.session import Session
 
 
 class Seer:
@@ -222,53 +220,21 @@ example_{i}_output = {str(pair.output.grid)}
 
         self._display_prompt(prompt, instructions)
 
-        # let's have one log_prompt function in session - it should include instructions instead of history AI!
         self.session.log_prompt(
             prompt, instructions, self.prompt_count, description=description
-        )  # Pass instructions
+        )
 
-        # write history file
-        total_prompt = []
         total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
         history = history + prompt
-        # Removed the separate history logging
 
         for attempt in range(self.max_iterations):
             try:
-                response_start = datetime.now()
                 response = self.nlp_client.generate_content(
                     total_prompt,
                     tools=tools,
                 )
-                response_end = datetime.now()
-                response_time = (response_end - response_start).total_seconds()
 
-                # Update timing metadata
-                self.response_times.append(response_time)
-                total_elapsed = (response_end - self.start_time).total_seconds()
-
-                # Update token counts immediately
-                metadata = response.to_dict().get("usage_metadata", {})
-                self.token_counts["prompt"] += metadata.get("prompt_token_count", 0)
-                self.token_counts["candidates"] += metadata.get(
-                    "candidates_token_count", 0
-                )
-                self.token_counts["total"] += metadata.get("total_token_count", 0)
-                self.token_counts["cached"] += metadata.get(
-                    "cached_content_token_count", 0
-                )
-
-                # Save response with current totals
-                response_data = response.to_dict()
-                response_data["token_totals"] = self.token_counts.copy()
-                response_data["timing"] = {
-                    "response_time": response_time,
-                    "total_elapsed": total_elapsed,
-                    "response_times": self.response_times.copy(),
-                }
-
-                self.session.log_response(response_data, self.prompt_count)
-                #  print(response_data)
+                self.session.log_response(response, self.prompt_count)  # Pass raw response
 
                 response_parts = []
                 function_call_found = False

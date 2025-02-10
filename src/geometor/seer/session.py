@@ -85,10 +85,33 @@ class Session:
                 f.write(str(part))
             f.write("\n")
 
-    def log_response(self, response: dict, prompt_count: int):
+    def log_response(self, response, prompt_count: int):
+        response_start = datetime.now()  # Capture start time
         response_file = self.task_dir / f"{prompt_count:03d}-response.json"
+
+        # Get token counts and update totals
+        metadata = response.to_dict().get("usage_metadata", {})
+        self.seer.token_counts["prompt"] += metadata.get("prompt_token_count", 0)
+        self.seer.token_counts["candidates"] += metadata.get("candidates_token_count", 0)
+        self.seer.token_counts["total"] += metadata.get("total_token_count", 0)
+        self.seer.token_counts["cached"] += metadata.get("cached_content_token_count", 0)
+
+        response_end = datetime.now()  # Capture end time
+        response_time = (response_end - response_start).total_seconds()
+        total_elapsed = (response_end - self.seer.start_time).total_seconds()
+        self.seer.response_times.append(response_time)
+
+        # Prepare the response data dictionary
+        response_data = response.to_dict()
+        response_data["token_totals"] = self.seer.token_counts.copy()
+        response_data["timing"] = {
+            "response_time": response_time,
+            "total_elapsed": total_elapsed,
+            "response_times": self.seer.response_times.copy(),
+        }
+
         with open(response_file, "w") as f:
-            json.dump(response, f, indent=2)
+            json.dump(response_data, f, indent=2)
 
         # Unpack the response and write elements to a markdown file
         response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
@@ -96,8 +119,8 @@ class Session:
             f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
             f.write("-" * 80 + "\n")
 
-            if "candidates" in response:
-                for candidate in response["candidates"]:
+            if "candidates" in response_
+                for candidate in response_data["candidates"]:
                     if "content" in candidate:
                         if "parts" in candidate["content"]:
                             for part in candidate["content"]["parts"]:
@@ -109,26 +132,26 @@ class Session:
                                         f"`{part['function_call']['name']}({json.dumps(part['function_call']['args'])})`\n"
                                     )
                                 if "executable_code" in part:
-                                     f.write("Executable Code:\n")
-                                     f.write(f"```python\n{part['executable_code']['code']}\n```\n")
+                                    f.write("Executable Code:\n")
+                                    f.write(f"```python\n{part['executable_code']['code']}\n```\n")
                                 if "code_execution_result" in part:
-                                     f.write("Code Execution Result:\n")
-                                     f.write(f"Outcome: {part['code_execution_result']['outcome']}\n")
-                                     f.write(f"```\n{part['code_execution_result']['output']}\n```\n")
+                                    f.write("Code Execution Result:\n")
+                                    f.write(f"Outcome: {part['code_execution_result']['outcome']}\n")
+                                    f.write(f"```\n{part['code_execution_result']['output']}\n```\n")
 
             f.write("\n")
 
             # Include token totals and timing information
-            if "token_totals" in response:
+            if "token_totals" in response_
                 f.write("Token Totals:\n")
-                f.write(f"  Prompt: {response['token_totals']['prompt']}\n")
-                f.write(f"  Candidates: {response['token_totals']['candidates']}\n")
-                f.write(f"  Total: {response['token_totals']['total']}\n")
-                f.write(f"  Cached: {response['token_totals']['cached']}\n")
-            if "timing" in response:
+                f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
+                f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")
+                f.write(f"  Total: {response_data['token_totals']['total']}\n")
+                f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
+            if "timing" in response_
                 f.write("Timing:\n")
-                f.write(f"  Response Time: {response['timing']['response_time']}s\n")
-                f.write(f"  Total Elapsed: {response['timing']['total_elapsed']}s\n")
+                f.write(f"  Response Time: {response_data['timing']['response_time']}s\n")
+                f.write(f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n")
 
     def log_error(self, error_message: str, context: str = ""):
         """Log an error message to a file.
