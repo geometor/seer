@@ -43,6 +43,9 @@ class Seer:
     Seer expects tasks to input/output pairs of training examples - and test inputs
     """
 
+    examples_summary_prompt = "Summarize the examples."  # Placeholder
+    examples_summary_instructions = "Provide a summary of the observations."  # Placeholder
+
     def __init__(
         self,
         session: object,
@@ -153,8 +156,8 @@ example_{i}_output = {str(pair.output.grid)}
         summarize observations on pairs
         """
 
-        prompt = [INST.examples_summary_prompt]
-        instructions = [INST.examples_summary_instructions]
+        prompt = [Seer.examples_summary_prompt]
+        instructions = [Seer.examples_summary_instructions]
         self._generate(
             prompt,
             instructions,
@@ -170,6 +173,8 @@ example_{i}_output = {str(pair.output.grid)}
         self.session.save_grid_image(
             test_pair.input.to_image(), self.call_count, f"test_input"
         )
+        history = [""]
+        instructions = [""]
         prompt = [
             f"""\
 **test**
