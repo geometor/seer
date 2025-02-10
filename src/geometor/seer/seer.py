@@ -209,6 +209,7 @@ example_{i}_output = {str(pair.output.grid)}
         """
         self.prompt_count += 1
 
+        # move these print functions to display prompt function AI!
         print(f"{self.prompt_count} • PROMPT")
         print("=" * 80)
 
@@ -219,7 +220,7 @@ example_{i}_output = {str(pair.output.grid)}
         for part in instructions:
             print(part)
 
-        # write the prompt file
+        # let's have one log_prompt function in session - it should include instructions instead of history AI!
         self.session.log_task_prompt(
             prompt, history, self.prompt_count, description=description
         )
