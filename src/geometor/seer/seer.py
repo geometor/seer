@@ -90,6 +90,7 @@ class Seer:
         Main method to orchestrate the task solving workflow.
         Returns the working grid if solution is found, None otherwise.
         """
+        self.call_count = 0  # Reset call count for each task
         history = [""]
 
         self._investigate_examples(task.train)
@@ -139,7 +140,7 @@ example_{i}_output = {str(pair.output.grid)}
 
             # nlp prompt
             # TODO: instructions
-            response = self._generate_content(
+            response = self._generate(
                 history,
                 prompt,
                 instructions,
@@ -154,7 +155,7 @@ example_{i}_output = {str(pair.output.grid)}
 
         prompt = [INST.examples_summary_prompt]
         instructions = [INST.examples_summary_instructions]
-        self._generate_content(
+        self._generate(
             prompt,
             instructions,
             #  tools="code_execution",
@@ -187,7 +188,7 @@ example_{i}_output = {str(pair.output.grid)}
             "\n**observations**\n",
         ]
 
-        self._generate_content(
+        self._generate(
             history,
             prompt,
             instructions,
@@ -195,7 +196,7 @@ example_{i}_output = {str(pair.output.grid)}
             description=f"test input",
         )
 
-    def _generate_content(
+    def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
     ):
         """
