@@ -156,8 +156,8 @@ example_{i}_output = {str(pair.output.grid)}
         summarize observations on pairs
         """
 
-        prompt = [Seer.examples_summary_prompt]
-        instructions = [Seer.examples_summary_instructions]
+        prompt = [""]
+        instructions = [""]
         self._generate(
             prompt,
             instructions,
