@@ -86,6 +86,24 @@ class Session:
                 f.write(str(part))
             f.write("\n")
 
+    def log_total_prompt(self, total_prompt: str, prompt_count: int, description: str = ""):
+        """Logs the complete, assembled prompt (including history).
+
+        Args:
+            total_prompt: The full prompt string.
+            prompt_count: Integer count of the prompt.
+            description: Optional description string.
+        """
+        prompt_file = self.task_dir / f"{prompt_count:03d}-total_prompt.md"
+        with open(prompt_file, "w") as f:
+            f.write(f"[{datetime.now().isoformat()}] TOTAL PROMPT: ")
+            if description:
+                f.write(f"Description: {description}\n")
+            f.write("-" * 80 + "\n")
+            f.write(total_prompt)
+            f.write("\n")
+
+
     def log_response(self, response, prompt_count: int):
         response_start = datetime.now()  # Capture start time
         response_file = self.task_dir / f"{prompt_count:03d}-response.json"
@@ -120,7 +138,7 @@ class Session:
             f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
             f.write("-" * 80 + "\n")
 
-            if "candidates" in response_data:
+            if "candidates" in response_
                 for candidate in response_data["candidates"]:
                     if "content" in candidate:
                         if "parts" in candidate["content"]:
@@ -143,7 +161,7 @@ class Session:
             f.write("\n")
 
             # Include token totals and timing information
-            if "token_totals" in response_data:
+            if "token_totals" in response_
                 f.write("Token Totals:\n")
                 f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
                 f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")

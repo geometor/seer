@@ -268,11 +268,16 @@ example_{i}_output = {output_grid_str}
 
         self._display_prompt(prompt, instructions)
 
+        total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
+
         self.session.log_prompt(
             prompt, instructions, self.prompt_count, description=description
         )
+        self.session.log_total_prompt(
+            total_prompt, self.prompt_count, description=description
+        )
 
-        total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
+
         history = history + prompt
 
         for attempt in range(self.max_iterations):
