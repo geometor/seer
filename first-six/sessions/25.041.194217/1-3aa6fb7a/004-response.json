@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nNatural Language Program:\n\nThe transformation process operates on each cell of the input grid to produce the output grid. For each cell in the input grid, we check its value. If the cell's value is 0, we then examine its immediate neighbors - the cells directly above, below, to the left, and to the right. We count how many of these neighboring cells in the input grid have a value of 8. If this count is exactly two, the corresponding cell in the output grid is set to 1. If the original cell in the input grid has a value of 8, then the corresponding cell in the output grid retains the value 8. In all other cases for cells with initial value 0 (meaning the count of neighboring 8s is not exactly two), the corresponding cell in the output grid remains 0.  This process is repeated for every cell in the input grid to construct the complete output grid.\n\"\"\"\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule.\n    \"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = [[0] * cols for _ in range(rows)] # Initialize output grid with 0s\n\n    for i in range(rows):\n        for j in range(cols):\n            cell_value = input_grid[i][j]\n\n            if cell_value == 0:\n                neighbor_8_count = 0\n                # Check neighbors (up, down, left, right)\n                for row_offset, col_offset in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                    neighbor_row, neighbor_col = i + row_offset, j + col_offset\n                    if 0 <= neighbor_row < rows and 0 <= neighbor_col < cols and input_grid[neighbor_row][neighbor_col] == 8:\n                        neighbor_8_count += 1\n\n                if neighbor_8_count == 2:\n                    output_grid[i][j] = 1\n                else:\n                    output_grid[i][j] = 0\n\n            elif cell_value == 8:\n                output_grid[i][j] = 8\n            else:\n                output_grid[i][j] = cell_value # keep original value if not 0 or 8\n\n    return output_grid\n\nif __name__ == '__main__':\n    input_grid = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0],\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0],\n    ]\n\n    transformed_grid = transform(input_grid)\n\n    if transformed_grid == expected_output:\n        print(\"Transformation successful!\")\n    else:\n        print(\"Transformation failed.\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", transformed_grid)\n\n    assert transformed_grid == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3279,
+    "candidates_token_count": 986,
+    "total_token_count": 4265,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 9166,
+    "candidates": 2371,
+    "total": 11537,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000253,
+    "total_elapsed": 41.631406,
+    "response_times": [
+      0.000297,
+      0.000255,
+      0.00024,
+      0.000253
+    ]
+  }
+}

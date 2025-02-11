@@ -1,3 +1,41 @@
+[2025-02-10T20:03:33.892289] PROMPT: Description: example_1_code
+--------------------------------------------------------------------------------
+
+```python
+example_1_input = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 8, 0, 0, 0, 0, 0],
+    [0, 8, 8, 0, 0, 0, 0],
+    [0, 0, 0, 0, 8, 8, 0],
+    [0, 0, 0, 0, 0, 8, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+]
+
+example_1_output = [
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 8, 1, 0, 0, 0, 0],
+    [0, 8, 8, 0, 0, 0, 0],
+    [0, 0, 0, 0, 8, 8, 0],
+    [0, 0, 0, 0, 1, 8, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0],
+]
+```
+
+**images**
+
+input:
+<PIL.Image.Image image mode=RGB size=448x448 at 0x73AA6B7D1990>
+output:
+<PIL.Image.Image image mode=RGB size=448x448 at 0x73AA6B7D1BD0>
+
+**Generate Code**
+
+**NLP:**
+["**Natural Language Program:**\n\nFor each connected region of cells with value 8 in the input grid:\n1. Identify the cell within the region that has the smallest row index. In case of a tie in row indices, choose the cell with the smallest column index among those. Let's call this the 'reference cell'.\n2. Examine the cell immediately to the right of the 'reference cell'. If this cell contains a 0, change its value to 1.\n3. If the cell to the right of the 'reference cell' does not contain a 0, then examine the cell immediately below the 'reference cell'. If this cell contains a 0, change its value to 1.\n"]
+
+================================================================================
 **Python Code Instructions**
 
 - Generate a complete Python module to be run in your code_execution to

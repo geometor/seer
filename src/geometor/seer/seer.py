@@ -62,9 +62,9 @@ class Seer:
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
 
-        with open("first-six/nlp_instructions.md", "r") as f:
+        with open("nlp_instructions.md", "r") as f:
             self.nlp_instructions = f.read().strip()
-        with open("first-six/code_instructions.md", "r") as f:
+        with open("code_instructions.md", "r") as f:
             self.code_instructions = f.read().strip()
 
         self.max_iterations = config["max_iterations"]
