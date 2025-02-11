@@ -32,3 +32,11 @@ response = model.generate_content(
 print(response.candidates[0].content.parts)
 print("\n---\n")
 print(Markdown(response.text))
+
+# Extract and save the code
+for part in response.candidates[0].content.parts:
+    if part.type == 'tool_use' and 'code_execution' in part.tool_use.name:
+        code_to_save = part.tool_use.args['code']
+        with open("extracted_code.py", "w") as f:
+            f.write(code_to_save)
+        print("Code saved to extracted_code.py")
