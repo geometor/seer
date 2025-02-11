@@ -35,8 +35,8 @@ print(Markdown(response.text))
 
 # Extract and save the code
 for part in response.candidates[0].content.parts:
-    if part.type == 'tool_use' and 'code_execution' in part.tool_use.name:
-        code_to_save = part.tool_use.args['code']
-        with open("extracted_code.py", "w") as f:
-            f.write(code_to_save)
+    dir(part)
+    if part.executable_code:
+        with open("code.py", "w") as f:
+            f.write(part.executable_code.code)
         print("Code saved to extracted_code.py")
