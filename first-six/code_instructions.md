@@ -1,9 +1,58 @@
 **Python Code Instructions**
 
-- Using your natural language description, develop a Python function that transforms any given input grid into the correct output grid.
-- Leverage common libraries (e.g., numpy, sympy) if needed.
-- Ensure your code covers all edge cases as per the transformation rule.
-- Place the natural language description in the top docstring of the function.
+- Generate a complete Python module.
+- The primary function should be named `transform`, which takes the input grid (represented as a Python list of lists) and returns the transformed output grid (also a Python list of lists).
+- Include a docstring at the top of the `transform` function that contains the natural language description of the transformation rule.
 - Break logic into sub-functions for clarity - particularly identifying objects and properties.
 - Use comments to describe the workflow.
 - All major math, science and analysis libraries are available to you.
+- Include an `if __name__ == '__main__':` block that:
+    - Defines the input grid.
+    - Defines the expected output grid.
+    - Calls the `transform` function with the input grid.
+    - Asserts that the transformed output matches the expected output. Print a clear message indicating success or failure.
+
+**Skeleton Template**
+
+```python
+\"\"\"
+Natural language description of the transformation rule goes here.
+\"\"\"
+
+# Imports (e.g., numpy, sympy)
+
+def transform(input_grid):
+    \"\"\"
+    Transforms the input grid according to the rule.
+    \"\"\"
+    # Implementation goes here
+
+def helper_function_1(grid): # if needed
+    # ...
+    pass
+
+def helper_function_2(grid): # if needed
+    # ...
+    pass
+
+if __name__ == '__main__':
+    input_grid = [
+        # ... Input grid data ...
+    ]
+
+    expected_output = [
+        # ... Expected output grid data ...
+    ]
+
+    transformed_grid = transform(input_grid)
+
+    if transformed_grid == expected_output:
+        print("Transformation successful!")
+    else:
+        print("Transformation failed.")
+        print("Expected Output:", expected_output)
+        print("Transformed Output:", transformed_grid)
+
+    assert transformed_grid == expected_output, "Transformed output does not match expected output."
+
+```
