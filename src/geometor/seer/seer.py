@@ -62,6 +62,11 @@ class Seer:
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
 
+        with open("first-six/nlp_instructions.md", "r") as f:
+            self.nlp_instructions = f.read().strip()
+        with open("first-six/code_instructions.md", "r") as f:
+            self.code_instructions = f.read().strip()
+
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
@@ -120,14 +125,13 @@ class Seer:
         """
         investigate all training pairs
         """
-        instructions = [""]
         history = [""]
 
         for i, pair in enumerate(examples, 1):
             input_grid_str = self._convert_grid_to_python(pair.input)
             output_grid_str = self._convert_grid_to_python(pair.output)
 
-            prompt = [
+            prompt_base = [
                 f"""
 ```python
 example_{i}_input = {input_grid_str}
@@ -143,7 +147,7 @@ example_{i}_output = {output_grid_str}
                 self.session.save_grid_image(
                     pair.output.to_image(), self.prompt_count, f"example_{i}_output"
                 )
-                prompt.extend(
+                prompt_base.extend(
                     [
                         "\n**images**\n\ninput:\n",
                         pair.input.to_image(),
@@ -153,15 +157,33 @@ example_{i}_output = {output_grid_str}
                     ]
                 )
 
-            # nlp prompt
-            # TODO: instructions
-            response = self._generate(
+            # NLP Prompt
+            nlp_prompt = prompt_base + ["\n**Generate NLP**\n"]
+            nlp_instructions = [self.nlp_instructions]
+
+            nlp_response = self._generate(
                 history,
-                prompt,
-                instructions,
-                tools="code_execution",
-                description=f"example_{i}",
+                nlp_prompt,
+                nlp_instructions,
+                tools=None,
+                description=f"example_{i}_nlp",
             )
+            history.extend(nlp_response)
+
+
+            # Code Prompt
+            code_prompt = prompt_base + [
+                f"\n**Generate Code**\n\n**NLP:**\n{nlp_response}\n"
+            ]
+            code_instructions = [self.code_instructions]
+            code_response = self._generate(  # Use nlp_client, no tools
+                history,
+                code_prompt,
+                code_instructions,
+                tools="code_execution",
+                description=f"example_{i}_code",
+            )
+            history.extend(code_response)
 
     def _review_programs(self, instructions):
         """
@@ -315,7 +337,7 @@ example_{i}_output = {output_grid_str}
 
                 history = history + response_parts
 
-                return last_result
+                return response_parts
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
