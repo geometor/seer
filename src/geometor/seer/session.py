@@ -137,7 +137,7 @@ class Session:
             f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
             f.write("-" * 80 + "\n")
 
-            if "candidates" in response_
+            if "candidates" in response:
                 for candidate in response_data["candidates"]:
                     if "content" in candidate:
                         if "parts" in candidate["content"]:
@@ -160,7 +160,7 @@ class Session:
             f.write("\n")
 
             # Include token totals and timing information
-            if "token_totals" in response_
+            if "token_totals" in response:
                 f.write("Token Totals:\n")
                 f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
                 f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")

@@ -1,27 +1,3 @@
-"""Dialogue-Based ARC task Solver
-
-Implements a structured workflow for solving ARC tasks through conversation
-with LLMs, focusing on building understanding before attempting solutions.
-
-The solver follows a systematic process:
-
-1.  Examine training examples individually
-2.  Build comprehensive observations
-3.  Validate understanding through pre-testing
-4.  Implement solution through standard operations
-
-Key Features:
-
-- Progressive observation building
-- Code-validated pattern discovery
-- Natural language program development
-- Iterative refinement through dialogue
-- Comprehensive session logging
-
-The solver maintains a conversation history and working grid state, allowing
-for cumulative understanding and step-by-step solution development.
-"""
-
 from rich import print
 from rich.markdown import Markdown
 from datetime import datetime
