@@ -1,19 +1,4 @@
-"""Google Gemini Model Interface for Seer
-
-Provides a streamlined interface to Google's Gemini model, configured specifically
-for the dialogue-based ARC solving approach.
-
-Features:
-    
-- Structured conversation management
-- Code execution capabilities
-- Function calling support
-- System instruction integration
-- Error handling and retry logic
-
-The client is designed to maintain consistent context while allowing for
-flexible interaction patterns including code exploration and function calls.
-"""
+"""Client for interacting with the Google Gemini model."""
 
 import os
 from pathlib import Path

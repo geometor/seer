@@ -1,3 +1,10 @@
+"""
+The Seer class orchestrates the process of solving ARC tasks.
+
+It interacts with the Gemini model, manages the session, handles logging,
+and controls the flow of execution for analyzing examples, generating code,
+and evaluating solutions.
+"""
 from rich import print
 from rich.markdown import Markdown
 from datetime import datetime

@@ -1,3 +1,12 @@
+"""
+Manages a session for interacting with the Seer, handling logging, and task execution.
+
+The Session class encapsulates a single run of the Seer, including configuration,
+task management, output directory handling, and interaction with the Seer instance.
+It also provides methods for saving images, logging prompts and responses, and
+handling errors.
+"""
+
 from pathlib import Path
 from datetime import datetime
 import json
