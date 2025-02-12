@@ -22,6 +22,7 @@ from geometor.seer.exceptions import (
     FunctionArgumentError,
     FunctionExecutionError,
 )
+from geometor.seer.session import Session  # Import Session
 
 
 class Seer:
@@ -33,9 +34,9 @@ class Seer:
 
     def __init__(
         self,
-        session: object,
         config: dict,
         max_iterations: int = 5,
+        tasks: object = None, # Add tasks
     ):
         self.start_time = datetime.now()
         self.response_times = []  # Track individual response times
@@ -65,9 +66,10 @@ class Seer:
         )
 
         # Initialize timestamp
-        self.timestamp = session.timestamp
+        # self.timestamp = session.timestamp  <- Removed. Session will handle
 
-        self.session = session
+        # Initialize Session *internally*
+        self.session = Session(config, tasks)
 
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
@@ -298,3 +300,17 @@ example_{i}_output = {output_grid_str}
         print(f"\nERROR: {error_msg}")
         self.session.logger.log_error(self.session.task_dir, error_msg, "".join(total_prompt))
         # Removed: raise MaxRetriesExceededError(error_msg)
+
+    def run(self):
+        """
+        Runs the Seer over the set of tasks.  This replaces Session.run().
+        """
+        for task in self.session.tasks.puzzles:  # Access tasks through self.session
+            self.session.task_dir = self.session.session_dir / task.id  # Set task_dir on session
+            self.session.task_dir.mkdir(parents=True, exist_ok=True)
+            try:
+                self.solve(task)  # Call solve on Seer instance
+            except Exception as e:
+                print(f"Error during task processing {task.id}: {e}")
+                self.session.logger.log_error(self.session.task_dir, f"Error during task processing: {e}")
+

@@ -4,8 +4,7 @@ from datetime import datetime
 
 from geometor.arcprize.puzzles import PuzzleSet
 from geometor.seer.seer import Seer
-from geometor.seer.session import Session
-
+from geometor.seer.session import Session  # Session is still imported, but not used directly here
 
 
 def run():
@@ -16,13 +15,13 @@ def run():
     # Initialize PuzzleSet
     tasks = PuzzleSet()
 
-    # Initialize Session
-    session = Session(
+    # Initialize Seer (Session is created internally by Seer)
+    seer = Seer(
         config,
         tasks=tasks
     )
 
-    session.run()
+    seer.run()
 
 
 if __name__ == "__main__":
