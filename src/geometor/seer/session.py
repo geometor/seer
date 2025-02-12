@@ -11,7 +11,6 @@ from pathlib import Path
 from datetime import datetime
 import json
 
-#  from geometor.seer.seer import Seer  # Import Seer <- REMOVE THIS LINE
 from geometor.seer.logger import Logger
 
 
@@ -36,15 +35,7 @@ class Session:
             if hasattr(self, 'logger'):
                 self.logger.log_error(self.session_dir, f"Error writing context files: {e}")
 
-
-        # Initialize Logger
         self.logger = Logger(self.session_dir)
-
-        # Removed: Seer initialization is now done in Seer.__init__
-        #  self.seer = Seer(
-        #      config=config,
-        #      session=self,
-        #  )
 
         # Log the configuration
         try:
@@ -64,13 +55,3 @@ class Session:
         (self.session_dir / "system_context.md").write_text(system_context)
         (self.session_dir / "task_context.md").write_text(task_context)
 
-    # Removed: run() method is now part of Seer
-    #  def run(self):
-    #      for task in self.tasks.puzzles:
-    #          self.task_dir = self.session_dir / task.id
-    #          self.task_dir.mkdir(parents=True, exist_ok=True)
-    #          try:
-    #              self.seer.solve(task) # Call generalized solve
-    #          except Exception as e:
-    #              print(f"Error during task processing {task.id}: {e}")
-    #              self.logger.log_error(self.task_dir, f"Error during task processing: {e}")

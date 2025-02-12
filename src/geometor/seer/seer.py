@@ -39,6 +39,7 @@ class Seer:
         tasks: object = None, # Add tasks
     ):
         self.start_time = datetime.now()
+        self.tasks = tasks
         self.response_times = []  # Track individual response times
 
         self.nlp_model = config["nlp_model"]
@@ -305,7 +306,7 @@ example_{i}_output = {output_grid_str}
         """
         Runs the Seer over the set of tasks.  This replaces Session.run().
         """
-        for task in self.session.tasks.puzzles:  # Access tasks through self.session
+        for task in self.tasks.puzzles:  # Access tasks through self.session
             self.session.task_dir = self.session.session_dir / task.id  # Set task_dir on session
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
             try:
