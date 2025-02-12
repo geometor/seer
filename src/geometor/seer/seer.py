@@ -87,22 +87,22 @@ class Seer:
         #      self.session.log_error(f"Solve failed: {str(e)}")
         #      raise
 
-    def _investigate_examples(self, examples, include_images=False): # Removed include_images
+    def _investigate_examples(self, examples, include_images=False):
         """
         investigate all training pairs
         """
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            #  input_grid_str = self._convert_grid_to_python(pair.input) # Removed grid conversion
-            #  output_grid_str = self._convert_grid_to_python(pair.output)
+            input_grid_str = self._convert_grid_to_python(pair.input)
+            output_grid_str = self._convert_grid_to_python(pair.output)
 
             prompt_base = [
                 f"""
 ```
-example_{i}_input = {str(pair.input)}
+example_{i}_input = {input_grid_str}
 
-example_{i}_output = {str(pair.output)}
+example_{i}_output = {output_grid_str}
 ```
 """
             ]
@@ -149,6 +149,25 @@ example_{i}_output = {str(pair.output)}
             #  tools="code_execution",
             description=f"example_summary",
         )
+
+    def _convert_grid_to_python(self, grid):
+        """
+        Converts a grid (represented as a nested list or numpy array)
+        into a Python list of lists string representation, with each row
+        on a new line.
+        """
+        if isinstance(grid, np.ndarray):
+            grid_list = grid.tolist()
+        else:
+            grid_list = grid
+
+        #  return '[\n    ' + ',\n    '.join([str(row) for row in grid_list]) + '\n]'
+        rows = [str(row) for row in grid_list]
+        output = "[\n"
+        for row in rows:
+            output += f"    {row},\n"
+        output += "]"
+        return output
 
     def _display_prompt(self, prompt, instructions):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
