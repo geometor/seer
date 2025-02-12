@@ -106,51 +106,39 @@ class Logger:
                 f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
                 f.write("-" * 80 + "\n")
 
-                if "candidates" in response:
-                    for candidate in response_data["candidates"]:
-                        if "content" in candidate:
-                            if "parts" in candidate["content"]:
-                                for part in candidate["content"]["parts"]:
-                                    if "text" in part:
-                                        f.write(part["text"] + "\n")
-                                    if "function_call" in part:
-                                        f.write("Function Call:\n")
-                                        f.write(
-                                            f"`{part['function_call']['name']}({json.dumps(part['function_call']['args'])})`\n"
-                                        )
-                                    if "executable_code" in part:
-                                        f.write("Executable Code:\n")
-                                        f.write(
-                                            f"```python\n{part['executable_code']['code']}\n```\n"
-                                        )
-                                    if "code_execution_result" in part:
-                                        f.write("Code Execution Result:\n")
-                                        f.write(
-                                            f"Outcome: {part['code_execution_result']['outcome']}\n"
-                                        )
-                                        f.write(
-                                            f"```\n{part['code_execution_result']['output']}\n```\n"
-                                        )
+                if hasattr(response.candidates[0].content, "parts"):
+                    for part in response.candidates[0].content.parts:
+                        if part.text:
+                            f.write(part.text + "\n")
+                        if part.executable_code:
+                            f.write("code_execution:\n")
+                            f.write(
+                                f"```python\n{part.executable_code.code}\n```\n"
+                            )
+                        if part.code_execution_result:
+                            f.write(
+                                f"code_execution_result: {part.code_execution_result.outcome}\n"
+                            )
+                            f.write(
+                                f"```\n{part.code_execution_result.output}\n```\n"
+                            )
+                        if part.function_call:
+                            f.write("function_call:\n")
+                            f.write(part.function_call.name + "\n")
+                            #  We do not call functions here
 
                 f.write("\n")
 
-                # Include token totals and timing information
-                if "token_totals" in response:
-                    f.write("Token Totals:\n")
-                    f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
-                    f.write(
-                        f"  Candidates: {response_data['token_totals']['candidates']}\n"
-                    )
-                    f.write(f"  Total: {response_data['token_totals']['total']}\n")
-                    f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
-                if "timing" in response:
-                    f.write("Timing:\n")
-                    f.write(
-                        f"  Response Time: {response_data['timing']['response_time']}s\n"
-                    )
-                    f.write(
-                        f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n"
-                    )
+                # Include token totals and timing information (from response_data)
+                f.write("Token Totals:\n")
+                f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
+                f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")
+                f.write(f"  Total: {response_data['token_totals']['total']}\n")
+                f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
+                f.write("Timing:\n")
+                f.write(f"  Response Time: {response_data['timing']['response_time']}s\n")
+                f.write(f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n")
+
         except (IOError, PermissionError) as e:
             print(f"Error writing response Markdown to file: {e}")
             self.log_error(task_dir, f"Error writing response Markdown to file: {e}")
