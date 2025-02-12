@@ -6,11 +6,19 @@ from pathlib import Path
 from datetime import datetime
 import json
 
+
 class Logger:
     def __init__(self, session_dir: Path):
         self.session_dir = session_dir
 
-    def log_prompt(self, task_dir: Path, prompt: list, instructions: list, prompt_count: int, description: str = ""):
+    def log_prompt(
+        self,
+        task_dir: Path,
+        prompt: list,
+        instructions: list,
+        prompt_count: int,
+        description: str = "",
+    ):
         prompt_file = task_dir / f"{prompt_count:03d}-prompt.md"
         try:
             with open(prompt_file, "w") as f:
@@ -31,8 +39,13 @@ class Logger:
             print(f"Error writing prompt to file: {e}")
             self.log_error(task_dir, f"Error writing prompt to file: {e}")
 
-
-    def log_total_prompt(self, task_dir: Path, total_prompt: str, prompt_count: int, description: str = ""):
+    def log_total_prompt(
+        self,
+        task_dir: Path,
+        total_prompt: str,
+        prompt_count: int,
+        description: str = "",
+    ):
         prompt_file = task_dir / f"{prompt_count:03d}-total_prompt.md"
         try:
             with open(prompt_file, "w") as f:
@@ -46,7 +59,15 @@ class Logger:
             print(f"Error writing total prompt to file: {e}")
             self.log_error(task_dir, f"Error writing total prompt to file: {e}")
 
-    def log_response(self, task_dir: Path, response, prompt_count: int, token_counts: dict, response_times: list, start_time):
+    def log_response(
+        self,
+        task_dir: Path,
+        response,
+        prompt_count: int,
+        token_counts: dict,
+        response_times: list,
+        start_time,
+    ):
         response_start = datetime.now()  # Capture start time
         response_file = task_dir / f"{prompt_count:03d}-response.json"
 
@@ -60,7 +81,7 @@ class Logger:
         response_end = datetime.now()  # Capture end time
         response_time = (response_end - response_start).total_seconds()
         total_elapsed = (response_end - start_time).total_seconds()
-        response_times.append(response_time) # Append to passed in list
+        response_times.append(response_time)  # Append to passed in list
 
         # Prepare the response data dictionary
         response_data = response.to_dict()
@@ -77,7 +98,6 @@ class Logger:
         except (IOError, PermissionError) as e:
             print(f"Error writing response JSON to file: {e}")
             self.log_error(task_dir, f"Error writing response JSON to file: {e}")
-
 
         # Unpack the response and write elements to a markdown file
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
@@ -100,11 +120,17 @@ class Logger:
                                         )
                                     if "executable_code" in part:
                                         f.write("Executable Code:\n")
-                                        f.write(f"```python\n{part['executable_code']['code']}\n```\n")
+                                        f.write(
+                                            f"```python\n{part['executable_code']['code']}\n```\n"
+                                        )
                                     if "code_execution_result" in part:
                                         f.write("Code Execution Result:\n")
-                                        f.write(f"Outcome: {part['code_execution_result']['outcome']}\n")
-                                        f.write(f"```\n{part['code_execution_result']['output']}\n```\n")
+                                        f.write(
+                                            f"Outcome: {part['code_execution_result']['outcome']}\n"
+                                        )
+                                        f.write(
+                                            f"```\n{part['code_execution_result']['output']}\n```\n"
+                                        )
 
                 f.write("\n")
 
@@ -112,17 +138,22 @@ class Logger:
                 if "token_totals" in response:
                     f.write("Token Totals:\n")
                     f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
-                    f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")
+                    f.write(
+                        f"  Candidates: {response_data['token_totals']['candidates']}\n"
+                    )
                     f.write(f"  Total: {response_data['token_totals']['total']}\n")
                     f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
                 if "timing" in response:
                     f.write("Timing:\n")
-                    f.write(f"  Response Time: {response_data['timing']['response_time']}s\n")
-                    f.write(f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n")
+                    f.write(
+                        f"  Response Time: {response_data['timing']['response_time']}s\n"
+                    )
+                    f.write(
+                        f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n"
+                    )
         except (IOError, PermissionError) as e:
             print(f"Error writing response Markdown to file: {e}")
             self.log_error(task_dir, f"Error writing response Markdown to file: {e}")
-
 
     def log_error(self, task_dir: Path, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -135,4 +166,3 @@ class Logger:
         except (IOError, PermissionError) as e:
             print(f"FATAL: Error writing to error log: {e}")
             print(f"Attempted to log: {error_message=}, {context=}")
-
