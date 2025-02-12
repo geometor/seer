@@ -29,7 +29,13 @@ class Session:
         self.session_dir.mkdir(parents=True, exist_ok=True)
 
         # Write system and task context to files
-        self._write_context_files(config["system_context_file"], config["task_context_file"])
+        try:
+            self._write_context_files(config["system_context_file"], config["task_context_file"])
+        except (FileNotFoundError, IOError, PermissionError) as e:
+            print(f"Error writing context files: {e}")
+            if hasattr(self, 'logger'):
+                self.logger.log_error(self.session_dir, f"Error writing context files: {e}")
+
 
         # Initialize Logger
         self.logger = Logger(self.session_dir)
@@ -40,8 +46,13 @@ class Session:
         )
 
         # Log the configuration
-        with open(self.session_dir / "config.json", "w") as f:
-            json.dump(config, f, indent=2)
+        try:
+            with open(self.session_dir / "config.json", "w") as f:
+                json.dump(config, f, indent=2)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing config file: {e}")
+            self.logger.log_error(self.session_dir, f"Error writing config file: {e}")
+
 
     def _write_context_files(self, system_context_file: str, task_context_file: str):
         with open(system_context_file, "r") as f:
@@ -56,4 +67,8 @@ class Session:
         for task in self.tasks.puzzles:
             self.task_dir = self.session_dir / task.id
             self.task_dir.mkdir(parents=True, exist_ok=True)
-            self.seer.solve(task) # Call generalized solve
+            try:
+                self.seer.solve(task) # Call generalized solve
+            except Exception as e:
+                print(f"Error during task processing {task.id}: {e}")
+                self.logger.log_error(self.task_dir, f"Error during task processing: {e}")

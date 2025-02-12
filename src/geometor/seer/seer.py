@@ -12,7 +12,7 @@ import json
 import numpy as np
 import os
 
-#  from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Removed ARC-specific imports
+from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Added ARC imports
 
 from geometor.seer.gemini_client import GeminiClient as Client
 
@@ -78,14 +78,14 @@ class Seer:
         self.prompt_count = 0  # Reset prompt count for each task
         history = [""]
 
-        self._investigate_examples(task.train) # Pass in the examples
-        #  self._review_programs()
-        #  self._run_solution_loop()
-
-        #  except Exception as e:
-        #      print(f"Solve failed: {str(e)}")
-        #      self.session.log_error(f"Solve failed: {str(e)}")
-        #      raise
+        try:
+            self._investigate_examples(task.train) # Pass in the examples
+            #  self._review_programs()
+            #  self._run_solution_loop()
+        except Exception as e:
+            print(f"Solve failed: {str(e)}")
+            self.session.logger.log_error(self.session.task_dir, f"Solve failed: {str(e)}")
+            # Removed: raise
 
     def _investigate_examples(self, examples, include_images=False):
         """
@@ -158,10 +158,11 @@ example_{i}_output = {output_grid_str}
         """
         if isinstance(grid, np.ndarray):
             grid_list = grid.tolist()
+        elif isinstance(grid, Grid):  # Check if it's a Grid object
+            grid_list = grid.grid.tolist()  # Access the .grid attribute
         else:
             grid_list = grid
 
-        #  return '[\n    ' + ',\n    '.join([str(row) for row in grid_list]) + '\n]'
         rows = [str(row) for row in grid_list]
         output = "[\n"
         for row in rows:
@@ -283,13 +284,13 @@ example_{i}_output = {output_grid_str}
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
                 self.session.logger.log_error(self.session.task_dir, str(e), "".join(total_prompt)) # Also join here for consistency
-                raise
+                # Removed: raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
         self.session.logger.log_error(self.session.task_dir, error_msg, "".join(total_prompt))
-        raise MaxRetriesExceededError(error_msg)
+        # Removed: raise MaxRetriesExceededError(error_msg)
 
 # Custom exceptions for better error handling
 class MultipleFunctionCallsError(Exception):
