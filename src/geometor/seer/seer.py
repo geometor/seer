@@ -189,7 +189,7 @@ example_{i}_output = {str(pair.output)}
             self.session.task_dir, prompt, instructions, self.prompt_count, description=description
         )
         self.session.logger.log_total_prompt(
-            self.session.task_dir, total_prompt, self.prompt_count, description=description
+            self.session.task_dir, "".join(total_prompt), self.prompt_count, description=description  # Join total_prompt into a string
         )
 
 
@@ -263,13 +263,13 @@ example_{i}_output = {str(pair.output)}
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
-                self.session.logger.log_error(self.session.task_dir, str(e), total_prompt)
+                self.session.logger.log_error(self.session.task_dir, str(e), "".join(total_prompt)) # Also join here for consistency
                 raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.session.logger.log_error(self.session.task_dir, error_msg, total_prompt)
+        self.session.logger.log_error(self.session.task_dir, error_msg, "".join(total_prompt))
         raise MaxRetriesExceededError(error_msg)
 
 # Custom exceptions for better error handling
