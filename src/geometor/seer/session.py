@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 import json
 
-from geometor.seer.seer import Seer  # Import Seer
+#  from geometor.seer.seer import Seer  # Import Seer <- REMOVE THIS LINE
 from geometor.seer.logger import Logger
 
 
