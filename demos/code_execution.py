@@ -26,6 +26,50 @@ model = genai.GenerativeModel(
   tools='code_execution',
 )
 
+def process_executable_code(code_to_execute):
+    """Processes the executable code extracted from the response.
+
+    Parses the code, executes it in a controlled namespace,
+    finds and calls defined functions, and captures output.
+    """
+    with open("code.py", "w") as f:
+        f.write(code_to_execute)
+    print("Code saved to code.py")
+
+    # Parse the code using ast
+    tree = ast.parse(code_to_execute)
+
+    # Create a dictionary to serve as the namespace for execution
+    namespace = {}
+
+    # Capture stdout
+    output_capture = io.StringIO()
+    with contextlib.redirect_stdout(output_capture):
+        # Execute the code within the namespace
+        exec(compile(tree, filename="code.py", mode="exec"), namespace)
+
+    # Find and call functions
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef):
+            function_name = node.name
+            print(f"Calling function: {function_name}")
+            if function_name in namespace:
+                # Call the function (you might need to adapt this based on expected arguments)
+                if function_name == 'is_prime':  # Example: specific to the expected output
+                    result = namespace[function_name](10)  # Assuming a function named 'is_prime' that takes an argument
+                    print(f"Result of {function_name}: {result}")
+                else:
+                    print(f"  Warning: Function '{function_name}' found, but not called (no specific handling).")
+
+            else:
+                print(f"  Error: Function '{function_name}' definition found, but not present in the execution namespace.")
+
+    # Print captured output
+    captured_output = output_capture.getvalue()
+    if captured_output:
+        print(f"Captured output:\n{captured_output}")
+
+
 response = model.generate_content(
   contents=[
         "using code_execution:\ncreate a full python module to find the first 10 prime numbers to \n\nonly respond with the code_execution\n",
@@ -39,42 +83,6 @@ print(Markdown(response.text))
 
 # Extract and save the code
 for part in response.candidates[0].content.parts:
-    dir(part)
     if part.executable_code:
-        code_to_execute = part.executable_code.code
-        with open("code.py", "w") as f:
-            f.write(code_to_execute)
-        print("Code saved to code.py")
+        process_executable_code(part.executable_code.code)
 
-        # Parse the code using ast
-        tree = ast.parse(code_to_execute)
-
-        # Create a dictionary to serve as the namespace for execution
-        namespace = {}
-
-        # Capture stdout
-        output_capture = io.StringIO()
-        with contextlib.redirect_stdout(output_capture):
-            # Execute the code within the namespace
-            exec(compile(tree, filename="code.py", mode="exec"), namespace)
-
-        # Find and call functions
-        for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef):
-                function_name = node.name
-                print(f"Calling function: {function_name}")
-                if function_name in namespace:
-                    # Call the function (you might need to adapt this based on expected arguments)
-                    if function_name == 'is_prime': # Example: specific to the expected output
-                      result = namespace[function_name](10)  # Assuming a function named 'find_primes' that takes an argument
-                      print(f"Result of {function_name}: {result}")
-                    else:
-                        print(f"  Warning: Function '{function_name}' found, but not called (no specific handling).")
-
-                else:
-                    print(f"  Error: Function '{function_name}' definition found, but not present in the execution namespace.")
-        
-        # Print captured output
-        captured_output = output_capture.getvalue()
-        if captured_output:
-            print(f"Captured output:\n{captured_output}")
