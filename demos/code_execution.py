@@ -65,7 +65,7 @@ for part in response.candidates[0].content.parts:
                 print(f"Calling function: {function_name}")
                 if function_name in namespace:
                     # Call the function (you might need to adapt this based on expected arguments)
-                    if function_name == 'find_primes': # Example: specific to the expected output
+                    if function_name == 'is_prime': # Example: specific to the expected output
                       result = namespace[function_name](10)  # Assuming a function named 'find_primes' that takes an argument
                       print(f"Result of {function_name}: {result}")
                     else:
