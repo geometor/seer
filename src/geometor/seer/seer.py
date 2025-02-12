@@ -15,6 +15,13 @@ import os
 from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Added ARC imports
 
 from geometor.seer.gemini_client import GeminiClient as Client
+from geometor.seer.exceptions import (
+    MultipleFunctionCallsError,
+    MaxRetriesExceededError,
+    UnknownFunctionError,
+    FunctionArgumentError,
+    FunctionExecutionError,
+)
 
 
 class Seer:
@@ -291,33 +298,3 @@ example_{i}_output = {output_grid_str}
         print(f"\nERROR: {error_msg}")
         self.session.logger.log_error(self.session.task_dir, error_msg, "".join(total_prompt))
         # Removed: raise MaxRetriesExceededError(error_msg)
-
-# Custom exceptions for better error handling
-class MultipleFunctionCallsError(Exception):
-    """Raised when multiple function calls are detected in a single response."""
-
-    pass
-
-
-class MaxRetriesExceededError(Exception):
-    """Raised when maximum retry attempts are exhausted."""
-
-    pass
-
-
-class UnknownFunctionError(Exception):
-    """Raised when an unknown function is called."""
-
-    pass
-
-
-class FunctionArgumentError(Exception):
-    """Raised when invalid arguments are provided to a function."""
-
-    pass
-
-
-class FunctionExecutionError(Exception):
-    """Raised when a function fails during execution."""
-
-    pass
