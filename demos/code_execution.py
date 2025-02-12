@@ -70,19 +70,19 @@ def process_executable_code(code_to_execute):
         print(f"Captured output:\n{captured_output}")
 
 
-response = model.generate_content(
-  contents=[
-        "using code_execution:\ncreate a full python module to find the first 10 prime numbers to \n\nonly respond with the code_execution\n",
-  ]
-)
+if __name__ == '__main__':
+    response = model.generate_content(
+      contents=[
+            "using code_execution:\ncreate a full python module to find the first 10 prime numbers to \n\nonly respond with the code_execution\n",
+      ]
+    )
 
 
-print(response.candidates[0].content.parts)
-print("\n---\n")
-print(Markdown(response.text))
+    print(response.candidates[0].content.parts)
+    print("\n---\n")
+    print(Markdown(response.text))
 
-# Extract and save the code
-for part in response.candidates[0].content.parts:
-    if part.executable_code:
-        process_executable_code(part.executable_code.code)
-
+    # Extract and save the code
+    for part in response.candidates[0].content.parts:
+        if part.executable_code:
+            process_executable_code(part.executable_code.code)
