@@ -7,6 +7,7 @@ from geometor.seer.seer import Seer
 from geometor.seer.session import Session
 
 
+
 def run():
     # Load configuration
     with open("config.yaml", "r") as f:
