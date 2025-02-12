@@ -1,9 +1,8 @@
 """
-The Seer class orchestrates the process of solving ARC tasks.
+The Seer class orchestrates the process of solving tasks.
 
 It interacts with the Gemini model, manages the session, handles logging,
-and controls the flow of execution for analyzing examples, generating code,
-and evaluating solutions.
+and controls the flow of execution for analyzing examples and generating solutions.
 """
 from rich import print
 from rich.markdown import Markdown
@@ -13,7 +12,7 @@ import json
 import numpy as np
 import os
 
-from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
+#  from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Removed ARC-specific imports
 
 from geometor.seer.gemini_client import GeminiClient as Client
 
@@ -22,11 +21,8 @@ class Seer:
     """
     Initialize the Seer with all necessary components for solving and logging.
 
-    Seer expects tasks to input/output pairs of training examples - and test inputs
+    Seer expects tasks with input/output pairs of training examples.
     """
-
-    examples_summary_prompt = "Summarize the examples."  # Placeholder
-    examples_summary_instructions = "Provide a summary of the observations."  # Placeholder
 
     def __init__(
         self,
@@ -72,21 +68,18 @@ class Seer:
         # Initialize prompt count
         self.prompt_count = 0
 
-    def solve_task(
+    def solve(
         self,
-        task: Puzzle,
+        task,
     ):
         """
         Main method to orchestrate the task solving workflow.
-        Returns the working grid if solution is found, None otherwise.
         """
         self.prompt_count = 0  # Reset prompt count for each task
         history = [""]
 
-        self._investigate_examples(task.train)
+        self._investigate_examples(task.train) # Pass in the examples
         #  self._review_programs()
-        #  self._show_test_input()
-        #  self._initialize_working_grid()
         #  self._run_solution_loop()
 
         #  except Exception as e:
@@ -94,51 +87,26 @@ class Seer:
         #      self.session.log_error(f"Solve failed: {str(e)}")
         #      raise
 
-    def _convert_grid_to_python(self, grid: Grid) -> str:
-        """
-        Converts a Grid object to a Python list representation string.
-        """
-        grid_str = "[\n"
-        for row in grid.grid:
-            grid_str += "    [" + ", ".join(map(str, row)) + "],\n"
-        grid_str += "]"
-        return grid_str
-
-    def _investigate_examples(self, examples, include_images=True):
+    def _investigate_examples(self, examples, include_images=False): # Removed include_images
         """
         investigate all training pairs
         """
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            input_grid_str = self._convert_grid_to_python(pair.input)
-            output_grid_str = self._convert_grid_to_python(pair.output)
+            #  input_grid_str = self._convert_grid_to_python(pair.input) # Removed grid conversion
+            #  output_grid_str = self._convert_grid_to_python(pair.output)
 
             prompt_base = [
                 f"""
-```python
-example_{i}_input = {input_grid_str}
+```
+example_{i}_input = {str(pair.input)}
 
-example_{i}_output = {output_grid_str}
+example_{i}_output = {str(pair.output)}
 ```
 """
             ]
-            if include_images:
-                self.session.save_grid_image(
-                    pair.input.to_image(), self.prompt_count, f"example_{i}_input"
-                )
-                self.session.save_grid_image(
-                    pair.output.to_image(), self.prompt_count, f"example_{i}_output"
-                )
-                prompt_base.extend(
-                    [
-                        "\n**images**\n\ninput:\n",
-                        pair.input.to_image(),
-                        "\noutput:\n",
-                        pair.output.to_image(),
-                        "\n",
-                    ]
-                )
+            # Removed image handling
 
             # NLP Prompt
             nlp_prompt = prompt_base + ["\n**Generate NLP**\n"]
@@ -182,42 +150,6 @@ example_{i}_output = {output_grid_str}
             description=f"example_summary",
         )
 
-    def _show_test_input(self):
-        """
-        step 3 - show test input for eval
-        """
-        test_pair = self.task.test[0]
-        self.session.save_grid_image(
-            test_pair.input.to_image(), self.prompt_count, f"test_input"
-        )
-        history = [""]
-        instructions = [""]
-        prompt = [
-            f"""\
-**test**
-
-**input**
-
-```
-{str(test_pair.input.grid)}
-```
-
-**image**
-
-""",
-            test_pair.input.to_image(),
-            "\n",
-            "\n**observations**\n",
-        ]
-
-        self._generate(
-            history,
-            prompt,
-            instructions,
-            #  tools="code_execution",
-            description=f"test input",
-        )
-
     def _display_prompt(self, prompt, instructions):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
         markdown_text = f"# PROMPT {self.prompt_count}\n\n"
@@ -253,11 +185,11 @@ example_{i}_output = {output_grid_str}
 
         total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
 
-        self.session.log_prompt(
-            prompt, instructions, self.prompt_count, description=description
+        self.session.logger.log_prompt(
+            self.session.task_dir, prompt, instructions, self.prompt_count, description=description
         )
-        self.session.log_total_prompt(
-            total_prompt, self.prompt_count, description=description
+        self.session.logger.log_total_prompt(
+            self.session.task_dir, total_prompt, self.prompt_count, description=description
         )
 
 
@@ -270,7 +202,9 @@ example_{i}_output = {output_grid_str}
                     tools=tools,
                 )
 
-                self.session.log_response(response, self.prompt_count)  # Pass raw response
+                self.session.logger.log_response(
+                    self.session.task_dir, response, self.prompt_count, self.token_counts, self.response_times, self.start_time
+                )  # Pass raw response
 
                 response_parts = []
                 function_call_found = False
@@ -329,67 +263,14 @@ example_{i}_output = {output_grid_str}
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
-                self.session.log_error(str(e), total_prompt)
+                self.session.logger.log_error(self.session.task_dir, str(e), total_prompt)
                 raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.session.log_error(error_msg, total_prompt)
+        self.session.logger.log_error(self.session.task_dir, error_msg, total_prompt)
         raise MaxRetriesExceededError(error_msg)
-
-    def _evaluate_accuracy(self, working_grid: Grid, expected_grid: Grid) -> dict:
-        """
-        Evaluate the accuracy of the working grid against the expected grid.
-
-        Parameters
-        ----------
-        working_grid : Grid
-            The grid created during the solution process.
-        expected_grid : Grid
-            The expected output grid from the training data.
-
-        Returns
-        -------
-        dict
-            A dictionary containing scores for each evaluated aspect.
-        """
-        # Size Correctness
-        size_correct = (
-            working_grid.height == expected_grid.height
-            and working_grid.width == expected_grid.width
-        )
-
-        # Colors Correctness
-        working_colors = working_grid.colors
-        expected_colors = expected_grid.colors
-        colors_correct = working_colors == expected_colors
-
-        # Quantities of Unique Pixel Colors
-        working_color_counts = working_grid.color_counts
-        expected_color_counts = expected_grid.color_counts
-        unique_color_difference = {
-            color: abs(
-                working_color_counts.get(color, 0) - expected_color_counts.get(color, 0)
-            )
-            for color in set(working_color_counts) | set(expected_color_counts)
-        }
-
-        # Per-Pixel Accuracy
-        total_pixels = working_grid.size
-        correct_pixels = np.sum(working_grid.grid == expected_grid.grid)
-        pixel_accuracy = (
-            (correct_pixels / total_pixels) * 100 if total_pixels > 0 else 0
-        )
-
-        # Return results as a dictionary
-        return {
-            "size_correct": size_correct,
-            "colors_correct": colors_correct,
-            "unique_color_difference": unique_color_difference,
-            "pixel_accuracy": pixel_accuracy,
-        }
-
 
 # Custom exceptions for better error handling
 class MultipleFunctionCallsError(Exception):
