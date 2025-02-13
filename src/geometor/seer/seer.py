@@ -192,7 +192,7 @@ example_{i}_output = {output_grid_str}
                 )
 
                 response_parts, function_call_found, last_result = self._process_response(
-                    response, functions, attempt
+                    response, functions, attempt, total_prompt
                 )
 
                 # If functions were provided but no function call was found
@@ -220,7 +220,7 @@ example_{i}_output = {output_grid_str}
                     self.session.task_dir, str(e), "".join(total_prompt)
                 )
 
-    def _process_response(self, response, functions, attempt):
+    def _process_response(self, response, functions, attempt, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
         function_call_found = False
@@ -250,7 +250,7 @@ example_{i}_output = {output_grid_str}
                     response_parts.append(part.function_call.name + "\n")
 
                     result, msg = self._call_function(
-                        part.function_call, functions
+                        part.function_call, functions, total_prompt
                     )
                     last_result = msg
 
@@ -261,7 +261,7 @@ example_{i}_output = {output_grid_str}
         return response_parts, function_call_found, last_result
 
 
-    def _call_function(self, function_call, functions):
+    def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""
         if not functions:
             raise ValueError("No functions provided")
