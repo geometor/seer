@@ -198,22 +198,24 @@ example_{i}_output = {output_grid_str}
                 if hasattr(response.candidates[0].content, "parts"):
                     for part in response.candidates[0].content.parts:
                         if part.text:
+                            response_parts.append("\n*text:*\n")
                             response_parts.append(part.text + "\n")
                         if part.executable_code:
-                            response_parts.append("code_execution:\n")
+                            response_parts.append("\n*code_execution:*\n")
                             response_parts.append(
                                 f"```python\n{part.executable_code.code}\n```\n"
                             )
                         if part.code_execution_result:
+                            response_parts.append("\n*code_execution_result:*\n")
                             response_parts.append(
-                                f"code_execution_result: {part.code_execution_result.outcome}\n"
+                                f"outcome: {part.code_execution_result.outcome}\n"
                             )
                             response_parts.append(
                                 f"```\n{part.code_execution_result.output}\n```\n"
                             )
                         if part.function_call:
                             function_call_found = True
-                            response_parts.append("function_call:\n")
+                            response_parts.append("\n*function_call:*\n")
                             response_parts.append(part.function_call.name + "\n")
 
                             result, msg = self._call_function(
@@ -225,8 +227,6 @@ example_{i}_output = {output_grid_str}
                             response_parts.append(f"{result}\n")
                             response_parts.append(f"{msg}\n")
 
-                            if msg == "submit":
-                                break
 
                 # If functions were provided but no function call was found
                 if (
@@ -252,6 +252,27 @@ example_{i}_output = {output_grid_str}
                 self.session.logger.log_error(
                     self.session.task_dir, str(e), "".join(total_prompt)
                 )
+
+    def _call_function(self, function_call, functions):
+        """Execute a function call with improved error handling."""
+        if not functions:
+            raise ValueError("No functions provided")
+
+        function_name = function_call.name
+        function_args = function_call.args
+
+        if function_name not in functions:
+            raise UnknownFunctionError(f"Unknown function: {function_name}")
+
+        try:
+            result = functions[function_name](**function_args)
+            return result
+        except TypeError as e:
+            raise FunctionArgumentError(
+                f"Invalid arguments for {function_name}: {str(e)}"
+            )
+        except Exception as e:
+            raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
