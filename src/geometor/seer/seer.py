@@ -93,8 +93,8 @@ class Seer:
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            input_grid_str = self._convert_grid_to_python(pair.input)
-            output_grid_str = self._convert_grid_to_python(pair.output)
+            input_grid_str = pair.input.to_python_string()
+            output_grid_str = pair.output.to_python_string()
 
             # NLP_Prompt
             prompt = [
@@ -148,26 +148,6 @@ example_{i}_output = {output_grid_str}
             #  tools="code_execution",
             description=f"example_summary",
         )
-
-    def _convert_grid_to_python(self, grid):
-        """
-        Converts a grid (represented as a nested list or numpy array)
-        into a Python list of lists string representation, with each row
-        on a new line.
-        """
-        if isinstance(grid, np.ndarray):
-            grid_list = grid.tolist()
-        elif isinstance(grid, Grid):  # Check if it's a Grid object
-            grid_list = grid.grid.tolist()  # Access the .grid attribute
-        else:
-            grid_list = grid
-
-        rows = [str(row) for row in grid_list]
-        output = "[\n"
-        for row in rows:
-            output += f"    {row},\n"
-        output += "]"
-        return output
 
     def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
@@ -285,6 +265,7 @@ example_{i}_output = {output_grid_str}
         Runs the Seer over the set of tasks.
         """
         self.tasks = tasks  # Set tasks here
+        self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:
