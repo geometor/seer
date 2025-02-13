@@ -39,6 +39,7 @@ class Seer:
         max_iterations: int = 5,
         # tasks: object = None,  # Remove tasks
     ):
+        self.config = config
         self.start_time = datetime.now()
         # self.tasks = tasks # Removed
         self.response_times = []  # Track individual response times
