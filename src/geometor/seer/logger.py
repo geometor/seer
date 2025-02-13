@@ -11,6 +11,12 @@ class Logger:
     def __init__(self, session_dir: Path):
         self.session_dir = session_dir
 
+    def _format_banner(self, task_dir: Path, description: str) -> str:
+        """Helper function to format the banner."""
+        session_folder = task_dir.parent.name  # Get the session folder name
+        task_folder = task_dir.name  # Get the task folder name
+        return f"{session_folder} • {task_folder} • {description}"
+
     def log_prompt(
         self,
         task_dir: Path,
@@ -20,11 +26,10 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-prompt.md"
+        banner = self._format_banner(task_dir, description) # Create banner
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"[{datetime.now().isoformat()}] PROMPT: ")
-                if description:
-                    f.write(f"Description: {description}\n")
+                f.write(f"{banner}\n") # Use banner
                 f.write("-" * 80)
                 f.write("\n")
                 for part in prompt:
@@ -47,11 +52,10 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-total_prompt.md"
+        banner = self._format_banner(task_dir, description)  # Create banner
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"[{datetime.now().isoformat()}] TOTAL PROMPT: ")
-                if description:
-                    f.write(f"Description: {description}\n")
+                f.write(f"{banner}\n")  # Use banner
                 f.write("-" * 80 + "\n")
                 for part in total_prompt:
                     f.write(str(part))
@@ -71,6 +75,7 @@ class Logger:
     ):
         response_start = datetime.now()  # Capture start time
         response_file = task_dir / f"{prompt_count:03d}-response.json"
+        description = "Response" # description for banner
 
         # Get token counts and update totals (passed in)
         metadata = response.to_dict().get("usage_metadata", {})
@@ -102,9 +107,11 @@ class Logger:
 
         # Unpack the response and write elements to a markdown file
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
+        banner = self._format_banner(task_dir, description) # Create banner
+
         try:
             with open(response_md_file, "w") as f:
-                f.write(f"[{datetime.now().isoformat()}] RESPONSE:\n")
+                f.write(f"{banner}\n") # Use banner
                 f.write("-" * 80 + "\n")
 
                 if hasattr(response.candidates[0].content, "parts"):
