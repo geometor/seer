@@ -44,6 +44,9 @@ class Logger:
             print(f"Error writing prompt to file: {e}")
             self.log_error(task_dir, f"Error writing prompt to file: {e}")
 
+        # Call display_prompt here
+        self.display_prompt(prompt, instructions, prompt_count)
+
     def log_total_prompt(
         self,
         task_dir: Path,
@@ -109,6 +112,7 @@ class Logger:
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
         banner = self._format_banner(task_dir, description)
 
+        response_parts = [] # Collect response parts for display
         try:
             with open(response_md_file, "w") as f:
                 f.write(f"{banner}\n")
@@ -118,11 +122,14 @@ class Logger:
                     for part in response.candidates[0].content.parts:
                         if part.text:
                             f.write(part.text + "\n")
+                            response_parts.append(part.text + "\n") # For display
                         if part.executable_code:
                             f.write("code_execution:\n")
                             f.write(
                                 f"```python\n{part.executable_code.code}\n```\n"
                             )
+                            response_parts.append("code_execution:\n") # For display
+                            response_parts.append(f"```python\n{part.executable_code.code}\n```\n") # For display
                         if part.code_execution_result:
                             f.write(
                                 f"code_execution_result: {part.code_execution_result.outcome}\n"
@@ -130,9 +137,14 @@ class Logger:
                             f.write(
                                 f"```\n{part.code_execution_result.output}\n```\n"
                             )
+                            response_parts.append(f"code_execution_result: {part.code_execution_result.outcome}\n") # For display
+                            response_parts.append(f"```\n{part.code_execution_result.output}\n```\n") # For display
+
                         if part.function_call:
                             f.write("function_call:\n")
                             f.write(part.function_call.name + "\n")
+                            response_parts.append("function_call:\n")  # For display
+                            response_parts.append(part.function_call.name + "\n")  # For display
                             #  We do not call functions here
 
                 f.write("\n")
@@ -150,6 +162,9 @@ class Logger:
         except (IOError, PermissionError) as e:
             print(f"Error writing response Markdown to file: {e}")
             self.log_error(task_dir, f"Error writing response Markdown to file: {e}")
+
+        # Call display_response here
+        self.display_response(response_parts, prompt_count)
 
     def log_error(self, task_dir: Path, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir

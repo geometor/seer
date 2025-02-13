@@ -5,7 +5,7 @@ It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
 from rich import print
-from rich.markdown import Markdown
+#  from rich.markdown import Markdown # Removed
 from datetime import datetime
 from pathlib import Path
 import json
@@ -193,8 +193,7 @@ example_{i}_output = {output_grid_str}
         """
         self.prompt_count += 1
 
-        # Call display_prompt on logger
-        self.session.logger.display_prompt(prompt, instructions, self.prompt_count)
+        # Removed: Call display_prompt on logger
 
         total_prompt = history + prompt + instructions
 
@@ -221,6 +220,7 @@ example_{i}_output = {output_grid_str}
                     tools=tools,
                 )
 
+                # Moved: log_response and display_response are called within log_response
                 self.session.logger.log_response(
                     self.session.task_dir,
                     response,
@@ -228,7 +228,7 @@ example_{i}_output = {output_grid_str}
                     self.token_counts,
                     self.response_times,
                     self.start_time,
-                )  # Pass raw response
+                )
 
                 response_parts = []
                 function_call_found = False
@@ -282,8 +282,7 @@ example_{i}_output = {output_grid_str}
                     )
                     continue
 
-                # Call display_response on logger
-                self.session.logger.display_response(response_parts, self.prompt_count)
+                # Removed: Call display_response on logger
 
                 history = history + response_parts
 
