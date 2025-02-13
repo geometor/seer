@@ -37,11 +37,9 @@ class Seer:
         self,
         config: dict,
         max_iterations: int = 5,
-        # tasks: object = None,  # Remove tasks
     ):
         self.config = config
         self.start_time = datetime.now()
-        # self.tasks = tasks # Removed
         self.response_times = []  # Track individual response times
 
         self.nlp_model = config["nlp_model"]
@@ -68,9 +66,6 @@ class Seer:
             self.code_model, f"{self.system_context}\n\n{self.task_context}"
         )
 
-        # Initialize Session *internally*
-        # self.session = Session(config, tasks) # REMOVED
-
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
 
@@ -96,7 +91,6 @@ class Seer:
             self.session.logger.log_error(
                 self.session.task_dir, f"Solve failed: {str(e)}"
             )
-            # Removed: raise
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -284,7 +278,6 @@ example_{i}_output = {output_grid_str}
                 self.session.logger.log_error(
                     self.session.task_dir, str(e), "".join(total_prompt)
                 )
-                # Removed: raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
@@ -292,14 +285,12 @@ example_{i}_output = {output_grid_str}
         self.session.logger.log_error(
             self.session.task_dir, error_msg, "".join(total_prompt)
         )
-        # Removed: raise MaxRetriesExceededError(error_msg)
 
     def run(self, tasks):
         """
         Runs the Seer over the set of tasks.
         """
         self.tasks = tasks  # Set tasks here
-        # Create session here
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:

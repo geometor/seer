@@ -37,7 +37,6 @@ class Session:
 
         self.logger = Logger(self.session_dir)
 
-        # Log the configuration
         try:
             with open(self.session_dir / "config.json", "w") as f:
                 json.dump(config, f, indent=2)
