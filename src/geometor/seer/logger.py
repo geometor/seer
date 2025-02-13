@@ -42,7 +42,7 @@ class Logger:
     def log_total_prompt(
         self,
         task_dir: Path,
-        total_prompt: str,
+        total_prompt: list,
         prompt_count: int,
         description: str = "",
     ):
@@ -53,7 +53,8 @@ class Logger:
                 if description:
                     f.write(f"Description: {description}\n")
                 f.write("-" * 80 + "\n")
-                f.write(total_prompt)
+                for part in total_prompt:
+                    f.write(str(part))
                 f.write("\n")
         except (IOError, PermissionError) as e:
             print(f"Error writing total prompt to file: {e}")
