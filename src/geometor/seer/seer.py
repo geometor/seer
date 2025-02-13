@@ -10,6 +10,7 @@ from pathlib import Path
 import json
 import numpy as np
 import os
+import re
 
 from geometor.seer.tasks import Tasks, Task, Grid
 
@@ -233,19 +234,25 @@ example_{i}_output = {output_grid_str}
                 if part.text:
                     response_parts.append("\n*text:*\n")
                     response_parts.append(part.text + "\n")
+                    # Check for triple backticks and write to file
+                    self._write_extracted_content(part.text)
+
                 if part.executable_code:
                     response_parts.append("\n*code_execution:*\n")
-                    response_parts.append(
-                        f"```python\n{part.executable_code.code}\n```\n"
-                    )
+                    code = part.executable_code.code
+                    response_parts.append(f"```python\n{code}\n```\n")
+                    self._write_to_file(f"{self.prompt_count:03d}-code.py", code)
+
                 if part.code_execution_result:
                     response_parts.append("\n*code_execution_result:*\n")
-                    response_parts.append(
-                        f"outcome: {part.code_execution_result.outcome}\n"
+                    outcome = part.code_execution_result.outcome
+                    output = part.code_execution_result.output
+                    response_parts.append(f"outcome: {outcome}\n")
+                    response_parts.append(f"```\n{output}\n```\n")
+                    self._write_to_file(
+                        f"{self.prompt_count:03d}-code_result.txt", output
                     )
-                    response_parts.append(
-                        f"```\n{part.code_execution_result.output}\n```\n"
-                    )
+
                 if part.function_call:
                     function_call_found = True
                     response_parts.append("\n*function_call:*\n")
@@ -261,6 +268,29 @@ example_{i}_output = {output_grid_str}
                     response_parts.append(f"{msg}\n")
 
         return response_parts, function_call_found, last_result
+
+    def _write_extracted_content(self, text):
+        """Extracts content enclosed in triple backticks and writes it to files."""
+        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
+        for file_type, content in matches:
+            file_type = file_type.lower() if file_type else "txt"
+            if file_type == "python":
+                file_type = "py"  # Correct extension
+            file_name = f"{self.prompt_count:03d}-extracted.{file_type}"
+            self._write_to_file(file_name, content)
+
+
+    def _write_to_file(self, file_name, content):
+        """Writes content to a file in the task directory."""
+        file_path = self.session.task_dir / file_name
+        try:
+            with open(file_path, "w") as f:
+                f.write(content)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to file {file_name}: {e}")
+            self.session.logger.log_error(
+                self.session.task_dir, f"Error writing to file {file_name}: {e}"
+            )
 
 
     def _call_function(self, function_call, functions, total_prompt):
