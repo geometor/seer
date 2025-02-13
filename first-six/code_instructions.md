@@ -44,12 +44,13 @@ if __name__ == '__main__':
     output = transform(input)
 
     if output == expected_output:
-        print("[bold green]SUCCESS![/]")
+        print("SUCCESS!\n")
     else:
-        print("[bold red]FAILED![/]")
+        print("FAILED!\n")
         print("Expected Output:", expected_output)
         print("Transformed Output:", output)
 
+    print()
     assert output == expected_output, "Transformed output does not match expected output."
 
 ```
