@@ -191,42 +191,9 @@ example_{i}_output = {output_grid_str}
                     self.start_time,
                 )
 
-                response_parts = []
-                function_call_found = False
-                last_result = None
-
-                if hasattr(response.candidates[0].content, "parts"):
-                    for part in response.candidates[0].content.parts:
-                        if part.text:
-                            response_parts.append("\n*text:*\n")
-                            response_parts.append(part.text + "\n")
-                        if part.executable_code:
-                            response_parts.append("\n*code_execution:*\n")
-                            response_parts.append(
-                                f"```python\n{part.executable_code.code}\n```\n"
-                            )
-                        if part.code_execution_result:
-                            response_parts.append("\n*code_execution_result:*\n")
-                            response_parts.append(
-                                f"outcome: {part.code_execution_result.outcome}\n"
-                            )
-                            response_parts.append(
-                                f"```\n{part.code_execution_result.output}\n```\n"
-                            )
-                        if part.function_call:
-                            function_call_found = True
-                            response_parts.append("\n*function_call:*\n")
-                            response_parts.append(part.function_call.name + "\n")
-
-                            result, msg = self._call_function(
-                                part.function_call, functions
-                            )
-                            last_result = msg
-
-                            response_parts.append("\nresult:\n")
-                            response_parts.append(f"{result}\n")
-                            response_parts.append(f"{msg}\n")
-
+                response_parts, function_call_found, last_result = self._process_response(
+                    response, functions, attempt
+                )
 
                 # If functions were provided but no function call was found
                 if (
@@ -252,6 +219,47 @@ example_{i}_output = {output_grid_str}
                 self.session.logger.log_error(
                     self.session.task_dir, str(e), "".join(total_prompt)
                 )
+
+    def _process_response(self, response, functions, attempt):
+        """Processes the response from the Gemini model."""
+        response_parts = []
+        function_call_found = False
+        last_result = None
+
+        if hasattr(response.candidates[0].content, "parts"):
+            for part in response.candidates[0].content.parts:
+                if part.text:
+                    response_parts.append("\n*text:*\n")
+                    response_parts.append(part.text + "\n")
+                if part.executable_code:
+                    response_parts.append("\n*code_execution:*\n")
+                    response_parts.append(
+                        f"```python\n{part.executable_code.code}\n```\n"
+                    )
+                if part.code_execution_result:
+                    response_parts.append("\n*code_execution_result:*\n")
+                    response_parts.append(
+                        f"outcome: {part.code_execution_result.outcome}\n"
+                    )
+                    response_parts.append(
+                        f"```\n{part.code_execution_result.output}\n```\n"
+                    )
+                if part.function_call:
+                    function_call_found = True
+                    response_parts.append("\n*function_call:*\n")
+                    response_parts.append(part.function_call.name + "\n")
+
+                    result, msg = self._call_function(
+                        part.function_call, functions
+                    )
+                    last_result = msg
+
+                    response_parts.append("\nresult:\n")
+                    response_parts.append(f"{result}\n")
+                    response_parts.append(f"{msg}\n")
+
+        return response_parts, function_call_found, last_result
+
 
     def _call_function(self, function_call, functions):
         """Execute a function call with improved error handling."""
