@@ -5,14 +5,12 @@ It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
 from rich import print
-#  from rich.markdown import Markdown # Removed
 from datetime import datetime
 from pathlib import Path
 import json
 import numpy as np
 import os
 
-# from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 from geometor.seer.tasks import Tasks, Task, Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
@@ -23,7 +21,7 @@ from geometor.seer.exceptions import (
     FunctionArgumentError,
     FunctionExecutionError,
 )
-from geometor.seer.session import Session  # Import Session
+from geometor.seer.session import Session  
 
 
 class Seer:
@@ -40,7 +38,7 @@ class Seer:
     ):
         self.config = config
         self.start_time = datetime.now()
-        self.response_times = []  # Track individual response times
+        self.response_times = []  
 
         self.nlp_model = config["nlp_model"]
         self.code_model = config["code_model"]
@@ -58,7 +56,6 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
-        # Initialize GeminiClient
         self.nlp_client = Client(
             self.nlp_model, f"{self.system_context}\n\n{self.task_context}"
         )
@@ -66,11 +63,8 @@ class Seer:
             self.code_model, f"{self.system_context}\n\n{self.task_context}"
         )
 
-        # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
 
-        # Initialize prompt count
-        self.prompt_count = 0
 
     def solve(
         self,
@@ -79,11 +73,11 @@ class Seer:
         """
         Main method to orchestrate the task solving workflow.
         """
-        self.prompt_count = 0  # Reset prompt count for each task
+        self.prompt_count = 0  
         history = [""]
 
         try:
-            self._investigate_examples(task.train)  # Pass in the examples
+            self._investigate_examples(task.train)  
             #  self._review_programs()
             #  self._run_solution_loop()
         except Exception as e:
