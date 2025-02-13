@@ -54,4 +54,3 @@ class Session:
 
         (self.session_dir / "system_context.md").write_text(system_context)
         (self.session_dir / "task_context.md").write_text(task_context)
-

@@ -67,11 +67,8 @@ class Seer:
             self.code_model, f"{self.system_context}\n\n{self.task_context}"
         )
 
-        # Initialize timestamp
-        # self.timestamp = session.timestamp  <- Removed. Session will handle
-
         # Initialize Session *internally*
-        self.session = Session(config, tasks)
+        # self.session = Session(config, tasks) # REMOVED
 
         # Initialize token tracking
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
@@ -300,6 +297,9 @@ example_{i}_output = {output_grid_str}
         """
         Runs the Seer over the set of tasks.
         """
+        # Create session here
+        self.session = Session(self.config, self.tasks)
+
         for task in self.tasks:
             self.session.task_dir = (
                 self.session.session_dir / task.id
