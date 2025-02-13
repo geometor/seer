@@ -45,12 +45,12 @@ class Logger:
             self.log_error(task_dir, f"Error writing prompt to file: {e}")
 
         # Call display_prompt here
-        self.display_prompt(prompt, instructions, prompt_count)
+        self.display_prompt(task_dir, prompt, instructions, prompt_count, description)
 
     def log_total_prompt(
         self,
         task_dir: Path,
-        total_prompt: list,  # Changed to list
+        total_prompt: list,
         prompt_count: int,
         description: str = "",
     ):
@@ -60,7 +60,7 @@ class Logger:
             with open(prompt_file, "w") as f:
                 f.write(f"{banner}\n")
                 f.write("---\n")
-                for part in total_prompt: # Iterate through the list
+                for part in total_prompt:
                     f.write(str(part))
                 f.write("\n")
         except (IOError, PermissionError) as e:
@@ -76,9 +76,9 @@ class Logger:
         response_times: list,
         start_time,
     ):
-        response_start = datetime.now()  # Capture start time
+        response_start = datetime.now()
         response_file = task_dir / f"{prompt_count:03d}-response.json"
-        description = "Response" # description for banner
+        description = "Response"
 
         # Get token counts and update totals (passed in)
         metadata = response.to_dict().get("usage_metadata", {})
@@ -87,10 +87,10 @@ class Logger:
         token_counts["total"] += metadata.get("total_token_count", 0)
         token_counts["cached"] += metadata.get("cached_content_token_count", 0)
 
-        response_end = datetime.now()  # Capture end time
+        response_end = datetime.now()
         response_time = (response_end - response_start).total_seconds()
         total_elapsed = (response_end - start_time).total_seconds()
-        response_times.append(response_time)  # Append to passed in list
+        response_times.append(response_time)
 
         # Prepare the response data dictionary
         response_data = response.to_dict()
@@ -112,7 +112,7 @@ class Logger:
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
         banner = self._format_banner(task_dir, description)
 
-        response_parts = [] # Collect response parts for display
+        response_parts = []  # Collect response parts for display
         try:
             with open(response_md_file, "w") as f:
                 f.write(f"{banner}\n")
@@ -122,14 +122,16 @@ class Logger:
                     for part in response.candidates[0].content.parts:
                         if part.text:
                             f.write(part.text + "\n")
-                            response_parts.append(part.text + "\n") # For display
+                            response_parts.append(part.text + "\n")
                         if part.executable_code:
                             f.write("code_execution:\n")
                             f.write(
                                 f"```python\n{part.executable_code.code}\n```\n"
                             )
-                            response_parts.append("code_execution:\n") # For display
-                            response_parts.append(f"```python\n{part.executable_code.code}\n```\n") # For display
+                            response_parts.append("code_execution:\n")
+                            response_parts.append(
+                                f"```python\n{part.executable_code.code}\n```\n"
+                            )
                         if part.code_execution_result:
                             f.write(
                                 f"code_execution_result: {part.code_execution_result.outcome}\n"
@@ -137,14 +139,18 @@ class Logger:
                             f.write(
                                 f"```\n{part.code_execution_result.output}\n```\n"
                             )
-                            response_parts.append(f"code_execution_result: {part.code_execution_result.outcome}\n") # For display
-                            response_parts.append(f"```\n{part.code_execution_result.output}\n```\n") # For display
+                            response_parts.append(
+                                f"code_execution_result: {part.code_execution_result.outcome}\n"
+                            )
+                            response_parts.append(
+                                f"```\n{part.code_execution_result.output}\n```\n"
+                            )
 
                         if part.function_call:
                             f.write("function_call:\n")
                             f.write(part.function_call.name + "\n")
-                            response_parts.append("function_call:\n")  # For display
-                            response_parts.append(part.function_call.name + "\n")  # For display
+                            response_parts.append("function_call:\n")
+                            response_parts.append(part.function_call.name + "\n")
                             #  We do not call functions here
 
                 f.write("\n")
@@ -152,19 +158,25 @@ class Logger:
                 # Include token totals and timing information (from response_data)
                 f.write("Token Totals:\n")
                 f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
-                f.write(f"  Candidates: {response_data['token_totals']['candidates']}\n")
+                f.write(
+                    f"  Candidates: {response_data['token_totals']['candidates']}\n"
+                )
                 f.write(f"  Total: {response_data['token_totals']['total']}\n")
                 f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
                 f.write("Timing:\n")
-                f.write(f"  Response Time: {response_data['timing']['response_time']}s\n")
-                f.write(f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n")
+                f.write(
+                    f"  Response Time: {response_data['timing']['response_time']}s\n"
+                )
+                f.write(
+                    f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n"
+                )
 
         except (IOError, PermissionError) as e:
             print(f"Error writing response Markdown to file: {e}")
             self.log_error(task_dir, f"Error writing response Markdown to file: {e}")
 
         # Call display_response here
-        self.display_response(response_parts, prompt_count)
+        self.display_response(task_dir, response_parts, prompt_count, description)
 
     def log_error(self, task_dir: Path, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -178,9 +190,12 @@ class Logger:
             print(f"FATAL: Error writing to error log: {e}")
             print(f"Attempted to log: {error_message=}, {context=}")
 
-    def display_prompt(self, prompt, instructions, prompt_count):
+    def display_prompt(
+        self, task_dir: Path, prompt: list, instructions: list, prompt_count: int, description: str
+    ):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
-        markdown_text = f"# PROMPT {prompt_count}\n\n"
+        banner = self._format_banner(task_dir, description)  # Use the banner
+        markdown_text = f"{banner}\n\n"  # Include banner in Markdown
         for part in prompt:
             markdown_text += str(part) + "\n"
 
@@ -190,9 +205,12 @@ class Logger:
         markdown = Markdown(markdown_text)
         print(markdown)
 
-    def display_response(self, response_parts, prompt_count):
+    def display_response(
+        self, task_dir: Path, response_parts: list, prompt_count: int, description: str
+    ):
         """Displays the response using rich.markdown.Markdown."""
-        markdown_text = f"# RESPONSE {prompt_count}\n\n"
+        banner = self._format_banner(task_dir, description)  # Use the banner
+        markdown_text = f"{banner}\n\n"  # Include banner in Markdown
         for part in response_parts:
             markdown_text += str(part) + "\n"
 

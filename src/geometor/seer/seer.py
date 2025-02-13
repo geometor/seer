@@ -12,7 +12,7 @@ import json
 import numpy as np
 import os
 
-#  from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Added ARC imports
+# from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid
 from geometor.seer.tasks import Tasks, Task, Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
@@ -110,7 +110,7 @@ class Seer:
             input_grid_str = self._convert_grid_to_python(pair.input)
             output_grid_str = self._convert_grid_to_python(pair.output)
 
-            #NLP_Prompt
+            # NLP_Prompt
             prompt = [
                 f"""
 ```
@@ -183,8 +183,6 @@ example_{i}_output = {output_grid_str}
         output += "]"
         return output
 
-    # Removed _display_prompt and _display_response
-
     def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
     ):
@@ -192,8 +190,6 @@ example_{i}_output = {output_grid_str}
         Generate content from the model with standardized logging and function call handling.
         """
         self.prompt_count += 1
-
-        # Removed: Call display_prompt on logger
 
         total_prompt = history + prompt + instructions
 
@@ -208,7 +204,7 @@ example_{i}_output = {output_grid_str}
             self.session.task_dir,
             total_prompt,
             self.prompt_count,
-            description=description,  # Join total_prompt into a string
+            description=description,
         )
 
         history = history + prompt
@@ -220,7 +216,6 @@ example_{i}_output = {output_grid_str}
                     tools=tools,
                 )
 
-                # Moved: log_response and display_response are called within log_response
                 self.session.logger.log_response(
                     self.session.task_dir,
                     response,
@@ -282,8 +277,6 @@ example_{i}_output = {output_grid_str}
                     )
                     continue
 
-                # Removed: Call display_response on logger
-
                 history = history + response_parts
 
                 return response_parts
@@ -292,7 +285,7 @@ example_{i}_output = {output_grid_str}
                 print(f"\nERROR generating content: {str(e)}")
                 self.session.logger.log_error(
                     self.session.task_dir, str(e), "".join(total_prompt)
-                )  # Also join here for consistency
+                )
                 # Removed: raise
 
         # If we get here, we've exhausted retries without success
@@ -305,15 +298,15 @@ example_{i}_output = {output_grid_str}
 
     def run(self):
         """
-        Runs the Seer over the set of tasks.  This replaces Session.run().
+        Runs the Seer over the set of tasks.
         """
-        for task in self.tasks:  # Access tasks through self.session
+        for task in self.tasks:
             self.session.task_dir = (
                 self.session.session_dir / task.id
-            )  # Set task_dir on session
+            )  # Set task_dir
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
             try:
-                self.solve(task)  # Call solve on Seer instance
+                self.solve(task)
             except Exception as e:
                 print(f"Error during task processing {task.id}: {e}")
                 self.session.logger.log_error(
