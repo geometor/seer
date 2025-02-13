@@ -126,7 +126,12 @@ example_{i}_output = {output_grid_str}
             history.extend(response)
 
             # Code Prompt
-            instructions = [self.code_instructions]
+            instructions = [
+                self.code_instructions.format(
+                    input_grid_rows=input_grid_str,
+                    expected_output_grid_rows=output_grid_str,
+                )
+            ]
             prompt = [""]
             response = self._generate(  # Use nlp_client, no tools
                 history,

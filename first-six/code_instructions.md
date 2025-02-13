@@ -33,13 +33,9 @@ def transform(input):
 
 
 if __name__ == '__main__':
-    input = [
-        {{ Input grid rows }}
-    ]
+    input = {input_grid_rows}
 
-    expected_output = [
-        {{ expected output grid rows }}
-    ]
+    expected_output = {expected_output_grid_rows}
 
     output = transform(input)
 
