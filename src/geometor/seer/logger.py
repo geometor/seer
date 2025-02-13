@@ -71,6 +71,7 @@ class Logger:
         self,
         task_dir: Path,
         response,
+        response_parts,
         prompt_count: int,
         token_counts: dict,
         response_times: list,
@@ -112,68 +113,11 @@ class Logger:
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
         banner = self._format_banner(task_dir, prompt_count, description)
 
-        response_parts = []  # Collect response parts for display
-        try:
-            with open(response_md_file, "w") as f:
-                f.write(f"{banner}\n")
-                f.write("---\n")
+        with open(response_md_file, "w") as f:
+            f.write(f"{banner}\n")
+            f.write("---\n")
+            f.write("\n".join(response_parts))
 
-                if hasattr(response.candidates[0].content, "parts"):
-                    for part in response.candidates[0].content.parts:
-                        if part.text:
-                            f.write(part.text + "\n")
-                            response_parts.append(part.text + "\n")
-                        if part.executable_code:
-                            f.write("code_execution:\n")
-                            f.write(
-                                f"```python\n{part.executable_code.code}\n```\n"
-                            )
-                            response_parts.append("code_execution:\n")
-                            response_parts.append(
-                                f"```python\n{part.executable_code.code}\n```\n"
-                            )
-                        if part.code_execution_result:
-                            f.write(
-                                f"code_execution_result: {part.code_execution_result.outcome}\n"
-                            )
-                            f.write(
-                                f"```\n{part.code_execution_result.output}\n```\n"
-                            )
-                            response_parts.append(
-                                f"code_execution_result: {part.code_execution_result.outcome}\n"
-                            )
-                            response_parts.append(
-                                f"```\n{part.code_execution_result.output}\n```\n"
-                            )
-
-                        if part.function_call:
-                            f.write("function_call:\n")
-                            f.write(part.function_call.name + "\n")
-                            response_parts.append("function_call:\n")
-                            response_parts.append(part.function_call.name + "\n")
-                            #  We do not call functions here
-
-                f.write("\n")
-
-                # Include token totals and timing information (from response_data)
-                f.write("Token Totals:\n")
-                f.write(f"  Prompt: {response_data['token_totals']['prompt']}\n")
-                f.write(
-                    f"  Candidates: {response_data['token_totals']['candidates']}\n"
-                )
-                f.write(f"  Total: {response_data['token_totals']['total']}\n")
-                f.write(f"  Cached: {response_data['token_totals']['cached']}\n")
-                f.write("Timing:\n")
-                f.write(
-                    f"  Response Time: {response_data['timing']['response_time']}s\n"
-                )
-                f.write(
-                    f"  Total Elapsed: {response_data['timing']['total_elapsed']}s\n"
-                )
-
-        except (IOError, PermissionError) as e:
-            print(f"Error writing response Markdown to file: {e}")
-            self.log_error(task_dir, f"Error writing response Markdown to file: {e}")
 
         # Call display_response here
         self.display_response(task_dir, response_parts, prompt_count, description)
@@ -203,6 +147,7 @@ class Logger:
             markdown_text += str(part) + "\n"
 
         markdown = Markdown(markdown_text)
+        print()
         print(markdown)
 
     def display_response(
@@ -215,4 +160,5 @@ class Logger:
             markdown_text += str(part) + "\n"
 
         markdown = Markdown(markdown_text)
+        print()
         print(markdown)

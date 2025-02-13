@@ -24,6 +24,10 @@
 
 {{ allowed imports that support the transform }}
 
+input = {input_grid_rows}
+
+expected_output = {expected_output_grid_rows}
+
 def transform(input):
     # initialize output
 
@@ -33,9 +37,6 @@ def transform(input):
 
 
 if __name__ == '__main__':
-    input = {input_grid_rows}
-
-    expected_output = {expected_output_grid_rows}
 
     output = transform(input)
 

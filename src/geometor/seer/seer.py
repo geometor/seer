@@ -89,23 +89,21 @@ class Seer:
         history = [""]
 
         for i, pair in enumerate(examples, 1):
-            input_grid_str = pair.input.to_python_string()
-            output_grid_str = pair.output.to_python_string()
+            input_grid_str = pair.input.to_string()
+            output_grid_str = pair.output.to_string()
 
-            # NLP_Prompt
             prompt = [
-                f"""
-```
-example_{i}_input = {input_grid_str}
-
-example_{i}_output = {output_grid_str}
-```
-"""
+                "\n**input**\n```\n",
+                input_grid_str,
+                "\n```\n\n"
             ]
             if include_images:
-                prompt.append("\ninput\n")
                 prompt.append(pair.input.to_image())
-                prompt.append("\noutput\n")
+                prompt.append("\n")
+            prompt.append("\n**output**\n```\n")
+            prompt.append(output_grid_str)
+            prompt.append("\n```\n\n")
+            if include_images:
                 prompt.append(pair.output.to_image())
                 prompt.append("\n")
 
@@ -123,8 +121,8 @@ example_{i}_output = {output_grid_str}
             # Code Prompt
             instructions = [
                 self.code_instructions.format(
-                    input_grid_rows=input_grid_str,
-                    expected_output_grid_rows=output_grid_str,
+                    input_grid_rows=pair.input.to_python_string(),
+                    expected_output_grid_rows=pair.output.to_python_string(),
                 )
             ]
             prompt = [""]

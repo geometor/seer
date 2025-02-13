@@ -1,5 +1,5 @@
 import numpy as np
-from geometor.model import Model
+#  from geometor.model import Model
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -51,19 +51,19 @@ class Grid:
         unique, counts = np.unique(self.grid, return_counts=True)
         return dict(zip(unique, counts))
 
-    @property
-    def model(self):
-        if self._model is None:
-            self._model = self._create_model()
-        return self._model
+    #  @property
+    #  def model(self):
+        #  if self._model is None:
+            #  self._model = self._create_model()
+        #  return self._model
 
-    def _create_model(self):
-        model = Model(self.name)
-        for y in range(self.height):
-            for x in range(self.width):
-                val = self.grid[y, x]
-                model.set_point(x, y, classes=[str(val)], label=f"({x},{y})")
-        return model
+    #  def _create_model(self):
+        #  model = Model(self.name)
+        #  for y in range(self.height):
+            #  for x in range(self.width):
+                #  val = self.grid[y, x]
+                #  model.set_point(x, y, classes=[str(val)], label=f"({x},{y})")
+        #  return model
 
     def rotate(self, k=1):
         """
@@ -245,4 +245,4 @@ class Grid:
         """
         Returns a string representation of the grid as a Python list of lists.
         """
-        return "[" + ",\n".join([str(list(row)) for row in self.grid]) + "]"
+        return "[\n" + ",\n".join(["    " + str(list(row)) for row in self.grid]) + "\n]"

@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\n1. **Identify '8' Corners:** Examine each cell in the input grid. Identify cells containing the value '8' that have exactly two neighboring cells (up, down, left, right) that also contain the value '8'.\n\n2. **Locate '8' Neighbors:** For each identified '8' corner cell, find its two neighboring cells that contain '8'.\n\n3. **Calculate Missing Square Corner:** Using the coordinates of the '8' corner cell and its two '8' neighbors, calculate the coordinates of the cell that would complete a 2x2 square if connected with these three '8's.  The coordinates of this 'missing corner' (row_missing, column_missing) can be calculated as follows:\n   `row_missing = row_neighbor1 + row_neighbor2 - row_corner`\n   `column_missing = column_neighbor1 + column_neighbor2 - column_corner`\n   where (row_corner, column_corner) is the location of the '8' corner, and (row_neighbor1, column_neighbor1) and (row_neighbor2, column_neighbor2) are the locations of its two '8' neighbors.\n\n4. **Conditional Fill:** Check the value of the cell at the calculated 'missing corner' location in the *input* grid. If this value is '0', then in the *output* grid, change the value of this cell to '1'.\n\n5. **Retain Unchanged Values:** For all other cells in the grid that are not modified in step 4, their values in the output grid should be identical to their values in the input grid.\n\nThis program describes a process of finding configurations of three '8's that form three corners of a 2x2 square and filling in the fourth corner with a '1' if it was initially '0'."
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3253,
+    "candidates_token_count": 399,
+    "total_token_count": 3652,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 6570,
+    "candidates": 1767,
+    "total": 8337,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000317,
+    "total_elapsed": 51.830226,
+    "response_times": [
+      0.000197,
+      0.000199,
+      0.000317
+    ]
+  }
+}
