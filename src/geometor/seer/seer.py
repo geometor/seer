@@ -183,26 +183,7 @@ example_{i}_output = {output_grid_str}
         output += "]"
         return output
 
-    def _display_prompt(self, prompt, instructions):
-        """Displays the prompt and instructions using rich.markdown.Markdown."""
-        markdown_text = f"# PROMPT {self.prompt_count}\n\n"
-        for part in prompt:
-            markdown_text += str(part) + "\n"
-
-        for part in instructions:
-            markdown_text += str(part) + "\n"
-
-        markdown = Markdown(markdown_text)
-        print(markdown)
-
-    def _display_response(self, response_parts):
-        """Displays the response using rich.markdown.Markdown."""
-        markdown_text = f"# RESPONSE {self.prompt_count}\n\n"
-        for part in response_parts:
-            markdown_text += str(part) + "\n"
-
-        markdown = Markdown(markdown_text)
-        print(markdown)
+    # Removed _display_prompt and _display_response
 
     def _generate(
         self, history, prompt, instructions, tools=None, functions=None, description=""
@@ -212,7 +193,8 @@ example_{i}_output = {output_grid_str}
         """
         self.prompt_count += 1
 
-        self._display_prompt(prompt, instructions)
+        # Call display_prompt on logger
+        self.session.logger.display_prompt(prompt, instructions, self.prompt_count)
 
         total_prompt = history + prompt + instructions
 
@@ -300,8 +282,8 @@ example_{i}_output = {output_grid_str}
                     )
                     continue
 
-                # Log the response
-                self._display_response(response_parts)
+                # Call display_response on logger
+                self.session.logger.display_response(response_parts, self.prompt_count)
 
                 history = history + response_parts
 

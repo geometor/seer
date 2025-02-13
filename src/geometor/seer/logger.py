@@ -5,6 +5,8 @@ Provides a Logger class for handling logging within a Seer session.
 from pathlib import Path
 from datetime import datetime
 import json
+from rich.markdown import Markdown
+from rich import print
 
 
 class Logger:
@@ -26,10 +28,10 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-prompt.md"
-        banner = self._format_banner(task_dir, description) 
+        banner = self._format_banner(task_dir, description)
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"{banner}\n") 
+                f.write(f"{banner}\n")
                 f.write("---\n")
                 f.write("\n")
                 for part in prompt:
@@ -45,17 +47,17 @@ class Logger:
     def log_total_prompt(
         self,
         task_dir: Path,
-        total_prompt: list,
+        total_prompt: list,  # Changed to list
         prompt_count: int,
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-total_prompt.md"
-        banner = self._format_banner(task_dir, description)  
+        banner = self._format_banner(task_dir, description)
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"{banner}\n")  
+                f.write(f"{banner}\n")
                 f.write("---\n")
-                for part in total_prompt:
+                for part in total_prompt: # Iterate through the list
                     f.write(str(part))
                 f.write("\n")
         except (IOError, PermissionError) as e:
@@ -89,11 +91,11 @@ class Logger:
 
         # Prepare the response data dictionary
         response_data = response.to_dict()
-        response_data["token_totals"] = token_counts.copy()  
+        response_data["token_totals"] = token_counts.copy()
         response_data["timing"] = {
             "response_time": response_time,
             "total_elapsed": total_elapsed,
-            "response_times": response_times.copy(),  
+            "response_times": response_times.copy(),
         }
 
         try:
@@ -105,11 +107,11 @@ class Logger:
 
         # Unpack the response and write elements to a markdown file
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
-        banner = self._format_banner(task_dir, description) 
+        banner = self._format_banner(task_dir, description)
 
         try:
             with open(response_md_file, "w") as f:
-                f.write(f"{banner}\n") 
+                f.write(f"{banner}\n")
                 f.write("---\n")
 
                 if hasattr(response.candidates[0].content, "parts"):
@@ -160,3 +162,24 @@ class Logger:
         except (IOError, PermissionError) as e:
             print(f"FATAL: Error writing to error log: {e}")
             print(f"Attempted to log: {error_message=}, {context=}")
+
+    def display_prompt(self, prompt, instructions, prompt_count):
+        """Displays the prompt and instructions using rich.markdown.Markdown."""
+        markdown_text = f"# PROMPT {prompt_count}\n\n"
+        for part in prompt:
+            markdown_text += str(part) + "\n"
+
+        for part in instructions:
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print(markdown)
+
+    def display_response(self, response_parts, prompt_count):
+        """Displays the response using rich.markdown.Markdown."""
+        markdown_text = f"# RESPONSE {prompt_count}\n\n"
+        for part in response_parts:
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print(markdown)
