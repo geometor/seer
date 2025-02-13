@@ -78,15 +78,9 @@ class Seer:
         self.prompt_count = 0  
         history = [""]
 
-        try:
-            self._investigate_examples(task.train)  
-            #  self._review_programs()
-            #  self._run_solution_loop()
-        except Exception as e:
-            print(f"Solve failed: {str(e)}")
-            self.session.logger.log_error(
-                self.session.task_dir, f"Solve failed: {str(e)}"
-            )
+        self._investigate_examples(task.train)  
+        #  self._review_programs()
+        #  self._run_solution_loop()
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -184,52 +178,32 @@ example_{i}_output = {output_grid_str}
 
         #  history = history + prompt
 
-        for attempt in range(self.max_iterations):
-            try:
-                response = self.nlp_client.generate_content(
-                    total_prompt,
-                    tools=tools,
-                )
 
-                self.session.logger.log_response(
-                    self.session.task_dir,
-                    response,
-                    self.prompt_count,
-                    self.token_counts,
-                    self.response_times,
-                    self.start_time,
-                )
+        response = self.nlp_client.generate_content(
+            total_prompt,
+            tools=tools,
+        )
 
-                response_parts, function_call_found, last_result = self._process_response(
-                    response, functions, attempt, total_prompt
-                )
+        response_parts, function_call_found, last_result = self._process_response(
+            response, functions, total_prompt
+        )
 
-                # If functions were provided but no function call was found
-                if (
-                    functions
-                    and not function_call_found
-                    and attempt < self.max_iterations - 1
-                ):
-                    retry_prompt = total_prompt + [
-                        "\nNo function call found in your response. Please provide exactly one function call using the available functions.\n"
-                    ]
-                    total_prompt = retry_prompt
-                    print(
-                        f"\nRetrying function call request (attempt {attempt + 2}/{self.max_iterations})"
-                    )
-                    continue
+        self.session.logger.log_response(
+            self.session.task_dir,
+            response,
+            response_parts,
+            self.prompt_count,
+            self.token_counts,
+            self.response_times,
+            self.start_time,
+        )
 
-                history = history + response_parts
+        #  history = history + response_parts
 
-                return response_parts
+        return response_parts
 
-            except Exception as e:
-                print(f"\nERROR generating content: {str(e)}")
-                self.session.logger.log_error(
-                    self.session.task_dir, str(e), "".join(total_prompt)
-                )
 
-    def _process_response(self, response, functions, attempt, total_prompt):
+    def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
         function_call_found = False
@@ -343,10 +317,5 @@ example_{i}_output = {output_grid_str}
                 self.session.session_dir / task.id
             )  # Set task_dir
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
-            try:
-                self.solve(task)
-            except Exception as e:
-                print(f"Error during task processing {task.id}: {e}")
-                self.session.logger.log_error(
-                    self.session.task_dir, f"Error during task processing: {e}"
-                )
+
+            self.solve(task)
