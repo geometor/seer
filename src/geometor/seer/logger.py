@@ -13,11 +13,11 @@ class Logger:
     def __init__(self, session_dir: Path):
         self.session_dir = session_dir
 
-    def _format_banner(self, task_dir: Path, description: str) -> str:
+    def _format_banner(self, task_dir: Path, prompt_count: int, description: str) -> str:
         """Helper function to format the banner."""
         session_folder = task_dir.parent.name  # Get the session folder name
         task_folder = task_dir.name  # Get the task folder name
-        return f"# {session_folder} • {task_folder} • {description}\n"
+        return f"# {session_folder} • {task_folder} • {prompt_count:03d} {description}\n"
 
     def log_prompt(
         self,
@@ -28,7 +28,7 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-prompt.md"
-        banner = self._format_banner(task_dir, description)
+        banner = self._format_banner(task_dir, prompt_count, description)
         try:
             with open(prompt_file, "w") as f:
                 f.write(f"{banner}\n")
@@ -55,7 +55,7 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-total_prompt.md"
-        banner = self._format_banner(task_dir, description)
+        banner = self._format_banner(task_dir, prompt_count, description)
         try:
             with open(prompt_file, "w") as f:
                 f.write(f"{banner}\n")
@@ -110,7 +110,7 @@ class Logger:
 
         # Unpack the response and write elements to a markdown file
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
-        banner = self._format_banner(task_dir, description)
+        banner = self._format_banner(task_dir, prompt_count, description)
 
         response_parts = []  # Collect response parts for display
         try:
@@ -194,7 +194,7 @@ class Logger:
         self, task_dir: Path, prompt: list, instructions: list, prompt_count: int, description: str
     ):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
-        banner = self._format_banner(task_dir, description)  # Use the banner
+        banner = self._format_banner(task_dir, prompt_count, description)  # Use the banner
         markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
         for part in prompt:
             markdown_text += str(part) + "\n"
@@ -209,7 +209,7 @@ class Logger:
         self, task_dir: Path, response_parts: list, prompt_count: int, description: str
     ):
         """Displays the response using rich.markdown.Markdown."""
-        banner = self._format_banner(task_dir, description)  # Use the banner
+        banner = self._format_banner(task_dir, prompt_count, description)  # Use the banner
         markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
         for part in response_parts:
             markdown_text += str(part) + "\n"
