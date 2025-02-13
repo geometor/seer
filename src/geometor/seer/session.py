@@ -22,7 +22,7 @@ class Session:
         self.output_dir = Path(config["output_dir"])
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.timestamp = datetime.now().strftime("%y.%j.%H%M%S")  # Generate timestamp
+        self.timestamp = datetime.now().strftime("%y.%j.%H%M")  # Generate timestamp
 
         self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
