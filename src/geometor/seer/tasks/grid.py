@@ -240,3 +240,9 @@ class Grid:
                     draw.text((text_x + 1, text_y - 1), value, fill="black", font=font)
 
         return image
+
+    def to_python_string(self):
+        """
+        Returns a string representation of the grid as a Python list of lists.
+        """
+        return "[" + ",\n".join([str(list(row)) for row in self.grid]) + "]"
