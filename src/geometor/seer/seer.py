@@ -12,7 +12,8 @@ import json
 import numpy as np
 import os
 
-from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Added ARC imports
+#  from geometor.arcprize.puzzles import Puzzle, PuzzleSet, Grid  # Added ARC imports
+from geometor.seer.tasks import Tasks, Task, Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
 from geometor.seer.exceptions import (
@@ -36,7 +37,7 @@ class Seer:
         self,
         config: dict,
         max_iterations: int = 5,
-        tasks: object = None, # Add tasks
+        tasks: object = None,  # Add tasks
     ):
         self.start_time = datetime.now()
         self.tasks = tasks
@@ -89,15 +90,17 @@ class Seer:
         history = [""]
 
         try:
-            self._investigate_examples(task.train) # Pass in the examples
+            self._investigate_examples(task.train)  # Pass in the examples
             #  self._review_programs()
             #  self._run_solution_loop()
         except Exception as e:
             print(f"Solve failed: {str(e)}")
-            self.session.logger.log_error(self.session.task_dir, f"Solve failed: {str(e)}")
+            self.session.logger.log_error(
+                self.session.task_dir, f"Solve failed: {str(e)}"
+            )
             # Removed: raise
 
-    def _investigate_examples(self, examples, include_images=False):
+    def _investigate_examples(self, examples, include_images=True):
         """
         investigate all training pairs
         """
@@ -107,7 +110,8 @@ class Seer:
             input_grid_str = self._convert_grid_to_python(pair.input)
             output_grid_str = self._convert_grid_to_python(pair.output)
 
-            prompt_base = [
+            #NLP_Prompt
+            prompt = [
                 f"""
 ```
 example_{i}_input = {input_grid_str}
@@ -116,35 +120,34 @@ example_{i}_output = {output_grid_str}
 ```
 """
             ]
-            # Removed image handling
+            if include_images:
+                prompt.append("\ninput\n")
+                prompt.append(pair.input.to_image())
+                prompt.append("\noutput\n")
+                prompt.append(pair.output.to_image())
+                prompt.append("\n")
 
-            # NLP Prompt
-            nlp_prompt = prompt_base + ["\n**Generate NLP**\n"]
-            nlp_instructions = [self.nlp_instructions]
-
-            nlp_response = self._generate(
+            instructions = [self.nlp_instructions]
+            response = self._generate(
                 history,
-                nlp_prompt,
-                nlp_instructions,
+                prompt,
+                instructions,
                 tools=None,
-                description=f"example_{i}_nlp",
+                description=f"example_{i} - NLP",
             )
-            history.extend(nlp_response)
-
+            history.extend(response)
 
             # Code Prompt
-            code_prompt = prompt_base + [
-                f"\n**Generate Code**\n\n**NLP:**\n{nlp_response}\n"
-            ]
-            code_instructions = [self.code_instructions]
-            code_response = self._generate(  # Use nlp_client, no tools
+            instructions = [self.code_instructions]
+            prompt = [""]
+            response = self._generate(  # Use nlp_client, no tools
                 history,
-                code_prompt,
-                code_instructions,
+                prompt,
+                instructions,
                 tools="code_execution",
-                description=f"example_{i}_code",
+                description=f"example_{i} - CODE",
             )
-            history.extend(code_response)
+            history.extend(response)
 
     def _review_programs(self, instructions):
         """
@@ -183,11 +186,9 @@ example_{i}_output = {output_grid_str}
     def _display_prompt(self, prompt, instructions):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
         markdown_text = f"# PROMPT {self.prompt_count}\n\n"
-        markdown_text += "## Prompt\n\n"
         for part in prompt:
             markdown_text += str(part) + "\n"
 
-        markdown_text += "\n## Instructions\n\n"
         for part in instructions:
             markdown_text += str(part) + "\n"
 
@@ -213,15 +214,21 @@ example_{i}_output = {output_grid_str}
 
         self._display_prompt(prompt, instructions)
 
-        total_prompt = history + prompt + ["\n\n====\n\n"] + instructions
+        total_prompt = history + prompt + instructions
 
         self.session.logger.log_prompt(
-            self.session.task_dir, prompt, instructions, self.prompt_count, description=description
+            self.session.task_dir,
+            prompt,
+            instructions,
+            self.prompt_count,
+            description=description,
         )
         self.session.logger.log_total_prompt(
-            self.session.task_dir, "".join(total_prompt), self.prompt_count, description=description  # Join total_prompt into a string
+            self.session.task_dir,
+            total_prompt,
+            self.prompt_count,
+            description=description,  # Join total_prompt into a string
         )
-
 
         history = history + prompt
 
@@ -233,7 +240,12 @@ example_{i}_output = {output_grid_str}
                 )
 
                 self.session.logger.log_response(
-                    self.session.task_dir, response, self.prompt_count, self.token_counts, self.response_times, self.start_time
+                    self.session.task_dir,
+                    response,
+                    self.prompt_count,
+                    self.token_counts,
+                    self.response_times,
+                    self.start_time,
                 )  # Pass raw response
 
                 response_parts = []
@@ -274,7 +286,11 @@ example_{i}_output = {output_grid_str}
                                 break
 
                 # If functions were provided but no function call was found
-                if functions and not function_call_found and attempt < self.max_iterations - 1:
+                if (
+                    functions
+                    and not function_call_found
+                    and attempt < self.max_iterations - 1
+                ):
                     retry_prompt = total_prompt + [
                         "\nNo function call found in your response. Please provide exactly one function call using the available functions.\n"
                     ]
@@ -293,25 +309,32 @@ example_{i}_output = {output_grid_str}
 
             except Exception as e:
                 print(f"\nERROR generating content: {str(e)}")
-                self.session.logger.log_error(self.session.task_dir, str(e), "".join(total_prompt)) # Also join here for consistency
+                self.session.logger.log_error(
+                    self.session.task_dir, str(e), "".join(total_prompt)
+                )  # Also join here for consistency
                 # Removed: raise
 
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.session.logger.log_error(self.session.task_dir, error_msg, "".join(total_prompt))
+        self.session.logger.log_error(
+            self.session.task_dir, error_msg, "".join(total_prompt)
+        )
         # Removed: raise MaxRetriesExceededError(error_msg)
 
     def run(self):
         """
         Runs the Seer over the set of tasks.  This replaces Session.run().
         """
-        for task in self.tasks.puzzles:  # Access tasks through self.session
-            self.session.task_dir = self.session.session_dir / task.id  # Set task_dir on session
+        for task in self.tasks:  # Access tasks through self.session
+            self.session.task_dir = (
+                self.session.session_dir / task.id
+            )  # Set task_dir on session
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
             try:
                 self.solve(task)  # Call solve on Seer instance
             except Exception as e:
                 print(f"Error during task processing {task.id}: {e}")
-                self.session.logger.log_error(self.session.task_dir, f"Error during task processing: {e}")
-
+                self.session.logger.log_error(
+                    self.session.task_dir, f"Error during task processing: {e}"
+                )

@@ -26,16 +26,14 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-prompt.md"
-        banner = self._format_banner(task_dir, description) # Create banner
+        banner = self._format_banner(task_dir, description) 
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"{banner}\n") # Use banner
-                f.write("-" * 80)
+                f.write(f"{banner}\n") 
+                f.write("---\n")
                 f.write("\n")
                 for part in prompt:
                     f.write(str(part))
-                f.write("\n")
-                f.write("=" * 80)
                 f.write("\n")
                 for part in instructions:
                     f.write(str(part))
@@ -52,11 +50,11 @@ class Logger:
         description: str = "",
     ):
         prompt_file = task_dir / f"{prompt_count:03d}-total_prompt.md"
-        banner = self._format_banner(task_dir, description)  # Create banner
+        banner = self._format_banner(task_dir, description)  
         try:
             with open(prompt_file, "w") as f:
-                f.write(f"{banner}\n")  # Use banner
-                f.write("-" * 80 + "\n")
+                f.write(f"{banner}\n")  
+                f.write("---\n")
                 for part in total_prompt:
                     f.write(str(part))
                 f.write("\n")
@@ -91,11 +89,11 @@ class Logger:
 
         # Prepare the response data dictionary
         response_data = response.to_dict()
-        response_data["token_totals"] = token_counts.copy()  # Use the passed-in dict
+        response_data["token_totals"] = token_counts.copy()  
         response_data["timing"] = {
             "response_time": response_time,
             "total_elapsed": total_elapsed,
-            "response_times": response_times.copy(),  # Use the passed-in list
+            "response_times": response_times.copy(),  
         }
 
         try:
@@ -107,12 +105,12 @@ class Logger:
 
         # Unpack the response and write elements to a markdown file
         response_md_file = task_dir / f"{prompt_count:03d}-response.md"
-        banner = self._format_banner(task_dir, description) # Create banner
+        banner = self._format_banner(task_dir, description) 
 
         try:
             with open(response_md_file, "w") as f:
-                f.write(f"{banner}\n") # Use banner
-                f.write("-" * 80 + "\n")
+                f.write(f"{banner}\n") 
+                f.write("---\n")
 
                 if hasattr(response.candidates[0].content, "parts"):
                     for part in response.candidates[0].content.parts:
