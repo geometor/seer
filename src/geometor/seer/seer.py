@@ -121,6 +121,7 @@ example_{i}_output = {output_grid_str}
                 tools=None,
                 description=f"example_{i} - NLP",
             )
+            history.extend(prompt)
             history.extend(response)
 
             # Code Prompt
@@ -133,6 +134,7 @@ example_{i}_output = {output_grid_str}
                 tools="code_execution",
                 description=f"example_{i} - CODE",
             )
+            history.extend(prompt)
             history.extend(response)
 
     def _review_programs(self, instructions):
@@ -173,7 +175,7 @@ example_{i}_output = {output_grid_str}
             description=description,
         )
 
-        history = history + prompt
+        #  history = history + prompt
 
         for attempt in range(self.max_iterations):
             try:
