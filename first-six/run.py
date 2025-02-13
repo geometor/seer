@@ -15,10 +15,10 @@ def run():
 
     seer = Seer(
         config,
-        tasks=tasks
+        # tasks=tasks # Removed
     )
 
-    seer.run()
+    seer.run(tasks) # Pass tasks to run()
 
 
 if __name__ == "__main__":

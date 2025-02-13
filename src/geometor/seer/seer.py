@@ -37,10 +37,10 @@ class Seer:
         self,
         config: dict,
         max_iterations: int = 5,
-        tasks: object = None,  # Add tasks
+        # tasks: object = None,  # Remove tasks
     ):
         self.start_time = datetime.now()
-        self.tasks = tasks
+        # self.tasks = tasks # Removed
         self.response_times = []  # Track individual response times
 
         self.nlp_model = config["nlp_model"]
@@ -293,10 +293,11 @@ example_{i}_output = {output_grid_str}
         )
         # Removed: raise MaxRetriesExceededError(error_msg)
 
-    def run(self):
+    def run(self, tasks):
         """
         Runs the Seer over the set of tasks.
         """
+        self.tasks = tasks  # Set tasks here
         # Create session here
         self.session = Session(self.config, self.tasks)
 
