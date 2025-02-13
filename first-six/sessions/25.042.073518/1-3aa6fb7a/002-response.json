@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "Here's the Python code implementing the transformation described in the natural language program:\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\n1.  Identify Disconnected Single Pixels: Examine the input grid and identify all individual pixels of color 8 that are not directly adjacent (horizontally or vertically) to any other pixel of color 8.\n\n2.  Change Color: Change the color of these identified pixels from 8 to 1.\n\n3. Preserve other pixels All other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule.\n    \"\"\"\n    input_array = np.array(input_grid)\n    output_array = input_array.copy()\n    rows, cols = input_array.shape\n\n    for i in range(rows):\n        for j in range(cols):\n            if input_array[i, j] == 8:\n                # Check neighbors (up, down, left, right)\n                neighbors = []\n                if i > 0:\n                    neighbors.append(input_array[i-1, j])\n                if i < rows - 1:\n                    neighbors.append(input_array[i+1, j])\n                if j > 0:\n                    neighbors.append(input_array[i, j-1])\n                if j < cols - 1:\n                    neighbors.append(input_array[i, j+1])\n\n                # If all neighbors are not 8, change to 1\n                if all(neighbor != 8 for neighbor in neighbors):\n                    output_array[i, j] = 1\n\n    return output_array.tolist()\n\n\nif __name__ == '__main__':\n    input_grid = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 0, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 1, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n    ]\n\n    transformed_grid = transform(input_grid)\n\n    if transformed_grid == expected_output:\n        print(\"Transformation successful!\")\n    else:\n        print(\"Transformation failed.\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", transformed_grid)\n\n    assert transformed_grid == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1982,
+    "candidates_token_count": 807,
+    "total_token_count": 2789,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3302,
+    "candidates": 952,
+    "total": 4254,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000285,
+    "total_elapsed": 10.4656,
+    "response_times": [
+      0.000366,
+      0.000285
+    ]
+  }
+}

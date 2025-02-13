@@ -1,4 +1,4 @@
-**Python Code Instructions**
+**Instructions**
 
 - Generate a complete Python module to be run in your code_execution to
   represent the natural language program 
@@ -18,37 +18,38 @@
 **Skeleton Template**
 
 ```python
-\"\"\"
-Natural language description of the transformation rule goes here.
-\"\"\"
+"""
+{{ natural language description of the transformation rule }}
+"""
 
-# Imports (e.g., numpy, sympy)
+{{ allowed imports that support the transform }}
 
-def transform(input_grid):
-    \"\"\"
-    Transforms the input grid according to the rule.
-    \"\"\"
-    # Implementation goes here
+def transform(input):
+    # initialize output
+
+    # change output pixels 
+
+    return output
 
 
 if __name__ == '__main__':
-    input_grid = [
-        # ... Input grid data ...
+    input = [
+        {{ Input grid rows }}
     ]
 
     expected_output = [
-        # ... Expected output grid data ...
+        {{ expected output grid rows }}
     ]
 
-    transformed_grid = transform(input_grid)
+    output = transform(input)
 
-    if transformed_grid == expected_output:
-        print("Transformation successful!")
+    if output == expected_output:
+        print("[bold green]SUCCESS![/]")
     else:
-        print("Transformation failed.")
+        print("[bold red]FAILED![/]")
         print("Expected Output:", expected_output)
-        print("Transformed Output:", transformed_grid)
+        print("Transformed Output:", output)
 
-    assert transformed_grid == expected_output, "Transformed output does not match expected output."
+    assert output == expected_output, "Transformed output does not match expected output."
 
 ```
