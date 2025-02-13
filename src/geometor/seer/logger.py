@@ -17,7 +17,7 @@ class Logger:
         """Helper function to format the banner."""
         session_folder = task_dir.parent.name  # Get the session folder name
         task_folder = task_dir.name  # Get the task folder name
-        return f"{session_folder} • {task_folder} • {description}"
+        return f"# {session_folder} • {task_folder} • {description}\n"
 
     def log_prompt(
         self,
@@ -195,7 +195,7 @@ class Logger:
     ):
         """Displays the prompt and instructions using rich.markdown.Markdown."""
         banner = self._format_banner(task_dir, description)  # Use the banner
-        markdown_text = f"{banner}\n\n"  # Include banner in Markdown
+        markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
         for part in prompt:
             markdown_text += str(part) + "\n"
 
@@ -210,7 +210,7 @@ class Logger:
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(task_dir, description)  # Use the banner
-        markdown_text = f"{banner}\n\n"  # Include banner in Markdown
+        markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
         for part in response_parts:
             markdown_text += str(part) + "\n"
 
