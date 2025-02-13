@@ -254,12 +254,14 @@ example_{i}_output = {output_grid_str}
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
             file_type = file_type.lower() if file_type else "txt"
-            file_type_ext = file_type
             if file_type == "python":
-                file_type_ext = "py"  # Correct extension
+                file_type = "py"  # Correct extension
+            if file_type not in self.extracted_file_counts:
+                file_type = "txt"
+
             self.extracted_file_counts[file_type] += 1
             count = self.extracted_file_counts[file_type]
-            file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type_ext}"
+            file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
             self._write_to_file(file_name, content)
 
 
