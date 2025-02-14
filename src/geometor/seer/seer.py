@@ -273,18 +273,17 @@ class Seer:
                         expected_output = pair.output.grid
                         try:
                             transformed_output = namespace["transform"](input_grid)
+                            test_results_str += f"  Input:\n{pair.input.to_string()}\n"
+                            test_results_str += (
+                                f"  Expected Output:\n{pair.output.to_string()}\n"
+                            )
+                            test_results_str += (
+                                f"  Actual Output:\n{Grid(transformed_output).to_string()}\n"
+                            )
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += (
                                     f"  Validation failed for example {i + 1}:\n"
                                 )
-                                test_results_str += f"    Input:\n{pair.input.to_string()}\n"
-                                test_results_str += (
-                                    f"    Expected Output:\n{pair.output.to_string()}\n"
-                                )
-                                test_results_str += (
-                                    f"    Actual Output:\n{Grid(transformed_output).to_string()}\n"
-                                )
-
                             else:
                                 test_results_str += f"  Validation passed for example {i+1}\n"
                         except Exception as e:
