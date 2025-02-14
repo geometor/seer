@@ -1,0 +1,29 @@
+task_context: "ARC-AGI grid puzzle transformation"
+transformation_rule: "For the first connected component of color 8, change the cell to the left of its bottom-right cell to color 1. For the second component of color 8, change the cell to the right of its top-left cell to color 1. For the third component of color 8, change the cell to the left of its top-left cell to color 1."
+objects:
+  - type: "connected component"
+    color: 8
+    properties:
+      - "shape"
+      - "position"
+      - "top-left cell"
+      - "bottom-right cell"
+actions:
+  - "identify": "connected components of color 8 in reading order"
+  - "process_component_1":
+    - "find": "bottom-right cell of the first component"
+    - "change_color": "cell to the left of the bottom-right cell to color 1 if it is color 0"
+  - "process_component_2":
+    - "find": "top-left cell of the second component"
+    - "change_color": "cell to the right of the top-left cell to color 1 if it is color 0"
+  - "process_component_3":
+    - "find": "top-left cell of the third component"
+    - "change_color": "cell to the left of the top-left cell to color 1 if it is color 0"
+predicates:
+  - "connected": "cells of the same color are adjacent"
+  - "top-left": "cell with minimum row and column index in a component"
+  - "bottom-right": "cell with maximum row and column index in a component"
+  - "to_the_right_of": "cell is immediately to the right"
+  - "to_the_left_of": "cell is immediately to the left"
+  - "color_is_0": "cell color is white"
+  - "color_is_1": "cell color is blue"

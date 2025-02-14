@@ -124,8 +124,8 @@ class Seer:
             # Code Prompt
             instructions = [
                 self.code_instructions.format(
-                    input_grid_rows=pair.input.to_python_string(2),
-                    expected_output_grid_rows=pair.output.to_python_string(2),
+                    input_grid_rows=pair.input.to_python_string(),
+                    expected_output_grid_rows=pair.output.to_python_string(),
                 )
             ]
             prompt = [""]
@@ -267,10 +267,12 @@ class Seer:
 
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                    test_results_str += "\n*validation:*\n"
+                    test_results_str += "\n# validation:*\n"
                     for i, pair in enumerate(self.task.train):
                         input_grid = pair.input.grid
                         expected_output = pair.output.grid
+
+                        test_results_str += f"\n*example {i + 1}:*\n"
                         try:
                             transformed_output = namespace["transform"](input_grid)
                             test_results_str += f"  Input:\n{pair.input.to_string()}\n"
@@ -282,10 +284,10 @@ class Seer:
                             )
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += (
-                                    f"  Validation failed for example {i + 1}:\n"
+                                    f"**FAILED!**\n"
                                 )
                             else:
-                                test_results_str += f"  Validation passed for example {i+1}\n"
+                                test_results_str += f"  PASSED\n"
                         except Exception as e:
                             test_results_str += (
                                 f"  Error during validation for example {i + 1}: {e}\n"

@@ -1,0 +1,39 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\nThe task is to modify the grid based on connected regions of color '8' (azure).\nFirst, identify all distinct connected components of cells containing the value '8'. Connectivity is defined by adjacency (horizontally or vertically).\nFor each connected component of '8's:\n  1. Find the topmost-leftmost cell within this component. This is the cell with the minimum row index, and among those with the same minimum row index, the minimum column index. Let's call this cell the 'anchor' cell.\n  2. Check the cell immediately to the right of the 'anchor' cell. If this cell is within the grid boundaries and its value is '0' (white), change its value to '1' (blue).\n  3. Check the cell immediately below the 'anchor' cell. If this cell is within the grid boundaries and its value is '0' (white), change its value to '1' (blue).\n\nThis process is applied independently to each connected component of '8's in the input grid to produce the output grid.\n\n**YAML Block:**\n\n```yaml\ntask_context: \"ARC-AGI grid puzzle transformation\"\ntransformation_rule: \"For each connected component of color '8', identify the topmost-leftmost cell. Change the value of the cell immediately to its right to '1' if it's '0', and change the value of the cell immediately below it to '1' if it's '0'.\"\nobjects:\n  - type: \"connected component\"\n    color: 8\n    properties:\n      - \"topmost-leftmost cell\"\nactions:\n  - \"identify connected components of color '8'\"\n  - \"find topmost-leftmost cell in each component\"\n  - \"check cell to the right and below the topmost-leftmost cell\"\n  - \"if cell is '0', change to '1'\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1669,
+    "candidates_token_count": 413,
+    "total_token_count": 2082,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1669,
+    "candidates": 413,
+    "total": 2082,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000412,
+    "total_elapsed": 24.601772,
+    "response_times": [
+      0.000412
+    ]
+  }
+}

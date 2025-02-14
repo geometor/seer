@@ -1,0 +1,39 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Description of the Transformation:**\n\nThe transformation operates on connected components of color 8 (azure) in the input grid.\n\n1. **Identify Connected Components:** Locate all distinct, contiguous regions of color 8. In this input, there are two such components.\n2. **Process First Component:** For the first component encountered (reading order: top to bottom, left to right):\n    - **Find Top-Left Cell:** Determine the cell within this component that has the minimum row index. If there are multiple cells with the same minimum row index, choose the one with the minimum column index among them. This is the \"top-left\" cell of the component.\n    - **Change Cell to the Right:**  Identify the cell immediately to the right of the \"top-left\" cell. If this cell exists within the grid boundaries and its current color is 0 (white), change its color to 1 (blue).\n3. **Process Second Component:** For the second component encountered (in reading order):\n    - **Find Bottom-Right Cell:** Determine the cell within this component that has the maximum row index. If there are multiple cells with the same maximum row index, choose the one with the maximum column index among them. This is the \"bottom-right\" cell of the component.\n    - **Change Cell to the Left:** Identify the cell immediately to the left of the \"bottom-right\" cell. If this cell exists within the grid boundaries and its current color is 0 (white), change its color to 1 (blue).\n4. **Output Grid:** The grid resulting from these changes is the output grid.\n\n**YAML Block:**\n\n```yaml\ntask_context: \"ARC-AGI grid puzzle transformation\"\ntransformation_rule: \"For the first connected component of color 8, change the cell to the right of its top-left cell to color 1. For the second connected component of color 8, change the cell to the left of its bottom-right cell to color 1.\"\nobjects:\n  - type: \"connected component\"\n    color: 8\n    properties:\n      - \"shape\"\n      - \"position\"\n      - \"top-left cell\"\n      - \"bottom-right cell\"\nactions:\n  - \"identify\": \"connected components of color 8\"\n  - \"find\": \"top-left cell of the first component\"\n  - \"change_color\": \"cell to the right of the top-left cell to color 1 if it is color 0\"\n  - \"find\": \"bottom-right cell of the second component\"\n  - \"change_color\": \"cell to the left of the bottom-right cell to color 1 if it is color 0\"\npredicates:\n  - \"connected\": \"cells of the same color are adjacent\"\n  - \"top-left\": \"cell with minimum row and column index in a component\"\n  - \"bottom-right\": \"cell with maximum row and column index in a component\"\n  - \"to_the_right_of\": \"cell is immediately to the right\"\n  - \"to_the_left_of\": \"cell is immediately to the left\"\n  - \"color_is_0\": \"cell color is white\"\n  - \"color_is_1\": \"cell color is blue\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1669,
+    "candidates_token_count": 718,
+    "total_token_count": 2387,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1669,
+    "candidates": 718,
+    "total": 2387,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000272,
+    "total_elapsed": 42.785829,
+    "response_times": [
+      0.000272
+    ]
+  }
+}

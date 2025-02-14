@@ -1,0 +1,52 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFor each connected component of color '8', identify the topmost-leftmost cell.\nChange the value of the cell immediately to its right to '1' if it's '0',\nand change the value of the cell immediately below it to '1' if it's '0'.\n\"\"\"\n\nimport collections\n\ndef get_connected_components(grid, color):\n    rows = len(grid)\n    cols = len(grid[0])\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n    components = []\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == color and not visited[r][c]:\n                component = []\n                q = collections.deque([(r, c)])\n                visited[r][c] = True\n                while q:\n                    row, col = q.popleft()\n                    component.append((row, col))\n                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                        nr, nc = row + dr, col + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == color and not visited[nr][nc]:\n                            visited[nr][nc] = True\n                            q.append((nr, nc))\n                components.append(component)\n    return components\n\ndef get_topmost_leftmost_cell(component):\n    topmost_row = float('inf')\n    leftmost_col = float('inf')\n    anchor_cell = None\n    for r, c in component:\n        if r < topmost_row:\n            topmost_row = r\n            leftmost_col = c\n            anchor_cell = (r, c)\n        elif r == topmost_row and c < leftmost_col:\n            leftmost_col = c\n            anchor_cell = (r, c)\n    return anchor_cell\n\ndef transform(input_grid):\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n    output_grid = [row[:] for row in input_grid] # Create a copy\n\n    components = get_connected_components(input_grid, 8)\n    for component in components:\n        anchor_cell = get_topmost_leftmost_cell(component)\n        if anchor_cell:\n            r, c = anchor_cell\n            # Check right\n            if c + 1 < cols and output_grid[r][c + 1] == 0:\n                output_grid[r][c + 1] = 1\n            # Check below\n            if r + 1 < rows and output_grid[r + 1][c] == 0:\n                output_grid[r + 1][c] = 1\n    return output_grid\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 341,
+            "end_index": 526,
+            "uri": "https://usablechan.vercel.app/CS/%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98/%EC%97%B0%EA%B2%B0%EC%84%B1%EB%B6%84%20%EA%B2%80%EC%82%AC(connected%20component)/",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4645,
+    "candidates_token_count": 1091,
+    "total_token_count": 5736,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 12814,
+    "candidates": 2824,
+    "total": 15638,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000358,
+    "total_elapsed": 45.597055,
+    "response_times": [
+      0.000412,
+      0.000376,
+      0.000301,
+      0.000358
+    ]
+  }
+}

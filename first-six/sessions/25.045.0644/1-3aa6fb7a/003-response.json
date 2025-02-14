@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\n1. **Identify '8'-objects:** Find all connected regions of cells with color '8' in the input grid. Consider each connected region as a distinct object.\n2. **Order Objects:** Order the identified '8'-objects based on their discovery order during a typical connected component finding algorithm (e.g., top-to-bottom, left-to-right scan).\n3. **Iterate through '8'-objects:** For each '8'-object in the determined order:\n    a. **Find Top-Left Cell:** Locate the top-left most cell within the current '8'-object.\n    b. **Cycle Directions:** Use a cyclic sequence of directions: right, down, left, up.\n    c. **Attempt Modification with Directions:** For each direction in the cycle, starting with right for the first object, down for the second, left for the third, up for the fourth, and then repeating the cycle:\n        - Check the cell immediately adjacent to the top-left cell in the current direction.\n        - If this adjacent cell is within the grid boundaries and its current color is '0', change its color to '1'.\n        - Once a cell is successfully changed to '1', stop attempting further directions for the current '8'-object and proceed to the next '8'-object in the sequence.\n\n**YAML Block:**\n\n```yaml\ntask_context: \"ARC-AGI grid puzzle\"\ntransformation_rule: \"Modify cells adjacent to connected '8' regions in a cyclic direction pattern.\"\nobjects:\n  - type: \"connected region\"\n    color: 8\n    properties:\n      - \"connectivity\"\n      - \"top-left most cell\"\n      - \"discovery order\"\nactions:\n  - action_type: \"change_color\"\n    target_object: \"cell adjacent to '8'-object's top-left cell\"\n    new_color: 1\n    conditions:\n      - \"target cell is within grid boundaries\"\n      - \"target cell's original color is 0\"\ntransformation_steps:\n  - \"Identify and order connected regions of color '8'.\"\n  - \"For each region, find the top-left most cell.\"\n  - \"Apply cyclic directions (right, down, left, up) based on the region's order.\"\n  - \"For each direction, check the adjacent cell; if valid and color '0', change to '1' and proceed to the next region.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4059,
+    "candidates_token_count": 538,
+    "total_token_count": 4597,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 8317,
+    "candidates": 2188,
+    "total": 10505,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000205,
+    "total_elapsed": 50.335229,
+    "response_times": [
+      0.000385,
+      0.000299,
+      0.000205
+    ]
+  }
+}

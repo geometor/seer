@@ -1,4 +1,5 @@
 import numpy as np
+
 #  from geometor.model import Model
 
 from PIL import Image, ImageDraw, ImageFont
@@ -53,17 +54,17 @@ class Grid:
 
     #  @property
     #  def model(self):
-        #  if self._model is None:
-            #  self._model = self._create_model()
-        #  return self._model
+    #  if self._model is None:
+    #  self._model = self._create_model()
+    #  return self._model
 
     #  def _create_model(self):
-        #  model = Model(self.name)
-        #  for y in range(self.height):
-            #  for x in range(self.width):
-                #  val = self.grid[y, x]
-                #  model.set_point(x, y, classes=[str(val)], label=f"({x},{y})")
-        #  return model
+    #  model = Model(self.name)
+    #  for y in range(self.height):
+    #  for x in range(self.width):
+    #  val = self.grid[y, x]
+    #  model.set_point(x, y, classes=[str(val)], label=f"({x},{y})")
+    #  return model
 
     def rotate(self, k=1):
         """
@@ -144,9 +145,10 @@ class Grid:
 
         cells_modified = (r2 - r1) * (c2 - c1)
 
-        return True, f"set_range({row1=}, {column1=}, {row2=}, {column2=}, {color=})\n {cells_modified} pixels modified"
-
-
+        return (
+            True,
+            f"set_range({row1=}, {column1=}, {row2=}, {column2=}, {color=})\n {cells_modified} pixels modified",
+        )
 
     def set_floodfill(self, row: int, column: int, color: int) -> str:
         """
@@ -166,7 +168,10 @@ class Grid:
 
         # If the initial color is the same as the new color, no need to proceed
         if initial_color == color:
-            return False, "No change needed as the target color is the same as the initial color"
+            return (
+                False,
+                "No change needed as the target color is the same as the initial color",
+            )
 
         # Stack for DFS
         stack = [(row, column)]
@@ -192,8 +197,10 @@ class Grid:
                 stack.append((current_row, current_col + 1))
                 stack.append((current_row, current_col - 1))
 
-        return True, f"set_floodfill({row=}, {column=}, {color=})\n {cells_modified} pixels modified"
-
+        return (
+            True,
+            f"set_floodfill({row=}, {column=}, {color=})\n {cells_modified} pixels modified",
+        )
 
     def to_string(self, row_delimiter="\n", cell_delimiter=" "):
         return row_delimiter.join(
@@ -245,5 +252,9 @@ class Grid:
         """
         Returns a string representation of the grid as a Python list of lists.
         """
-        indent = "    " * indent_level
-        return "[\n" + ",\n".join([indent + str(list(row)) for row in self.grid]) + "\n]"
+        indent = "        "
+        return (
+            "[\n"
+            + ",\n".join([indent + str(list(row)) for row in self.grid])
+            + "\n    ]"
+        )
