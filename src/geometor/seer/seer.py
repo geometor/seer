@@ -300,7 +300,7 @@ class Seer:
                 test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
 
             # Write test results to file
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
+            test_results_file =  Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
 
@@ -310,7 +310,7 @@ class Seer:
                 self.session.task_dir, f"SyntaxError in generated code: {e}"
             )
             # Write test results to file even on error
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
+            test_results_file = Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
         except Exception as e:
@@ -319,7 +319,7 @@ class Seer:
                 self.session.task_dir, f"Error executing generated code: {e}"
             )
             # Write test results to file even on error
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
+            test_results_file =  Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
         return []
 
@@ -339,7 +339,7 @@ class Seer:
             file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
             file_path = self.session.task_dir / file_name
 
-            self._write_to_file(file_path, content)
+            self._write_to_file(file_name, content)
 
             # If it's a Python file, also run tests
             if file_type == "py":
