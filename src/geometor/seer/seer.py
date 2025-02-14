@@ -310,7 +310,7 @@ class Seer:
                 self.session.task_dir, f"SyntaxError in generated code: {e}"
             )
             # Write test results to file even on error
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
             self._write_to_file(test_results_file, test_results_str)
 
         except Exception as e:
@@ -319,7 +319,7 @@ class Seer:
                 self.session.task_dir, f"Error executing generated code: {e}"
             )
             # Write test results to file even on error
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
             self._write_to_file(test_results_file, test_results_str)
         return []
 
@@ -337,7 +337,14 @@ class Seer:
             self.extracted_file_counts[file_type] += 1
             count = self.extracted_file_counts[file_type]
             file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
-            self._write_to_file(file_name, content)
+            file_path = self.session.task_dir / file_name
+
+            self._write_to_file(file_path, content)
+
+            # If it's a Python file, also run tests
+            if file_type == "py":
+                self._test_code(content, file_path)
+
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
