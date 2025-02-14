@@ -225,7 +225,7 @@ class Seer:
 
                     # Call _test_code and extend response_parts
                     test_results = self._test_code(code, code_file_path)
-                    response_parts.extend(test_results)
+                    response_parts.extend(test_results)  # Should now be an empty list
 
 
                 if part.code_execution_result:
@@ -255,8 +255,8 @@ class Seer:
         return response_parts, function_call_found, last_result
 
     def _test_code(self, code, code_file_path):
-        """Executes and validates the generated code."""
-        test_results = []
+        """Executes and validates the generated code, writing results to a file."""
+        test_results_str = ""
         try:
             tree = ast.parse(code)
             namespace = {}
@@ -267,28 +267,28 @@ class Seer:
 
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                    test_results.append("\n*validation:*\n")
+                    test_results_str += "\n*validation:*\n"
                     for i, pair in enumerate(self.task.train):
                         input_grid = pair.input.grid
                         expected_output = pair.output.grid
                         try:
                             transformed_output = namespace["transform"](input_grid)
                             if not np.array_equal(transformed_output, expected_output):
-                                test_results.append(
+                                test_results_str += (
                                     f"  Validation failed for example {i + 1}:\n"
                                 )
-                                test_results.append(f"    Input:\n{pair.input.to_string()}\n")
-                                test_results.append(
+                                test_results_str += f"    Input:\n{pair.input.to_string()}\n"
+                                test_results_str += (
                                     f"    Expected Output:\n{pair.output.to_string()}\n"
                                 )
-                                test_results.append(
+                                test_results_str += (
                                     f"    Actual Output:\n{Grid(transformed_output).to_string()}\n"
                                 )
 
                             else:
-                                test_results.append(f"  Validation passed for example {i+1}\n")
+                                test_results_str += f"  Validation passed for example {i+1}\n"
                         except Exception as e:
-                            test_results.append(
+                            test_results_str += (
                                 f"  Error during validation for example {i + 1}: {e}\n"
                             )
                             self.session.logger.log_error(
@@ -297,20 +297,32 @@ class Seer:
                             )
             captured_output = output_capture.getvalue()
             if captured_output:
-                test_results.append(f"*captured output:*\n```\n{captured_output}\n```\n")
+                test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
+
+            # Write test results to file
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            self._write_to_file(test_results_file, test_results_str)
 
 
         except SyntaxError as e:
-            test_results.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             self.session.logger.log_error(
                 self.session.task_dir, f"SyntaxError in generated code: {e}"
             )
+            # Write test results to file even on error
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            self._write_to_file(test_results_file, test_results_str)
+
         except Exception as e:
-            test_results.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             self.session.logger.log_error(
                 self.session.task_dir, f"Error executing generated code: {e}"
             )
-        return test_results
+            # Write test results to file even on error
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            self._write_to_file(test_results_file, test_results_str)
+        return []
+
 
     def _write_extracted_content(self, text):
         """Extracts content enclosed in triple backticks and writes it to files."""
