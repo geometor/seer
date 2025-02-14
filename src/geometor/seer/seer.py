@@ -11,6 +11,9 @@ import json
 import numpy as np
 import os
 import re
+import ast
+import contextlib
+import io
 
 from geometor.seer.tasks import Tasks, Task, Grid
 
@@ -22,7 +25,7 @@ from geometor.seer.exceptions import (
     FunctionArgumentError,
     FunctionExecutionError,
 )
-from geometor.seer.session import Session  
+from geometor.seer.session import Session
 
 
 class Seer:
@@ -39,7 +42,7 @@ class Seer:
     ):
         self.config = config
         self.start_time = datetime.now()
-        self.response_times = []  
+        self.response_times = []
 
         self.nlp_model = config["nlp_model"]
         self.code_model = config["code_model"]
@@ -67,7 +70,6 @@ class Seer:
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
-
     def solve(
         self,
         task,
@@ -75,10 +77,11 @@ class Seer:
         """
         Main method to orchestrate the task solving workflow.
         """
-        self.prompt_count = 0  
+        self.prompt_count = 0
+        self.task = task  # Store the task for use in _process_response
         history = [""]
 
-        self._investigate_examples(task.train)  
+        self._investigate_examples(task.train)
         #  self._review_programs()
         #  self._run_solution_loop()
 
@@ -95,7 +98,7 @@ class Seer:
             prompt = [
                 "\n**input**\n```\n",
                 input_grid_str,
-                "\n```\n\n"
+                "\n```\n\n",
             ]
             if include_images:
                 prompt.append(pair.input.to_image())
@@ -176,7 +179,6 @@ class Seer:
 
         #  history = history + prompt
 
-
         response = self.nlp_client.generate_content(
             total_prompt,
             tools=tools,
@@ -200,7 +202,6 @@ class Seer:
 
         return response_parts
 
-
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
@@ -219,7 +220,63 @@ class Seer:
                     response_parts.append("\n*code_execution:*\n")
                     code = part.executable_code.code
                     response_parts.append(f"```python\n{code}\n```\n")
-                    self._write_to_file(f"{self.prompt_count:03d}-code.py", code)
+                    code_file_path = self.session.task_dir / f"{self.prompt_count:03d}-code.py"
+                    self._write_to_file(code_file_path, code)
+
+                    # Execute and validate the code
+                    try:
+                        tree = ast.parse(code)
+                        namespace = {}
+                        # Capture stdout
+                        output_capture = io.StringIO()
+                        with contextlib.redirect_stdout(output_capture):
+                            exec(compile(tree, filename=str(code_file_path), mode="exec"), namespace)
+
+                        for node in ast.walk(tree):
+                            if isinstance(node, ast.FunctionDef) and node.name == "transform":
+                                response_parts.append("\n*validation:*\n")
+                                for i, pair in enumerate(self.task.train):
+                                    input_grid = pair.input.grid
+                                    expected_output = pair.output.grid
+                                    try:
+                                        transformed_output = namespace["transform"](input_grid)
+                                        if not np.array_equal(transformed_output, expected_output):
+                                            response_parts.append(
+                                                f"  Validation failed for example {i + 1}:\n"
+                                            )
+                                            response_parts.append(f"    Input:\n{pair.input.to_string()}\n")
+                                            response_parts.append(
+                                                f"    Expected Output:\n{pair.output.to_string()}\n"
+                                            )
+                                            response_parts.append(
+                                                f"    Actual Output:\n{Grid(transformed_output).to_string()}\n"
+                                            )
+
+                                        else:
+                                            response_parts.append(f"  Validation passed for example {i+1}\n")
+                                    except Exception as e:
+                                        response_parts.append(
+                                            f"  Error during validation for example {i + 1}: {e}\n"
+                                        )
+                                        self.session.logger.log_error(
+                                            self.session.task_dir,
+                                            f"Error during validation for example {i + 1}: {e}",
+                                        )
+                        captured_output = output_capture.getvalue()
+                        if captured_output:
+                            response_parts.append(f"*captured output:*\n```\n{captured_output}\n```\n")
+
+
+                    except SyntaxError as e:
+                        response_parts.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+                        self.session.logger.log_error(
+                            self.session.task_dir, f"SyntaxError in generated code: {e}"
+                        )
+                    except Exception as e:
+                        response_parts.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+                        self.session.logger.log_error(
+                            self.session.task_dir, f"Error executing generated code: {e}"
+                        )
 
                 if part.code_execution_result:
                     response_parts.append("\n*code_execution_result:*\n")
@@ -262,7 +319,6 @@ class Seer:
             file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
             self._write_to_file(file_name, content)
 
-
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
         file_path = self.session.task_dir / file_name
@@ -274,7 +330,6 @@ class Seer:
             self.session.logger.log_error(
                 self.session.task_dir, f"Error writing to file {file_name}: {e}"
             )
-
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""
