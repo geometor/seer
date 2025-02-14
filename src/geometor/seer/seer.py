@@ -78,7 +78,7 @@ class Seer:
         Main method to orchestrate the task solving workflow.
         """
         self.prompt_count = 0
-        self.task = task  # Store the task for use in _process_response
+        self.task = task  # Store the task for use in _process_response and _test_code
         history = [""]
 
         self._investigate_examples(task.train)
@@ -223,60 +223,10 @@ class Seer:
                     code_file_path = self.session.task_dir / f"{self.prompt_count:03d}-code.py"
                     self._write_to_file(code_file_path, code)
 
-                    # Execute and validate the code
-                    try:
-                        tree = ast.parse(code)
-                        namespace = {}
-                        # Capture stdout
-                        output_capture = io.StringIO()
-                        with contextlib.redirect_stdout(output_capture):
-                            exec(compile(tree, filename=str(code_file_path), mode="exec"), namespace)
+                    # Call _test_code and extend response_parts
+                    test_results = self._test_code(code, code_file_path)
+                    response_parts.extend(test_results)
 
-                        for node in ast.walk(tree):
-                            if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                                response_parts.append("\n*validation:*\n")
-                                for i, pair in enumerate(self.task.train):
-                                    input_grid = pair.input.grid
-                                    expected_output = pair.output.grid
-                                    try:
-                                        transformed_output = namespace["transform"](input_grid)
-                                        if not np.array_equal(transformed_output, expected_output):
-                                            response_parts.append(
-                                                f"  Validation failed for example {i + 1}:\n"
-                                            )
-                                            response_parts.append(f"    Input:\n{pair.input.to_string()}\n")
-                                            response_parts.append(
-                                                f"    Expected Output:\n{pair.output.to_string()}\n"
-                                            )
-                                            response_parts.append(
-                                                f"    Actual Output:\n{Grid(transformed_output).to_string()}\n"
-                                            )
-
-                                        else:
-                                            response_parts.append(f"  Validation passed for example {i+1}\n")
-                                    except Exception as e:
-                                        response_parts.append(
-                                            f"  Error during validation for example {i + 1}: {e}\n"
-                                        )
-                                        self.session.logger.log_error(
-                                            self.session.task_dir,
-                                            f"Error during validation for example {i + 1}: {e}",
-                                        )
-                        captured_output = output_capture.getvalue()
-                        if captured_output:
-                            response_parts.append(f"*captured output:*\n```\n{captured_output}\n```\n")
-
-
-                    except SyntaxError as e:
-                        response_parts.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
-                        self.session.logger.log_error(
-                            self.session.task_dir, f"SyntaxError in generated code: {e}"
-                        )
-                    except Exception as e:
-                        response_parts.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
-                        self.session.logger.log_error(
-                            self.session.task_dir, f"Error executing generated code: {e}"
-                        )
 
                 if part.code_execution_result:
                     response_parts.append("\n*code_execution_result:*\n")
@@ -303,6 +253,64 @@ class Seer:
                     response_parts.append(f"{msg}\n")
 
         return response_parts, function_call_found, last_result
+
+    def _test_code(self, code, code_file_path):
+        """Executes and validates the generated code."""
+        test_results = []
+        try:
+            tree = ast.parse(code)
+            namespace = {}
+            # Capture stdout
+            output_capture = io.StringIO()
+            with contextlib.redirect_stdout(output_capture):
+                exec(compile(tree, filename=str(code_file_path), mode="exec"), namespace)
+
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name == "transform":
+                    test_results.append("\n*validation:*\n")
+                    for i, pair in enumerate(self.task.train):
+                        input_grid = pair.input.grid
+                        expected_output = pair.output.grid
+                        try:
+                            transformed_output = namespace["transform"](input_grid)
+                            if not np.array_equal(transformed_output, expected_output):
+                                test_results.append(
+                                    f"  Validation failed for example {i + 1}:\n"
+                                )
+                                test_results.append(f"    Input:\n{pair.input.to_string()}\n")
+                                test_results.append(
+                                    f"    Expected Output:\n{pair.output.to_string()}\n"
+                                )
+                                test_results.append(
+                                    f"    Actual Output:\n{Grid(transformed_output).to_string()}\n"
+                                )
+
+                            else:
+                                test_results.append(f"  Validation passed for example {i+1}\n")
+                        except Exception as e:
+                            test_results.append(
+                                f"  Error during validation for example {i + 1}: {e}\n"
+                            )
+                            self.session.logger.log_error(
+                                self.session.task_dir,
+                                f"Error during validation for example {i + 1}: {e}",
+                            )
+            captured_output = output_capture.getvalue()
+            if captured_output:
+                test_results.append(f"*captured output:*\n```\n{captured_output}\n```\n")
+
+
+        except SyntaxError as e:
+            test_results.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+            self.session.logger.log_error(
+                self.session.task_dir, f"SyntaxError in generated code: {e}"
+            )
+        except Exception as e:
+            test_results.append(f"\n*code_execution_error:*\n```\n{e}\n```\n")
+            self.session.logger.log_error(
+                self.session.task_dir, f"Error executing generated code: {e}"
+            )
+        return test_results
 
     def _write_extracted_content(self, text):
         """Extracts content enclosed in triple backticks and writes it to files."""
