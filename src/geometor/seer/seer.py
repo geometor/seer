@@ -278,7 +278,7 @@ class Seer:
                                 f"  Expected Output:\n{pair.output.to_string()}\n"
                             )
                             test_results_str += (
-                                f"  Transformed Output:\n{transformed_output}\n"
+                                f"  Transformed Output:\n{Grid(transformed_output, '', '', '', '').to_string()}\n"
                             )
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += (
