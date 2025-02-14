@@ -124,8 +124,8 @@ class Seer:
             # Code Prompt
             instructions = [
                 self.code_instructions.format(
-                    input_grid_rows=pair.input.to_python_string(),
-                    expected_output_grid_rows=pair.output.to_python_string(),
+                    input_grid_rows=pair.input.to_python_string(2),
+                    expected_output_grid_rows=pair.output.to_python_string(2),
                 )
             ]
             prompt = [""]
@@ -300,7 +300,7 @@ class Seer:
                 test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
 
             # Write test results to file
-            test_results_file = self.session.task_dir / f"{code_file_path.stem}-test_results.txt"
+            test_results_file = self.session.task_dir / f"{code_file_path.stem}.md"
             self._write_to_file(test_results_file, test_results_str)
 
 

@@ -241,8 +241,9 @@ class Grid:
 
         return image
 
-    def to_python_string(self):
+    def to_python_string(self, indent_level=1):
         """
         Returns a string representation of the grid as a Python list of lists.
         """
-        return "[\n" + ",\n".join(["    " + str(list(row)) for row in self.grid]) + "\n]"
+        indent = "    " * indent_level
+        return "[\n" + ",\n".join([indent + str(list(row)) for row in self.grid]) + "\n]"
