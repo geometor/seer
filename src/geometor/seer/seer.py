@@ -395,16 +395,14 @@ class Seer:
 
         print(f"Using model: {self.nlp_model}")
 
-
-        # Display system context and task context at the beginning
+        # Use session_dir for the initial context display
         self.session.logger.display_prompt(
-            self.session.task_dir,
+            self.session.session_dir,
             [self.system_context],
             [self.task_context],
             0,
             description="Initial Context",
         )
-
 
         for task in self.tasks:
             self.session.task_dir = (
