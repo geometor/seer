@@ -236,7 +236,7 @@ class Seer:
 
                     # Call _test_code and extend response_parts
                     test_results = self._test_code(code, code_file_path)
-                    response_parts.extend(test_results)  # Should now be an empty list
+                    response_parts.extend(test_results)
 
 
                 if part.code_execution_result:
@@ -314,8 +314,8 @@ class Seer:
             test_results_file =  Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
-            # Display test results
-            self.session.display_test_results(test_results_str, self.prompt_count)
+            # Display test results  <- REMOVE THIS
+            #  self.session.display_test_results(test_results_str, self.prompt_count)
 
 
         except SyntaxError as e:
@@ -325,8 +325,8 @@ class Seer:
             test_results_file = Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
-            # Display test results
-            self.session.display_test_results(test_results_str, self.prompt_count)
+            # Display test results  <- REMOVE THIS
+            #  self.session.display_test_results(test_results_str, self.prompt_count)
 
         except Exception as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
@@ -335,9 +335,9 @@ class Seer:
             test_results_file =  Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
-            # Display test results
-            self.session.display_test_results(test_results_str, self.prompt_count)
-        return []
+            # Display test results  <- REMOVE THIS
+            #  self.session.display_test_results(test_results_str, self.prompt_count)
+        return [test_results_str] # return the string
 
 
     def _write_extracted_content(self, text):
