@@ -10,8 +10,8 @@ handling errors.
 from pathlib import Path
 from datetime import datetime
 import json
-
-from geometor.seer.logger import Logger
+from rich.markdown import Markdown
+from rich import print
 
 
 class Session:
@@ -32,17 +32,14 @@ class Session:
             self._write_context_files(config["system_context_file"], config["task_context_file"])
         except (FileNotFoundError, IOError, PermissionError) as e:
             print(f"Error writing context files: {e}")
-            if hasattr(self, 'logger'):
-                self.logger.log_error(self.session_dir, f"Error writing context files: {e}")
-
-        self.logger = Logger(self.session_dir)
+            self.log_error(f"Error writing context files: {e}")
 
         try:
             with open(self.session_dir / "config.json", "w") as f:
                 json.dump(config, f, indent=2)
         except (IOError, PermissionError) as e:
             print(f"Error writing config file: {e}")
-            self.logger.log_error(self.session_dir, f"Error writing config file: {e}")
+            self.log_error(f"Error writing config file: {e}")
 
 
     def _write_context_files(self, system_context_file: str, task_context_file: str):
@@ -53,3 +50,150 @@ class Session:
 
         (self.session_dir / "system_context.md").write_text(system_context)
         (self.session_dir / "task_context.md").write_text(task_context)
+
+    def _format_banner(self, prompt_count: int, description: str) -> str:
+        """Helper function to format the banner."""
+        session_folder = self.task_dir.parent.name  # Get the session folder name
+        task_folder = self.task_dir.name  # Get the task folder name
+        return f"# {session_folder} • {task_folder} • {prompt_count:03d} {description}\n"
+
+    def log_prompt(
+        self,
+        prompt: list,
+        instructions: list,
+        prompt_count: int,
+        description: str = "",
+    ):
+        prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.md"
+        banner = self._format_banner(prompt_count, description)
+        try:
+            with open(prompt_file, "w") as f:
+                f.write(f"{banner}\n")
+                f.write("---\n")
+                f.write("\n")
+                for part in prompt:
+                    f.write(str(part))
+                f.write("\n")
+                for part in instructions:
+                    f.write(str(part))
+                f.write("\n")
+        except (IOError, PermissionError) as e:
+            print(f"Error writing prompt to file: {e}")
+            self.log_error(f"Error writing prompt to file: {e}")
+
+        # Call display_prompt here
+        self.display_prompt(prompt, instructions, prompt_count, description)
+
+    def log_total_prompt(
+        self,
+        total_prompt: list,
+        prompt_count: int,
+        description: str = "",
+    ):
+        prompt_file = self.task_dir / f"{prompt_count:03d}-total_prompt.md"
+        banner = self._format_banner(prompt_count, description)
+        try:
+            with open(prompt_file, "w") as f:
+                f.write(f"{banner}\n")
+                f.write("---\n")
+                for part in total_prompt:
+                    f.write(str(part))
+                f.write("\n")
+        except (IOError, PermissionError) as e:
+            print(f"Error writing total prompt to file: {e}")
+            self.log_error(f"Error writing total prompt to file: {e}")
+
+    def log_response(
+        self,
+        response,
+        response_parts,
+        prompt_count: int,
+        token_counts: dict,
+        response_times: list,
+        start_time,
+    ):
+        response_start = datetime.now()
+        response_file = self.task_dir / f"{prompt_count:03d}-response.json"
+        description = "Response"
+
+        # Get token counts and update totals (passed in)
+        metadata = response.to_dict().get("usage_metadata", {})
+        token_counts["prompt"] += metadata.get("prompt_token_count", 0)
+        token_counts["candidates"] += metadata.get("candidates_token_count", 0)
+        token_counts["total"] += metadata.get("total_token_count", 0)
+        token_counts["cached"] += metadata.get("cached_content_token_count", 0)
+
+        response_end = datetime.now()
+        response_time = (response_end - response_start).total_seconds()
+        total_elapsed = (response_end - start_time).total_seconds()
+        response_times.append(response_time)
+
+        # Prepare the response data dictionary
+        response_data = response.to_dict()
+        response_data["token_totals"] = token_counts.copy()
+        response_data["timing"] = {
+            "response_time": response_time,
+            "total_elapsed": total_elapsed,
+            "response_times": response_times.copy(),
+        }
+
+        try:
+            with open(response_file, "w") as f:
+                json.dump(response_data, f, indent=2)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing response JSON to file: {e}")
+            self.log_error(f"Error writing response JSON to file: {e}")
+
+        # Unpack the response and write elements to a markdown file
+        response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
+        banner = self._format_banner(prompt_count, description)
+
+        with open(response_md_file, "w") as f:
+            f.write(f"{banner}\n")
+            f.write("---\n")
+            f.write("\n".join(response_parts))
+
+
+        # Call display_response here
+        self.display_response(response_parts, prompt_count, description)
+
+    def log_error(self, error_message: str, context: str = ""):
+        error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
+        try:
+            with open(error_log_file, "a") as f:
+                f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}\n")
+                if context:
+                    f.write(f"Context: {context}\n")
+                f.write("\n")
+        except (IOError, PermissionError) as e:
+            print(f"FATAL: Error writing to error log: {e}")
+            print(f"Attempted to log: {error_message=}, {context=}")
+
+    def display_prompt(
+        self, prompt: list, instructions: list, prompt_count: int, description: str
+    ):
+        """Displays the prompt and instructions using rich.markdown.Markdown."""
+        banner = self._format_banner(prompt_count, description)  # Use the banner
+        markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
+        for part in prompt:
+            markdown_text += str(part) + "\n"
+
+        for part in instructions:
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print()
+        print(markdown)
+
+    def display_response(
+        self, response_parts: list, prompt_count: int, description: str
+    ):
+        """Displays the response using rich.markdown.Markdown."""
+        banner = self._format_banner(prompt_count, description)  # Use the banner
+        markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
+        for part in response_parts:
+            markdown_text += str(part) + "\n"
+
+        markdown = Markdown(markdown_text)
+        print()
+        print(markdown)

@@ -163,15 +163,13 @@ class Seer:
 
         total_prompt = history + prompt + instructions
 
-        self.session.logger.log_prompt(
-            self.session.task_dir,
+        self.session.log_prompt(
             prompt,
             instructions,
             self.prompt_count,
             description=description,
         )
-        self.session.logger.log_total_prompt(
-            self.session.task_dir,
+        self.session.log_total_prompt(
             total_prompt,
             self.prompt_count,
             description=description,
@@ -188,8 +186,7 @@ class Seer:
             response, functions, total_prompt
         )
 
-        self.session.logger.log_response(
-            self.session.task_dir,
+        self.session.log_response(
             response,
             response_parts,
             self.prompt_count,
@@ -292,8 +289,7 @@ class Seer:
                             test_results_str += (
                                 f"  Error during validation for example {i + 1}: {e}\n"
                             )
-                            self.session.logger.log_error(
-                                self.session.task_dir,
+                            self.session.log_error(
                                 f"Error during validation for example {i + 1}: {e}",
                             )
             captured_output = output_capture.getvalue()
@@ -307,18 +303,14 @@ class Seer:
 
         except SyntaxError as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
-            self.session.logger.log_error(
-                self.session.task_dir, f"SyntaxError in generated code: {e}"
-            )
+            self.session.log_error(f"SyntaxError in generated code: {e}")
             # Write test results to file even on error
             test_results_file = Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
         except Exception as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
-            self.session.logger.log_error(
-                self.session.task_dir, f"Error executing generated code: {e}"
-            )
+            self.session.log_error(f"Error executing generated code: {e}")
             # Write test results to file even on error
             test_results_file =  Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
@@ -355,9 +347,7 @@ class Seer:
                 f.write(content)
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
-            self.session.logger.log_error(
-                self.session.task_dir, f"Error writing to file {file_name}: {e}"
-            )
+            self.session.log_error(f"Error writing to file {file_name}: {e}")
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""
@@ -383,9 +373,7 @@ class Seer:
         # If we get here, we've exhausted retries without success
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
-        self.session.logger.log_error(
-            self.session.task_dir, error_msg, "".join(total_prompt)
-        )
+        self.session.log_error(error_msg, "".join(total_prompt))
 
     def run(self, tasks):
         """
@@ -398,8 +386,7 @@ class Seer:
         print(f"Using model: {self.nlp_model}")
 
         # Use session_dir for the initial context display
-        self.session.logger.display_prompt(
-            self.session.session_dir,
+        self.session.display_prompt(
             [self.system_context],
             [self.task_context],
             0,
