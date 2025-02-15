@@ -27,6 +27,9 @@ class Session:
         self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
 
+        # Initialize task_dir to None
+        self.task_dir = None
+
         # Write system and task context to files
         try:
             self._write_context_files(config["system_context_file"], config["task_context_file"])
