@@ -27,8 +27,8 @@ class Session:
         self.session_dir = self.output_dir / self.timestamp
         self.session_dir.mkdir(parents=True, exist_ok=True)
 
-        # Initialize task_dir to None
-        self.task_dir = None
+        # Initialize task_dir to session_dir for initial context display
+        self.task_dir = self.session_dir
 
         # Write system and task context to files
         try:
