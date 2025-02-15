@@ -49,8 +49,10 @@ class Seer:
         self.dreamer_config = config["dreamer"]
         self.builder_config = config["builder"]
 
-        with open(config["system_context_file"], "r") as f:
-            self.system_context = f.read().strip()
+        with open(self.dreamer_config["system_context_file"], "r") as f:
+            self.dreamer_system_context = f.read().strip()
+        with open(self.builder_config["system_context_file"], "r") as f:
+            self.builder_system_context = f.read().strip()
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
 
@@ -69,10 +71,10 @@ class Seer:
         #      self.code_model, f"{self.system_context}\n\n{self.task_context}"
         #  )
         self.dreamer_client = Client(
-            self.dreamer_config, f"{self.system_context}\n\n{self.task_context}"
+            self.dreamer_config, f"{self.dreamer_system_context}\n\n{self.task_context}"
         )
         self.builder_client = Client(
-            self.builder_config, f"{self.system_context}\n\n{self.task_context}"
+            self.builder_config, f"{self.builder_system_context}\n\n{self.task_context}"
         )
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
@@ -398,11 +400,23 @@ class Seer:
         print(f"Using model: {self.dreamer_client.model_name}")
 
         # Use session_dir for the initial context display
+        #  self.session.display_prompt(
+        #      [self.system_context],
+        #      [self.task_context],
+        #      0,
+        #      description="Initial Context",
+        #  )
         self.session.display_prompt(
-            [self.system_context],
+            [self.dreamer_system_context],
             [self.task_context],
             0,
-            description="Initial Context",
+            description="Initial Dreamer Context",
+        )
+        self.session.display_prompt(
+            [self.builder_system_context],
+            [self.task_context],
+            0,
+            description="Initial Builder Context",
         )
 
         for task in self.tasks:

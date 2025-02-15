@@ -32,7 +32,11 @@ class Session:
 
         # Write system and task context to files
         try:
-            self._write_context_files(config["system_context_file"], config["task_context_file"])
+            self._write_context_files(
+                config["dreamer"]["system_context_file"],
+                config["builder"]["system_context_file"],
+                config["task_context_file"],
+            )
         except (FileNotFoundError, IOError, PermissionError) as e:
             print(f"Error writing context files: {e}")
             self.log_error(f"Error writing context files: {e}")
@@ -45,13 +49,25 @@ class Session:
             self.log_error(f"Error writing config file: {e}")
 
 
-    def _write_context_files(self, system_context_file: str, task_context_file: str):
-        with open(system_context_file, "r") as f:
-            system_context = f.read().strip()
+    def _write_context_files(
+        self,
+        dreamer_system_context_file: str,
+        builder_system_context_file: str,
+        task_context_file: str,
+    ):
+        with open(dreamer_system_context_file, "r") as f:
+            dreamer_system_context = f.read().strip()
+        with open(builder_system_context_file, "r") as f:
+            builder_system_context = f.read().strip()
         with open(task_context_file, "r") as f:
             task_context = f.read().strip()
 
-        (self.session_dir / "system_context.md").write_text(system_context)
+        (self.session_dir / "dreamer_system_context.md").write_text(
+            dreamer_system_context
+        )
+        (self.session_dir / "builder_system_context.md").write_text(
+            builder_system_context
+        )
         (self.session_dir / "task_context.md").write_text(task_context)
 
     def _format_banner(self, prompt_count: int, description: str) -> str:
