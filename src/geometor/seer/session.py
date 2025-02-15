@@ -176,7 +176,7 @@ class Session:
 
 
         # Call display_response here
-        self.display_response(response_parts, prompt_count, description)
+        self.display_response(response_parts, prompt_count, description, response_data)
 
     def log_error(self, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -207,13 +207,20 @@ class Session:
         print(markdown)
 
     def display_response(
-        self, response_parts: list, prompt_count: int, description: str
+        self, response_parts: list, prompt_count: int, description: str, response_ dict
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(prompt_count, description)  # Use the banner
         markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
         for part in response_parts:
             markdown_text += str(part) + "\n"
+
+        # Add usage metadata
+        usage_metadata = response_data.get("usage_metadata", {})
+        if usage_meta
+            markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
+            markdown_text += json.dumps(usage_metadata, indent=2)
+            markdown_text += "\n```\n"
 
         markdown = Markdown(markdown_text)
         print()
