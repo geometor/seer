@@ -394,7 +394,7 @@ class Seer:
         self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
-        print(f"Using model: {self.nlp_model}")
+        print(f"Using model: {self.dreamer_client.model_name}")
 
         # Use session_dir for the initial context display
         self.session.display_prompt(
