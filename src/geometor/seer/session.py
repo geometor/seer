@@ -207,7 +207,7 @@ class Session:
         print(markdown)
 
     def display_response(
-            self, response_parts: list, prompt_count: int, description: str, response_ dict
+        self, response_parts: list, prompt_count: int, description: str, response_ dict
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -246,4 +246,3 @@ class Session:
         markdown = Markdown(markdown_text)
         print()
         print(markdown)
-
