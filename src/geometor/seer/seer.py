@@ -103,6 +103,7 @@ class Seer:
             input_grid_str = pair.input.to_string()
             output_grid_str = pair.output.to_string()
 
+            # dreamer prompt
             prompt = [
                 "\n**input**\n```\n",
                 input_grid_str,
@@ -130,7 +131,7 @@ class Seer:
             history.extend(prompt)
             history.extend(response)
 
-            # Code Prompt
+            # builder prompt
             instructions = [
                 self.code_instructions.format(
                     input_grid_rows=pair.input.to_python_string(),
