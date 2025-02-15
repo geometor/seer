@@ -20,9 +20,10 @@ class GeminiClient():
         Path to the instructions file.
     """
 
-    def __init__(self, model_name: str, instructions: str):
+    def __init__(self, config: dict, instructions: str):
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.model_name = model_name
+        #  self.model_name = model_name
+        self.model_name = config["model_name"]
 
         #  script_dir = Path(__file__).parent.absolute()
         #  instructions_file = script_dir / instructions_file
@@ -31,7 +32,10 @@ class GeminiClient():
             #  instruction = f.read().strip()
 
         self.model = genai.GenerativeModel(
-            model_name=self.model_name,
+            #  model_name=self.model_name,
+            #  system_instruction=instructions,
+            model_name=config["model_name"],
+            generation_config=config["generation_config"],
             system_instruction=instructions,
         )
 

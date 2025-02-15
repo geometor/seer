@@ -44,8 +44,10 @@ class Seer:
         self.start_time = datetime.now()
         self.response_times = []
 
-        self.nlp_model = config["nlp_model"]
-        self.code_model = config["code_model"]
+        #  self.nlp_model = config["nlp_model"]
+        #  self.code_model = config["code_model"]
+        self.dreamer_config = config["dreamer"]
+        self.builder_config = config["builder"]
 
         with open(config["system_context_file"], "r") as f:
             self.system_context = f.read().strip()
@@ -60,11 +62,17 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
-        self.nlp_client = Client(
-            self.nlp_model, f"{self.system_context}\n\n{self.task_context}"
+        #  self.nlp_client = Client(
+        #      self.nlp_model, f"{self.system_context}\n\n{self.task_context}"
+        #  )
+        #  self.code_client = Client(
+        #      self.code_model, f"{self.system_context}\n\n{self.task_context}"
+        #  )
+        self.dreamer_client = Client(
+            self.dreamer_config, f"{self.system_context}\n\n{self.task_context}"
         )
-        self.code_client = Client(
-            self.code_model, f"{self.system_context}\n\n{self.task_context}"
+        self.builder_client = Client(
+            self.builder_config, f"{self.system_context}\n\n{self.task_context}"
         )
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
@@ -112,6 +120,7 @@ class Seer:
 
             instructions = [self.nlp_instructions]
             response = self._generate(
+                self.dreamer_client,  # Use dreamer_client
                 history,
                 prompt,
                 instructions,
@@ -129,7 +138,8 @@ class Seer:
                 )
             ]
             prompt = [""]
-            response = self._generate(  # Use nlp_client, no tools
+            response = self._generate(  # Use builder_client
+                self.builder_client,
                 history,
                 prompt,
                 instructions,
@@ -154,7 +164,7 @@ class Seer:
         )
 
     def _generate(
-        self, history, prompt, instructions, tools=None, functions=None, description=""
+        self, client, history, prompt, instructions, tools=None, functions=None, description=""
     ):
         """
         Generate content from the model with standardized logging and function call handling.
@@ -177,7 +187,8 @@ class Seer:
 
         #  history = history + prompt
 
-        response = self.nlp_client.generate_content(
+        #  response = self.nlp_client.generate_content(
+        response = client.generate_content(
             total_prompt,
             tools=tools,
         )
