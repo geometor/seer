@@ -286,12 +286,12 @@ class Seer:
                         test_results_str += f"\n*example {i + 1}:*\n"
                         try:
                             transformed_output = namespace["transform"](input_grid)
-                            test_results_str += f"  Input:\n{pair.input.to_string()}\n"
+                            test_results_str += f"  Input:\n```\n{pair.input.to_string()}\n```\n"
                             test_results_str += (
-                                f"  Expected Output:\n{pair.output.to_string()}\n"
+                                f"  Expected Output:\n```\n{pair.output.to_string()}\n```\n"
                             )
                             test_results_str += (
-                                f"  Transformed Output:\n{Grid(transformed_output, '', '', '', '').to_string()}\n"
+                                f"  Transformed Output:\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
                             )
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += (
