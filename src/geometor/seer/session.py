@@ -207,7 +207,7 @@ class Session:
         print(markdown)
 
     def display_response(
-        self, response_parts: list, prompt_count: int, description: str, response_ dict
+            self, response_parts: list, prompt_count: int, description: str, response_data: dict
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -217,7 +217,7 @@ class Session:
 
         # Add usage metadata
         usage_metadata = response_data.get("usage_metadata", {})
-        if usage_meta
+        if usage_metadata:
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
             markdown_text += json.dumps(usage_metadata, indent=2)
             markdown_text += "\n```\n"
