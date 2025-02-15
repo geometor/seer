@@ -48,6 +48,8 @@ class Session:
             print(f"Error writing config file: {e}")
             self.log_error(f"Error writing config file: {e}")
 
+        self.display_config() # display config at start of session
+
 
     def _write_context_files(
         self,
@@ -213,6 +215,14 @@ class Session:
         for part in response_parts:
             markdown_text += str(part) + "\n"
 
+        markdown = Markdown(markdown_text)
+        print()
+        print(markdown)
+
+    def display_config(self):
+        """Displays the configuration information using rich.markdown.Markdown."""
+        markdown_text = "# Configuration\n\n"
+        markdown_text += f"```yaml\n{json.dumps(self.config, indent=2)}\n```\n"
         markdown = Markdown(markdown_text)
         print()
         print(markdown)
