@@ -2,6 +2,15 @@
 
 This document outlines the process workflow for SEER, an agent designed to solve ARC-like tasks.
 
+**Objectives (from README.md):**
+
+-   Understand the nature of the problem based on the context or requirements.
+-   Be able to describe the problem and the process through it in natural language.
+-   Convert natural language program to executable code.
+-   Facilitation and coaching.
+
+SEER uses multi-modal models capable of reasoning and code execution (specifically mentioning Gemini).
+
 ## I. Initialization and Setup
 
 1.  **Configuration Loading:**
