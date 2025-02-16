@@ -94,7 +94,13 @@ class Session:
                 f.write("---\n")
                 f.write("\n")
                 for part in prompt:
-                    f.write(str(part))
+                    if hasattr(part, "save"):  # Check if it's an image
+                        image_filename = f"{prompt_count:03d}-{description}-image.png"
+                        image_path = self.task_dir / image_filename
+                        part.save(image_path)
+                        f.write(f"![Image]({image_filename})\n")
+                    else:
+                        f.write(str(part))
                 f.write("\n")
                 for part in instructions:
                     f.write(str(part))
@@ -211,7 +217,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        response_data: dict,
+        response_ dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -227,7 +233,7 @@ class Session:
 
         # Add usage metadata
         usage_metadata = response_data.get("usage_metadata", {})
-        if usage_metadata:
+        if usage_meta
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
             markdown_text += json.dumps(usage_metadata, indent=2)
             markdown_text += "\n```\n"

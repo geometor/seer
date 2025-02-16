@@ -293,6 +293,15 @@ class Seer:
                             test_results_str += (
                                 f"  Transformed Output:\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
                             )
+
+                            # Generate and save image of transformed output
+                            transformed_grid = Grid(transformed_output, self.task.id, 'train', i, 'transformed')
+                            transformed_image = transformed_grid.to_image()
+                            image_filename = f"{code_file_path.stem}-example_{i + 1}-transformed.png"
+                            image_path = self.session.task_dir / image_filename
+                            transformed_image.save(image_path)
+                            test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
+
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += (
                                     f"**FAILED!**\n"
