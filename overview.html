@@ -12,270 +12,252 @@
             <section>
                 <h1>SEER Process Workflow Overview</h1>
                 <p>An agent designed to solve ARC-like tasks</p>
+                <p><strong>Objectives:</strong></p>
+                <ul>
+                    <li>Understand problem context</li>
+                    <li>Describe problem &amp; process in natural language</li>
+                    <li>Convert natural language to code</li>
+                    <li>Facilitation and coaching</li>
+                </ul>
             </section>
 
             <section>
                 <h2>I. Initialization and Setup</h2>
-                <ol>
-                    <li>Configuration Loading</li>
-                    <li>Task Loading</li>
-                    <li>Seer Instance Creation</li>
-                    <li>Session Initialization</li>
-                </ol>
-            </section>
-
-            <section>
-                <h3>Configuration Loading</h3>
-                <ul>
-                    <li>Reads <code>config.yaml</code></li>
-                    <li>Output directory (<code>output_dir</code>)</li>
-                    <li>"Dreamer" model (NLP)</li>
-                    <li>"Builder" model (code generation)</li>
-                    <li>Task context file (<code>task_context_file</code>)</li>
-                    <li>Maximum iterations (<code>max_iterations</code> - currently unused)</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Task Loading</h3>
-                <ul>
-                    <li>Creates a <code>Tasks</code> object</li>
-                    <li>Loads <code>.json</code> task files</li>
-                    <li>Each <code>Task</code>: ID, training <code>TaskPair</code>s, testing <code>TaskPair</code>s</li>
-                    <li>Each <code>TaskPair</code>: input <code>Grid</code>, output <code>Grid</code></li>
-                    <li><code>Grid</code> objects: NumPy arrays + metadata</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Seer Instance Creation</h3>
-                <ul>
-                    <li>Creates a <code>Seer</code> object</li>
-                    <li>Initializes:</li>
+                <section>
+                    <h3>1. Configuration Loading</h3>
                     <ul>
-                        <li>Start time tracking</li>
-                        <li>Gemini API clients (<code>dreamer_client</code>, <code>builder_client</code>)</li>
-                        <li>Loads instructions (<code>nlp_instructions.md</code>, <code>code_instructions.md</code>)</li>
-                        <li>Sets <code>max_iterations</code></li>
-                        <li>Initializes counters</li>
+                        <li>Reads <code>config.yaml</code></li>
+                        <li>Output directory (<code>output_dir</code>)</li>
+                        <li>"Dreamer" model (NLP)</li>
+                        <li>"Builder" model (code generation)</li>
+                        <li>Task context file (<code>task_context_file</code>)</li>
+                        <li>Maximum iterations (<code>max_iterations</code> - currently unused)</li>
                     </ul>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Session Initialization</h3>
-                <ul>
-                    <li>Creates a <code>Session</code> object</li>
-                    <li>Creates timestamped session directory</li>
-                    <li>Creates task subdirectories</li>
-                    <li>Writes <code>config.yaml</code></li>
-                    <li>Displays configuration</li>
-                </ul>
+                </section>
+                <section>
+                    <h3>2. Task Loading</h3>
+                    <ul>
+                        <li>Creates a <code>Tasks</code> object</li>
+                        <li>Loads <code>.json</code> task files</li>
+                        <li>Each <code>Task</code>: ID, training <code>TaskPair</code>s, testing <code>TaskPair</code>s</li>
+                        <li>Each <code>TaskPair</code>: input <code>Grid</code>, output <code>Grid</code></li>
+                        <li><code>Grid</code> objects: NumPy arrays + metadata</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Seer Instance Creation</h3>
+                    <ul>
+                        <li>Creates a <code>Seer</code> object</li>
+                        <li>Initializes:</li>
+                        <ul>
+                            <li>Start time tracking</li>
+                            <li>Gemini API clients (<code>dreamer_client</code>, <code>builder_client</code>)</li>
+                            <li>Loads instructions (<code>nlp_instructions.md</code>, <code>code_instructions.md</code>)</li>
+                            <li>Sets <code>max_iterations</code></li>
+                            <li>Initializes counters</li>
+                        </ul>
+                    </ul>
+                </section>
+                <section>
+                    <h3>4. Session Initialization</h3>
+                    <ul>
+                        <li>Creates a <code>Session</code> object</li>
+                        <li>Creates timestamped session directory</li>
+                        <li>Creates task subdirectories</li>
+                        <li>Writes <code>config.yaml</code></li>
+                        <li>Displays configuration</li>
+                    </ul>
+                </section>
             </section>
 
             <section>
                 <h2>II. Task Solving Loop (Outer Loop - <code>Seer.run</code>)</h2>
-                <ol>
-                    <li>Iterate through Tasks</li>
-                    <li>Task Setup</li>
-                    <li>Solve Task (Call to <code>Seer.solve</code>)</li>
-                </ol>
-            </section>
-
-            <section>
-                <h3>Iterate through Tasks</h3>
-                <ul>
-                    <li><code>Seer.run</code> iterates through <code>Task</code> objects</li>
-                </ul>
-                <h3>Task Setup</h3>
-                <ul>
-                    <li>Sets <code>Session.task_dir</code></li>
-                    <li>Initializes prompt counter</li>
-                </ul>
-                <h3>Solve Task</h3>
-                <ul>
-                    <li>Calls <code>Seer.solve</code></li>
-                </ul>
+                <section>
+                    <h3>1. Iterate through Tasks</h3>
+                    <ul>
+                        <li><code>Seer.run</code> iterates through <code>Task</code> objects</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Task Setup</h3>
+                    <ul>
+                        <li>Sets <code>Session.task_dir</code></li>
+                        <li>Initializes prompt counter</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Solve Task</h3>
+                    <ul>
+                        <li>Calls <code>Seer.solve</code></li>
+                    </ul>
+                </section>
             </section>
 
             <section>
                 <h2>III. Task Solving Process (Inner Loop - <code>Seer.solve</code>)</h2>
-                <ol>
-                    <li>Investigate Examples (<code>_investigate_examples</code>)</li>
-                    <li>Review Programs (<code>_review_programs</code> - Currently Placeholder)</li>
-                </ol>
-            </section>
-
-            <section>
-                <h3>Investigate Examples</h3>
-                <ul>
-                    <li>Iterates through training <code>TaskPair</code>s</li>
-                    <li>For each <code>TaskPair</code>:</li>
+                <section>
+                    <h3>1. Investigate Examples (<code>_investigate_examples</code>)</h3>
                     <ul>
-                        <li>Natural Language Description (Dreamer)</li>
-                        <li>Code Generation (Builder)</li>
+                        <li>Iterates through training <code>TaskPair</code>s</li>
+                        <li>For each <code>TaskPair</code>:</li>
+                        <ul>
+                            <li>Natural Language Description (Dreamer)</li>
+                            <li>Code Generation (Builder)</li>
+                        </ul>
                     </ul>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Natural Language Description (Dreamer)</h3>
-                <ul>
-                    <li>Constructs prompt:</li>
+                </section>
+                <section>
+                    <h4>Natural Language Description (Dreamer)</h4>
                     <ul>
-                        <li>Input grid (text, optional image)</li>
-                        <li>Output grid (text, optional image)</li>
-                        <li>Instructions (<code>nlp_instructions.md</code>)</li>
+                        <li>Constructs prompt:</li>
+                        <ul>
+                            <li>Input grid (text, optional image)</li>
+                            <li>Output grid (text, optional image)</li>
+                            <li>Instructions (<code>nlp_instructions.md</code>)</li>
+                        </ul>
+                        <li>Calls <code>_generate</code></li>
+                        <li>Logs prompt and response</li>
+                        <li>Processes response (<code>_process_response</code>)</li>
                     </ul>
-                    <li>Calls <code>_generate</code></li>
-                    <li>Logs prompt and response</li>
-                    <li>Processes response (<code>_process_response</code>)</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Code Generation (Builder)</h3>
-                <ul>
-                    <li>Constructs prompt:</li>
+                </section>
+                <section>
+                    <h4>Code Generation (Builder)</h4>
                     <ul>
-                        <li>Instructions (<code>code_instructions.md</code>)</li>
-                        <li>Input/output grids as Python lists</li>
+                        <li>Constructs prompt:</li>
+                        <ul>
+                            <li>Instructions (<code>code_instructions.md</code>)</li>
+                            <li>Input/output grids as Python lists</li>
+                        </ul>
+                        <li>Calls <code>_generate</code> (<code>tools="code_execution"</code>)</li>
+                        <li>Logs prompt and response</li>
+                        <li>Processes response (<code>_process_response</code>)</li>
                     </ul>
-                    <li>Calls <code>_generate</code> (<code>tools="code_execution"</code>)</li>
-                    <li>Logs prompt and response</li>
-                    <li>Processes response (<code>_process_response</code>)</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Response Processing (<code>_process_response</code>)</h3>
-                <ul>
-                    <li>Extracts text parts</li>
-                    <li>Identifies and extracts code</li>
-                    <li>Saves code to <code>.py</code> file</li>
-                    <li>Executes code (<code>_test_code</code>)</li>
-                    <li>Extracts code execution results</li>
-                    <li>Saves code execution output</li>
-                    <li>Extracts function calls (currently not used)</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Code Execution (<code>_test_code</code>)</h3>
-                <ul>
-                    <li>Runs <code>transform</code> function</li>
-                    <li>Compares output with expected output</li>
-                    <li>Logs results</li>
-                    <li>Captures printed output</li>
-                    <li>Handles exceptions</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>Review Programs</h3>
-                <ul>
-                    <li>(<code>_review_programs</code> - Currently Placeholder)</li>
-                    <li>Intended to summarize observations</li>
-                </ul>
+                </section>
+                <section>
+                    <h4>Response Processing (<code>_process_response</code>)</h4>
+                    <ul>
+                        <li>Extracts text parts</li>
+                        <li>Identifies and extracts code</li>
+                        <li>Saves code to <code>.py</code> file</li>
+                        <li>Executes code (<code>_test_code</code>)</li>
+                        <li>Extracts code execution results</li>
+                        <li>Saves code execution output</li>
+                        <li>Extracts function calls (currently not used)</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Code Execution (<code>_test_code</code>)</h4>
+                    <ul>
+                        <li>Runs <code>transform</code> function</li>
+                        <li>Compares output with expected output</li>
+                        <li>Logs results</li>
+                        <li>Captures printed output</li>
+                        <li>Handles exceptions</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Review Programs</h3>
+                    <ul>
+                        <li>(<code>_review_programs</code> - Currently Placeholder)</li>
+                        <li>Intended to summarize observations</li>
+                    </ul>
+                </section>
             </section>
 
             <section>
                 <h2>IV. Generation and Response Handling (<code>_generate</code>)</h2>
-                <ol>
-                    <li>Prompt Construction</li>
-                    <li>Model Interaction</li>
-                    <li>Response Processing</li>
-                </ol>
-            </section>
-
-            <section>
-                <h3>Prompt Construction</h3>
-                <ul>
-                    <li>Combines history, prompt, instructions</li>
-                    <li>Logs prompt</li>
-                </ul>
-                <h3>Model Interaction</h3>
-                <ul>
-                    <li>Calls Gemini client's <code>generate_content</code></li>
-                    <li>Specifies <code>tools</code> if needed</li>
-                    <li>Uses retries</li>
-                </ul>
-                <h3>Response Processing</h3>
-                <ul>
-                    <li>Calls <code>_process_response</code></li>
-                </ul>
+                <section>
+                    <h3>1. Prompt Construction</h3>
+                    <ul>
+                        <li>Combines history, prompt, instructions</li>
+                        <li>Logs prompt</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Model Interaction</h3>
+                    <ul>
+                        <li>Calls Gemini client's <code>generate_content</code></li>
+                        <li>Specifies <code>tools</code> if needed</li>
+                        <li>Uses retries</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Response Processing</h3>
+                    <ul>
+                        <li>Calls <code>_process_response</code></li>
+                    </ul>
+                </section>
             </section>
 
             <section>
                 <h2>V. Code Execution and Validation (<code>_test_code</code>)</h2>
-                <ol>
-                    <li>Code Execution</li>
-                    <li>Validation</li>
-                    <li>Error Handling</li>
-                    <li>Output Capture</li>
-                    <li>Result Logging</li>
-                </ol>
-            </section>
-            <section>
-                <h3>Code Execution</h3>
-                <ul>
-                    <li>Parses code (<code>ast.parse</code>)</li>
-                    <li>Executes code</li>
-                    <li>Captures standard output</li>
-                </ul>
-                <h3>Validation</h3>
-                <ul>
-                    <li>Finds <code>transform</code> function</li>
-                    <li>Calls <code>transform</code> with input</li>
-                    <li>Compares result to expected output (<code>np.array_equal</code>)</li>
-                    <li>Logs results</li>
-                </ul>
-                <h3>Error Handling</h3>
-                <ul>
-                    <li>Catches <code>SyntaxError</code> and other exceptions</li>
-                    <li>Logs errors</li>
-                </ul>
-                <h3>Output Capture</h3>
-                <ul>
-                    <li>Captures printed output</li>
-                    <li>Logs output</li>
-                </ul>
-                <h3>Result Logging</h3>
-                <ul>
-                    <li>Writes results to <code>.md</code> file</li>
-                </ul>
+                <section>
+                    <h3>1. Code Execution</h3>
+                    <ul>
+                        <li>Parses code (<code>ast.parse</code>)</li>
+                        <li>Executes code</li>
+                        <li>Captures standard output</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Validation</h3>
+                    <ul>
+                        <li>Finds <code>transform</code> function</li>
+                        <li>Calls <code>transform</code> with input</li>
+                        <li>Compares result to expected output (<code>np.array_equal</code>)</li>
+                        <li>Logs results</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Error Handling</h3>
+                    <ul>
+                        <li>Catches <code>SyntaxError</code> and other exceptions</li>
+                        <li>Logs errors</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>4. Output Capture</h3>
+                    <ul>
+                        <li>Captures printed output</li>
+                        <li>Logs output</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>5. Result Logging</h3>
+                    <ul>
+                        <li>Writes results to <code>.md</code> file</li>
+                    </ul>
+                </section>
             </section>
 
             <section>
                 <h2>VI. Session Management (<code>Session</code> class)</h2>
-                <ol>
-                    <li>Initialization</li>
-                    <li>Logging</li>
-                    <li>Display</li>
-                </ol>
-            </section>
-
-            <section>
-                <h3>Initialization</h3>
-                <ul>
-                    <li>Creates directories</li>
-                    <li>Writes configuration</li>
-                    <li>Displays configuration</li>
-                </ul>
-                <h3>Logging</h3>
-                <ul>
-                    <li><code>log_prompt</code></li>
-                    <li><code>log_total_prompt</code></li>
-                    <li><code>log_response</code></li>
-                    <li><code>log_error</code></li>
-                </ul>
-                <h3>Display</h3>
-                <ul>
-                    <li><code>display_prompt</code></li>
-                    <li><code>display_response</code></li>
-                    <li><code>display_config</code></li>
-                    <li><code>display_test_results</code></li>
-                </ul>
+                <section>
+                    <h3>1. Initialization</h3>
+                    <ul>
+                        <li>Creates directories</li>
+                        <li>Writes configuration</li>
+                        <li>Displays configuration</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Logging</h3>
+                    <ul>
+                        <li><code>log_prompt</code></li>
+                        <li><code>log_total_prompt</code></li>
+                        <li><code>log_response</code></li>
+                        <li><code>log_error</code></li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Display</h3>
+                    <ul>
+                        <li><code>display_prompt</code></li>
+                        <li><code>display_response</code></li>
+                        <li><code>display_config</code></li>
+                        <li><code>display_test_results</code></li>
+                    </ul>
+                </section>
             </section>
 
             <section>
