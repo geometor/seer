@@ -217,25 +217,25 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        response_ dict,
+        responsedata: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
         markdown_text = f"\n## RESPONSE\n\n"  # Include banner in Markdown
 
         # Extract test_results_str, if present, and remove from response_parts
-        test_results_str = ""
-        if response_parts and isinstance(response_parts[-1], str):
-            test_results_str = response_parts.pop()
+        #  test_results_str = ""
+        #  if response_parts and isinstance(response_parts[-1], str):
+            #  test_results_str = response_parts.pop()
 
         for part in response_parts:
             markdown_text += str(part) + "\n"
 
         # Add usage metadata
-        usage_metadata = response_data.get("usage_metadata", {})
-        if usage_meta
+        usage= responsedata.get("usage_metadata", {})
+        if usage:
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
-            markdown_text += json.dumps(usage_metadata, indent=2)
+            markdown_text += json.dumps(usage, indent=2)
             markdown_text += "\n```\n"
 
         markdown = Markdown(markdown_text)
@@ -243,8 +243,8 @@ class Session:
         print(markdown)
 
         # Display test results here, after usage metadata
-        if test_results_str:
-            self.display_test_results(test_results_str, prompt_count)
+        #  if test_results_str:
+            #  self.display_test_results(test_results_str, prompt_count)
 
 
     def display_config(self):
