@@ -93,9 +93,17 @@ class Session:
                 f.write(f"{banner}\n")
                 f.write("---\n")
                 f.write("\n")
-                for part in prompt:
+                for i, part in enumerate(prompt):  # Use enumerate to get index
                     if hasattr(part, "save"):  # Check if it's an image
-                        image_filename = f"{prompt_count:03d}-{description}-image.png"
+                        # Determine if it's input or output based on position
+                        if "input" in description:
+                            image_type = "input"
+                        elif "output" in description:
+                            image_type = "output"
+                        else:  # Fallback, should not normally happen
+                            image_type = "image"
+
+                        image_filename = f"{prompt_count:03d}-{description}-{image_type}.png"
                         image_path = self.task_dir / image_filename
                         part.save(image_path)
                         f.write(f"![Image]({image_filename})\n")
@@ -217,7 +225,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        responsedata: dict,
+        response dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
