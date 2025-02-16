@@ -48,8 +48,7 @@ class Session:
             print(f"Error writing config file: {e}")
             self.log_error(f"Error writing config file: {e}")
 
-        self.display_config() # display config at start of session
-
+        self.display_config()  # display config at start of session
 
     def _write_context_files(
         self,
@@ -76,7 +75,9 @@ class Session:
         """Helper function to format the banner."""
         session_folder = self.task_dir.parent.name  # Get the session folder name
         task_folder = self.task_dir.name  # Get the task folder name
-        return f"# {session_folder} • {task_folder} • {prompt_count:03d} {description}\n"
+        return (
+            f"# {session_folder} • {task_folder} • {prompt_count:03d} {description}\n"
+        )
 
     def log_prompt(
         self,
@@ -174,7 +175,6 @@ class Session:
             f.write("---\n")
             f.write("\n".join(response_parts))
 
-
         # Call display_response here
         self.display_response(response_parts, prompt_count, description, response_data)
 
@@ -207,7 +207,11 @@ class Session:
         print(markdown)
 
     def display_response(
-            self, response_parts: list, prompt_count: int, description: str, response_ dict
+        self,
+        response_parts: list,
+        prompt_count: int,
+        description: str,
+        response_data: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -223,18 +227,19 @@ class Session:
 
         # Add usage metadata
         usage_metadata = response_data.get("usage_metadata", {})
-        if usage_meta
+        if usage_metadata:
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
             markdown_text += json.dumps(usage_metadata, indent=2)
             markdown_text += "\n```\n"
+
+        markdown = Markdown(markdown_text)
+        print()
+        print(markdown)
 
         # Display test results here, after usage metadata
         if test_results_str:
             self.display_test_results(test_results_str, prompt_count)
 
-        markdown = Markdown(markdown_text)
-        print()
-        print(markdown)
 
     def display_config(self):
         """Displays the configuration information using rich.markdown.Markdown."""
