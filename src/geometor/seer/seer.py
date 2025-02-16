@@ -406,7 +406,7 @@ class Seer:
         self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
-        print(f"Using model: {self.dreamer_client.model_name}")
+        #  print(f"Using model: {self.dreamer_client.model_name}")
 
         # Use session_dir for the initial context display
         #  self.session.display_prompt(
@@ -415,18 +415,18 @@ class Seer:
         #      0,
         #      description="Initial Context",
         #  )
-        self.session.display_prompt(
-            [self.dreamer_system_context],
-            [self.task_context],
-            0,
-            description="Initial Dreamer Context",
-        )
-        self.session.display_prompt(
-            [self.builder_system_context],
-            [self.task_context],
-            0,
-            description="Initial Builder Context",
-        )
+        #  self.session.display_prompt(
+            #  [self.dreamer_system_context],
+            #  [self.task_context],
+            #  0,
+            #  description="Initial Dreamer Context",
+        #  )
+        #  self.session.display_prompt(
+            #  [self.builder_system_context],
+            #  [self.task_context],
+            #  0,
+            #  description="Initial Builder Context",
+        #  )
 
         for task in self.tasks:
             self.session.task_dir = (

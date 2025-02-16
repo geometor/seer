@@ -30,7 +30,7 @@ class Session:
         # Initialize task_dir to session_dir for initial context display
         self.task_dir = self.session_dir
 
-        # Write system and task context to files
+        #  Write system and task context to files
         try:
             self._write_context_files(
                 config["dreamer"]["system_context_file"],
@@ -76,7 +76,7 @@ class Session:
         session_folder = self.task_dir.parent.name  # Get the session folder name
         task_folder = self.task_dir.name  # Get the task folder name
         return (
-            f"# {session_folder} • {task_folder} • {prompt_count:03d} {description}\n"
+            f"# {task_folder} • {prompt_count:03d} {description}\n"
         )
 
     def log_prompt(
@@ -214,8 +214,8 @@ class Session:
         response_data: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
-        banner = self._format_banner(prompt_count, description)  # Use the banner
-        markdown_text = f"\n{banner}\n\n"  # Include banner in Markdown
+        #  banner = self._format_banner(prompt_count, description)  # Use the banner
+        markdown_text = f"\n## RESPONSE\n\n"  # Include banner in Markdown
 
         # Extract test_results_str, if present, and remove from response_parts
         test_results_str = ""
@@ -243,7 +243,7 @@ class Session:
 
     def display_config(self):
         """Displays the configuration information using rich.markdown.Markdown."""
-        markdown_text = "# Configuration\n\n"
+        markdown_text = f"# {self.timestamp}\n\n"
         markdown_text += f"```yaml\n{json.dumps(self.config, indent=2)}\n```\n"
         markdown = Markdown(markdown_text)
         print()
