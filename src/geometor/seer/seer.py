@@ -352,30 +352,120 @@ class Seer:
         self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
-        #  print(f"Using model: {self.dreamer_client.model_name}")
-
-        # Use session_dir for the initial context display
-        #  self.session.display_prompt(
-        #      [self.system_context],
-        #      [self.task_context],
-        #      0,
-        #      description="Initial Context",
-        #  )
-        #  self.session.display_prompt(
-        #  [self.dreamer_system_context],
-        #  [self.task_context],
-        #  0,
-        #      description="Initial Dreamer Context",
-        #  )
-        #  self.session.display_prompt(
-        #  [self.coder_system_context],
-        #  [self.task_context],
-        #  0,
-        #      description="Initial Coder Context",
-        #  )
-
         for task in self.tasks:
             self.session.task_dir = self.session.session_dir / task.id  # Set task_dir
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
 
             self.solve(task)
+
+        # Create session summary report
+        self.create_session_summary_report()
+
+    def create_session_summary_report(self):
+        """
+        Creates a session-level summary report by aggregating task summary reports.
+        """
+        session_response_report_json = []
+        session_test_report_json = {}
+
+        # Iterate through each task directory
+        for task_dir in self.session.session_dir.iterdir():
+            if task_dir.is_dir():  # Ensure it's a directory
+                summary_report_json_path = task_dir / "summary_report.json"
+                if summary_report_json_path.exists():
+                    try:
+                        with open(summary_report_json_path, "r") as f:
+                            task_summary = json.load(f)
+                            # Aggregate response reports
+                            session_response_report_json.extend(
+                                task_summary.get("response_report", [])
+                            )
+                            # Aggregate test reports, keyed by task ID
+                            task_id = task_dir.name
+                            session_test_report_json[task_id] = task_summary.get(
+                                "test_report", {}
+                            )
+                    except (IOError, json.JSONDecodeError) as e:
+                        print(f"Error reading or parsing {summary_report_json_path}: {e}")
+                        self.session.log_error(
+                            f"Error reading or parsing {summary_report_json_path}: {e}"
+                        )
+
+        # Combine into a session-level report
+        session_summary_report = {
+            "response_report": session_response_report_json,
+            "test_report": session_test_report_json,
+        }
+
+        # Write the session summary report to the session directory
+        session_summary_report_json_file = (
+            self.session.session_dir / "session_summary_report.json"
+        )
+        self._write_to_file(
+            session_summary_report_json_file,
+            json.dumps(session_summary_report, indent=2),
+        )
+
+        # --- Create Markdown Report ---
+        session_summary_report_md = "# Session Summary Report\n\n"
+
+        # Response Report
+        session_summary_report_md += "## Response Summary\n\n"
+        session_summary_report_md += "| Task ID | Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
+        session_summary_report_md += "|-------|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
+
+        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        total_response_time = 0
+
+        for response in session_response_report_json:
+            task_id = response.get("response_file", "N/A").split("-")[
+                0
+            ]  # Extract task ID
+            session_summary_report_md += f"| {task_id} | {response.get('response_file', 'N/A')} | {response['token_usage'].get('prompt', 0)} | {response['token_usage'].get('candidates', 0)} | {response['token_usage'].get('total', 0)} | {response['token_usage'].get('cached', 0)} | {response['timing']['response_time']:.4f} | {response['timing']['total_elapsed']:.4f} |\n"
+
+            for key in total_tokens:
+                total_tokens[key] += response["token_usage"].get(key, 0)
+            total_response_time += response["timing"]["response_time"]
+
+        session_summary_report_md += f"| **Total** | | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
+
+        # Test Report - More complex due to nested structure
+        session_summary_report_md += "## Test Summary\n\n"
+        for task_id, test_report in session_test_report_json.items():
+            session_summary_report_md += f"### Task: {task_id}\n\n"
+            for file_index, file_results in test_report.items():
+                session_summary_report_md += f"#### Code File: {file_index}\n\n"
+                session_summary_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
+                session_summary_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
+                for result in file_results:
+                    if "example" in result:
+                        session_summary_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
+                    elif "captured_output" in result:
+                        session_summary_report_md += f"| Captured Output |  |  |  |  |\n"
+                        session_summary_report_md += f"|---|---|---|---|---|\n"
+                        session_summary_report_md += (
+                            f"|  | ```{result['captured_output']}``` |  |  |  |\n"
+                        )
+                    elif "code_execution_error" in result:
+                        session_summary_report_md += (
+                            f"| Code Execution Error |  |  |  |  |\n"
+                        )
+                        session_summary_report_md += f"|---|---|---|---|---|\n"
+                        session_summary_report_md += (
+                            f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
+                        )
+                session_summary_report_md += "\n"
+
+        # Write the session summary report (Markdown) to the session directory
+        session_summary_report_md_file = (
+            self.session.session_dir / "session_summary_report.md"
+        )
+        self._write_to_file(session_summary_report_md_file, session_summary_report_md)
+
+        # Display report
+        self.session.display_response(
+            [session_summary_report_md],
+            0,
+            "Session Summary",
+            {},
+        )  # prompt_count=0
