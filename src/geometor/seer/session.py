@@ -75,9 +75,7 @@ class Session:
         """Helper function to format the banner."""
         session_folder = self.task_dir.parent.name  # Get the session folder name
         task_folder = self.task_dir.name  # Get the task folder name
-        return (
-            f"# {task_folder} • {prompt_count:03d} {description}\n"
-        )
+        return f"# {task_folder} • {prompt_count:03d} • {description}\n"
 
     def log_prompt(
         self,
@@ -88,6 +86,7 @@ class Session:
     ):
         prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.md"
         banner = self._format_banner(prompt_count, description)
+        image_count = 0
         try:
             with open(prompt_file, "w") as f:
                 f.write(f"{banner}\n")
@@ -95,15 +94,11 @@ class Session:
                 f.write("\n")
                 for i, part in enumerate(prompt):  # Use enumerate to get index
                     if hasattr(part, "save"):  # Check if it's an image
-                        # Determine if it's input or output based on position
-                        if "input" in description:
-                            image_type = "input"
-                        elif "output" in description:
-                            image_type = "output"
-                        else:  # Fallback, should not normally happen
-                            image_type = "image"
+                        image_count += 1
 
-                        image_filename = f"{prompt_count:03d}-{description}-{image_type}.png"
+                        image_filename = (
+                            f"{prompt_count:03d}-{description}-{image_count}.png"
+                        )
                         image_path = self.task_dir / image_filename
                         part.save(image_path)
                         f.write(f"![Image]({image_filename})\n")
@@ -225,7 +220,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        response dict,
+        responsedata: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -234,13 +229,13 @@ class Session:
         # Extract test_results_str, if present, and remove from response_parts
         #  test_results_str = ""
         #  if response_parts and isinstance(response_parts[-1], str):
-            #  test_results_str = response_parts.pop()
+        #  test_results_str = response_parts.pop()
 
         for part in response_parts:
             markdown_text += str(part) + "\n"
 
         # Add usage metadata
-        usage= responsedata.get("usage_metadata", {})
+        usage = responsedata.get("usage_metadata", {})
         if usage:
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
             markdown_text += json.dumps(usage, indent=2)
@@ -252,8 +247,7 @@ class Session:
 
         # Display test results here, after usage metadata
         #  if test_results_str:
-            #  self.display_test_results(test_results_str, prompt_count)
-
+        #  self.display_test_results(test_results_str, prompt_count)
 
     def display_config(self):
         """Displays the configuration information using rich.markdown.Markdown."""

@@ -64,12 +64,6 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
-        #  self.nlp_client = Client(
-        #      self.nlp_model, f"{self.system_context}\n\n{self.task_context}"
-        #  )
-        #  self.code_client = Client(
-        #      self.code_model, f"{self.system_context}\n\n{self.task_context}"
-        #  )
         self.dreamer_client = Client(
             self.dreamer_config, f"{self.dreamer_system_context}\n\n{self.task_context}"
         )
@@ -127,7 +121,7 @@ class Seer:
                 history,
                 prompt,
                 instructions,
-                tools=None,
+                #  tools=None,
                 description=f"example_{i} - NLP",
             )
             history.extend(prompt)
@@ -146,7 +140,7 @@ class Seer:
                 history,
                 prompt,
                 instructions,
-                tools="code_execution",
+                #  tools="code_execution",
                 description=f"example_{i} - CODE",
             )
             history.extend(prompt)
@@ -167,7 +161,14 @@ class Seer:
         )
 
     def _generate(
-        self, client, history, prompt, instructions, tools=None, functions=None, description=""
+        self,
+        client,
+        history,
+        prompt,
+        instructions,
+        tools=None,
+        functions=None,
+        description="",
     ):
         """
         Generate content from the model with standardized logging and function call handling.
@@ -231,13 +232,14 @@ class Seer:
                     response_parts.append("\n*code_execution:*\n")
                     code = part.executable_code.code
                     response_parts.append(f"```python\n{code}\n```\n")
-                    code_file_path = self.session.task_dir / f"{self.prompt_count:03d}-code.py"
+                    code_file_path = (
+                        self.session.task_dir / f"{self.prompt_count:03d}-code.py"
+                    )
                     self._write_to_file(code_file_path, code)
 
                     # Call _test_code and extend response_parts
                     test_results = self._test_code(code, code_file_path)
                     response_parts.extend(test_results)
-
 
                 if part.code_execution_result:
                     response_parts.append("\n*code_execution_result:*\n")
@@ -274,7 +276,9 @@ class Seer:
             # Capture stdout
             output_capture = io.StringIO()
             with contextlib.redirect_stdout(output_capture):
-                exec(compile(tree, filename=str(code_file_path), mode="exec"), namespace)
+                exec(
+                    compile(tree, filename=str(code_file_path), mode="exec"), namespace
+                )
 
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
@@ -283,29 +287,33 @@ class Seer:
                         input_grid = pair.input.grid
                         expected_output = pair.output.grid
 
-                        test_results_str += f"\n*example {i + 1}:*\n"
+                        test_results_str += f"\n## example {i + 1}\n"
                         try:
                             transformed_output = namespace["transform"](input_grid)
-                            test_results_str += f"  Input:\n```\n{pair.input.to_string()}\n```\n"
                             test_results_str += (
-                                f"  Expected Output:\n```\n{pair.output.to_string()}\n```\n"
+                                f"*input:*\n```\n{pair.input.to_string()}\n```\n"
                             )
-                            test_results_str += (
-                                f"  Transformed Output:\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
-                            )
+                            test_results_str += f"*expected output:*\n```\n{pair.output.to_string()}\n```\n"
+                            test_results_str += f"*transformed output:*\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
 
                             # Generate and save image of transformed output
-                            transformed_grid = Grid(transformed_output, self.task.id, 'train', i, 'transformed')
+                            transformed_grid = Grid(
+                                transformed_output,
+                                self.task.id,
+                                "train",
+                                i,
+                                "transformed",
+                            )
                             transformed_image = transformed_grid.to_image()
-                            image_filename = f"{code_file_path.stem}-example_{i + 1}-transformed.png"
+                            image_filename = (
+                                f"{code_file_path.stem}-example_{i + 1}-transformed.png"
+                            )
                             image_path = self.session.task_dir / image_filename
                             transformed_image.save(image_path)
-                            test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
+                            #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
 
                             if not np.array_equal(transformed_output, expected_output):
-                                test_results_str += (
-                                    f"**FAILED!**\n"
-                                )
+                                test_results_str += f"**FAILED!**\n"
                             else:
                                 test_results_str += f"  PASSED\n"
                         except Exception as e:
@@ -320,12 +328,11 @@ class Seer:
                 test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
 
             # Write test results to file
-            test_results_file =  Path(f"{code_file_path.stem}.md")
+            test_results_file = Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
             # Display test results  <- REMOVE THIS
             #  self.session.display_test_results(test_results_str, self.prompt_count)
-
 
         except SyntaxError as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
@@ -341,13 +348,12 @@ class Seer:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             self.session.log_error(f"Error executing generated code: {e}")
             # Write test results to file even on error
-            test_results_file =  Path(f"{code_file_path.stem}.md")
+            test_results_file = Path(f"{code_file_path.stem}.md")
             self._write_to_file(test_results_file, test_results_str)
 
             # Display test results  <- REMOVE THIS
             #  self.session.display_test_results(test_results_str, self.prompt_count)
-        return [test_results_str] # return the string
-
+        return [test_results_str]  # return the string
 
     def _write_extracted_content(self, text):
         """Extracts content enclosed in triple backticks and writes it to files."""
@@ -369,7 +375,6 @@ class Seer:
             # If it's a Python file, also run tests
             if file_type == "py":
                 self._test_code(content, file_path)
-
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
@@ -425,22 +430,20 @@ class Seer:
         #      description="Initial Context",
         #  )
         #  self.session.display_prompt(
-            #  [self.dreamer_system_context],
-            #  [self.task_context],
-            #  0,
-            #  description="Initial Dreamer Context",
+        #  [self.dreamer_system_context],
+        #  [self.task_context],
+        #  0,
+        #  description="Initial Dreamer Context",
         #  )
         #  self.session.display_prompt(
-            #  [self.builder_system_context],
-            #  [self.task_context],
-            #  0,
-            #  description="Initial Builder Context",
+        #  [self.builder_system_context],
+        #  [self.task_context],
+        #  0,
+        #  description="Initial Builder Context",
         #  )
 
         for task in self.tasks:
-            self.session.task_dir = (
-                self.session.session_dir / task.id
-            )  # Set task_dir
+            self.session.task_dir = self.session.session_dir / task.id  # Set task_dir
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
 
             self.solve(task)
