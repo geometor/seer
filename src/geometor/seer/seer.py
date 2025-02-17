@@ -364,13 +364,13 @@ class Seer:
         #  [self.dreamer_system_context],
         #  [self.task_context],
         #  0,
-        #  description="Initial Dreamer Context",
+        #      description="Initial Dreamer Context",
         #  )
         #  self.session.display_prompt(
         #  [self.coder_system_context],
         #  [self.task_context],
         #  0,
-        #  description="Initial Coder Context",
+        #      description="Initial Coder Context",
         #  )
 
         for task in self.tasks:
@@ -401,9 +401,9 @@ class Seer:
         all_response_times = []
         test_results = []
 
-        for data in respdata:
+        for data in resp
             for key in total_tokens:
-                total_tokenskey += data["token_totals"].get(key, 0)
+                total_tokens[key] += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
             all_response_times.extend(data["timing"]["response_times"])
 
@@ -471,4 +471,3 @@ class Seer:
         self.session.display_response(
             [report_md], 0, "Task Summary", {}
         )  # prompt_count=0, as this isn't a regular prompt/response
-
