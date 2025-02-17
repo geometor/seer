@@ -392,11 +392,11 @@ class Session:
         report_md = response_report_md + test_report_md
         report_json = {"response_report": response_report_json, "test_report": test_report_json}
 
-        report_md_file = task_dir / "summary_report.md"
-        report_json_file = task_dir / "summary_report.json"
+        report_md_file = "summary_report.md"  # Simplified
+        report_json_file = "summary_report.json" # Simplified
 
         self._write_to_file(report_md_file, report_md)
-        with open(report_json_file, "w") as f:
+        with open(report_json_file, "w") as f:  # Simplified
             json.dump(report_json, f, indent=2)
 
         # Display report
@@ -413,3 +413,4 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
+
