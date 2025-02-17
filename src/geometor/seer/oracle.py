@@ -9,6 +9,7 @@ import io
 import contextlib
 import numpy as np
 from geometor.seer.tasks import Grid
+import json
 
 class Oracle:
     def __init__(self, config, system_context):
@@ -18,6 +19,7 @@ class Oracle:
     def test_code(self, code, code_file_path, task):
         """Executes and validates the generated code, writing results to a file."""
         test_results_str = ""
+        test_results_json = []  # Store results for JSON output
         try:
             tree = ast.parse(code)
             namespace = {}
@@ -36,6 +38,11 @@ class Oracle:
                         expected_output = pair.output.grid
 
                         test_results_str += f"\n## example {i + 1}\n"
+                        example_result = {
+                            "example": i + 1,
+                            "input": pair.input.to_string(),
+                            "expected_output": pair.output.to_string(),
+                        }
                         try:
                             transformed_output = namespace["transform"](input_grid)
                             test_results_str += (
@@ -60,32 +67,44 @@ class Oracle:
                             transformed_image.save(image_path)
                             #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
 
+                            example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
+
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += f"**FAILED!**\n"
+                                example_result["status"] = "FAILED"
                             else:
                                 test_results_str += f"  PASSED\n"
+                                example_result["status"] = "PASSED"
                         except Exception as e:
                             test_results_str += (
                                 f"  Error during validation for example {i + 1}: {e}\n"
                             )
+                            example_result["status"] = f"ERROR: {e}"
                             # Removed session.log_error call, as Oracle doesn't have session
-                            # self.session.log_error(
-                            #     f"Error during validation for example {i + 1}: {e}",
-                            # )
+
+                        test_results_json.append(example_result)
 
             captured_output = output_capture.getvalue()
             if captured_output:
                 test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
+                test_results_json.append({"captured_output": captured_output})
+
 
         except SyntaxError as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
+            test_results_json.append({"code_execution_error": str(e)})
             # Removed session.log_error call
-            # self.session.log_error(f"SyntaxError in generated code: {e}")
 
         except Exception as e:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
+            test_results_json.append({"code_execution_error": str(e)})
             # Removed session.log_error call
-            # self.session.log_error(f"Error executing generated code: {e}")
+
+        # Save test results as JSON
+        test_results_json_file = Path(f"{code_file_path.stem}.json")
+        with open(code_file_path.parent / test_results_json_file, "w") as f:
+            json.dump(test_results_json, f, indent=2)
+
 
         return [test_results_str]  # return the string
 
