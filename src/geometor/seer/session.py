@@ -221,7 +221,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        resp dict,
+        respdict: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -236,7 +236,7 @@ class Session:
             markdown_text += str(part) + "\n"
 
         # Add usage metadata
-        usage = respdata.get("usage_metadata", {})
+        usage = respdict.get("usage_metadata", {})
         if usage:
             markdown_text += "\n---\n\n**Usage Meta**\n\n```json\n"
             markdown_text += json.dumps(usage, indent=2)
@@ -273,18 +273,18 @@ class Session:
 
     def gather_response_data(self, task_dir):
         """Gathers data from all response.json files in the task directory."""
-        respdata = []
+        resplist = []
         for respfile in task_dir.glob("*-response.json"):
             try:
                 with open(respfile, "r") as f:
                     data = json.load(f)
-                    respdata.append(data)
+                    resplist.append(data)
             except (IOError, json.JSONDecodeError) as e:
                 print(f"Error reading or parsing {respfile}: {e}")
                 self.log_error(f"Error reading or parsing {respfile}: {e}")
-        return respdata
+        return resplist
 
-    def create_summary_report(self, respdata, task_dir):
+    def create_summary_report(self, resplist, task_dir):
         """Creates a summary report (Markdown and JSON) of token usage, timing, and test results."""
 
         # --- Response Report ---
@@ -296,10 +296,10 @@ class Session:
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
 
-        # Use a copy of respdata and sort it by response_file
-        sorted_respdata = sorted(respdata.copy(), key=lambda x: x.get("response_file", ""))
+        # Use a copy of resplist and sort it by response_file
+        sorted_resplist = sorted(resplist.copy(), key=lambda x: x.get("response_file", ""))
 
-        for data in sorted_resp  # Iterate over the sorted copy
+        for data in sorted_resplist:  # Iterate over the sorted copy
             response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
 
             response_report_json.append({
