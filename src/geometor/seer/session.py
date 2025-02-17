@@ -339,8 +339,8 @@ class Session:
         # Create Markdown table
         for file_index, test_results in sorted_grouped_test_results.items():  # Iterate over sorted dictionary
             test_report_md += f"## Code File: {file_index}\n\n"
-            test_report_md += "| Example | Status | Size Correct | Color Palette Correct | Pixel Counts Correct | Pixels Off |\n"
-            test_report_md += "|---------|--------|--------------|-----------------------|----------------------|------------|\n"
+            test_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
+            test_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
 
             test_report_json[file_index] = []
 
