@@ -61,9 +61,9 @@ class Seer:
         with open(self.oracle_config["system_context_file"], "r") as f: # New
             self.oracle_system_context = f.read().strip() # New
 
-        with open("config/nlp_instructions.md", "r") as f:
+        with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
-        with open("config/code_instructions.md", "r") as f:
+        with open(config["investigate_code"], "r") as f:
             self.code_instructions = f.read().strip()
 
         self.max_iterations = config["max_iterations"]
@@ -379,6 +379,3 @@ class Seer:
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
 
             self.solve(task)
-```
-
-These changes ensure that all configuration and instruction files are neatly organized within the `config` directory, and that `run.py` and `src/geometor/seer/seer.py` correctly reference their new locations.
