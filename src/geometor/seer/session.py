@@ -220,7 +220,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        respdata: dict,
+        resp dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -269,3 +269,106 @@ class Session:
         markdown = Markdown(markdown_text)
         print()
         print(markdown)
+
+    def gather_response_data(self, task_dir):
+        """Gathers data from all response.json files in the task directory."""
+        respdata = []
+        for respfile in task_dir.glob("*-response.json"):
+            try:
+                with open(respfile, "r") as f:
+                    data = json.load(f)
+                    respdata.append(data)
+            except (IOError, json.JSONDecodeError) as e:
+                print(f"Error reading or parsing {respfile}: {e}")
+                self.log_error(f"Error reading or parsing {respfile}: {e}")
+        return respdata
+
+    def create_summary_report(self, respdata, task_dir):
+        """Creates a summary report (Markdown and JSON) of token usage, timing, and test results."""
+
+        # Aggregate data
+        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        total_response_time = 0
+        all_response_times = []
+        test_results = []
+
+        for data in resp
+            for key in total_tokens:
+                total_tokens[key] += data["token_totals"].get(key, 0)
+            total_response_time += data["timing"]["response_time"]
+            all_response_times.extend(data["timing"]["response_times"])
+
+            # Collect test results from JSON files
+            for py_file in task_dir.glob("*-py_*.json"):
+                try:
+                    with open(py_file, 'r') as f:
+                        test_results.extend(json.load(f))
+                except Exception as e:
+                    print(f"Failed to load test results from {py_file}: {e}")
+
+        # Create Markdown report
+        report_md = "# Task Summary Report\n\n"
+        report_md += "## Token Usage\n\n"
+        report_md += "| Category        | Token Count |\n"
+        report_md += "|-----------------|-------------|\n"
+        report_md += f"| Prompt Tokens   | {total_tokens['prompt']} |\n"
+        report_md += f"| Candidate Tokens| {total_tokens['candidates']} |\n"
+        report_md += f"| Total Tokens    | {total_tokens['total']} |\n"
+        report_md += f"| Cached Tokens   | {total_tokens['cached']} |\n\n"
+
+        report_md += "## Timing\n\n"
+        report_md += "| Metric          | Time (s) |\n"
+        report_md += "|-----------------|----------|\n"
+        report_md += f"| Total Resp Time | {total_response_time:.4f} |\n"
+        report_md += f"| Avg Resp Time   | {sum(all_response_times) / len(all_response_times) if all_response_times else 0:.4f} |\n\n"
+        #  report_md += f"| All Response Times | {all_response_times} |\n\n"
+
+        report_md += "## Test Results\n\n"
+        if test_results:
+             for result in test_results:
+                if 'example' in result:
+                    report_md += f"### Example {result['example']}\n"
+                    report_md += f"- **Status:** {result['status']}\n"
+                    report_md += f"- **Input:**\n```\n{result['input']}\n```\n"
+                    report_md += f"- **Expected Output:**\n```\n{result['expected_output']}\n```\n"
+                    if 'transformed_output' in result:
+                        report_md += f"- **Transformed Output:**\n```\n{result['transformed_output']}\n```\n"
+                elif 'captured_output' in result:
+                    report_md += f"### Captured Output\n```\n{result['captured_output']}\n```\n"
+                elif 'code_execution_error' in result:
+                    report_md += f"### Code Execution Error\n```\n{result['code_execution_error']}\n```\n"
+        else:
+            report_md += "No test results found.\n"
+
+        # Create JSON report
+        report_json = {
+            "token_usage": total_tokens,
+            "timing": {
+                "total_response_time": total_response_time,
+                "all_response_times": all_response_times,
+            },
+            "test_results": test_results,
+        }
+
+        # Save reports
+        report_md_file = task_dir / "summary_report.md"
+        report_json_file = task_dir / "summary_report.json"
+
+        self._write_to_file(report_md_file, report_md)
+        with open(report_json_file, "w") as f:
+            json.dump(report_json, f, indent=2)
+
+        # Display report
+        self.display_response(
+            [report_md], 0, "Task Summary", {}
+        )  # prompt_count=0, as this isn't a regular prompt/response
+
+    def _write_to_file(self, file_name, content):
+        """Writes content to a file in the task directory."""
+        file_path = self.task_dir / file_name  # Use self.task_dir
+        try:
+            with open(file_path, "w") as f:
+                f.write(content)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to file {file_name}: {e}")
+            self.log_error(f"Error writing to file {file_name}: {e}")
