@@ -125,10 +125,8 @@ class Tasks(list):
         tasks = []
         for file_path in sorted(folder_path.glob("*.json")):
             task_id = file_path.stem  # Get filename without extension
-            print(f"{task_id=}")
             with file_path.open("r") as f:
                 data = json.load(f)
-                print(f"{data=}")
                 tasks.append(Task(task_id, data))
         return tasks
 
