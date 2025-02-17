@@ -399,9 +399,7 @@ class Seer:
 
         # Write the session summary report to the session directory
         # Corrected: Use self.session.session_dir, not self.session.task_dir
-        session_summary_report_json_file = (
-            self.session.session_dir / "session_summary_report.json"
-        )
+        session_summary_report_json_file = "session_summary_report.json"
         self._write_to_file_session(  # Use the session-level writing method
             session_summary_report_json_file,
             json.dumps(session_summary_report, indent=2),
@@ -459,9 +457,7 @@ class Seer:
 
         # Write the session summary report (Markdown) to the session directory
         # Corrected: Use self.session.session_dir
-        session_summary_report_md_file = (
-            self.session.session_dir / "session_summary_report.md"
-        )
+        session_summary_report_md_file = "session_summary_report.md"
         self._write_to_file_session(  # Use session-level writing method
             session_summary_report_md_file, session_summary_report_md
         )

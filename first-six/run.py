@@ -10,7 +10,7 @@ def run():
     with open("config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
-    tasks = Tasks("first-six")
+    tasks = Tasks("one")
 
     seer = Seer(
         config,

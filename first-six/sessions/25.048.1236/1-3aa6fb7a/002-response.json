@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies two azure (color 8) \"L\"-shaped objects in the input grid. \nIt then places a blue cell (color 1) inside the corner of each \"L\". \nAll other cells in the grid remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds \"L\" shapes of a specified color in the grid.\n    Returns a list of corner coordinates for each L shape.\n    \"\"\"\n    l_corners = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            # Check for L shape in all 4 orientations.\n            if grid[r, c] == color:\n                # Check different orientations of the L shape\n                if grid[r + 1, c] == color and grid[r, c + 1] == color :\n                    l_corners.append((r,c))\n                elif grid[r+1,c] == color and grid[r,c-1] == color:\n                      l_corners.append((r,c-1))\n                elif grid[r-1,c] == color and grid[r,c+1] == color:\n                    l_corners.append((r-1,c))\n                elif grid[r-1,c] == color and grid[r, c-1] == color:\n                    l_corners.append((r-1, c-1))\n\n            elif grid[r,c+1] == color:\n                if grid[r+1,c+1] == color and grid[r-1,c+1] == color:\n                    l_corners.append((r-1,c))\n            elif grid[r+1,c] == color:\n                if grid[r+1, c-1] == color and grid[r+1, c+1] == color:\n                    l_corners.append((r,c))\n    \n    filtered_corners = []\n    for corner in l_corners:\n        r, c = corner\n        # Ensure the corner and its adjacent cells form an L-shape of 3 cells\n        count = 0\n        if grid[r,c] == color:\n          if 0 <= r + 1 < rows and grid[r + 1, c] == color:\n              count += 1\n          if 0 <= r - 1 < rows and grid[r - 1, c] == color:\n              count += 1\n          if 0 <= c + 1 < cols and grid[r, c + 1] == color:\n              count += 1\n          if 0 <= c - 1 < cols and grid[r, c - 1] == color:\n              count += 1\n          if count == 2: #Check that there's indeed 2 other adjancent cells making the L\n              # check diagonal to detect real corners.\n              is_real_corner = False\n              if 0 <= r+1 < rows and 0 <= c+1 < cols and grid[r+1,c+1] != color:\n                  is_real_corner = True\n\n              if 0 <= r+1 < rows and 0 <= c-1 < cols and grid[r+1, c-1] != color:\n                  is_real_corner = True\n              \n              if 0 <= r-1 < rows and 0 <= c+1 < cols and grid[r-1, c+1] != color:\n                  is_real_corner = True\n              \n              if 0 <= r-1 < rows and 0 <= c-1 < cols and grid[r-1, c-1] != color:\n                  is_real_corner = True\n\n              if is_real_corner:    \n                filtered_corners.append(corner)\n\n\n    return filtered_corners\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    l_corners = find_l_shapes(input_grid, 8)\n\n    # Place a blue cell (color 1) at the identified corner of each L shape.\n    for corner in l_corners:\n        r, c = corner\n        #find adjacent color 8\n        if input_grid[r+1,c] == 8:\n            if input_grid[r,c+1] == 8:\n              output_grid[r + 1, c + 1] = 1\n            elif 0<= c-1 and input_grid[r,c-1] == 8:\n              output_grid[r+1,c-1] = 1\n        elif 0 <= r-1 and input_grid[r-1,c] == 8:\n            if input_grid[r,c+1] == 8:\n                output_grid[r-1,c+1] = 1\n            elif 0 <= c-1 and input_grid[r,c-1] == 8:\n                output_grid[r-1,c-1] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2133,
+    "candidates_token_count": 1193,
+    "total_token_count": 3326,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3802,
+    "candidates": 1565,
+    "total": 5367,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000116,
+    "total_elapsed": 17.293599,
+    "response_times": [
+      0.000403,
+      0.000116
+    ]
+  },
+  "response_file": "002-response.json"
+}
