@@ -85,6 +85,9 @@ class Seer:
         self.task = task  # Store the task for use in _process_response and _test_code
         history = [""]
 
+        # Reset extracted file counts for each task
+        self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
+
         self._investigate_examples(task.train)
         #  self._review_programs()
         #  self._run_solution_loop()
