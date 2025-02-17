@@ -339,14 +339,14 @@ class Session:
         # Create Markdown table
         for file_index, test_results in sorted_grouped_test_results.items():  # Iterate over sorted dictionary
             test_report_md += f"## Code File: {file_index}\n\n"
-            test_report_md += "| Example | Input | Expected Output | Transformed Output | Status | Size Correct | Color Palette Correct | Pixel Counts Correct | Pixels Off |\n"
-            test_report_md += "|---------|-------|-----------------|--------------------|--------|--------------|-----------------------|----------------------|------------|\n"
+            test_report_md += "| Example | Status | Size Correct | Color Palette Correct | Pixel Counts Correct | Pixels Off |\n"
+            test_report_md += "|---------|--------|--------------|-----------------------|----------------------|------------|\n"
 
             test_report_json[file_index] = []
 
             for result in test_results:
                 if "example" in result:
-                    test_report_md += f"| {result['example']} | `{result['input'][:20]}...` | `{result['expected_output'][:20]}...` | `{result.get('transformed_output', '')[:20]}...` | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
+                    test_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
                     test_report_json[file_index].append(
                         {  # append to correct file index
                             "example": result["example"],
@@ -365,10 +365,10 @@ class Session:
                         }
                     )
                 elif "captured_output" in result:
-                    test_report_md += f"| Captured Output |  |  |  |  |  |  |  |  |\n"
-                    test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
+                    test_report_md += f"| Captured Output |  |  |  |  |\n"
+                    test_report_md += f"|---|---|---|---|---|\n"
                     test_report_md += (
-                        f"|  |  |  | ```{result['captured_output']}``` |  |  |  |  |  |\n"
+                        f"|  | ```{result['captured_output']}``` |  |  |  |\n"
                     )
                     test_report_json[file_index].append(
                         {"captured_output": result["captured_output"]}
@@ -376,11 +376,11 @@ class Session:
 
                 elif "code_execution_error" in result:
                     test_report_md += (
-                        f"| Code Execution Error |  |  |  |  |  |  |  |  |\n"
+                        f"| Code Execution Error |  |  |  |  |\n"
                     )
-                    test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
+                    test_report_md += f"|---|---|---|---|---|\n"
                     test_report_md += (
-                        f"|  |  |  | ```{result['code_execution_error']}``` |  |  |  |  |  |\n"
+                        f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
                     )
                     test_report_json[file_index].append(
                         {"code_execution_error": result["code_execution_error"]}
@@ -413,4 +413,3 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
-
