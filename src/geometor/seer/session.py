@@ -167,6 +167,7 @@ class Session:
             "total_elapsed": total_elapsed,
             "response_times": response_times.copy(),
         }
+        response_data["response_file"] = str(response_file.name) # Add filename for report
 
         try:
             with open(response_file, "w") as f:
@@ -220,7 +221,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        respdata: dict,
+        resp dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -286,71 +287,88 @@ class Session:
     def create_summary_report(self, respdata, task_dir):
         """Creates a summary report (Markdown and JSON) of token usage, timing, and test results."""
 
-        # Aggregate data
+        # --- Response Report ---
+        response_report_md = "# Response Report\n\n"
+        response_report_md += "| Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
+        response_report_md += "|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
+
+        response_report_json = []
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
-        all_response_times = []
-        test_results = []
 
-        for data in respdata:
+        for data in resp
+            response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
+
+            response_report_json.append({
+                "response_file": data.get('response_file', 'N/A'),
+                "token_usage": data['token_totals'],
+                "timing": data['timing']
+            })
+
             for key in total_tokens:
                 total_tokens[key] += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
-            all_response_times.extend(data["timing"]["response_times"])
 
-            # Collect test results from JSON files
-            for py_file in task_dir.glob("*-py_*.json"):
-                try:
-                    with open(py_file, 'r') as f:
-                        test_results.extend(json.load(f))
-                except Exception as e:
-                    print(f"Failed to load test results from {py_file}: {e}")
 
-        # Create Markdown report
-        report_md = "# Task Summary Report\n\n"
-        report_md += "## Token Usage\n\n"
-        report_md += "| Category        | Token Count |\n"
-        report_md += "|-----------------|-------------|\n"
-        report_md += f"| Prompt Tokens   | {total_tokens['prompt']} |\n"
-        report_md += f"| Candidate Tokens| {total_tokens['candidates']} |\n"
-        report_md += f"| Total Tokens    | {total_tokens['total']} |\n"
-        report_md += f"| Cached Tokens   | {total_tokens['cached']} |\n\n"
+        response_report_md += f"| **Total**     | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
 
-        report_md += "## Timing\n\n"
-        report_md += "| Metric          | Time (s) |\n"
-        report_md += "|-----------------|----------|\n"
-        report_md += f"| Total Resp Time | {total_response_time:.4f} |\n"
-        report_md += f"| Avg Resp Time   | {sum(all_response_times) / len(all_response_times) if all_response_times else 0:.4f} |\n\n"
-        #  report_md += f"| All Response Times | {all_response_times} |\n\n"
 
-        report_md += "## Test Results\n\n"
-        if test_results:
-             for result in test_results:
+        # --- Test Report ---
+        test_report_md = "# Test Report\n\n"
+        test_report_json = {}
+
+        # Collect and group test results by code file
+        grouped_test_results = {}
+        for py_file in task_dir.glob("*-py_*.json"):
+            try:
+                with open(py_file, 'r') as f:
+                    test_results = json.load(f)
+                    # Extract the file index from the filename (e.g., "002" from "002-py_01.json")
+                    file_index = py_file.stem.split('-')[0]
+                    grouped_test_results[file_index] = test_results
+            except Exception as e:
+                print(f"Failed to load test results from {py_file}: {e}")
+                self.log_error(f"Failed to load test results from {py_file}: {e}")
+
+        # Create Markdown table
+        for file_index, test_results in grouped_test_results.items():
+            test_report_md += f"## Code File: {file_index}\n\n"
+            test_report_md += "| Example | Input | Expected Output | Transformed Output | Status |\n"
+            test_report_md += "|---------|-------|-----------------|--------------------|--------|\n"
+
+            test_report_json[file_index] = []
+
+            for result in test_results:
                 if 'example' in result:
-                    report_md += f"### Example {result['example']}\n"
-                    report_md += f"- **Status:** {result['status']}\n"
-                    report_md += f"- **Input:**\n```\n{result['input']}\n```\n"
-                    report_md += f"- **Expected Output:**\n```\n{result['expected_output']}\n```\n"
-                    if 'transformed_output' in result:
-                        report_md += f"- **Transformed Output:**\n```\n{result['transformed_output']}\n```\n"
+                    test_report_md += f"| {result['example']} | `{result['input'][:20]}...` | `{result['expected_output'][:20]}...` | `{result.get('transformed_output', '')[:20]}...` | {result['status']} |\n"
+                    test_report_json[file_index].append({
+                        "example": result['example'],
+                        "input": result['input'],
+                        "expected_output": result['expected_output'],
+                        "transformed_output": result.get('transformed_output', ''),
+                        "status": result['status']
+                    })
                 elif 'captured_output' in result:
-                    report_md += f"### Captured Output\n```\n{result['captured_output']}\n```\n"
-                elif 'code_execution_error' in result:
-                    report_md += f"### Code Execution Error\n```\n{result['code_execution_error']}\n```\n"
-        else:
-            report_md += "No test results found.\n"
+                    test_report_md += f"| Captured Output |  |  |  |  |\n"
+                    test_report_md += f"|---|---|---|---|---|\n"
+                    test_report_md += f"|  |  |  | ```{result['captured_output']}``` |  |\n"
+                    test_report_json[file_index].append({"captured_output": result['captured_output']})
 
-        # Create JSON report
+                elif 'code_execution_error' in result:
+                    test_report_md += f"| Code Execution Error |  |  |  |  |\n"
+                    test_report_md += f"|---|---|---|---|---|\n"
+                    test_report_md += f"|  |  |  | ```{result['code_execution_error']}``` |  |\n"
+                    test_report_json[file_index].append({"code_execution_error": result['code_execution_error']})
+
+            test_report_md += "\n"
+
+        # --- Combine Reports and Save ---
+        report_md = response_report_md + test_report_md
         report_json = {
-            "token_usage": total_tokens,
-            "timing": {
-                "total_response_time": total_response_time,
-                "all_response_times": all_response_times,
-            },
-            "test_results": test_results,
+            "response_report": response_report_json,
+            "test_report": test_report_json
         }
 
-        # Save reports
         report_md_file = task_dir / "summary_report.md"
         report_json_file = task_dir / "summary_report.json"
 
@@ -372,3 +390,4 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
+
