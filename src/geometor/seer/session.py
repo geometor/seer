@@ -221,7 +221,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        respdata: dict,
+        resp dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -296,7 +296,7 @@ class Session:
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
 
-        for data in respdata:
+        for data in resp
             response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
 
             response_report_json.append({
@@ -333,31 +333,37 @@ class Session:
         # Create Markdown table
         for file_index, test_results in grouped_test_results.items():
             test_report_md += f"## Code File: {file_index}\n\n"
-            test_report_md += "| Example | Input | Expected Output | Transformed Output | Status |\n"
-            test_report_md += "|---------|-------|-----------------|--------------------|--------|\n"
+            test_report_md += "| Example | Input | Expected Output | Transformed Output | Status | Size Correct | Color Palette Correct | Pixel Counts Correct | Pixels Off |\n"
+            test_report_md += "|---------|-------|-----------------|--------------------|--------|--------------|-----------------------|----------------------|------------|\n"
 
             test_report_json[file_index] = []
 
             for result in test_results:
                 if 'example' in result:
-                    test_report_md += f"| {result['example']} | `{result['input'][:20]}...` | `{result['expected_output'][:20]}...` | `{result.get('transformed_output', '')[:20]}...` | {result['status']} |\n"
+                    test_report_md += f"| {result['example']} | `{result['input'][:20]}...` | `{result['expected_output'][:20]}...` | `{result.get('transformed_output', '')[:20]}...` | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
+                    test_report_json[file_index] = []
+
                     test_report_json[file_index].append({
                         "example": result['example'],
                         "input": result['input'],
                         "expected_output": result['expected_output'],
                         "transformed_output": result.get('transformed_output', ''),
-                        "status": result['status']
+                        "status": result['status'],
+                        "size_correct": result.get('size_correct', 'N/A'),
+                        "color_palette_correct": result.get('color_palette_correct', 'N/A'),
+                        "correct_pixel_counts": result.get('correct_pixel_counts', 'N/A'),
+                        "pixels_off": result.get('pixels_off', 'N/A')
                     })
                 elif 'captured_output' in result:
-                    test_report_md += f"| Captured Output |  |  |  |  |\n"
-                    test_report_md += f"|---|---|---|---|---|\n"
-                    test_report_md += f"|  |  |  | ```{result['captured_output']}``` |  |\n"
+                    test_report_md += f"| Captured Output |  |  |  |  |  |  |  |  |\n"
+                    test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
+                    test_report_md += f"|  |  |  | ```{result['captured_output']}``` |  |  |  |  |  |\n"
                     test_report_json[file_index].append({"captured_output": result['captured_output']})
 
                 elif 'code_execution_error' in result:
-                    test_report_md += f"| Code Execution Error |  |  |  |  |\n"
-                    test_report_md += f"|---|---|---|---|---|\n"
-                    test_report_md += f"|  |  |  | ```{result['code_execution_error']}``` |  |\n"
+                    test_report_md += f"| Code Execution Error |  |  |  |  |  |  |  |  |\n"
+                    test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
+                    test_report_md += f"|  |  |  | ```{result['code_execution_error']}``` |  |  |  |  |  |\n"
                     test_report_json[file_index].append({"code_execution_error": result['code_execution_error']})
 
             test_report_md += "\n"
@@ -390,4 +396,3 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
-

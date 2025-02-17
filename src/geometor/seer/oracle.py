@@ -50,6 +50,7 @@ class Oracle:
                                 f"*input:*\n```\n{pair.input.to_string()}\n```\n"
                             )
                             test_results_str += f"*expected output:*\n```\n{pair.output.to_string()}\n```\n"
+                            )
                             test_results_str += f"*transformed output:*\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
 
                             # Generate and save image of transformed output
@@ -69,6 +70,30 @@ class Oracle:
                             #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
 
                             example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
+
+                            # --- Calculate Statistics ---
+                            size_correct = transformed_output.shape == expected_output.shape
+                            example_result["size_correct"] = size_correct
+
+                            transformed_colors = set(np.unique(transformed_output))
+                            expected_colors = set(np.unique(expected_output))
+                            color_palette_correct = transformed_colors.issubset(expected_colors)
+                            example_result["color_palette_correct"] = color_palette_correct
+
+                            transformed_counts = dict(zip(*np.unique(transformed_output, return_counts=True)))
+                            expected_counts = dict(zip(*np.unique(expected_output, return_counts=True)))
+                            correct_pixel_counts = transformed_counts == expected_counts
+                            example_result["correct_pixel_counts"] = correct_pixel_counts
+
+                            pixels_off = np.sum(transformed_output != expected_output)
+                            example_result["pixels_off"] = int(pixels_off)  # Ensure it's a standard int
+
+                            # --- Update test_results_str with Statistics ---
+                            test_results_str += f"  Size Correct: {size_correct}\n"
+                            test_results_str += f"  Color Palette Correct: {color_palette_correct}\n"
+                            test_results_str += f"  Pixel Counts Correct: {correct_pixel_counts}\n"
+                            test_results_str += f"  Pixels Off: {pixels_off}\n"
+
 
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += f"**FAILED!**\n"
