@@ -220,7 +220,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        resp dict,
+        respdata: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -292,7 +292,7 @@ class Session:
         all_response_times = []
         test_results = []
 
-        for data in resp
+        for data in respdata:
             for key in total_tokens:
                 total_tokens[key] += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
