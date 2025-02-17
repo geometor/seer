@@ -392,11 +392,12 @@ class Session:
         report_md = response_report_md + test_report_md
         report_json = {"response_report": response_report_json, "test_report": test_report_json}
 
-        report_md_file = "summary_report.md"  # Simplified
-        report_json_file = "summary_report.json" # Simplified
+        report_md_file = "summary_report.md"
+        report_json_file = "summary_report.json"
 
         self._write_to_file(report_md_file, report_md)
-        self._write_to_file(report_json_file, json.dumps(report_json, indent=2)) # Use _write_to_file
+        # Corrected line: Use _write_to_file for JSON too
+        self._write_to_file(report_json_file, json.dumps(report_json, indent=2))
 
         # Display report
         self.display_response(
