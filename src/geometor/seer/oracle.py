@@ -50,7 +50,6 @@ class Oracle:
                                 f"*input:*\n```\n{pair.input.to_string()}\n```\n"
                             )
                             test_results_str += f"*expected output:*\n```\n{pair.output.to_string()}\n```\n"
-                            )
                             test_results_str += f"*transformed output:*\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
 
                             # Generate and save image of transformed output
