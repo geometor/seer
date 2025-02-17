@@ -167,7 +167,7 @@ class Session:
             "total_elapsed": total_elapsed,
             "response_times": response_times.copy(),
         }
-        response_data["response_file"] = str(response_file.name) # Add filename for report
+        response_data["response_file"] = str(response_file.name)  # Add filename for report
 
         try:
             with open(response_file, "w") as f:
@@ -221,7 +221,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        respdata: dict,
+        resp dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -296,42 +296,48 @@ class Session:
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
 
-        for data in respdata:
+        # Use a copy of respdata and sort it by response_file
+        sorted_respdata = sorted(respdata.copy(), key=lambda x: x.get("response_file", ""))
+
+        for data in sorted_resp  # Iterate over the sorted copy
             response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
 
             response_report_json.append({
-                "response_file": data.get('response_file', 'N/A'),
-                "token_usage": data['token_totals'],
-                "timing": data['timing']
+                "response_file": data.get("response_file", "N/A"),
+                "token_usage": data["token_totals"],
+                "timing": data["timing"],
             })
 
             for key in total_tokens:
                 total_tokens[key] += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
 
-
-        response_report_md += f"| **Total**     | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
-
+        response_report_md += (
+            f"| **Total**     | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
+        )
 
         # --- Test Report ---
         test_report_md = "# Test Report\n\n"
         test_report_json = {}
 
-        # Collect and group test results by code file
+        # Collect and group test results by code file, sorting the files
         grouped_test_results = {}
-        for py_file in task_dir.glob("*-py_*.json"):
+        for py_file in sorted(task_dir.glob("*-py_*.json")):  # Sort here
             try:
-                with open(py_file, 'r') as f:
+                with open(py_file, "r") as f:
                     test_results = json.load(f)
                     # Extract the file index from the filename (e.g., "002" from "002-py_01.json")
-                    file_index = py_file.stem.split('-')[0]
+                    file_index = py_file.stem.split("-")[0]
                     grouped_test_results[file_index] = test_results
             except Exception as e:
                 print(f"Failed to load test results from {py_file}: {e}")
                 self.log_error(f"Failed to load test results from {py_file}: {e}")
 
+        # Sort the grouped test results by file index
+        sorted_grouped_test_results = dict(sorted(grouped_test_results.items()))
+
         # Create Markdown table
-        for file_index, test_results in grouped_test_results.items():
+        for file_index, test_results in sorted_grouped_test_results.items():  # Iterate over sorted dictionary
             test_report_md += f"## Code File: {file_index}\n\n"
             test_report_md += "| Example | Input | Expected Output | Transformed Output | Status | Size Correct | Color Palette Correct | Pixel Counts Correct | Pixels Off |\n"
             test_report_md += "|---------|-------|-----------------|--------------------|--------|--------------|-----------------------|----------------------|------------|\n"
@@ -339,41 +345,52 @@ class Session:
             test_report_json[file_index] = []
 
             for result in test_results:
-                if 'example' in result:
+                if "example" in result:
                     test_report_md += f"| {result['example']} | `{result['input'][:20]}...` | `{result['expected_output'][:20]}...` | `{result.get('transformed_output', '')[:20]}...` | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
-                    test_report_json[file_index] = []
-
-                    test_report_json[file_index].append({
-                        "example": result['example'],
-                        "input": result['input'],
-                        "expected_output": result['expected_output'],
-                        "transformed_output": result.get('transformed_output', ''),
-                        "status": result['status'],
-                        "size_correct": result.get('size_correct', 'N/A'),
-                        "color_palette_correct": result.get('color_palette_correct', 'N/A'),
-                        "correct_pixel_counts": result.get('correct_pixel_counts', 'N/A'),
-                        "pixels_off": result.get('pixels_off', 'N/A')
-                    })
-                elif 'captured_output' in result:
+                    test_report_json[file_index].append(
+                        {  # append to correct file index
+                            "example": result["example"],
+                            "input": result["input"],
+                            "expected_output": result["expected_output"],
+                            "transformed_output": result.get("transformed_output", ""),
+                            "status": result["status"],
+                            "size_correct": result.get("size_correct", "N/A"),
+                            "color_palette_correct": result.get(
+                                "color_palette_correct", "N/A"
+                            ),
+                            "correct_pixel_counts": result.get(
+                                "correct_pixel_counts", "N/A"
+                            ),
+                            "pixels_off": result.get("pixels_off", "N/A"),
+                        }
+                    )
+                elif "captured_output" in result:
                     test_report_md += f"| Captured Output |  |  |  |  |  |  |  |  |\n"
                     test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
-                    test_report_md += f"|  |  |  | ```{result['captured_output']}``` |  |  |  |  |  |\n"
-                    test_report_json[file_index].append({"captured_output": result['captured_output']})
+                    test_report_md += (
+                        f"|  |  |  | ```{result['captured_output']}``` |  |  |  |  |  |\n"
+                    )
+                    test_report_json[file_index].append(
+                        {"captured_output": result["captured_output"]}
+                    )
 
-                elif 'code_execution_error' in result:
-                    test_report_md += f"| Code Execution Error |  |  |  |  |  |  |  |  |\n"
+                elif "code_execution_error" in result:
+                    test_report_md += (
+                        f"| Code Execution Error |  |  |  |  |  |  |  |  |\n"
+                    )
                     test_report_md += f"|---|---|---|---|---|---|---|---|---|\n"
-                    test_report_md += f"|  |  |  | ```{result['code_execution_error']}``` |  |  |  |  |  |\n"
-                    test_report_json[file_index].append({"code_execution_error": result['code_execution_error']})
+                    test_report_md += (
+                        f"|  |  |  | ```{result['code_execution_error']}``` |  |  |  |  |  |\n"
+                    )
+                    test_report_json[file_index].append(
+                        {"code_execution_error": result["code_execution_error"]}
+                    )
 
             test_report_md += "\n"
 
         # --- Combine Reports and Save ---
         report_md = response_report_md + test_report_md
-        report_json = {
-            "response_report": response_report_json,
-            "test_report": test_report_json
-        }
+        report_json = {"response_report": response_report_json, "test_report": test_report_json}
 
         report_md_file = task_dir / "summary_report.md"
         report_json_file = task_dir / "summary_report.json"
@@ -396,3 +413,4 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
+
