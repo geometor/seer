@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransformation Rule:\n\n1. Identify all non-zero colored cells in the input grid.\n2. Move these cells to the last row of the output grid.\n3. Maintain the original column index of each cell during the move.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero colored cells\n    to the last row, preserving their original column positions.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find all non-zero cells and their column indices\n    non_zero_cells = []\n    for c in range(cols):\n        for r in range(rows):\n            if input_grid[r, c] != 0:\n                non_zero_cells.append((input_grid[r, c], c))\n\n    # Place the non-zero cells in the last row of the output grid\n    for i, (value, col) in enumerate(non_zero_cells):\n        output_grid[rows - 1, col] = value\n        \n    # Copy cells from row 2\n    output_grid[2,:] = input_grid[2,:]\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2283,
+    "candidates_token_count": 307,
+    "total_token_count": 2590,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 42948,
+    "candidates": 8226,
+    "total": 51174,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000121,
+    "total_elapsed": 92.498091,
+    "response_times": [
+      0.000484,
+      0.000118,
+      0.000285,
+      0.000122,
+      0.000316,
+      0.000119,
+      0.000384,
+      0.000115,
+      0.00028,
+      0.000117,
+      0.000344,
+      0.000121
+    ]
+  }
+}
