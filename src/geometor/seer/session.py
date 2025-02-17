@@ -396,8 +396,7 @@ class Session:
         report_json_file = "summary_report.json" # Simplified
 
         self._write_to_file(report_md_file, report_md)
-        with open(report_json_file, "w") as f:  # Simplified
-            json.dump(report_json, f, indent=2)
+        self._write_to_file(report_json_file, json.dumps(report_json, indent=2)) # Use _write_to_file
 
         # Display report
         self.display_response(
@@ -413,4 +412,3 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
-
