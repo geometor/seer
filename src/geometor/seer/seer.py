@@ -16,6 +16,7 @@ import contextlib
 import io
 
 from geometor.seer.tasks import Tasks, Task, Grid
+from geometor.seer.oracle import Oracle
 
 from geometor.seer.gemini_client import GeminiClient as Client
 from geometor.seer.exceptions import (
@@ -48,6 +49,7 @@ class Seer:
         #  self.code_model = config["code_model"]
         self.dreamer_config = config["dreamer"]
         self.coder_config = config["coder"]
+        self.oracle_config = config["oracle"] # New
 
         with open(self.dreamer_config["system_context_file"], "r") as f:
             self.dreamer_system_context = f.read().strip()
@@ -55,6 +57,9 @@ class Seer:
             self.coder_system_context = f.read().strip()
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
+
+        with open(self.oracle_config["system_context_file"], "r") as f: # New
+            self.oracle_system_context = f.read().strip() # New
 
         with open("nlp_instructions.md", "r") as f:
             self.nlp_instructions = f.read().strip()
@@ -70,6 +75,9 @@ class Seer:
         self.coder_client = Client(
             self.coder_config, f"{self.coder_system_context}\n\n{self.task_context}"
         )
+        self.oracle_client = Oracle(  # New
+            self.oracle_config, self.oracle_system_context
+        )  # New
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
@@ -241,7 +249,7 @@ class Seer:
                     self._write_to_file(code_file_path, code)
 
                     # Call _test_code and extend response_parts
-                    test_results = self._test_code(code, code_file_path)
+                    test_results = self.oracle_client.test_code(code, code_file_path, self.task)
                     response_parts.extend(test_results)
 
                 if part.code_execution_result:
@@ -270,94 +278,6 @@ class Seer:
 
         return response_parts, function_call_found, last_result
 
-    def _test_code(self, code, code_file_path):
-        """Executes and validates the generated code, writing results to a file."""
-        test_results_str = ""
-        try:
-            tree = ast.parse(code)
-            namespace = {}
-            # Capture stdout
-            output_capture = io.StringIO()
-            with contextlib.redirect_stdout(output_capture):
-                exec(
-                    compile(tree, filename=str(code_file_path), mode="exec"), namespace
-                )
-
-            for node in ast.walk(tree):
-                if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                    test_results_str += "\n# validation:*\n"
-                    for i, pair in enumerate(self.task.train):
-                        input_grid = pair.input.grid
-                        expected_output = pair.output.grid
-
-                        test_results_str += f"\n## example {i + 1}\n"
-                        try:
-                            transformed_output = namespace["transform"](input_grid)
-                            test_results_str += (
-                                f"*input:*\n```\n{pair.input.to_string()}\n```\n"
-                            )
-                            test_results_str += f"*expected output:*\n```\n{pair.output.to_string()}\n```\n"
-                            test_results_str += f"*transformed output:*\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
-
-                            # Generate and save image of transformed output
-                            transformed_grid = Grid(
-                                transformed_output,
-                                self.task.id,
-                                "train",
-                                i,
-                                "transformed",
-                            )
-                            transformed_image = transformed_grid.to_image()
-                            image_filename = (
-                                f"{code_file_path.stem}-example_{i + 1}-transformed.png"
-                            )
-                            image_path = self.session.task_dir / image_filename
-                            transformed_image.save(image_path)
-                            #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
-
-                            if not np.array_equal(transformed_output, expected_output):
-                                test_results_str += f"**FAILED!**\n"
-                            else:
-                                test_results_str += f"  PASSED\n"
-                        except Exception as e:
-                            test_results_str += (
-                                f"  Error during validation for example {i + 1}: {e}\n"
-                            )
-                            self.session.log_error(
-                                f"Error during validation for example {i + 1}: {e}",
-                            )
-            captured_output = output_capture.getvalue()
-            if captured_output:
-                test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
-
-            # Write test results to file
-            test_results_file = Path(f"{code_file_path.stem}.md")
-            self._write_to_file(test_results_file, test_results_str)
-
-            # Display test results  <- REMOVE THIS
-            #  self.session.display_test_results(test_results_str, self.prompt_count)
-
-        except SyntaxError as e:
-            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
-            self.session.log_error(f"SyntaxError in generated code: {e}")
-            # Write test results to file even on error
-            test_results_file = Path(f"{code_file_path.stem}.md")
-            self._write_to_file(test_results_file, test_results_str)
-
-            # Display test results  <- REMOVE THIS
-            #  self.session.display_test_results(test_results_str, self.prompt_count)
-
-        except Exception as e:
-            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
-            self.session.log_error(f"Error executing generated code: {e}")
-            # Write test results to file even on error
-            test_results_file = Path(f"{code_file_path.stem}.md")
-            self._write_to_file(test_results_file, test_results_str)
-
-            # Display test results  <- REMOVE THIS
-            #  self.session.display_test_results(test_results_str, self.prompt_count)
-        return [test_results_str]  # return the string
-
     def _write_extracted_content(self, text):
         """Extracts content enclosed in triple backticks and writes it to files."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
@@ -377,7 +297,11 @@ class Seer:
 
             # If it's a Python file, also run tests
             if file_type == "py":
-                self._test_code(content, file_path)
+                test_results = self.oracle_client.test_code(content, file_path, self.task) # Pass task
+                # Write test results to file
+                test_results_file = Path(f"{file_path.stem}.md")
+                self._write_to_file(test_results_file, "".join(test_results))
+
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""

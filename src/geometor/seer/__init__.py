@@ -9,3 +9,4 @@ __licence__ = "MIT"
 """
 Seer package.
 """
+from .oracle import Oracle
