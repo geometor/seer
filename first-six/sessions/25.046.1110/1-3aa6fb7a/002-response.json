@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "Okay, let's create the Python code based on the refined natural language program.\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\nIdentify Azure Objects: Locate all azure (color 8) pixels in the input grid.\n\nPlace Blue Pixel: For every separated azure object made out of more than one pixel, detect the azure color with the highest x and lowest y, and place a new blue (color 1) pixel directly to its right.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    input_np = np.array(input_grid)\n    output_np = np.copy(input_np)\n    rows, cols = input_np.shape\n\n    visited = np.zeros((rows, cols), dtype=bool)\n    \n    def get_neighbors(r, c):\n        neighbors = []\n        if r > 0 and input_np[r-1, c] == 8:\n            neighbors.append((r-1, c))\n        if r < rows - 1 and input_np[r+1, c] == 8:\n            neighbors.append((r+1, c))\n        if c > 0 and input_np[r, c-1] == 8:\n            neighbors.append((r, c-1))\n        if c < cols - 1 and input_np[r, c+1] == 8:\n            neighbors.append((r, c+1))\n        return neighbors\n\n    def dfs(r, c, current_object):\n        visited[r, c] = True\n        current_object.append((r, c))\n        for nr, nc in get_neighbors(r, c):\n            if not visited[nr, nc]:\n                dfs(nr, nc, current_object)\n\n    objects = []\n    for r in range(rows):\n        for c in range(cols):\n            if input_np[r, c] == 8 and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n\n    for obj in objects:\n        if len(obj) > 1:\n            # Find rightmost-uppermost pixel\n            rightmost_uppermost = None\n            for r, c in obj:\n                if rightmost_uppermost is None:\n                    rightmost_uppermost = (r, c)\n                else:\n                    if c > rightmost_uppermost[1]:\n                        rightmost_uppermost = (r, c)\n                    elif c == rightmost_uppermost[1] and r < rightmost_uppermost[0]:\n                        rightmost_uppermost = (r,c)\n\n            # Place blue pixel to the right\n            if rightmost_uppermost:\n              r,c = rightmost_uppermost\n              if c + 1 < cols:\n                output_np[r, c + 1] = 1\n\n    return output_np.tolist()\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 0, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 1, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2607,
+    "candidates_token_count": 1097,
+    "total_token_count": 3704,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 4276,
+    "candidates": 1546,
+    "total": 5822,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000285,
+    "total_elapsed": 15.956061,
+    "response_times": [
+      0.00028,
+      0.000285
+    ]
+  }
+}

@@ -1,5 +1,8 @@
 """
-Main entry point for running the Seer application.
+Main entry point for the Seer application.
+
+This module provides the command-line interface for running the Seer. It initializes
+the Seer and GeminiClient, and demonstrates the basic workflow of generating content.
 """
 
 from geometor.seer.seer import Seer

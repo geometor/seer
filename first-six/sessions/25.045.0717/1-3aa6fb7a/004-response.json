@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe task is to identify connected regions of color 8 and modify a single cell adjacent to one of these regions.\n1. Identify Connected Regions: Find all contiguous regions of color 8 in the input grid. Two cells are considered connected if they are adjacent horizontally or vertically and have the same color.\n2. Order Regions: Order these regions based on their top-leftmost cell. The top-leftmost cell is defined as the cell with the smallest row index, and among those with the same smallest row index, the smallest column index. Order the regions first by row index and then by column index in ascending order.\n3. Directions Cycle: Define a cycle of directions in the order: Right, Down, Left, Up.\n4. Iterate and Modify: For each region in the ordered list, starting from the first region:\n   a. Determine the direction from the directions cycle based on the region's order (1st region uses 'Right', 2nd uses 'Down', 3rd uses 'Left', 4th uses 'Up', and then the cycle repeats for subsequent regions if any).\n   b. Calculate the coordinates of the target cell by taking the top-leftmost cell of the current region and moving one step in the determined direction.\n   c. Check if the target cell is within the grid boundaries and if its color is 0.\n   d. If both conditions are true, change the color of the target cell to 1, and stop the entire process. Only one cell's color is changed in the output grid.\n\"\"\"\n\nimport copy\n\ndef find_connected_regions(grid, color):\n    rows = len(grid)\n    cols = len(grid[0]) if rows > 0 else 0\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n    regions = []\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def get_neighbors(r, c):\n        return [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]\n\n    def dfs(r, c, current_region):\n        visited[r][c] = True\n        current_region.append((r, c))\n        for nr, nc in get_neighbors(r, c):\n            if is_valid(nr, nc) and grid[nr][nc] == color and not visited[nr][nc]:\n                dfs(nr, nc, current_region)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == color and not visited[r][c]:\n                current_region = []\n                dfs(r, c, current_region)\n                regions.append(current_region)\n    return regions\n\ndef get_top_leftmost_cell(region):\n    top_leftmost_cell = region[0]\n    for r, c in region:\n        if r < top_leftmost_cell[0] or (r == top_leftmost_cell[0] and c < top_leftmost_cell[1]):\n            top_leftmost_cell = (r, c)\n    return top_leftmost_cell\n\ndef transform(input_grid):\n    output_grid = copy.deepcopy(input_grid)\n    regions = find_connected_regions(input_grid, 8)\n\n    if not regions:\n        return output_grid\n\n    regions.sort(key=lambda region: get_top_leftmost_cell(region))\n\n    directions = [(0, 1), (1, 0), (0, -1), (-1, 0)] # Right, Down, Left, Up\n\n    for i, region in enumerate(regions):\n        top_left_r, top_left_c = get_top_leftmost_cell(region)\n        direction_index = i % 4\n        dr, dc = directions[direction_index]\n        target_r, target_c = top_left_r + dr, top_left_c + dc\n\n        if 0 <= target_r < len(input_grid) and 0 <= target_c < len(input_grid[0]) and input_grid[target_r][target_c] == 0:\n            output_grid[target_r][target_c] = 1\n            return output_grid # Modify only one cell and stop\n\n    return output_grid\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5425,
+    "candidates_token_count": 1431,
+    "total_token_count": 6856,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 14051,
+    "candidates": 3956,
+    "total": 18007,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000369,
+    "total_elapsed": 77.923768,
+    "response_times": [
+      0.000373,
+      0.000284,
+      0.000148,
+      0.000369
+    ]
+  }
+}

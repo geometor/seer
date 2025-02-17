@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFor each empty cell (value 0) in the input grid, if any of its adjacent cells (up, down, left, or right) in the input grid is an '8', then fill this empty cell with '1' in the output grid. Otherwise, leave the cell as it is. Cells with values other than 0 are unchanged in the output.\n\"\"\"\n\ndef transform(input_grid):\n    # Get the dimensions of the input grid\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n\n    # Initialize the output grid as a copy of the input grid\n    output_grid = [row[:] for row in input_grid]\n\n    # Iterate through each cell in the input grid\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r][c] == 0:\n                # Check neighbors for value 8\n                neighbors = [\n                    (r - 1, c),  # Up\n                    (r + 1, c),  # Down\n                    (r, c - 1),  # Left\n                    (r, c + 1)   # Right\n                ]\n                found_neighbor_8 = False\n                for nr, nc in neighbors:\n                    if 0 <= nr < rows and 0 <= nc < cols and input_grid[nr][nc] == 8:\n                        found_neighbor_8 = True\n                        break\n                if found_neighbor_8:\n                    output_grid[r][c] = 1\n\n    return output_grid\n\n\nif __name__ == '__main__':\n    input_grid = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 0, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 1, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    output = transform(input_grid)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2214,
+    "candidates_token_count": 796,
+    "total_token_count": 3010,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3515,
+    "candidates": 1073,
+    "total": 4588,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000219,
+    "total_elapsed": 35.668299,
+    "response_times": [
+      0.000526,
+      0.000219
+    ]
+  }
+}

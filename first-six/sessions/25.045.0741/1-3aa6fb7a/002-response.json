@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation process operates on connected regions of color '8' (azure) within the input grid. For each distinct connected component of '8's, the algorithm identifies a specific cell within that component: the \"top-leftmost\" cell. This cell is defined as the cell with the smallest row index, and in case of ties, the smallest column index among those with the smallest row index within the component.\n\nOnce the top-leftmost cell of a component is located, the algorithm first checks the cell immediately to its right. If this cell is within the grid boundaries and its color in the input grid is '0' (white), then the color of this cell is changed to '1' (blue) in the output grid.\n\nIf the cell to the right is not modified (either because it's out of bounds, or its color is not '0'), the algorithm then checks the cell immediately below the top-leftmost cell. If this cell is within the grid boundaries and its color in the input grid is '0', then the color of this cell is changed to '1' in the output grid.\n\nIf neither the cell to the right nor the cell below meet the conditions for color change, then no modification is made for that specific connected component. This process is repeated for every connected component of color '8' in the input grid to produce the final output grid.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef transform(input_grid):\n    input_grid_np = np.array(input_grid)\n    output_grid_np = np.copy(input_grid_np)\n\n    labeled_grid, num_components = label(input_grid_np == 8)\n\n    for component_index in range(1, num_components + 1):\n        component_coords = np.argwhere(labeled_grid == component_index)\n        min_row = np.min(component_coords[:, 0])\n        topmost_cells = component_coords[component_coords[:, 0] == min_row]\n        top_leftmost_cell_coord = topmost_cells[np.argmin(topmost_cells[:, 1])]\n        row, col = top_leftmost_cell_coord\n\n        # Check cell to the right\n        right_col = col + 1\n        if 0 <= right_col < input_grid_np.shape[1]:\n            if input_grid_np[row, right_col] == 0:\n                output_grid_np[row, right_col] = 1\n                continue # If right is changed, do not check below\n\n        # Check cell below\n        below_row = row + 1\n        if 0 <= below_row < input_grid_np.shape[0]:\n            if input_grid_np[below_row, col] == 0:\n                output_grid_np[below_row, col] = 1\n\n    return output_grid_np.tolist()\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 0, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 1, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3443,
+    "candidates_token_count": 1087,
+    "total_token_count": 4530,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 5112,
+    "candidates": 2373,
+    "total": 7485,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000329,
+    "total_elapsed": 27.288306,
+    "response_times": [
+      0.000166,
+      0.000329
+    ]
+  }
+}

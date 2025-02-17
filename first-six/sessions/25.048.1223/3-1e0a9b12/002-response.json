@@ -1,0 +1,51 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Identify all non-white colored cells in the input grid.\n2. Move all non-white cells to the last row of the output grid, maintaining their original horizontal order.\n3. Fill the remaining cells in the output grid with white (0).\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_objects(grid):\n    \"\"\"\n    Finds and returns a list of non-white objects with their positions and colors.\n    Each object is a tuple: ((row, col), color).\n    \"\"\"\n    objects = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                objects.append(((r, c), grid[r, c]))\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    # Initialize output grid with the same dimensions as the input, filled with white (0).\n    output_grid = np.zeros_like(input_grid)\n\n    # Get non-white objects from the input grid.\n    objects = get_non_white_objects(input_grid)\n\n    # Sort objects by their original column to maintain horizontal order.\n    objects.sort(key=lambda x: x[0][1])\n\n    # Place the objects in the last row of the output grid.\n    last_row = output_grid.shape[0] - 1\n    col_index = 0\n    for _, color in objects:\n        output_grid[last_row, col_index] = color\n        col_index += 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2100,
+    "candidates_token_count": 393,
+    "total_token_count": 2493,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 40472,
+    "candidates": 7028,
+    "total": 47500,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000288,
+    "total_elapsed": 126.966789,
+    "response_times": [
+      0.00036,
+      0.000118,
+      0.000292,
+      0.000129,
+      0.000292,
+      0.000141,
+      0.000174,
+      0.000116,
+      0.000376,
+      0.000135,
+      0.00031,
+      0.000288
+    ]
+  },
+  "response_file": "002-response.json"
+}

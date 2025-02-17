@@ -1,0 +1,52 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "*text:*\n```python\n\"\"\"\nThe transformation rule involves taking non-white cells on the input grid and moving them to the last row of the output grid if the row index is less than number of rows-1, keeping their original column position. Otherwise the coloured cells remain in place. All other cells turn white.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid, then fill with white (0).\n    output_grid = np.zeros_like(input_grid)\n\n    # Get the dimensions of the grid.\n    rows, cols = input_grid.shape\n\n    # Iterate through the input grid to find non-white cells.\n    for i in range(rows):\n        for j in range(cols):\n            if input_grid[i, j] != 0:\n                # Move the non-white cell to the last row of the output grid.\n                if i < rows - 1:\n                  output_grid[rows - 1, j] = input_grid[i, j]\n                else:\n                  output_grid[i,j] = input_grid[i,j]\n    \n    # Iterate over original positions of moved cells, making them zero\n    for j in range(cols):\n        for i in range(rows-1):\n           if input_grid[i,j]!= 0: output_grid[i,j] = 0\n    \n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3645,
+    "candidates_token_count": 332,
+    "total_token_count": 3977,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 46658,
+    "candidates": 7129,
+    "total": 53787,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000118,
+    "total_elapsed": 107.927279,
+    "response_times": [
+      0.00034,
+      0.000121,
+      0.000314,
+      0.000123,
+      0.000314,
+      0.000162,
+      0.000282,
+      0.000137,
+      0.000279,
+      0.000122,
+      0.000442,
+      0.000125,
+      0.000315,
+      0.000118
+    ]
+  }
+}

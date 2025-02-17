@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCollect all non-background colored cells.\nMove all of them to the last row.\nPreserve the relative order of appearance from left to right.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero colored cells to the last row,\n    preserving their original left-to-right order.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Find all non-zero (non-background) elements and their coordinates\n    non_zero_elements = []\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                non_zero_elements.append((input_grid[r, c], c))\n\n    # Sort the non-zero elements based on their original column position (left-to-right)\n    non_zero_elements.sort(key=lambda x: x[1])\n\n    # Place the non-zero elements in the last row of the output grid\n    last_row_index = 0\n    for value, _ in non_zero_elements:\n        output_grid[rows - 1, last_row_index] = value\n        last_row_index += 1\n    \n    # copy elements from the last row of input if background\n    for c in range(cols):\n        if input_grid[rows-1,c]!=0 and output_grid[rows-1,c]==0:\n           for r in range(rows-1,-1,-1):\n              if input_grid[r,c]!=0:\n                output_grid[rows-1,c]=input_grid[r,c]\n                break\n                \n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2094,
+    "candidates_token_count": 433,
+    "total_token_count": 2527,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 39996,
+    "candidates": 6455,
+    "total": 46451,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000268,
+    "total_elapsed": 92.52066,
+    "response_times": [
+      0.000353,
+      0.000125,
+      0.000292,
+      0.000122,
+      0.000314,
+      0.000126,
+      0.000374,
+      0.000122,
+      0.000288,
+      0.000126,
+      0.000291,
+      0.000268
+    ]
+  }
+}

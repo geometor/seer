@@ -1,0 +1,48 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "Okay, I'm ready to generate the refined Python code based on the updated natural language program. Here's the code:\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Connected Components of '8's:** Find all distinct groups of '8's where each '8' is directly adjacent (up, down, left, or right) to another '8' in the same group.\n\n2.  **Process Each Component:** For each connected component identified:\n    *   Locate the '8' with the smallest row index (topmost '8'). Change this '8' to a '1'.\n    *   Locate the '8' with the largest row index (bottommost '8'). Change this '8' to a '1'.\n\n3.  **Preserve Other Cells:** All cells that are not '8's, or are not the topmost or bottommost '8' in their connected component, remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_connected_components(grid):\n    \"\"\"\n    Finds connected components of '8's in the grid.\n\n    Returns:\n        A list of sets, where each set contains the (row, col) coordinates\n        of '8's belonging to the same connected component.\n    \"\"\"\n    grid = np.array(grid)\n    visited = set()\n    components = []\n\n    def dfs(row, col, current_component):\n        \"\"\"\n        Depth-first search to explore a connected component.\n        \"\"\"\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != 8:\n            return\n\n        visited.add((row, col))\n        current_component.add((row, col))\n\n        # Explore adjacent cells\n        dfs(row + 1, col, current_component)\n        dfs(row - 1, col, current_component)\n        dfs(row, col + 1, current_component)\n        dfs(row, col - 1, current_component)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == 8 and (r, c) not in visited:\n                current_component = set()\n                dfs(r, c, current_component)\n                components.append(current_component)\n\n    return components\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = [row[:] for row in input_grid]  # Create a copy\n    components = find_connected_components(input_grid)\n\n    for component in components:\n        # Find topmost and bottommost '8's in the component\n        rows = [r for r, _ in component]\n        topmost_row = min(rows)\n        bottommost_row = max(rows)\n\n        # Change topmost and bottommost '8's to '1'\n        for r, c in component:\n            if r == topmost_row or r == bottommost_row:\n                output_grid[r][c] = 1\n\n    return output_grid\n\n\nif __name__ == '__main__':\n    input_grid = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n    output = transform(input_grid)\n\n    if output == expected_output:\n        print(\"[bold green]SUCCESS![/]\")\n    else:\n        print(\"[bold red]FAILED![/]\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          },
+          {
+            "text": "\n\nI've added a `find_connected_components` function that uses Depth-First Search (DFS) to identify the connected groups of 8s. The `transform` function now uses this to correctly identify and process each component. I believe this code accurately reflects the refined natural language program and will pass the second example test case, as well as the first. I will run it now to confirm.\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4113,
+    "candidates_token_count": 1240,
+    "total_token_count": 5353,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 10725,
+    "candidates": 2808,
+    "total": 13533,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000356,
+    "total_elapsed": 41.695487,
+    "response_times": [
+      0.000412,
+      0.00039,
+      0.000256,
+      0.000356
+    ]
+  }
+}

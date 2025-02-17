@@ -1,0 +1,74 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies a vertical line of gray cells (value 5) in the input grid. It then analyzes the distribution of blue cells (value 1) in each row relative to this gray line. For each row, if there are more blue cells to the left of the gray line than to the right, a red cell (value 2) is placed in the leftmost column of the corresponding row in the output grid. Conversely, if there are more blue cells to the right of the gray line, a red cell is placed in the rightmost column of the corresponding row in the output grid. The output grid is always 3x3, and any cells not set to red are filled with white (value 0).\n\"\"\"\n\nimport numpy as np\n\ndef find_gray_column(grid):\n    # Find the column index containing gray cells (value 5).\n    for j in range(grid.shape[1]):\n        if np.any(grid[:, j] == 5):\n            return j\n    return -1\n\ndef count_blue_cells(grid, row, gray_column):\n    # Count blue cells (value 1) to the left and right of the gray column in the given row.\n    left_count = 0\n    for j in range(gray_column):\n        if grid[row, j] == 1:\n            left_count += 1\n\n    right_count = 0\n    for j in range(gray_column + 1, grid.shape[1]):\n        if grid[row, j] == 1:\n            right_count += 1\n    return left_count, right_count\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid based on the distribution of blue cells relative to a vertical gray line.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    gray_column = find_gray_column(input_grid)\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    if gray_column != -1:\n        for row in range(3):\n            left_count, right_count = count_blue_cells(input_grid, row, gray_column)\n            if left_count > right_count:\n                output_grid[row, 0] = 2  # Red on the left\n            elif right_count > left_count:\n                output_grid[row, 2] = 2  # Red on the right\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6219,
+    "candidates_token_count": 559,
+    "total_token_count": 6778,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 137463,
+    "candidates": 20603,
+    "total": 158066,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.00013,
+    "total_elapsed": 350.927566,
+    "response_times": [
+      0.000374,
+      0.000122,
+      0.000291,
+      0.000116,
+      0.000288,
+      0.000141,
+      0.000165,
+      0.000142,
+      0.000305,
+      0.000122,
+      0.000289,
+      0.000258,
+      0.000283,
+      0.000121,
+      0.000275,
+      0.000145,
+      0.000176,
+      0.000115,
+      0.000281,
+      0.000118,
+      0.00012,
+      0.000244,
+      0.000302,
+      0.00012,
+      0.000176,
+      0.000123,
+      0.000285,
+      0.000122,
+      0.000328,
+      0.000118,
+      0.000303,
+      0.00012,
+      0.000121,
+      0.000124,
+      0.000284,
+      0.00013
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "*text:*\n```python\n\"\"\"\nThe program finds all non-white and non-uniform colors and moves these values to the bottom row, preserving their original order.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid, then fill with white\n    output_grid = np.full_like(input_grid, 0)\n\n    # Find rows with all elements of the same color (excluding white)\n    uniform_rows = []\n    for row_index, row in enumerate(input_grid):\n        unique_colors = np.unique(row)\n        if len(unique_colors) == 1 and unique_colors[0] != 0:\n            uniform_rows.append(row_index)\n        elif len(unique_colors) == 2 and 0 in unique_colors:\n            if len(np.where(row==unique_colors[1])[0])==1:\n                uniform_rows.append(row_index)\n\n    # Copy uniform rows to the output grid\n    for row_index in uniform_rows:\n        output_grid[row_index] = input_grid[row_index]\n\n    # Find non-white pixels that are NOT in uniform rows\n    non_white_pixels = []\n    for row_index, row in enumerate(input_grid):\n        if row_index not in uniform_rows:\n            for col_index, pixel in enumerate(row):\n                if pixel != 0:\n                    non_white_pixels.append((pixel, col_index))\n\n    # Sort the non-white pixels by their original column index\n    non_white_pixels.sort(key=lambda x: x[1])\n\n    # Place the non-white pixels in the last row of the output grid\n    last_row_index = output_grid.shape[0] - 1\n    \n    for i, (pixel, _) in enumerate(non_white_pixels):\n        output_grid[last_row_index][i] = pixel\n        \n    #fill the remaining non-white pixels in the appropriate row\n    rows_non_white = []\n    for r in range(len(input_grid)):\n        colors = []\n        for cor in range(len(input_grid)):\n            colors.append(input_grid[r][cor])\n        colors = np.unique(colors)\n        if 0 in colors and len(colors)>2:\n          for i in colors:\n            if i != 0:\n                rows_non_white.append(r)\n                break\n\n    for row_non_white in rows_non_white:\n        col_index=0    \n        for c in range(len(input_grid)):\n          if input_grid[row_non_white][c] != 0:\n            output_grid[row_non_white][col_index]=input_grid[row_non_white][c]\n            col_index += 1\n        \n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5594,
+    "candidates_token_count": 684,
+    "total_token_count": 6278,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 58348,
+    "candidates": 9838,
+    "total": 68186,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000145,
+    "total_elapsed": 152.8468,
+    "response_times": [
+      0.000374,
+      0.000122,
+      0.000291,
+      0.000116,
+      0.000288,
+      0.000141,
+      0.000165,
+      0.000142,
+      0.000305,
+      0.000122,
+      0.000289,
+      0.000258,
+      0.000283,
+      0.000121,
+      0.000275,
+      0.000145
+    ]
+  }
+}

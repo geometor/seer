@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies separated azure objects, calculates a type of center to place a blue cell, and preserves the original azure objects.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds objects of a specific color in the grid.\n    Returns a list of coordinates where the object's cells are located.\n    \"\"\"\n    coords = []\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n\n    def dfs(r, c):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return []\n\n        visited[r, c] = True\n        coords = [(r, c)]\n\n        coords.extend(dfs(r + 1, c))\n        coords.extend(dfs(r - 1, c))\n        coords.extend(dfs(r, c + 1))\n        coords.extend(dfs(r, c - 1))\n        return coords\n\n    objects_coords = []\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                objects_coords.append(dfs(r, c))\n    return objects_coords\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the identified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Iterate through each azure object\n    for obj_coords in azure_objects:\n        #find x and y coordinates\n        x_coords = [coord[0] for coord in obj_coords]\n        y_coords = [coord[1] for coord in obj_coords]\n\n        #find min and max of x and y coordinate\n        min_x = min(x_coords)\n        max_x = max(x_coords)\n        min_y = min(y_coords)\n        max_y = max(y_coords)\n    \n        # calculate new object position with +1 and -1 offsets\n        new_x = min_x\n        new_y = max_y + 1\n        if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n                output_grid[new_x, new_y] = 1\n\n        new_x = max_x + 1\n        new_y = min_y -1\n        if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n                output_grid[new_x, new_y] = 1\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2328,
+    "candidates_token_count": 665,
+    "total_token_count": 2993,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3997,
+    "candidates": 1232,
+    "total": 5229,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000133,
+    "total_elapsed": 14.832579,
+    "response_times": [
+      0.000386,
+      0.000133
+    ]
+  }
+}

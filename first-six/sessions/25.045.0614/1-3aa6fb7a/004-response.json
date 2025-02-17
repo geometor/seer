@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Color Objects: Detect all distinct, connected regions of color 8 (azure) within the input grid.\n2. Determine Top-Right Corner for Each Object: For every object identified in step 1, locate the cell that is simultaneously in the topmost row and the rightmost column among all cells belonging to that object.\n3. Recolor Top-Right Cell: Change the color of the \"top-right\" cell identified in step 2 from its original color 8 (azure) to color 1 (blue).\n4. Preserve Other Cells:  Ensure that all cells in the grid that are not identified as \"top-right\" cells of color 8 objects remain unchanged.\n\"\"\"\n\nimport copy\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by identifying contiguous blocks of color 8 and\n    changing the color of the top-right cell of each block to color 1.\n\n    Args:\n        input_grid (list of lists): The input grid represented as a list of lists of integers.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n    output_grid = copy.deepcopy(input_grid)\n    visited = [[False for _ in range(cols)] for _ in range(rows)]\n\n    def get_neighbors(r, c):\n        neighbors = []\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols:\n                neighbors.append((nr, nc))\n        return neighbors\n\n    def find_block(r, c):\n        block_cells = []\n        queue = [(r, c)]\n        visited[r][c] = True\n        block_cells.append((r, c))\n\n        while queue:\n            row, col = queue.pop(0)\n            for nr, nc in get_neighbors(row, col):\n                if input_grid[nr][nc] == 8 and not visited[nr][nc]:\n                    visited[nr][nc] = True\n                    queue.append((nr, nc))\n                    block_cells.append((nr, nc))\n        return block_cells\n\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r][c] == 8 and not visited[r][c]:\n                block = find_block(r, c)\n                if block:\n                    top_row = float('inf')\n                    right_col = float('-inf')\n                    top_right_cell = None\n                    for cell_r, cell_c in block:\n                        if cell_r < top_row:\n                            top_row = cell_r\n                            right_col = cell_c\n                            top_right_cell = (cell_r, cell_c)\n                        elif cell_r == top_row and cell_c > right_col:\n                            right_col = cell_c\n                            top_right_cell = (cell_r, cell_c)\n                    if top_right_cell:\n                        tr_r, tr_c = top_right_cell\n                        output_grid[tr_r][tr_c] = 1\n\n    return output_grid\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4682,
+    "candidates_token_count": 1208,
+    "total_token_count": 5890,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 12684,
+    "candidates": 2842,
+    "total": 15526,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000304,
+    "total_elapsed": 20.998239,
+    "response_times": [
+      0.000426,
+      0.000282,
+      0.000212,
+      0.000304
+    ]
+  }
+}

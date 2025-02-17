@@ -1,0 +1,68 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis program takes an input grid and transforms it based on the following rules:\n1. Identifies a single connected object of color 5 (gray).\n2. Divides the gray object into two regions: \"inner\" and \"outer\".\n   - The \"outer\" region consists of gray pixels (color 5) that have at least one neighbor of color 0.\n   - The \"inner\" region consists of the remaining gray pixels (color 5).\n3. Recolors the inner region to color 8 (azure).\n4. Recolors the outer region to color 2 (red).\n5. Keeps the background (color 0) unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Returns the coordinates of the neighbors of a cell.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for i in range(max(0, row - 1), min(rows, row + 2)):\n        for j in range(max(0, col - 1), min(cols, col + 2)):\n            if (i, j) != (row, col):\n                neighbors.append((i, j))\n    return neighbors\n\ndef find_object(grid, color):\n    \"\"\"Finds the coordinates of all cells belonging to the object of a given color.\"\"\"\n    object_cells = []\n    for r in range(grid.shape[0]):\n      for c in range(grid.shape[1]):\n        if grid[r,c] == color:\n          object_cells.append((r,c))\n\n    return object_cells\n    \n\ndef segment_object(grid, object_cells):\n    \"\"\"Segments the object into inner and outer regions.\"\"\"\n    inner_region = []\n    outer_region = []\n\n    for row, col in object_cells:\n        neighbors = get_neighbors(grid, row, col)\n        is_outer = False\n        for n_row, n_col in neighbors:\n            if grid[n_row, n_col] == 0:\n                is_outer = True\n                break\n        if is_outer:\n            outer_region.append((row, col))\n        else:\n            inner_region.append((row, col))\n\n    return inner_region, outer_region\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    # Initialize output_grid with the same dimensions and background color as the input.\n    output_grid = np.zeros_like(input_grid)\n\n    # Find the object with color 5 (gray).\n    object_cells = find_object(input_grid, 5)\n    \n    # Check that we have one object\n    if not object_cells:\n        return output_grid\n\n    # Segment the object into inner and outer regions.\n    inner_region, outer_region = segment_object(input_grid, object_cells)\n\n    # Recolor the inner region to color 8 (azure).\n    for row, col in inner_region:\n        output_grid[row, col] = 8\n\n    # Recolor the outer region to color 2 (red).\n    for row, col in outer_region:\n        output_grid[row, col] = 2\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6470,
+    "candidates_token_count": 748,
+    "total_token_count": 7218,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 114605,
+    "candidates": 16669,
+    "total": 131274,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000118,
+    "total_elapsed": 288.775136,
+    "response_times": [
+      0.000374,
+      0.000122,
+      0.000291,
+      0.000116,
+      0.000288,
+      0.000141,
+      0.000165,
+      0.000142,
+      0.000305,
+      0.000122,
+      0.000289,
+      0.000258,
+      0.000283,
+      0.000121,
+      0.000275,
+      0.000145,
+      0.000176,
+      0.000115,
+      0.000281,
+      0.000118,
+      0.00012,
+      0.000244,
+      0.000302,
+      0.00012,
+      0.000176,
+      0.000123,
+      0.000285,
+      0.000122,
+      0.000328,
+      0.000118
+    ]
+  }
+}

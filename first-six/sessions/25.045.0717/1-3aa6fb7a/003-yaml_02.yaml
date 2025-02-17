@@ -1,0 +1,25 @@
+task_context: "Grid transformation with connected regions and directional modification"
+transformation_rule: "Identify and order connected regions of color 8. Modify a single cell adjacent to the top-leftmost cell of the first region in the order for which a valid modification is possible, following a cycle of directions (Right, Down, Left, Up)."
+objects:
+  - type: "connected region"
+    color: 8
+    properties:
+      - "top-leftmost cell"
+      - "adjacent cell"
+actions:
+  - "identify connected regions of color 8"
+  - "order regions based on top-leftmost cell position"
+  - "iterate through regions in order"
+  - "determine direction from cycle (Right, Down, Left, Up) based on region order"
+  - "calculate target cell based on top-leftmost cell and direction"
+  - "check if target cell is within bounds and color 0"
+  - "if conditions met, change target cell color to 1 and stop"
+predicates:
+  - "connected"
+  - "same color"
+  - "top-leftmost"
+  - "adjacent"
+  - "within bounds"
+  - "color 0"
+  - "first region in order"
+  - "direction (Right, Down, Left, Up)"

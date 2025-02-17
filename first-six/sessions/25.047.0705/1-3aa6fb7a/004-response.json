@@ -1,0 +1,42 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies cells that have specific relations to the L-shape objects and changes the color of cells in the described location. The other elements of the grid remain the same. This description is very close with the previous one. The difference is that now we have three L-shapes.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the positions of the L-shaped objects\n    l_shape_positions = []\n    for r in range(len(input_grid)):\n        for c in range(len(input_grid[0])):\n            if input_grid[r][c] == 8:\n                l_shape_positions.append((r, c))\n\n    # Group L-shape positions\n    l_shapes = []\n    \n    #Helper Function\n    def find_l_shape(start_pos, positions):\n\n      \n      r, c = start_pos\n      \n      l_shape = [start_pos]\n      \n      # Check right\n      if (r, c+1) in positions:\n        l_shape.append((r,c+1))\n        if (r-1, c+1) in positions:\n          l_shape.append((r-1, c+1))\n        elif (r+1, c+1) in positions:\n          l_shape.append((r+1, c+1))\n        \n      # Check left  \n      elif (r, c-1) in positions:\n          l_shape.append((r, c-1))\n          if (r-1, c-1) in positions:\n            l_shape.append((r-1, c-1))\n          elif (r+1, c-1) in positions:\n            l_shape.append((r+1, c-1))\n      \n      # Check down\n      elif (r+1, c) in positions:\n          l_shape.append((r+1, c))\n          if (r+1, c-1) in positions:\n              l_shape.append((r+1, c-1))\n          elif (r+1, c+1) in positions:\n              l_shape.append((r+1,c+1))\n\n      # Check up\n      elif (r-1, c) in positions:\n          l_shape.append((r-1, c))\n          if (r-1, c-1) in positions:\n            l_shape.append((r-1, c-1))\n          elif (r-1, c+1) in positions:\n            l_shape.append((r-1, c+1))\n            \n      return sorted(l_shape)\n\n    \n    \n    processed_positions = []\n    for pos in l_shape_positions:\n      if pos not in processed_positions:\n        current_l = find_l_shape(pos, l_shape_positions)  \n        l_shapes.append(current_l)\n        processed_positions.extend(current_l)\n    \n\n    # Iterate through each L-shape\n    for l_shape in l_shapes:\n        # Find top cell\n        top_cell = sorted(l_shape)[0]\n\n        # Determine relative position to modify and modify it\n        \n        # If there is only one position at the top row within l_shape\n        if len([pos for pos in l_shape if pos[0] == top_cell[0]])==2: # two cells in top row\n          # then the top cell is the left most, so modify to the left.\n\n            output_grid[top_cell[0]][top_cell[1] - 1] = 1\n\n        # If there is a cell to the right of top_cell\n        elif (top_cell[0], top_cell[1]+1) in l_shape:\n          output_grid[top_cell[0]][top_cell[1] - 1] = 1\n\n        # If there is a cell to the left of top_cell    \n        else:\n          output_grid[top_cell[0]][top_cell[1] + 1] = 1\n\n    return output_grid\n\n\nif __name__ == '__main__':\n\n    input_grid = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output_grid = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n    \n    output_grid = transform(input_grid)\n\n    if output_grid.tolist() == expected_output_grid:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output_grid)\n        print(\"Transformed Output:\", output_grid.tolist())\n\n    print()\n    assert output_grid.tolist() == expected_output_grid, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4892,
+    "candidates_token_count": 1440,
+    "total_token_count": 6332,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 12980,
+    "candidates": 3404,
+    "total": 16384,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000116,
+    "total_elapsed": 37.161954,
+    "response_times": [
+      0.000353,
+      0.000147,
+      0.000283,
+      0.000116
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe rule preserves every pixel of color 8. The input contains two distinct objects composed by pixels of color 8. The program turns to color 1 the rightmost and leftmost pixels of the objects found on the input, iterating the search from top to down.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    input_array = np.array(input_grid)\n    \n    # Find the connected components of color 8\n    visited = np.zeros_like(input_array, dtype=bool)\n    objects = []\n    \n    def dfs(r, c, current_object):\n        if (r < 0 or r >= input_array.shape[0] or\n            c < 0 or c >= input_array.shape[1] or\n            visited[r, c] or input_array[r, c] != 8):\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(input_array.shape[0]):\n        for c in range(input_array.shape[1]):\n            if input_array[r, c] == 8 and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n\n    # change output pixels\n    for obj in objects:\n      #find rightmost\n      rightmost = obj[0]\n      for (r,c) in obj:\n        if c > rightmost[1]:\n          rightmost = (r,c)\n      #find leftmost\n      leftmost = obj[0]\n      for (r,c) in obj:\n        if c < leftmost[1]:\n          leftmost = (r,c)\n\n      output_grid[rightmost] = 1\n      output_grid[leftmost] = 1\n\n\n    return output_grid.tolist()\n\n\nif __name__ == '__main__':\n\n    input_grid = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 0, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    expected_output_grid = [\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 8, 1, 0, 0, 0, 0],\n        [0, 8, 8, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    output_grid = transform(input_grid)\n\n    if output_grid == expected_output_grid:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output_grid)\n        print(\"Transformed Output:\", output_grid)\n\n    print()\n    assert output_grid == expected_output_grid, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2730,
+    "candidates_token_count": 972,
+    "total_token_count": 3702,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 4399,
+    "candidates": 1516,
+    "total": 5915,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000171,
+    "total_elapsed": 18.460144,
+    "response_times": [
+      0.000241,
+      0.000171
+    ]
+  }
+}

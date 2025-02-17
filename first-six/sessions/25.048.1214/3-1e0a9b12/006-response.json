@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCopies non-zero colored cells from the input grid to the last row of the output grid,\nmaintaining their relative horizontal order, except for objects in the third and fourth row which stays in place.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving non-zero colored cells to the last row,\n    maintaining their order, except for objects in the third and fourth row which stay in place.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get the height (number of rows) of the grid.\n    height = input_grid.shape[0]\n    \n    # Copy the third and fourth rows from input to output.\n    output_grid[height - 3, :] = input_grid[height-3, :]\n    output_grid[height - 2, :] = input_grid[height-2, :]\n\n    # Get non-zero elements from the input grid.\n    non_zero_indices = np.where(input_grid != 0)\n    non_zero_values = input_grid[non_zero_indices]\n\n    # Create a list to store non-zero elements and their original column indices for sorting, filtering third and fourth rows.\n    non_zero_elements = []\n    for i in range(len(non_zero_values)):\n      if non_zero_indices[0][i] != height - 3 and non_zero_indices[0][i] != height - 2: #filter elements from third and fourth row.\n        non_zero_elements.append((non_zero_values[i], non_zero_indices[1][i]))\n\n    # Sort the non-zero elements based on their original column index.\n    non_zero_elements.sort(key=lambda x: x[1])\n\n    # Place the sorted non-zero elements in the last row of the output grid.\n    j=0\n    for i in range (input_grid.shape[1]):\n      if len(non_zero_elements) > j and input_grid[height-1,i] == 0:\n        output_grid[height - 1, i] = non_zero_elements[j][0]\n        j+=1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5568,
+    "candidates_token_count": 536,
+    "total_token_count": 6104,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 59371,
+    "candidates": 10266,
+    "total": 69637,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000113,
+    "total_elapsed": 148.575247,
+    "response_times": [
+      0.000247,
+      0.000141,
+      0.000194,
+      0.000122,
+      0.000287,
+      0.000115,
+      0.000152,
+      0.000121,
+      0.000121,
+      0.000134,
+      0.000184,
+      0.000118,
+      0.000326,
+      0.000186,
+      0.000288,
+      0.000113
+    ]
+  },
+  "response_file": "006-response.json"
+}

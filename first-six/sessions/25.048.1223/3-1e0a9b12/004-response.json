@@ -1,0 +1,53 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Identify all non-white colored cells in the input grid.\n2. Move all non-white cells present in rows 0, 1 and 2 to the last row of the output grid, maintaining their original horizontal order.\n3. Keep the colored object present in rows 3,4 and 5.\n4. Fill the remaining cells in the output grid with white (0).\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_objects(grid):\n    \"\"\"\n    Finds and returns a list of non-white objects with their positions and colors.\n    Each object is a tuple: ((row, col), color).\n    \"\"\"\n    objects = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                objects.append(((r, c), grid[r, c]))\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    # Initialize output grid with the same dimensions as the input, filled with white (0).\n    output_grid = np.zeros_like(input_grid)\n\n    # Get non-white objects from the input grid.\n    objects = get_non_white_objects(input_grid)\n\n    # Sort objects by their original column to maintain horizontal order.\n    objects.sort(key=lambda x: x[0][1])\n\n    # Place the objects in the last row of the output grid.\n    last_row = output_grid.shape[0] - 1\n\n    # Iterate through the objects\n    for (r,c), color in objects:\n      if r >= 3: # objects in rows 3, 4 and 5 should be left alone.\n        output_grid[r,c] = color\n      else:\n          # Find the next available position in last_row\n          col_index = 0\n          while output_grid[last_row, col_index] != 0: #find an empty slot.\n            col_index +=1\n\n          output_grid[last_row,col_index] = color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4167,
+    "candidates_token_count": 510,
+    "total_token_count": 4677,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 47730,
+    "candidates": 8523,
+    "total": 56253,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000123,
+    "total_elapsed": 140.969075,
+    "response_times": [
+      0.00036,
+      0.000118,
+      0.000292,
+      0.000129,
+      0.000292,
+      0.000141,
+      0.000174,
+      0.000116,
+      0.000376,
+      0.000135,
+      0.00031,
+      0.000288,
+      0.000116,
+      0.000123
+    ]
+  },
+  "response_file": "004-response.json"
+}

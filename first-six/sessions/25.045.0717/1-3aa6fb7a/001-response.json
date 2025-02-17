@@ -1,0 +1,39 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\nThe task is to identify and modify cells within connected regions of color 8 (azure).\n1. **Identify Connected Regions:** Find all contiguous regions of color 8 in the input grid. Two cells are considered connected if they are adjacent horizontally or vertically and have the same color.\n2. **Order the Regions:**  For each connected region, find its \"top-leftmost\" cell. The top-leftmost cell is defined as the cell with the smallest row index, and among those with the same smallest row index, the smallest column index. Order the regions based on their top-leftmost cells, first by row index and then by column index in ascending order. Let's call the regions Region 1 and Region 2 based on this order.\n3. **Modify Region 1:** In Region 1, locate its top-leftmost cell and change its color to 1 (blue).\n4. **Modify Region 2:** In Region 2, locate its bottom-rightmost cell. The bottom-rightmost cell is defined as the cell with the largest row index, and among those with the same largest row index, the largest column index. Change the color of this bottom-rightmost cell to 1 (blue).\n\n**YAML Block:**\n\n```yaml\ntask_context: \"Grid transformation\"\ntransformation_rule: \"Modify cells in connected regions of color 8. For the first region (ordered by top-leftmost cell), change its top-leftmost cell to color 1. For the second region, change its bottom-rightmost cell to color 1.\"\nobjects:\n  - type: \"connected region\"\n    color: 8\n    properties:\n      - \"top-leftmost cell\"\n      - \"bottom-rightmost cell\"\nactions:\n  - \"identify connected regions of color 8\"\n  - \"order regions based on top-leftmost cell position\"\n  - \"change color of top-leftmost cell of the first region to 1\"\n  - \"change color of bottom-rightmost cell of the second region to 1\"\npredicates:\n  - \"connected\"\n  - \"same color\"\n  - \"top-leftmost\"\n  - \"bottom-rightmost\"\n  - \"first region\"\n  - \"second region\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1669,
+    "candidates_token_count": 501,
+    "total_token_count": 2170,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1669,
+    "candidates": 501,
+    "total": 2170,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000373,
+    "total_elapsed": 13.806882,
+    "response_times": [
+      0.000373
+    ]
+  }
+}

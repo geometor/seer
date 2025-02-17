@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SEER Process Workflow Overview</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css">
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h1>SEER Process Workflow Overview</h1>
+                <p>An agent designed to solve ARC-like tasks</p>
+                <p><strong>Objectives:</strong></p>
+                <ul>
+                    <li>Understand problem context</li>
+                    <li>Describe problem &amp; process</li>
+                    <li>Convert language to code</li>
+                    <li>Facilitation and coaching</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>I. Initialization and Setup</h2>
+                <section>
+                    <h3>1. Configuration Loading</h3>
+                    <ul>
+                        <li>Reads <code>config.yaml</code></li>
+                        <li>Sets output directory</li>
+                        <li>Defines models</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Task Loading</h3>
+                    <ul>
+                        <li>Creates <code>Tasks</code> object</li>
+                        <li>Loads <code>.json</code> tasks</li>
+                        <li>Defines <code>Task</code> structure</li>
+
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Seer Creation</h3>
+                    <ul>
+                        <li>Creates <code>Seer</code> object</li>
+                        <li>Initializes API clients</li>
+                        <li>Loads instructions</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>4. Session Initialization</h3>
+                    <ul>
+                        <li>Creates <code>Session</code></li>
+                        <li>Creates directories</li>
+                        <li>Writes <code>config.yaml</code></li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>II. Task Solving Loop (Outer)</h2>
+                <section>
+                    <h3>1. Iterate through Tasks</h3>
+                    <ul>
+                        <li><code>Seer.run</code> iterates</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Task Setup</h3>
+                    <ul>
+                        <li>Sets directory</li>
+                        <li>Initializes counter</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Solve Task</h3>
+                    <ul>
+                        <li>Calls <code>Seer.solve</code></li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>III. Task Solving (Inner)</h2>
+                <section>
+                    <h3>1. Investigate Examples</h3>
+                    <ul>
+                        <li>Iterates through pairs</li>
+                        <li>Uses Dreamer &amp; Builder</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Natural Language (Dreamer)</h4>
+                    <ul>
+                        <li>Constructs prompt</li>
+                        <li>Calls <code>_generate</code></li>
+                        <li>Processes response</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Code Generation (Builder)</h4>
+                    <ul>
+                        <li>Constructs prompt</li>
+                        <li>Calls <code>_generate</code></li>
+                        <li>Processes response</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Response Processing</h4>
+                    <ul>
+                        <li>Extracts text &amp; code</li>
+                        <li>Saves/Executes code</li>
+                        <li>Extracts results</li>
+                    </ul>
+                </section>
+                <section>
+                    <h4>Code Execution</h4>
+                    <ul>
+                        <li>Runs <code>transform</code></li>
+                        <li>Compares output</li>
+                        <li>Logs results</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Review Programs</h3>
+                    <ul>
+                        <li>Placeholder</li>
+                        <li>Summarizes observations</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>IV. Generation</h2>
+                <section>
+                    <h3>1. Prompt Construction</h3>
+                    <ul>
+                        <li>Combines inputs</li>
+                        <li>Logs prompt</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Model Interaction</h3>
+                    <ul>
+                        <li>Calls Gemini API</li>
+                        <li>Handles retries</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Response Processing</h3>
+                    <ul>
+                        <li>Calls <code>_process_response</code></li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>V. Code Execution</h2>
+                <section>
+                    <h3>1. Execution</h3>
+                    <ul>
+                        <li>Parses &amp; executes code</li>
+                        <li>Captures output</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Validation</h3>
+                    <ul>
+                        <li>Calls <code>transform</code></li>
+                        <li>Compares to expected</li>
+                        <li>Logs results</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Error Handling</h3>
+                    <ul>
+                        <li>Catches exceptions</li>
+                        <li>Logs errors</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>4. Output &amp; Logging</h3>
+                    <ul>
+                        <li>Captures output</li>
+                        <li>Writes to file</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>VI. Session Management</h2>
+                <section>
+                    <h3>1. Initialization</h3>
+                    <ul>
+                        <li>Creates directories</li>
+                        <li>Writes config</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>2. Logging</h3>
+                    <ul>
+                        <li>Prompts &amp; responses</li>
+                        <li>Errors</li>
+                    </ul>
+                </section>
+                <section>
+                    <h3>3. Display</h3>
+                    <ul>
+                        <li>Config &amp; results</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section>
+                <h2>VII. Helper Functions</h2>
+                <ul>
+                    <li>File writing</li>
+                    <li>Formatting</li>
+                    <li>(Function Calls - Unused)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Key Considerations</h2>
+                <ul>
+                    <li>Separation of Concerns</li>
+                    <li>Logging &amp; Error Handling</li>
+                    <li>Code Validation</li>
+                    <li>Extensibility</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script>
+        Reveal.initialize();
+    </script>
+</body>
+</html>

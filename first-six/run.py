@@ -2,26 +2,21 @@ import yaml
 from pathlib import Path
 from datetime import datetime
 
-from geometor.arcprize.puzzles import PuzzleSet
+from geometor.seer.tasks import Tasks
 from geometor.seer.seer import Seer
-from geometor.seer.session import Session
 
 
 def run():
-    # Load configuration
     with open("config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
-    # Initialize PuzzleSet
-    tasks = PuzzleSet()
+    tasks = Tasks("one")
 
-    # Initialize Session
-    session = Session(
+    seer = Seer(
         config,
-        tasks=tasks
     )
 
-    session.run()
+    seer.run(tasks) 
 
 
 if __name__ == "__main__":

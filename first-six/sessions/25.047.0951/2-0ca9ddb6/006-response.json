@@ -1,0 +1,48 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule involves identifying single-cell objects and drawing a 3x3 colored frame around each of them, but only if the cell is empty (color 0). The color of the frame depends on the color of the single-cell object.\n- If the single-cell object is red (color 2), the frame is yellow (color 4).\n- If the single-cell object is blue (color 1), the frame is orange (color 7).\n- If the single-cell object has any color other than 1 or 2, there is no framing.\nThe original single-cell objects are preserved, and all other cells remain unchanged (color 0) unless they are overwritten by a frame.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    for i in range(rows):\n        for j in range(cols):\n            if input_grid[i, j] != 0:\n                is_single_cell = True\n                for x in range(max(0, i - 1), min(rows, i + 2)):\n                    for y in range(max(0, j - 1), min(cols, j + 2)):\n                        if (x, y) != (i, j) and input_grid[x, y] != 0:\n                            is_single_cell = False\n                            break\n                    if not is_single_cell:\n                        break\n\n                if is_single_cell:\n                    if input_grid[i, j] == 2:\n                        frame_color = 4\n                    elif input_grid[i, j] == 1:\n                        frame_color = 7\n                    else:\n                        continue\n\n                    for x in range(max(0, i - 1), min(rows, i + 2)):\n                        for y in range(max(0, j - 1), min(cols, j + 2)):\n                            if (x, y) != (i, j) and output_grid[x,y] == 0:\n                                output_grid[x, y] = frame_color\n    return output_grid.tolist()\n\n\nif __name__ == '__main__':\n\n    input_grid = [\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 2, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 6, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0]\n    ]\n\n    expected_output_grid = [\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 4, 0, 4, 0, 0, 0, 0, 0],\n        [0, 0, 2, 0, 0, 0, 0, 0, 0],\n        [0, 4, 0, 4, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 6, 0, 0],\n        [0, 0, 0, 7, 0, 0, 0, 0, 0],\n        [0, 0, 7, 1, 7, 0, 0, 0, 0],\n        [0, 0, 0, 7, 0, 0, 0, 0, 0]\n    ]\n\n    output_grid = transform(input_grid)\n\n    if output_grid == expected_output_grid:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output_grid)\n        print(\"Transformed Output:\", output_grid)\n\n    print()\n    assert output_grid == expected_output_grid, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8712,
+    "candidates_token_count": 1169,
+    "total_token_count": 9881,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 44905,
+    "candidates": 8682,
+    "total": 53587,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000261,
+    "total_elapsed": 101.720341,
+    "response_times": [
+      0.000241,
+      0.000171,
+      0.000302,
+      0.000134,
+      0.000266,
+      0.0002,
+      0.000223,
+      0.000152,
+      0.000215,
+      0.000261
+    ]
+  }
+}

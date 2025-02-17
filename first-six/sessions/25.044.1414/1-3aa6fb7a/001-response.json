@@ -1,0 +1,39 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\n1. **Identify Corner '8's:** Locate cells in the input grid that contain the value '8' and have exactly two neighboring cells that also contain the value '8'. These '8' cells are considered the corners of potential \"L\" shapes.\n\n2. **Find '8'-Neighbors:** For each identified corner '8', determine its two neighboring cells that contain '8'.\n\n3. **Calculate Missing Corner Position:**  Using the coordinates of the corner '8' cell and its two '8'-neighbor cells, calculate the coordinates of the 'missing corner' that would complete a 2x2 square. The formula for calculating the missing corner coordinates (row_missing, column_missing) is:\n   `row_missing = row_neighbor1 + row_neighbor2 - row_corner`\n   `column_missing = column_neighbor1 + column_neighbor2 - column_corner`\n   where (row_corner, column_corner) are the coordinates of the corner '8', and (row_neighbor1, column_neighbor1), (row_neighbor2, column_neighbor2) are the coordinates of its two '8'-neighbors.\n\n4. **Check and Fill:** Examine the cell in the input grid at the calculated 'missing corner' coordinates. If this cell contains the value '0', then in the output grid, change the value of this cell to '1'.\n\n5. **Maintain Unchanged Cells:** For all other cells in the grid that are not modified in step 4, their values in the output grid remain the same as they were in the input grid.\n\nThis program effectively identifies \"L\" shapes formed by '8's and fills in the 'missing corner' with a '1' if it was originally a '0'."
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1152,
+    "candidates_token_count": 377,
+    "total_token_count": 1529,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1152,
+    "candidates": 377,
+    "total": 1529,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000197,
+    "total_elapsed": 33.118804,
+    "response_times": [
+      0.000197
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis script implements the transformation rule described as follows:\n\n1. **Identify Key Objects:** Locate all red (color 2) pixels and blue (color 1) pixels in the input grid.\n2. **Red Surroundings:** For each red pixel, change the color of the pixels immediately above, below, to the left, and right to the color yellow (value 4).\n3. **Blue Surroundings:** For each blue pixel, change the color of the pixels immediately above, below, to the left, and right to the color orange (value 7).\n4. **Preservation:** The positions of the original red and blue pixels, and any other color are preserved.\n5. **Background:** All other pixels remain unchanged (color 0).\n\"\"\"\n\nimport numpy as np\n\ndef find_all_pixels(grid, color):\n    \"\"\"Finds the coordinates of all pixels of the specified color.\"\"\"\n    coords = np.where(grid == color)\n    return list(zip(coords[0], coords[1]))\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the generalized rule.\"\"\"\n    \n    output_grid = np.copy(input_grid)\n    \n    # Find all red pixels (color 2)\n    red_pixels = find_all_pixels(input_grid, 2)\n    for row, col in red_pixels:\n        # Change surrounding pixels to yellow (color 4)\n        if row > 0:\n            output_grid[row - 1, col] = 4  # Above\n        if row < input_grid.shape[0] - 1:\n            output_grid[row + 1, col] = 4  # Below\n        if col > 0:\n            output_grid[row, col - 1] = 4  # Left\n        if col < input_grid.shape[1] - 1:\n            output_grid[row, col + 1] = 4  # Right\n            \n    # Find all blue pixels (color 1)\n    blue_pixels = find_all_pixels(input_grid, 1)\n    for row, col in blue_pixels:\n       # Change surrounding pixels to orange (color 7)\n        if row > 0:\n            output_grid[row - 1, col] = 7  # Above\n        if row < input_grid.shape[0] - 1:\n            output_grid[row + 1, col] = 7  # Below\n        if col > 0:\n            output_grid[row, col - 1] = 7  # Left\n        if col < input_grid.shape[1] - 1:\n            output_grid[row, col + 1] = 7  # Right\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4610,
+    "candidates_token_count": 635,
+    "total_token_count": 5245,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 23660,
+    "candidates": 4354,
+    "total": 28014,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000122,
+    "total_elapsed": 50.850748,
+    "response_times": [
+      0.000353,
+      0.000125,
+      0.000292,
+      0.000122,
+      0.000314,
+      0.000126,
+      0.000374,
+      0.000122
+    ]
+  }
+}
