@@ -221,7 +221,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        resp dict,
+        respdata: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -296,7 +296,7 @@ class Session:
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
 
-        for data in resp
+        for data in respdata:
             response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
 
             response_report_json.append({
