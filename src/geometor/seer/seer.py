@@ -101,8 +101,8 @@ class Seer:
         #  self._run_solution_loop()
 
         # Gather response data and create summary report
-        response_data = self._gather_response_data()
-        self._create_summary_report(response_data)
+        respdata = self._gather_response_data()
+        self._create_summary_report(respdata)
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -381,18 +381,18 @@ class Seer:
 
     def _gather_response_data(self):
         """Gathers data from all response.json files in the task directory."""
-        response_data = []
-        for response_file in self.session.task_dir.glob("*-response.json"):
+        respdata = []
+        for respfile in self.session.task_dir.glob("*-response.json"):
             try:
-                with open(response_file, "r") as f:
+                with open(respfile, "r") as f:
                     data = json.load(f)
-                    response_data.append(data)
+                    respdata.append(data)
             except (IOError, json.JSONDecodeError) as e:
-                print(f"Error reading or parsing {response_file}: {e}")
-                self.session.log_error(f"Error reading or parsing {response_file}: {e}")
-        return response_data
+                print(f"Error reading or parsing {respfile}: {e}")
+                self.session.log_error(f"Error reading or parsing {respfile}: {e}")
+        return respdata
 
-    def _create_summary_report(self, response_data):
+    def _create_summary_report(self, respdata):
         """Creates a summary report (Markdown and JSON) of token usage, timing, and test results."""
 
         # Aggregate data
@@ -401,9 +401,9 @@ class Seer:
         all_response_times = []
         test_results = []
 
-        for data in response_
+        for data in respdata:
             for key in total_tokens:
-                total_tokens[key] += data["token_totals"].get(key, 0)
+                total_tokenskey += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
             all_response_times.extend(data["timing"]["response_times"])
 
