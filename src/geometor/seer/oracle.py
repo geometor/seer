@@ -10,6 +10,7 @@ import contextlib
 import numpy as np
 from geometor.seer.tasks import Grid
 import json
+from pathlib import Path
 
 class Oracle:
     def __init__(self, config, system_context):
