@@ -1,0 +1,69 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid contains a gray object (color 5). This object is decomposed and recolored: the right extensions become azure (color 8), while the central \"stem\" and the top horizontal segment become red (color 2). The background (color 0) remains unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    \"\"\"Finds the coordinates of an object with the given color.\"\"\"\n    coords = []\n    for r_idx, row in enumerate(grid):\n        for c_idx, cell in enumerate(row):\n            if cell == color:\n                coords.append((r_idx, c_idx))\n    return coords\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n\n    # Find the gray object (color 5)\n    gray_object_coords = find_object(input_grid, 5)\n\n    # Get the boundaries of the gray object\n    min_row = min(r for r, _ in gray_object_coords)\n    #max_row = max(r for r, _ in gray_object_coords)\n    min_col = min(c for _, c in gray_object_coords)\n    max_col = max(c for _, c in gray_object_coords)\n\n    # Recolor the \"stem\" and top segment to red (color 2)\n    for r, c in gray_object_coords:\n        if r == min_row and c <= max_col -2 :\n            output_grid[r,c] = 2\n        if min_row < r and c == min_col + 3:\n            output_grid[r, c] = 2  # Red\n        if r > min_row and (c == max_col or c== max_col -1):\n            output_grid[r,c] = 8\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6412,
+    "candidates_token_count": 460,
+    "total_token_count": 6872,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 114163,
+    "candidates": 16536,
+    "total": 130699,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000163,
+    "total_elapsed": 314.4426,
+    "response_times": [
+      0.00036,
+      0.000118,
+      0.000292,
+      0.000129,
+      0.000292,
+      0.000141,
+      0.000174,
+      0.000116,
+      0.000376,
+      0.000135,
+      0.00031,
+      0.000288,
+      0.000116,
+      0.000123,
+      0.00015,
+      0.000119,
+      0.000332,
+      0.000117,
+      0.000317,
+      0.000118,
+      0.000325,
+      0.000114,
+      0.000378,
+      0.00012,
+      0.000226,
+      0.000122,
+      0.000286,
+      0.00012,
+      0.000313,
+      0.000163
+    ]
+  },
+  "response_file": "006-response.json"
+}
