@@ -310,7 +310,7 @@ class Seer:
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
-        file_path = self.session.task_dir / file_name
+        file_path = self.session.task_dir / file_name  # Always use task_dir
         try:
             with open(file_path, "w") as f:
                 f.write(content)
@@ -398,10 +398,11 @@ class Seer:
         }
 
         # Write the session summary report to the session directory
+        # Corrected: Use self.session.session_dir, not self.session.task_dir
         session_summary_report_json_file = (
             self.session.session_dir / "session_summary_report.json"
         )
-        self._write_to_file(
+        self._write_to_file_session(  # Use the session-level writing method
             session_summary_report_json_file,
             json.dumps(session_summary_report, indent=2),
         )
@@ -457,10 +458,13 @@ class Seer:
                 session_summary_report_md += "\n"
 
         # Write the session summary report (Markdown) to the session directory
+        # Corrected: Use self.session.session_dir
         session_summary_report_md_file = (
             self.session.session_dir / "session_summary_report.md"
         )
-        self._write_to_file(session_summary_report_md_file, session_summary_report_md)
+        self._write_to_file_session(  # Use session-level writing method
+            session_summary_report_md_file, session_summary_report_md
+        )
 
         # Display report
         self.session.display_response(
@@ -469,3 +473,16 @@ class Seer:
             "Session Summary",
             {},
         )  # prompt_count=0
+
+    def _write_to_file_session(self, file_name, content):
+        """
+        Writes content to a file in the session directory.  
+        Distinct from _write_to_file, which writes to task directory.
+        """
+        file_path = self.session.session_dir / file_name  # Use session_dir
+        try:
+            with open(file_path, "w") as f:
+                f.write(content)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to file {file_name}: {e}")
+            self.session.log_error(f"Error writing to file {file_name}: {e}")
