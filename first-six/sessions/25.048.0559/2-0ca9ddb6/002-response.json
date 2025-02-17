@@ -1,0 +1,44 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis script transforms an input grid based on the following rules:\n1. Identifies the positions of single red (2) and blue (1) cells.\n2. Constructs a plus-shaped pattern around the red cell using yellow (4) cells.\n3. Constructs a plus-shaped pattern around the blue cell using orange (7) cells.\nThe positions of the original red and blue cells remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_cell(grid, color):\n    \"\"\"Finds the coordinates of the first occurrence of a single cell of the specified color.\"\"\"\n    coords = np.argwhere(grid == color)\n    if len(coords) > 0:\n        return tuple(coords[0])\n    return None\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the red and blue cells\n    red_pos = find_cell(input_grid, 2)\n    blue_pos = find_cell(input_grid, 1)\n\n    # Construct plus pattern around the red cell\n    if red_pos:\n        row, col = red_pos\n        if row > 0:\n            output_grid[row - 1, col] = 4  # Above\n        if row < rows - 1:\n            output_grid[row + 1, col] = 4  # Below\n        if col > 0:\n            output_grid[row, col - 1] = 4  # Left\n        if col < cols - 1:\n            output_grid[row, col + 1] = 4  # Right\n\n    # Construct plus pattern around the blue cell\n    if blue_pos:\n        row, col = blue_pos\n        if row > 0:\n            output_grid[row - 1, col] = 7  # Above\n        if row < rows - 1:\n            output_grid[row + 1, col] = 7  # Below\n        if col > 0:\n            output_grid[row, col - 1] = 7  # Left\n        if col < cols - 1:\n            output_grid[row, col + 1] = 7  # Right\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2418,
+    "candidates_token_count": 537,
+    "total_token_count": 2955,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 16486,
+    "candidates": 4122,
+    "total": 20608,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000141,
+    "total_elapsed": 51.141631,
+    "response_times": [
+      0.000374,
+      0.000122,
+      0.000291,
+      0.000116,
+      0.000288,
+      0.000141
+    ]
+  }
+}

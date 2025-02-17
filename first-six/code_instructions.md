@@ -1,44 +1,29 @@
-**Instructions**
+**INSTRUCTIONS**
 
-- Generate a complete Python module to be run in your code_execution to
-  represent the natural language program 
-- Follow the template below
-- If your code fails to achieve a match - analyze the expected and generated
-  outputs and try to run the code again 
+- generate a Python module to represent the natural language program 
+- follow the template below
+- all common math and science libraries are available
+- create docstring only at top - but comment the workflow in the function
+- use helper functions for common operations like finding objects, counting,
+  measuring, moving, etc. 
 
-**Transform Template:**
+remember - we are working iteratively - so this code will inform your future
+self as we converge on the solution
+
+*template:*
 
 ```python
 """
 {{ natural language description of the transformation rule }}
 """
 
-{{ allowed imports that support the transform }}
+{{ imports }}
 
-def transform(input):
-    # initialize output
+def transform(input_grid):
+    # initialize output_grid
 
     # change output pixels 
 
-    return output
-
-
-if __name__ == '__main__':
-
-    input = {input_grid_rows}
-
-    expected_output = {expected_output_grid_rows}
-
-    output = transform(input)
-
-    if output == expected_output:
-        print("SUCCESS!\n")
-    else:
-        print("FAILED!\n")
-        print("Expected Output:", expected_output)
-        print("Transformed Output:", output)
-
-    print()
-    assert output == expected_output, "Transformed output does not match expected output."
+    return output_grid
 
 ```

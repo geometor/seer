@@ -1,0 +1,45 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "Okay, let's create the Python module based on the natural language program and the provided example.\n\n"
+          },
+          {
+            "text": "```python\n\"\"\"\nIterate through each pixel of the input grid.\nIf a pixel is part of an azure ('8') object, check if it's the topmost pixel of that object.\nIf it is the topmost pixel, change the pixel to its immediate right in the output grid to blue ('1').\nAll the other pixels stay the same.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Place a blue (1) pixel to the right of the topmost azure (8) pixel of each azure object.\n    \"\"\"\n    input_np = np.array(input_grid)\n    output_np = np.copy(input_np)\n    rows, cols = input_np.shape\n\n    # Find all azure pixels\n    azure_pixels = np.where(input_np == 8)\n    azure_coords = list(zip(azure_pixels[0], azure_pixels[1]))\n\n    # Group azure pixels into objects\n    objects = []\n    while azure_coords:\n        current_object = []\n        queue = [azure_coords[0]]\n        while queue:\n            row, col = queue.pop(0)\n            if (row, col) in azure_coords:\n                current_object.append((row, col))\n                azure_coords.remove((row, col))\n                # Check neighbors (up, down, left, right)\n                neighbors = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]\n                for nr, nc in neighbors:\n                    if 0 <= nr < rows and 0 <= nc < cols and (nr, nc) in azure_coords:\n                        queue.append((nr, nc))\n        objects.append(current_object)\n\n    # Find the topmost pixel of each object and place a blue pixel to its right\n    for obj in objects:\n        # Sort by row (ascending) to find topmost\n        obj.sort(key=lambda x: x[0])\n        topmost_pixel = obj[0]\n        row, col = topmost_pixel\n        if col + 1 < cols:  # Check boundary\n            output_np[row, col + 1] = 1\n\n    return output_np.tolist()\n\n\nif __name__ == '__main__':\n\n    input = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 0, 8, 0],\n        [0, 0, 8, 0, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 0, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    expected_output = [\n        [0, 0, 0, 0, 8, 8, 0],\n        [0, 0, 0, 0, 1, 8, 0],\n        [0, 0, 8, 1, 0, 0, 0],\n        [0, 0, 8, 8, 0, 0, 0],\n        [0, 0, 0, 0, 0, 0, 0],\n        [0, 0, 0, 1, 8, 0, 0],\n        [0, 0, 0, 8, 8, 0, 0]\n    ]\n\n    output = transform(input)\n\n    if output == expected_output:\n        print(\"SUCCESS!\\n\")\n    else:\n        print(\"FAILED!\\n\")\n        print(\"Expected Output:\", expected_output)\n        print(\"Transformed Output:\", output)\n\n    print()\n    assert output == expected_output, \"Transformed output does not match expected output.\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3303,
+    "candidates_token_count": 977,
+    "total_token_count": 4280,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 9944,
+    "candidates": 2906,
+    "total": 12850,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000224,
+    "total_elapsed": 42.828595,
+    "response_times": [
+      0.000169,
+      0.00038,
+      0.000392,
+      0.000224
+    ]
+  }
+}
