@@ -34,7 +34,7 @@ class Session:
         try:
             self._write_context_files(
                 config["dreamer"]["system_context_file"],
-                config["builder"]["system_context_file"],
+                config["coder"]["system_context_file"],
                 config["task_context_file"],
             )
         except (FileNotFoundError, IOError, PermissionError) as e:
@@ -53,13 +53,13 @@ class Session:
     def _write_context_files(
         self,
         dreamer_system_context_file: str,
-        builder_system_context_file: str,
+        coder_system_context_file: str,
         task_context_file: str,
     ):
         with open(dreamer_system_context_file, "r") as f:
             dreamer_system_context = f.read().strip()
-        with open(builder_system_context_file, "r") as f:
-            builder_system_context = f.read().strip()
+        with open(coder_system_context_file, "r") as f:
+            coder_system_context = f.read().strip()
         with open(task_context_file, "r") as f:
             task_context = f.read().strip()
 
@@ -67,7 +67,7 @@ class Session:
             dreamer_system_context
         )
         (self.session_dir / "builder_system_context.md").write_text(
-            builder_system_context
+            coder_system_context
         )
         (self.session_dir / "task_context.md").write_text(task_context)
 
@@ -220,7 +220,7 @@ class Session:
         response_parts: list,
         prompt_count: int,
         description: str,
-        responsedata: dict,
+        response dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
         #  banner = self._format_banner(prompt_count, description)  # Use the banner

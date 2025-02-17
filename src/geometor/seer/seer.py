@@ -47,12 +47,12 @@ class Seer:
         #  self.nlp_model = config["nlp_model"]
         #  self.code_model = config["code_model"]
         self.dreamer_config = config["dreamer"]
-        self.builder_config = config["builder"]
+        self.coder_config = config["coder"]
 
         with open(self.dreamer_config["system_context_file"], "r") as f:
             self.dreamer_system_context = f.read().strip()
-        with open(self.builder_config["system_context_file"], "r") as f:
-            self.builder_system_context = f.read().strip()
+        with open(self.coder_config["system_context_file"], "r") as f:
+            self.coder_system_context = f.read().strip()
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
 
@@ -67,8 +67,8 @@ class Seer:
         self.dreamer_client = Client(
             self.dreamer_config, f"{self.dreamer_system_context}\n\n{self.task_context}"
         )
-        self.builder_client = Client(
-            self.builder_config, f"{self.builder_system_context}\n\n{self.task_context}"
+        self.coder_client = Client(
+            self.coder_config, f"{self.coder_system_context}\n\n{self.task_context}"
         )
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
@@ -127,7 +127,7 @@ class Seer:
             history.extend(prompt)
             history.extend(response)
 
-            # builder prompt
+            # coder prompt
             instructions = [
                 self.code_instructions.format(
                     input_grid_rows=pair.input.to_python_string(),
@@ -135,8 +135,8 @@ class Seer:
                 )
             ]
             prompt = [""]
-            response = self._generate(  # Use builder_client
-                self.builder_client,
+            response = self._generate(  # Use coder_client
+                self.coder_client,
                 history,
                 prompt,
                 instructions,
@@ -436,10 +436,10 @@ class Seer:
         #  description="Initial Dreamer Context",
         #  )
         #  self.session.display_prompt(
-        #  [self.builder_system_context],
+        #  [self.coder_system_context],
         #  [self.task_context],
         #  0,
-        #  description="Initial Builder Context",
+        #  description="Initial Coder Context",
         #  )
 
         for task in self.tasks:
