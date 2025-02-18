@@ -30,12 +30,6 @@ from geometor.seer.session import Session
 
 
 class Seer:
-    """
-    Initialize the Seer with all necessary components for solving and logging.
-
-    Seer expects tasks with input/output pairs of training examples.
-    """
-
     def __init__(
         self,
         config: dict,
@@ -47,14 +41,14 @@ class Seer:
 
         self.dreamer_config = config["dreamer"]
         self.coder_config = config["coder"]
-        self.oracle_config = config["oracle"] 
+        self.oracle_config = config["oracle"]
 
         with open(self.dreamer_config["system_context_file"], "r") as f:
             self.dreamer_system_context = f.read().strip()
         with open(self.coder_config["system_context_file"], "r") as f:
             self.coder_system_context = f.read().strip()
-        with open(self.oracle_config["system_context_file"], "r") as f: 
-            self.oracle_system_context = f.read().strip() 
+        with open(self.oracle_config["system_context_file"], "r") as f:
+            self.oracle_system_context = f.read().strip()
 
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
@@ -73,9 +67,7 @@ class Seer:
         self.coder_client = Client(
             self.coder_config, f"{self.coder_system_context}\n\n{self.task_context}"
         )
-        self.oracle_client = Oracle(  
-            self.oracle_config, self.oracle_system_context
-        )  
+        self.oracle_client = Oracle(self.oracle_config, self.oracle_system_context)
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
@@ -88,7 +80,7 @@ class Seer:
         Main method to orchestrate the task solving workflow.
         """
         self.prompt_count = 0
-        self.task = task  
+        self.task = task
         history = [""]
 
         # Reset extracted file counts for each task
@@ -101,7 +93,6 @@ class Seer:
         # Gather response data and create summary report
         respdata = self.session.gather_response_data(self.session.task_dir)
         self.session.create_summary_report(respdata, self.session.task_dir)
-
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -203,28 +194,32 @@ class Seer:
             description=description,
         )
 
-        #  history = history + prompt
-
-        #  response = self.nlp_client.generate_content(
         response = client.generate_content(
             total_prompt,
             tools=tools,
         )
 
-        response_parts, function_call_found, last_result = self._process_response(
-            response, functions, total_prompt
-        )
-
-        self.session.log_response(
+        self.session.log_response_json(
             response,
-            response_parts,
             self.prompt_count,
             self.token_counts,
             self.response_times,
             self.start_time,
         )
 
-        #  history = history + response_parts
+        response_parts, function_call_found, last_result = self._process_response(
+            response, functions, total_prompt
+        )
+
+        self.session.log_response_md(
+            response,
+            response_parts,
+            self.prompt_count,
+            self.token_counts,
+            self.response_times,
+            self.start_time,
+            description=description,
+        )
 
         return response_parts
 
@@ -252,7 +247,9 @@ class Seer:
                     self._write_to_file(code_file_path, code)
 
                     # Call _test_code and extend response_parts
-                    test_results = self.oracle_client.test_code(code, code_file_path, self.task)
+                    test_results = self.oracle_client.test_code(
+                        code, code_file_path, self.task
+                    )
                     response_parts.extend(test_results)
 
                 if part.code_execution_result:
@@ -300,11 +297,12 @@ class Seer:
 
             # If it's a Python file, also run tests
             if file_type == "py":
-                test_results = self.oracle_client.test_code(content, file_path, self.task) # Pass task
+                test_results = self.oracle_client.test_code(
+                    content, file_path, self.task
+                )  # Pass task
                 # Write test results to file
                 test_results_file = Path(f"{file_path.stem}.md")
                 self._write_to_file(test_results_file, "".join(test_results))
-
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
@@ -346,134 +344,15 @@ class Seer:
         """
         Runs the Seer over the set of tasks.
         """
-        self.tasks = tasks  
+        self.tasks = tasks
         self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:
-            self.session.task_dir = self.session.session_dir / task.id  
+            self.session.task_dir = self.session.session_dir / task.id
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
 
             self.solve(task)
 
-        self.create_session_summary_report()
+        self.session.create_session_summary_report()
 
-    def create_session_summary_report(self):
-        """
-        Creates a session-level summary report by aggregating task summary reports.
-        """
-        session_response_report_json = []
-        session_test_report_json = {}
-
-        # Iterate through each task directory
-        for task_dir in self.session.session_dir.iterdir():
-            if task_dir.is_dir():  
-                summary_report_json_path = task_dir / "summary_report.json"
-                if summary_report_json_path.exists():
-                    try:
-                        with open(summary_report_json_path, "r") as f:
-                            task_summary = json.load(f)
-                            # Aggregate response reports
-                            session_response_report_json.extend(
-                                task_summary.get("response_report", [])
-                            )
-                            # Aggregate test reports, keyed by task ID
-                            task_id = task_dir.name
-                            session_test_report_json[task_id] = task_summary.get(
-                                "test_report", {}
-                            )
-                    except (IOError, json.JSONDecodeError) as e:
-                        print(f"Error reading or parsing {summary_report_json_path}: {e}")
-                        self.session.log_error(
-                            f"Error reading or parsing {summary_report_json_path}: {e}"
-                        )
-
-        # Combine into a session-level report
-        session_summary_report = {
-            "response_report": session_response_report_json,
-            "test_report": session_test_report_json,
-        }
-
-        # Write the session summary report to the session directory
-        session_summary_report_json_file = "session_summary_report.json"
-        self._write_to_file_session(  # Use the session-level writing method
-            session_summary_report_json_file,
-            json.dumps(session_summary_report, indent=2),
-        )
-
-        # --- Create Markdown Report ---
-        session_summary_report_md = "# Session Summary Report\n\n"
-
-        # Response Report
-        session_summary_report_md += "## Response Summary\n\n"
-        session_summary_report_md += "| Task ID | Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
-        session_summary_report_md += "|-------|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
-
-        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
-        total_response_time = 0
-
-        for response in session_response_report_json:
-            task_id = response.get("response_file", "N/A").split("-")[
-                0
-            ]  
-            session_summary_report_md += f"| {task_id} | {response.get('response_file', 'N/A')} | {response['token_usage'].get('prompt', 0)} | {response['token_usage'].get('candidates', 0)} | {response['token_usage'].get('total', 0)} | {response['token_usage'].get('cached', 0)} | {response['timing']['response_time']:.4f} | {response['timing']['total_elapsed']:.4f} |\n"
-
-            for key in total_tokens:
-                total_tokens[key] += response["token_usage"].get(key, 0)
-            total_response_time += response["timing"]["response_time"]
-
-        session_summary_report_md += f"| **Total** | | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
-
-        # Test Report - More complex due to nested structure
-        session_summary_report_md += "## Test Summary\n\n"
-        for task_id, test_report in session_test_report_json.items():
-            session_summary_report_md += f"### Task: {task_id}\n\n"
-            for file_index, file_results in test_report.items():
-                session_summary_report_md += f"#### Code File: {file_index}\n\n"
-                session_summary_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
-                session_summary_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
-                for result in file_results:
-                    if "example" in result:
-                        session_summary_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
-                    elif "captured_output" in result:
-                        session_summary_report_md += f"| Captured Output |  |  |  |  |\n"
-                        session_summary_report_md += f"|---|---|---|---|---|\n"
-                        session_summary_report_md += (
-                            f"|  | ```{result['captured_output']}``` |  |  |  |\n"
-                        )
-                    elif "code_execution_error" in result:
-                        session_summary_report_md += (
-                            f"| Code Execution Error |  |  |  |  |\n"
-                        )
-                        session_summary_report_md += f"|---|---|---|---|---|\n"
-                        session_summary_report_md += (
-                            f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
-                        )
-                session_summary_report_md += "\n"
-
-        # Write the session summary report (Markdown) to the session directory
-        session_summary_report_md_file = "session_summary_report.md"
-        self._write_to_file_session(  
-            session_summary_report_md_file, session_summary_report_md
-        )
-
-        # Display report
-        self.session.display_response(
-            [session_summary_report_md],
-            0,
-            "Session Summary",
-            {},
-        )  
-
-    def _write_to_file_session(self, file_name, content):
-        """
-        Writes content to a file in the session directory.  
-        Distinct from _write_to_file, which writes to task directory.
-        """
-        file_path = self.session.session_dir / file_name  
-        try:
-            with open(file_path, "w") as f:
-                f.write(content)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing to file {file_name}: {e}")
-            self.session.log_error(f"Error writing to file {file_name}: {e}")
