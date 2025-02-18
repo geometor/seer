@@ -229,52 +229,60 @@ class Seer:
         function_call_found = False
         last_result = None
 
-        if hasattr(response.candidates[0].content, "parts"):
-            for part in response.candidates[0].content.parts:
-                if part.text:
-                    response_parts.append("\n*text:*\n")
-                    response_parts.append(part.text + "\n")
-                    # Check for triple backticks and write to file
-                    self._write_extracted_content(part.text)
+        if response.candidates:  # Check if candidates is not empty
+            if hasattr(response.candidates[0].content, "parts"):
+                for part in response.candidates[0].content.parts:
+                    if part.text:
+                        response_parts.append("\n*text:*\n")
+                        response_parts.append(part.text + "\n")
+                        # Check for triple backticks and write to file
+                        self._write_extracted_content(part.text)
 
-                if part.executable_code:
-                    response_parts.append("\n*code_execution:*\n")
-                    code = part.executable_code.code
-                    response_parts.append(f"```python\n{code}\n```\n")
-                    code_file_path = (
-                        self.session.task_dir / f"{self.prompt_count:03d}-code.py"
-                    )
-                    self._write_to_file(code_file_path, code)
+                    if part.executable_code:
+                        response_parts.append("\n*code_execution:*\n")
+                        code = part.executable_code.code
+                        response_parts.append(f"```python\n{code}\n```\n")
+                        code_file_path = (
+                            self.session.task_dir / f"{self.prompt_count:03d}-code.py"
+                        )
+                        self._write_to_file(code_file_path, code)
 
-                    # Call _test_code and extend response_parts
-                    test_results = self.oracle_client.test_code(
-                        code, code_file_path, self.task
-                    )
-                    response_parts.extend(test_results)
+                        # Call _test_code and extend response_parts
+                        test_results = self.oracle_client.test_code(
+                            code, code_file_path, self.task
+                        )
+                        response_parts.extend(test_results)
 
-                if part.code_execution_result:
-                    response_parts.append("\n*code_execution_result:*\n")
-                    outcome = part.code_execution_result.outcome
-                    output = part.code_execution_result.output
-                    response_parts.append(f"outcome: {outcome}\n")
-                    response_parts.append(f"```\n{output}\n```\n")
-                    self._write_to_file(
-                        f"{self.prompt_count:03d}-code_result.txt", output
-                    )
+                    if part.code_execution_result:
+                        response_parts.append("\n*code_execution_result:*\n")
+                        outcome = part.code_execution_result.outcome
+                        output = part.code_execution_result.output
+                        response_parts.append(f"outcome: {outcome}\n")
+                        response_parts.append(f"```\n{output}\n```\n")
+                        self._write_to_file(
+                            f"{self.prompt_count:03d}-code_result.txt", output
+                        )
 
-                if part.function_call:
-                    function_call_found = True
-                    response_parts.append("\n*function_call:*\n")
-                    response_parts.append(part.function_call.name + "\n")
+                    if part.function_call:
+                        function_call_found = True
+                        response_parts.append("\n*function_call:*\n")
+                        response_parts.append(part.function_call.name + "\n")
 
-                    result, msg = self._call_function(
-                        part.function_call, functions, total_prompt
-                    )
-                    last_result = msg
+                        result, msg = self._call_function(
+                            part.function_call, functions, total_prompt
+                        )
+                        last_result = msg
 
-                    response_parts.append("\nresult:\n")
-                    response_parts.append(f"{result}\n")
-                    response_parts.append(f"{msg}\n")
+                        response_parts.append("\nresult:\n")
+                        response_parts.append(f"{result}\n")
+                        response_parts.append(f"{msg}\n")
+        else:
+            # Handle the case where response.candidates is empty
+            error_msg = "No candidates returned in response."
+            print(f"\nERROR: {error_msg}")
+            self.session.log_error(error_msg, "".join(total_prompt))
+            response_parts.append("\n*error:*\n")  # Add an error indicator to response
+            response_parts.append(error_msg + "\n")
 
         return response_parts, function_call_found, last_result
 
