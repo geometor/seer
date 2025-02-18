@@ -45,21 +45,19 @@ class Seer:
         self.start_time = datetime.now()
         self.response_times = []
 
-        #  self.nlp_model = config["nlp_model"]
-        #  self.code_model = config["code_model"]
         self.dreamer_config = config["dreamer"]
         self.coder_config = config["coder"]
-        self.oracle_config = config["oracle"] # New
+        self.oracle_config = config["oracle"] 
 
         with open(self.dreamer_config["system_context_file"], "r") as f:
             self.dreamer_system_context = f.read().strip()
         with open(self.coder_config["system_context_file"], "r") as f:
             self.coder_system_context = f.read().strip()
+        with open(self.oracle_config["system_context_file"], "r") as f: 
+            self.oracle_system_context = f.read().strip() 
+
         with open(config["task_context_file"], "r") as f:
             self.task_context = f.read().strip()
-
-        with open(self.oracle_config["system_context_file"], "r") as f: # New
-            self.oracle_system_context = f.read().strip() # New
 
         with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
@@ -75,9 +73,9 @@ class Seer:
         self.coder_client = Client(
             self.coder_config, f"{self.coder_system_context}\n\n{self.task_context}"
         )
-        self.oracle_client = Oracle(  # New
+        self.oracle_client = Oracle(  
             self.oracle_config, self.oracle_system_context
-        )  # New
+        )  
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
@@ -90,7 +88,7 @@ class Seer:
         Main method to orchestrate the task solving workflow.
         """
         self.prompt_count = 0
-        self.task = task  # Store the task for use in _process_response and _test_code
+        self.task = task  
         history = [""]
 
         # Reset extracted file counts for each task
@@ -348,17 +346,16 @@ class Seer:
         """
         Runs the Seer over the set of tasks.
         """
-        self.tasks = tasks  # Set tasks here
+        self.tasks = tasks  
         self.prompt_count = 0
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:
-            self.session.task_dir = self.session.session_dir / task.id  # Set task_dir
+            self.session.task_dir = self.session.session_dir / task.id  
             self.session.task_dir.mkdir(parents=True, exist_ok=True)
 
             self.solve(task)
 
-        # Create session summary report
         self.create_session_summary_report()
 
     def create_session_summary_report(self):
@@ -370,7 +367,7 @@ class Seer:
 
         # Iterate through each task directory
         for task_dir in self.session.session_dir.iterdir():
-            if task_dir.is_dir():  # Ensure it's a directory
+            if task_dir.is_dir():  
                 summary_report_json_path = task_dir / "summary_report.json"
                 if summary_report_json_path.exists():
                     try:
@@ -398,7 +395,6 @@ class Seer:
         }
 
         # Write the session summary report to the session directory
-        # Corrected: Use self.session.session_dir, not self.session.task_dir
         session_summary_report_json_file = "session_summary_report.json"
         self._write_to_file_session(  # Use the session-level writing method
             session_summary_report_json_file,
@@ -419,7 +415,7 @@ class Seer:
         for response in session_response_report_json:
             task_id = response.get("response_file", "N/A").split("-")[
                 0
-            ]  # Extract task ID
+            ]  
             session_summary_report_md += f"| {task_id} | {response.get('response_file', 'N/A')} | {response['token_usage'].get('prompt', 0)} | {response['token_usage'].get('candidates', 0)} | {response['token_usage'].get('total', 0)} | {response['token_usage'].get('cached', 0)} | {response['timing']['response_time']:.4f} | {response['timing']['total_elapsed']:.4f} |\n"
 
             for key in total_tokens:
@@ -456,9 +452,8 @@ class Seer:
                 session_summary_report_md += "\n"
 
         # Write the session summary report (Markdown) to the session directory
-        # Corrected: Use self.session.session_dir
         session_summary_report_md_file = "session_summary_report.md"
-        self._write_to_file_session(  # Use session-level writing method
+        self._write_to_file_session(  
             session_summary_report_md_file, session_summary_report_md
         )
 
@@ -468,14 +463,14 @@ class Seer:
             0,
             "Session Summary",
             {},
-        )  # prompt_count=0
+        )  
 
     def _write_to_file_session(self, file_name, content):
         """
         Writes content to a file in the session directory.  
         Distinct from _write_to_file, which writes to task directory.
         """
-        file_path = self.session.session_dir / file_name  # Use session_dir
+        file_path = self.session.session_dir / file_name  
         try:
             with open(file_path, "w") as f:
                 f.write(content)

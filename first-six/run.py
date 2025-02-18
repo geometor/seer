@@ -7,7 +7,8 @@ from geometor.seer.seer import Seer
 
 
 def run():
-    with open("config.yaml", "r") as f:
+    config_file = "thinker.yaml"
+    with open(config_file, "r") as f:
         config = yaml.safe_load(f)
 
     tasks = Tasks("one")

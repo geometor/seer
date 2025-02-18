@@ -1,0 +1,24 @@
+task_context: "ARC-AGI grid puzzle transformation"
+transformation_rule: "Identify connected components of color 8, sort them horizontally, and modify cells adjacent to the topmost cell of each component based on their horizontal order."
+objects:
+  - type: "connected region"
+    color: 8 # azure
+predicates:
+  - "connected": "cells of the same color are adjacent"
+  - "leftmost": "object with the minimum starting column index (first in sorted list)"
+  - "rightmost": "object with the maximum starting column index (last in sorted list)"
+  - "middle_object": "object that is neither leftmost nor rightmost in sorted list"
+  - "topmost": "cell with the minimum row index within an object"
+actions:
+  - "identify": "detect connected regions of color 8"
+  - "sort": "order objects based on their leftmost column"
+  - "change_color": "modify cell color to 1 (blue)"
+  - "locate_adjacent_cell_right": "find cell immediately to the right of a given cell"
+  - "locate_adjacent_cell_below": "find cell immediately below a given cell"
+  - "locate_adjacent_cell_left": "find cell immediately to the left of a given cell"
+steps:
+  - "Identify all connected components of color 8."
+  - "Sort these components based on their minimum column index (left to right)."
+  - "For the first (leftmost) component, find its topmost cell and change the color of the cell immediately to its right to 1."
+  - "For the last (rightmost) component, find its topmost cell and change the color of the cell immediately below it to 1."
+  - "For all components in between (if any), find their topmost cell and change the color of the cell immediately to their left to 1."
