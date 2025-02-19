@@ -221,7 +221,7 @@ class Seer:
                         response_parts.append(part.text + "\n")
                         # Check for triple backticks and write to file
                         self.session._write_extracted_content(
-                            part.text, self.prompt_count, self.extracted_file_counts, self.task
+                            part.text, self.prompt_count, self.extracted_file_counts, self.task, self.verifier
                         )  # Use session method
 
                     if part.executable_code:

@@ -297,7 +297,7 @@ class Session:
         print()
         print(markdown)
 
-    def _write_extracted_content(self, text, prompt_count, extracted_file_counts, task):
+    def _write_extracted_content(self, text, prompt_count, extracted_file_counts, task, verifier):
         """Extracts content enclosed in triple backticks and writes it to files."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
@@ -316,7 +316,7 @@ class Session:
 
             # If it's a Python file, also run tests
             if file_type == "py":
-                test_results = task.verifier.test_code(
+                test_results = verifier.test_code(
                     content, file_path, task
                 )  # Pass task
                 # Write test results to file
