@@ -262,6 +262,11 @@ class Session:
             markdown_text += "\n**Timing Meta**\n\n```json\n"
             markdown_text += json.dumps(timing, indent=2)
             markdown_text += "\n```\n"
+            # Add elapsed time display here:
+            total_elapsed_time = timing.get("total_elapsed")
+            if total_elapsed_time is not None:
+                markdown_text += f"\n**Total Elapsed Time:** {total_elapsed_time:.4f} seconds\n"
+
 
         markdown = Markdown(markdown_text)
         print()
