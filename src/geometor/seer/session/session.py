@@ -189,30 +189,23 @@ class Session:
         token_counts: dict,
         response_times: list,
         start_time,
-        description
+        description,
     ):
         # Unpack the response and write elements to a markdown file
         response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
         banner = self._format_banner(prompt_count, description)
 
-        with open(response_md_file, "w") as f:
-            f.write(f"{banner}\n")
-            f.write("---\n")
-            f.write("\n".join(response_parts))
+        try:  # Added try-except block
+            with open(response_md_file, "w") as f:
+                f.write(f"{banner}\n")
+                f.write("---\n")
+                f.write("\n".join(response_parts))
+        except (IOError, PermissionError) as e:  # Catch potential write errors
+            print(f"Error writing response Markdown to file: {e}")
+            self.log_error(f"Error writing response Markdown to file: {e}")
 
-
-        #TODO: refactor with log_response_json
-        # Prepare the response data dictionary
-        response_data = response.to_dict()
-        #  response_data["token_totals"] = token_counts.copy()
-        #  response_data["timing"] = {
-            #  "response_time": response_times,
-            #  "total_elapsed": total_elapsed,
-            #  "response_times": response_times.copy(),
-        #  }
-        #  response_data["response_file"] = str(response_file.name)  # Add filename for report
         # Call display_response here
-        self.display_response(response_parts, prompt_count, description, response_data)
+        self.display_response(response_parts, prompt_count, description, response.to_dict())
 
     def log_error(self, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -250,13 +243,8 @@ class Session:
         respdict: dict,
     ):
         """Displays the response using rich.markdown.Markdown."""
-        #  banner = self._format_banner(prompt_count, description)  # Use the banner
+        banner = self._format_banner(prompt_count, description)  # Use the banner
         markdown_text = f"\n## RESPONSE\n\n"  # Include banner in Markdown
-
-        # Extract test_results_str, if present, and remove from response_parts
-        #  test_results_str = ""
-        #  if response_parts and isinstance(response_parts[-1], str):
-        #  test_results_str = response_parts.pop()
 
         for part in response_parts:
             markdown_text += str(part) + "\n"
@@ -268,13 +256,17 @@ class Session:
             markdown_text += json.dumps(usage, indent=2)
             markdown_text += "\n```\n"
 
+        # Add timing metadata
+        timing = respdict.get("timing", {})
+        if timing:
+            markdown_text += "\n**Timing Meta**\n\n```json\n"
+            markdown_text += json.dumps(timing, indent=2)
+            markdown_text += "\n```\n"
+
         markdown = Markdown(markdown_text)
         print()
         print(markdown)
 
-        # Display test results here, after usage metadata
-        #  if test_results_str:
-        #  self.display_test_results(test_results_str, prompt_count)
 
     def display_config(self):
         """Displays the configuration information using rich.markdown.Markdown."""
@@ -348,4 +340,3 @@ class Session:
         for task in self.tasks:
             self.run_task(task)
         summarize_session(self.session_dir, self.log_error, self.display_response)
-
