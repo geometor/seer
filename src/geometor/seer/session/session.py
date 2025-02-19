@@ -102,7 +102,7 @@ class Session:
         """Saves an image and returns its filename."""
         image_filename = f"{prompt_count:03d}-{description}.png"
         image_path = self.task_dir / image_filename
-        image.save(image_path)
+        image.to_image().save(image_path)
         return image_filename
 
     def log_prompt(
