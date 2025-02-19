@@ -27,6 +27,7 @@ from geometor.seer.exceptions import (
     FunctionExecutionError,
 )
 from geometor.seer.session import Session
+from geometor.seer.session.summary import create_session_summary_report
 
 
 class Seer:
@@ -362,5 +363,6 @@ class Seer:
 
             self.solve(task)
 
-        self.session.create_session_summary_report()
-
+        create_session_summary_report(
+            self.session.session_dir, self.session.log_error, self.session.display_response
+        )
