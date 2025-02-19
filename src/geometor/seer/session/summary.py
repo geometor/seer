@@ -230,7 +230,7 @@ def _create_response_table(resplist):
 
     total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
     total_response_time = 0
-    total_elapsed_time = 0 # Initialize
+    #  total_elapsed_time = 0 # Initialize
 
     sorted_resplist = sorted(resplist, key=lambda x: x.get("response_file", ""))
 
@@ -249,7 +249,7 @@ def _create_response_table(resplist):
         total_tokens["candidates"] += data["usage_metadata"].get("candidates_token_count", 0)
         total_tokens["total"] += data["usage_metadata"].get("total_token_count", 0)
         total_tokens["cached"] += data["usage_metadata"].get("cached_token_count", 0)
-        total_response_time += data["timing"]["response_time"]
+        total_response_time += data["timing"].get("response_time", 0) # handle missing
         total_elapsed_time += data["timing"].get("total_elapsed", 0) # Sum
 
     # Add a summary row
