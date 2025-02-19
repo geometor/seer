@@ -48,10 +48,8 @@ def create_session_summary_report(session_dir, log_error, display_response):
                         f"Error reading or parsing {summary_report_json_path}: {e}"
                     )
 
-    # --- Create Markdown Report ---
     summary_table = _create_session_summary_table(session_summary_data)
 
-    # Combine and output using Console
     console = Console(record=True)
     console.print(Markdown("# Session Summary"))
     console.print(summary_table)
@@ -77,20 +75,20 @@ def create_session_summary_report(session_dir, log_error, display_response):
 def _create_session_summary_table(session_summary_data):
     """Creates a rich table for the session-level summary."""
     table = Table(title="Session Summary")
-    table.add_column("Task ID", style="cyan", no_wrap=True)
-    table.add_column("Prompt Tokens", justify="right")
-    table.add_column("Candidate Tokens", justify="right")
-    table.add_column("Total Tokens", justify="right")
-    table.add_column("Cached Tokens", justify="right")
-    table.add_column("Total Response Time (s)", justify="right")
+    table.add_column("task", style="cyan", no_wrap=True)
+    table.add_column("prompt", justify="right")
+    table.add_column("candidate", justify="right")
+    table.add_column("total", justify="right")
+    table.add_column("cached", justify="right")
+    table.add_column("time (s)", justify="right")
 
-    for task_data in session_summary_
+    for task_data in session_summary_data:
         table.add_row(
             task_data["task_id"],
-            str(task_data["total_tokens"]["prompt"]),
-            str(task_data["total_tokens"]["candidates"]),
-            str(task_data["total_tokens"]["total"]),
-            str(task_data["total_tokens"]["cached"]),
+            str(task_data["token_usage"]["prompt"]),
+            str(task_data["token_usage"]["candidates"]),
+            str(task_data["token_usage"]["total"]),
+            str(task_data["token_usage"]["cached"]),
             f"{task_data['total_response_time']:.4f}",
         )
     return table
