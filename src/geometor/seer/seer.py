@@ -27,7 +27,7 @@ from geometor.seer.exceptions import (
     FunctionExecutionError,
 )
 from geometor.seer.session import Session
-from geometor.seer.session.summary import create_session_summary_report
+from geometor.seer.session.summary import summarize_session
 
 
 class Seer:
@@ -91,9 +91,7 @@ class Seer:
         #  self._review_programs()
         #  self._run_solution_loop()
 
-        # Gather response data and create summary report
-        respdata = self.session.gather_response_data(self.session.task_dir)
-        self.session.create_summary_report(respdata, self.session.task_dir)
+        self.session.summarize_task()
 
     def _investigate_examples(self, examples, include_images=True):
         """
@@ -234,7 +232,7 @@ class Seer:
             if hasattr(response.candidates[0].content, "parts"):
                 for part in response.candidates[0].content.parts:
                     if part.text:
-                        response_parts.append("\n*text:*\n")
+                        #  response_parts.append("\n*text:*\n")
                         response_parts.append(part.text + "\n")
                         # Check for triple backticks and write to file
                         self._write_extracted_content(part.text)
@@ -363,6 +361,8 @@ class Seer:
 
             self.solve(task)
 
-        create_session_summary_report(
-            self.session.session_dir, self.session.log_error, self.session.display_response
+        summarize_session(
+            self.session.session_dir,
+            self.session.log_error,
+            self.session.display_response,
         )
