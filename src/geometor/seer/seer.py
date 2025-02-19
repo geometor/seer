@@ -39,15 +39,11 @@ class Seer:
         self.start_time = datetime.now()
         self.response_times = []
 
-        self.dreamer_client = Client(self.config, "dreamer")
-        self.coder_client = Client(
-            self.config, "coder"
-        )
-        self.oracle_client = Client(
-            self.config, "oracle"
-        )
+        self.roles = {}
+        for role_name, role_config in config["roles"].items():
+            self.roles[role_name] = Client(self.config, role_name)
+
         self.verifier = Verifier()  # Simplified instantiation
-        
         with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
         with open(config["investigate_code"], "r") as f:
@@ -108,7 +104,7 @@ class Seer:
 
             instructions = [self.nlp_instructions]
             response = self._generate(
-                self.dreamer_client,  # Use dreamer_client
+                "dreamer",
                 history,
                 prompt,
                 instructions,
@@ -127,7 +123,7 @@ class Seer:
             ]
             prompt = [""]
             response = self._generate(  # Use coder_client
-                self.coder_client,
+                "coder",
                 history,
                 prompt,
                 instructions,
@@ -153,7 +149,7 @@ class Seer:
 
     def _generate(
         self,
-        client,
+        role_name,
         history,
         prompt,
         instructions,
@@ -163,6 +159,7 @@ class Seer:
     ):
         """
         Generate content from the model with standardized logging and function call handling.
+        Now accepts role_name instead of client object.
         """
         self.prompt_count += 1
 
@@ -180,6 +177,7 @@ class Seer:
             description=description,
         )
 
+        client = self.roles[role_name]  # Look up the client
         response = client.generate_content(
             total_prompt,
             tools=tools,
