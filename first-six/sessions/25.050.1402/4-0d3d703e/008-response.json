@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis program transforms the input grid to the output grid by applying the following color mapping:\n- Color 9 (maroon) in the input grid is changed to color 8 (azure) in the output grid.\n- Color 4 (yellow) in the input grid is changed to color 3 (green) in the output grid.\n- Color 2 (red) in the input grid is changed to color 6 (magenta) in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid to the output grid by applying a color mapping.\n    \n    Args:\n        input_grid (numpy.ndarray): A 2D numpy array representing the input grid.\n    \n    Returns:\n        numpy.ndarray: A 2D numpy array representing the output grid.\n    \"\"\"\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Define the color mapping.\n    color_map = {\n        9: 8,  # Maroon to Azure\n        4: 3,  # Yellow to Green\n        2: 6   # Red to Magenta\n    }\n\n    # Iterate over all cells in the grid using nested loops.\n    for i in range(output_grid.shape[0]):\n        for j in range(output_grid.shape[1]):\n            # Apply color transformation based on the color map.\n            if output_grid[i, j] in color_map:\n                output_grid[i, j] = color_map[output_grid[i, j]]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5254,
+    "candidates_token_count": 373,
+    "total_token_count": 5627,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.447015
+  },
+  "response_file": "008-response.json"
+}

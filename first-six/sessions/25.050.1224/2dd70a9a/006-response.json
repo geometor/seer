@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\nimport numpy as np\n\ndef get_object_positions(grid, color):\n    \"\"\"Finds the positions of all cells with a specific color.\"\"\"\n    return np.array(np.where(grid == color)).T\n\ndef find_closest_azure_seed(grid, row, start_col, direction):\n    \"\"\"\n    Finds the closest azure cell in the specified row, starting from a given column and searching in a given direction.\n    \n    Args:\n        grid: The input grid.\n        row: The row to search.\n        start_col: start searching from this column\n        direction: 1 for right, -1 for left.\n\n    Returns: The position of the closest azure, or None.\n    \"\"\"\n\n    if direction != 1 and direction != -1:\n        raise Exception(\"direction must be -1 (left) or +1 (right)\")\n\n    azure_positions = get_object_positions(grid, 8)\n    \n    if len(azure_positions) == 0 :\n        return None\n\n    azure_in_row = [pos for pos in azure_positions if pos[0] == row]\n    if not azure_in_row:\n        return None\n    \n    if direction == 1: # search to the right\n      \n      valid_azure = [pos for pos in azure_in_row if pos[1] > start_col]\n\n      if len(valid_azure) == 0: # no azure on the right, search closest\n          return min(azure_in_row, key=lambda pos: abs(pos[1] - start_col), default=None)\n\n      return min(valid_azure, key=lambda pos: abs(pos[1] - start_col), default=None)\n\n    else: # search to the left\n      valid_azure = [pos for pos in azure_in_row if pos[1] < start_col]\n\n      if len(valid_azure) == 0:  # no azure on the left, search closest\n            return min(azure_in_row, key=lambda pos: abs(pos[1] - start_col), default=None)\n      \n      return min(valid_azure, key=lambda pos: abs(pos[1] - start_col), default = None)\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the final rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    \n    # 1. Keep red and azure cells unchanged\n    \n    # 2 & 3. Green expansion\n    green_positions = list(get_object_positions(input_grid, 3)) # Convert to list for easier manipulation\n    \n    \n    processed_greens = []\n\n    while len(green_positions) > 0:\n\n      current_green = green_positions.pop(0) # Take one green as reference\n      \n      if (current_green[0],current_green[1]) in processed_greens: # already used\n          continue\n      \n      # calculate average row with another green or azure\n      \n      if len(green_positions) > 0: # exist other green\n            other_green = min(green_positions, key=lambda pos: abs(pos[0] - current_green[0]) +  abs(pos[1] - current_green[1])) # closest one\n            expansion_row = int(np.mean([current_green[0], other_green[0]]))\n            \n            #seed to the right\n            seed = find_closest_azure_seed(input_grid, expansion_row, current_green[1], direction = 1)\n            \n      else:  # no other green\n        expansion_row = current_green[0]\n        seed = find_closest_azure_seed(input_grid, expansion_row, current_green[1], direction = 1)\n\n      \n      if seed is not None: # apply expansion\n\n        if expansion_row == current_green[0]: # same line\n          # expand to the left\n          col = seed[1] - 1\n          while col >= 0 and input_grid[expansion_row, col] != 8:\n                output_grid[expansion_row, col] = 3\n                col -= 1\n\n        else: # different line\n\n          # expand to the right\n          col = seed[1] + 1\n          while col < input_grid.shape[1] and input_grid[expansion_row, col] != 8:\n            output_grid[expansion_row, col] = 3\n            col += 1\n\n      processed_greens.append((current_green[0],current_green[1]))\n      if 'other_green' in locals():\n        processed_greens.append((other_green[0],other_green[1]))\n\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9916,
+    "candidates_token_count": 1098,
+    "total_token_count": 11014,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 10.75097
+  },
+  "response_file": "006-response.json"
+}

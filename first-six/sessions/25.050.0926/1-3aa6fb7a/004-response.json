@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies azure (color 8) components in the input grid. Based on shape of azure component:\n- 1x2 (horizontal): places a blue pixel (color 1) below and to the left of the top-left corner.\n- 2x1 (vertical): places a blue pixel (color 1) on the same row, one column to the right.\n- Irregular shape: Look for a pixel which as south and east neighbors. Place a blue pixel (color 1) one row above, and one column to the left.\nAll other pixels remain unchanged (color 0).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds objects of a specified color in the grid.\n    Returns a list of positions where the color is found.\n    \"\"\"\n    objects = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color:\n                objects.append((r, c))\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n    processed = set()\n\n    for r, c in azure_objects:\n        if (r,c) in processed:\n          continue\n\n        # Check for 1x2 horizontal\n        if (r, c + 1) in azure_objects:\n            output_grid[r + 1, c] = 1\n            processed.add((r,c))\n            processed.add((r, c+1))\n            continue\n        # Check for 2x1 vertical\n        if (r + 1, c) in azure_objects:\n            output_grid[r, c + 1] = 1\n            processed.add((r,c))\n            processed.add((r+1, c))\n            continue\n\n        #check for irregular with south and east neighbors\n        rows, cols = input_grid.shape\n\n        if (r+1 < rows) and (c+1 < cols) and ((r+1,c) in azure_objects) and ((r, c+1) in azure_objects):\n           output_grid[r,c-1] = 1\n           processed.add((r,c))\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4160,
+    "candidates_token_count": 561,
+    "total_token_count": 4721,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 11574,
+    "candidates": 2232,
+    "total": 13806,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000318,
+    "total_elapsed": 29.952188,
+    "response_times": [
+      0.000382,
+      0.000365,
+      0.000303,
+      0.000318
+    ]
+  },
+  "response_file": "004-response.json"
+}

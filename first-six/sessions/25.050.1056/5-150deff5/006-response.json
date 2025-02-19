@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\nimport numpy as np\n\ndef get_object(grid, color):\n    \"\"\"\n    Finds the contiguous region of a specified color.\n\n    Returns a mask where object pixels are True, and the background is False.\n    \"\"\"\n    mask = (grid == color)\n    return mask\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by recoloring a gray (5) object with azure (8) and red (2) sub-shapes,\n    while preserving the background (0).  Azure is applied to the right-most portions of the gray object.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    gray_mask = get_object(input_grid, 5)\n    coords = np.argwhere(gray_mask)\n\n    # Create a dictionary to store the right-most column index for each row within the gray object.\n    rightmost_cols = {}\n    for r, c in coords:\n        if r not in rightmost_cols or c > rightmost_cols[r]:\n            rightmost_cols[r] = c\n\n    # Apply color changes based on the right-most rule.\n    for r, c in coords:\n        if c == rightmost_cols.get(r, -1) :\n           output_grid[r,c] = 8 #rightmost\n        elif c == rightmost_cols.get(r, -1) - 1 and output_grid[r,c+1] == 8:\n           output_grid[r,c] = 8 # second rightmost if contiguous\n        elif input_grid[r, c] == 5:\n            output_grid[r, c] = 2  # Red for the remaining parts\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7476,
+    "candidates_token_count": 400,
+    "total_token_count": 7876,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.381035
+  },
+  "response_file": "006-response.json"
+}

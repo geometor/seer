@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is: Extract a subgrid around a specific color object.\n\n- If the object of color 1 (blue) exists and is unique:\n    Extract the 3x3 subgrid centered around the blue object.\n    Pad with background color 4 (yellow) if necessary to ensure a 3x3 output.\n- Else, if the object of color 8 (azure) exists and is unique:\n    Extract the 5x5 subgrid centered around the azure object.\n    Pad with background color 3 (green) if necessary to ensure a 5x5 output.\n- Else, if the object of color 8 (azure) and 4 (yellow) exists on the border corners of the input:\n    Extract the 2x2 bottom-left corner of the input grid.\n- Otherwise, return the original input grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts a subgrid based on the presence and uniqueness of specific colored objects.\n    Prioritizes blue (color 1), then azure (color 8), and finally the bottom-left corner.\n    \"\"\"\n    input_array = np.array(input_grid)\n\n    # Check for unique blue object (color 1)\n    blue_coords = np.argwhere(input_array == 1)\n    if len(blue_coords) == 1:\n        row, col = blue_coords[0]\n        min_row = max(0, row - 1)\n        max_row = min(input_array.shape[0], row + 2)\n        min_col = max(0, col - 1)\n        max_col = min(input_array.shape[1], col + 2)\n        output_grid = input_array[min_row:max_row, min_col:max_col]\n\n        rows, cols = output_grid.shape\n        background_color = 4  # yellow background\n        if rows < 3:\n            pad_rows = 3 - rows\n            pad_before = pad_rows // 2\n            pad_after = pad_rows - pad_before\n            output_grid = np.pad(output_grid, ((pad_before, pad_after), (0, 0)), mode='constant', constant_values=background_color)\n        if cols < 3:\n            pad_cols = 3 - cols\n            pad_before = pad_cols // 2\n            pad_after = pad_cols - pad_before\n            output_grid = np.pad(output_grid, ((0, 0), (pad_before, pad_after)), mode='constant', constant_values=background_color)\n        return output_grid.tolist()\n\n    # Check for unique azure object (color 8)\n    azure_coords = np.argwhere(input_array == 8)\n    if len(azure_coords) == 1:\n        row, col = azure_coords[0]\n        min_row = max(0, row - 2)\n        max_row = min(input_array.shape[0], row + 3)\n        min_col = max(0, col - 2)\n        max_col = min(input_array.shape[1], col + 3)\n        output_grid = input_array[min_row:max_row, min_col:max_col]\n\n        rows, cols = output_grid.shape\n        background_color = 3  # green background\n        if rows < 5:\n            pad_rows = 5 - rows\n            pad_before = pad_rows // 2\n            pad_after = pad_rows - pad_before\n            output_grid = np.pad(output_grid, ((pad_before, pad_after), (0, 0)), mode='constant', constant_values=background_color)\n        if cols < 5:\n            pad_cols = 5 - cols\n            pad_before = pad_cols // 2\n            pad_after = pad_cols - pad_before\n            output_grid = np.pad(output_grid, ((0, 0), (pad_before, pad_after)), mode='constant', constant_values=background_color)\n\n        return output_grid.tolist()\n    \n    # Check for 2x2 bottom-left corner condition\n    rows, cols = input_array.shape\n    if rows >= 2 and cols >= 2:\n        bottom_left_corner = input_array[rows-2:rows, 0:2]\n        unique_colors = np.unique(bottom_left_corner)\n        if set(unique_colors).issubset({4, 8}):\n            return bottom_left_corner.tolist()\n\n\n    return input_array.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6241,
+    "candidates_token_count": 1094,
+    "total_token_count": 7335,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 11.271031
+  },
+  "response_file": "006-response.json"
+}

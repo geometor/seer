@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule operates on each column of the grid independently. For each column, the goal is to rearrange the numbers such that all non-zero numbers are moved to the bottom of the column, while the top positions are filled with zeros. The relative vertical order of the non-zero numbers within each column is maintained.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving non-zero numbers in each column to the bottom.\n    \n    Args:\n        input_grid (list of lists): The input grid represented as a 2D list.\n    \n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Iterate through each column\n    for j in range(cols):\n        # Extract non-zero numbers from the current column\n        non_zero_elements = input_grid[:, j][input_grid[:, j] != 0]\n        \n        # Count the number of non-zero elements\n        num_non_zero = len(non_zero_elements)\n        \n        # Fill the bottom 'num_non_zero' rows of the output column with the extracted numbers\n        output_grid[rows - num_non_zero:, j] = non_zero_elements\n        \n        # Fill the remaining top rows with zeros (this is already done during initialization)\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4609,
+    "candidates_token_count": 352,
+    "total_token_count": 4961,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 3.933685
+  },
+  "response_file": "006-response.json"
+}

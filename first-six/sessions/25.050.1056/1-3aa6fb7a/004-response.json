@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\nimport numpy as np\n\ndef find_azure_clusters(grid):\n    \"\"\"\n    Finds separate clusters of azure (color 8) pixels.\n    \"\"\"\n    visited = set()\n    clusters = []\n\n    def dfs(row, col, current_cluster):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != 8:\n            return\n        visited.add((row, col))\n        current_cluster.append((row, col))\n        # Check all 8 neighbors\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                dfs(row + dr, col + dc, current_cluster)\n\n    for i in range(grid.shape[0]):\n        for j in range(grid.shape[1]):\n            if grid[i, j] == 8 and (i, j) not in visited:\n                current_cluster = []\n                dfs(i, j, current_cluster)\n                clusters.append(current_cluster)\n    return clusters\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    - Azure objects are preserved.\n    - For each separate cluster of azure objects, find the top right most azure pixel within that cluster and transform the pixel up and to the left of that pixel to blue.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_clusters = find_azure_clusters(input_grid)\n\n    for cluster in azure_clusters:\n        if cluster:\n            #Find top-right corner of each cluster\n            top_right_row =  min(pos[0] for pos in cluster)\n            possible_cols = [pos[1] for pos in cluster if pos[0] == top_right_row]\n            top_right_col = max(possible_cols)\n\n            # Place blue pixel one up and one left if possible.\n            if(top_right_row-1 >= 0 and top_right_col-1 >= 0):\n              output_grid[top_right_row - 1, top_right_col - 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4203,
+    "candidates_token_count": 542,
+    "total_token_count": 4745,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.01057
+  },
+  "response_file": "004-response.json"
+}

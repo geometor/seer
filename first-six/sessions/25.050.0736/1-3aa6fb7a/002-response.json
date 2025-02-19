@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation preserves the azure L-shaped objects. The transformation paints blue the cells at the right of the top-left element of each azure L-shape.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, current_object):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef get_top_left(object_coords):\n     # Sort by row, then by column, and take the first element\n    return sorted(object_coords, key=lambda x: (x[0], x[1]))[0]\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Preserves azure L-shaped objects and paints blue the cell to the right\n    of the top-left corner of each L-shape.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Iterate through each azure object\n    for obj in azure_objects:\n        # find top-left element\n        top_left = get_top_left(obj)\n\n        # Paint the cell to the right of the top-left corner blue\n        paint_row = top_left[0]\n        paint_col = top_left[1] + 1\n\n        if 0 <= paint_row < output_grid.shape[0] and 0 <= paint_col < output_grid.shape[1]:\n             output_grid[paint_row, paint_col] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2171,
+    "candidates_token_count": 585,
+    "total_token_count": 2756,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3840,
+    "candidates": 998,
+    "total": 4838,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.00032,
+    "total_elapsed": 13.135262,
+    "response_times": [
+      0.000437,
+      0.00032
+    ]
+  },
+  "response_file": "002-response.json"
+}

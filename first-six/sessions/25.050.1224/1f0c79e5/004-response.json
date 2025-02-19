@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule can be summarized as follows:\n\n1. Identify the \"L\" shaped object (either yellow or green in the examples) and a single-celled red object.\n2. Remove the red cell.\n3. Expand the \"L\" shaped object into a 5x5 tilted square. The direction of the tilt depends on the initial orientation of the \"L\":\n   - If the \"L\" points down and right (yellow example), the expansion is upwards and leftwards, forming a tilted square missing the bottom-right 3x3 area.\n   - If the \"L\" points up and right (green example), the expansion is downwards and rightwards, forming a tilted square missing the top-left 3x3 area.\n   The top-left or bottom-right corner of the incomplete tilted square corresponds to the corner cell of the initial L-shape.\n\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    \"\"\"Finds coordinates of cells with a specific color.\"\"\"\n    coords = []\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r,c] == color:\n                coords.append((r, c))\n    return coords\n\ndef detect_l_shape(coords):\n    \"\"\"Detects if the given coordinates form an L-shape and determines its orientation.\"\"\"\n    if len(coords) != 3:\n        return None  # Not an L-shape\n\n    # Convert to numpy array for easier calculations\n    coords = np.array(coords)\n\n    # Calculate differences between coordinates\n    diffs = np.diff(coords, axis=0)\n\n    # Check if it's an L-shape\n    if (np.all(diffs[0] == [0, 1]) and np.all(diffs[1] == [1, 0])) or \\\n       (np.all(diffs[0] == [1, 0]) and np.all(diffs[1] == [0, 1])) :\n      # case 1:  _|_  \n      return 'down_right', coords[0]\n    elif (np.all(diffs[0] == [0, 1]) and np.all(diffs[1] == [-1, 0])) or \\\n       (np.all(diffs[0] == [-1, 0]) and np.all(diffs[1] == [0, 1])) :\n      # case 2:   _|  \n      return 'down_left',  coords[0] if  (np.all(diffs[0] == [0, 1])) else coords[1]\n    elif (np.all(diffs[0] == [0, -1]) and np.all(diffs[1] == [-1, 0])) or \\\n       (np.all(diffs[0] == [-1, 0]) and np.all(diffs[1] == [0, -1])) :\n       # case 3: |_\n       return 'up_left', coords[0] if  (np.all(diffs[0] == [0, -1])) else coords[1]\n    elif (np.all(diffs[0] == [0, -1]) and np.all(diffs[1] == [1, 0])) or \\\n       (np.all(diffs[0] == [1, 0]) and np.all(diffs[1] == [0, -1])) :\n       # case 4:  -|\n       return 'up_right',  coords[1] if  (np.all(diffs[0] == [1, 0])) else coords[0]\n    else:\n      # sorting coords to handle different input L orders\n      coords = sorted(coords, key=lambda x: (x[0],x[1]))\n      coords = np.array(coords)\n      diffs = np.diff(coords, axis=0)\n      if (np.all(diffs[0] == [1, 0]) and np.all(diffs[1] == [0, 1])) or \\\n         (np.all(diffs[0] == [0, 1]) and np.all(diffs[1] == [1, 0])) :\n        # case 1:  _|_  \n        return 'down_right', coords[0]\n      elif (np.all(diffs[0] == [0, 1]) and np.all(diffs[1] == [-1, 0])) or \\\n        (np.all(diffs[0] == [-1, 0]) and np.all(diffs[1] == [0, 1])) :\n        # case 2:   _|\n        return 'down_left', coords[0] if (np.all(diffs[0] == [-1, 0])) else coords[2]\n      elif (np.all(diffs[0] == [0, -1]) and np.all(diffs[1] == [-1, 0])) or \\\n        (np.all(diffs[0] == [-1, 0]) and np.all(diffs[1] == [0, -1])) :\n        # case 3: |_\n        return 'up_left',  coords[0] if (np.all(diffs[0] == [-1, 0])) else coords[2]\n      elif (np.all(diffs[0] == [1, 0]) and np.all(diffs[1] == [0, -1])) or \\\n         (np.all(diffs[0] == [0, -1]) and np.all(diffs[1] == [1, 0])) :\n        # case 4:  -|\n        return 'up_right', coords[0]\n    \n    return None\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the observed rule.\"\"\"\n    output_grid = np.zeros_like(input_grid)\n\n    # 1. Identify Objects and their properties\n    l_colors = []\n    for color in range(10):\n      l_coords = find_object(input_grid, color)\n      l_shape = detect_l_shape(l_coords)\n      if l_shape != None:\n        l_colors.append((color, l_shape))\n\n    red_coords = find_object(input_grid, 2)\n\n    # 2 & 3. Expand L-shape and remove red\n    for color, l_shape in l_colors:\n          orientation, corner = l_shape\n          start_row, start_col = corner\n\n          if orientation == 'down_right' or orientation == 'up_left':\n              for i in range(5):\n                  for j in range(5):\n                      row = start_row - 4 + i + j\n                      col = start_col + 4 - i - 3 + j\n                      if 0 <= row < output_grid.shape[0] and 0 <= col < output_grid.shape[1] and not(i >= 2 and j >= 2):\n                          output_grid[row, col] = color\n\n          elif orientation == 'up_right' or orientation == 'down_left':\n              for i in range(5):\n                  for j in range(5):\n                      row = start_row + i - j\n                      col = start_col + i + j - 1\n                      if 0 <= row < output_grid.shape[0] and 0 <= col < output_grid.shape[1] and not(i < 3 and j < 3):\n                          output_grid[row, col] = color\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4583,
+    "candidates_token_count": 1782,
+    "total_token_count": 6365,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 16.765492
+  },
+  "response_file": "004-response.json"
+}

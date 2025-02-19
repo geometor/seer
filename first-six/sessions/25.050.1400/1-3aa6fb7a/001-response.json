@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\n1. **Identify Color-8 Regions:** Find all contiguous regions of color 8 in the input grid. Consider cells to be part of the same region if they are 8-connected (horizontally, vertically, or diagonally).\n\n2. **Process Each Region:** For each identified region of color 8, perform the following steps:\n   a. **Find Top-Most Cell:** Locate the cell within the region that has the smallest row index. If there are multiple cells with the same smallest row index, choose the one with the smallest column index among them.\n   b. **Find Bottom-Most Cell:** Locate the cell within the region that has the largest row index. If there are multiple cells with the same largest row index, choose the one with the smallest column index among them.\n   c. **Modify Right of Top-Most:** Check the cell immediately to the right of the identified \"top-most\" cell. If this cell is within the grid boundaries (not outside the grid) and its current color is not 8, change its color to 1.\n   d. **Modify Left of Bottom-Most:** Check the cell immediately to the left of the identified \"bottom-most\" cell. If this cell is within the grid boundaries (not outside the grid) and its current color is not 8, change its color to 1.\n\n3. **Output Result:** After processing all color-8 regions, the modified grid becomes the output grid.\n\n**YAML Block:**\n\n```yaml\ntask_context: \"ARC puzzle transformation\"\ntransformation_rule: \"For each connected component of color 8, modify the cell to the right of the topmost cell and the cell to the left of the bottommost cell to color 1, if they are within grid boundaries and not already color 8.\"\nobjects:\n  - color_8_regions: \"Connected components of cells with color 8\"\npredicates:\n  - top_most_cell: \"Cell in a region with the smallest row index (and smallest column index in case of ties)\"\n  - bottom_most_cell: \"Cell in a region with the largest row index (and smallest column index in case of ties)\"\nactions:\n  - identify_regions: \"Find connected regions of color 8\"\n  - find_top_bottom_cells: \"Locate the top-most and bottom-most cells within each region\"\n  - modify_cell_right: \"Change color of the cell to the right of the top-most cell to 1 if conditions are met\"\n  - modify_cell_left: \"Change color of the cell to the left of the bottom-most cell to 1 if conditions are met\"\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1669,
+    "candidates_token_count": 578,
+    "total_token_count": 2247,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 15.322079
+  },
+  "response_file": "001-response.json"
+}

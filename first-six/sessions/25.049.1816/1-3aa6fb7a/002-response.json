@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis program transforms an input grid by identifying two L-shaped objects of color 8 (azure),\nand changing the color of the corner pixel of each L-shape to color 1 (blue).\n\n1. Find the azure (8) colored objects in the grid.\n2. Find the corners of the two L-shapes. The coordinates are (1, 2) and (5,5).\n3. Paint the corner cells of the azure shapes to blue (1).\n4. Keep other azure pixels.\n5. Keep other grid colors.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find all objects of a specific color\n    objects = []\n    visited = set()\n\n    def is_valid(x, y):\n        return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]\n\n    def dfs(x, y, current_object):\n        if (x, y) in visited or not is_valid(x, y) or grid[x, y] != color:\n            return\n        visited.add((x, y))\n        current_object.append((x, y))\n\n        # Check all 8 neighbors\n        for dx in [-1, 0, 1]:\n            for dy in [-1, 0, 1]:\n                if dx == 0 and dy == 0:\n                    continue\n                dfs(x + dx, y + dy, current_object)\n\n    for x in range(grid.shape[0]):\n        for y in range(grid.shape[1]):\n            if grid[x, y] == color and (x, y) not in visited:\n                current_object = []\n                dfs(x, y, current_object)\n                objects.append(current_object)\n    return objects\n\ndef find_l_corners(obj):\n    # Find the corner of an L-shape object\n    min_x, min_y = float('inf'), float('inf')\n    max_x, max_y = float('-inf'), float('-inf')\n\n    coords = {}\n    for x,y in obj:\n      if (x,y) in coords:\n        coords[(x,y)] += 1\n      else:\n        coords[(x,y)] = 1\n\n    corners = []\n    for key in coords.keys():\n      if coords[key] > 1:\n        corners.append(key)\n\n    if len(corners) > 0:\n      if len(obj) == 3:\n         return corners[0]\n\n    return None\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # Find and change L-shape corners to blue\n    for obj in azure_objects:\n        corner = find_l_corners(obj)\n        if corner:\n            output_grid[corner[0], corner[1]] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2194,
+    "candidates_token_count": 709,
+    "total_token_count": 2903,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3863,
+    "candidates": 1140,
+    "total": 5003,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000335,
+    "total_elapsed": 14.216398,
+    "response_times": [
+      0.000504,
+      0.000335
+    ]
+  },
+  "response_file": "002-response.json"
+}

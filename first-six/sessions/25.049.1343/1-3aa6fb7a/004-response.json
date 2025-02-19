@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransformation Rule:\n1. Identify azure (color 8) objects in the input grid, classifying them as \"L\" or \"reverse-L\" shapes.\n2. For each \"reverse-L\" shaped object, change the color of the cell immediately to the left of its top-left corner to blue (color 1), if the cell exists and contains a 0.\n3. For each \"L\" shaped object, change the color of the cell immediately to the right of its top-left corner to blue (color 1), if the cell exists and contains a 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds objects of a specific color in the grid and classifies them as \"L\" or \"reverse-L\".\n    Returns a list of (shape, top_left_corner_row, top_left_corner_col) tuples.\n    \"\"\"\n    objects = []\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, shape_coords):\n        visited[r, c] = True\n        shape_coords.append((r, c))\n        neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]\n        for nr, nc in neighbors:\n            if is_valid(nr, nc) and grid[nr, nc] == color and not visited[nr, nc]:\n                dfs(nr, nc, shape_coords)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                shape_coords = []\n                dfs(r, c, shape_coords)\n                \n                # Classify the shape based on relative coordinates\n                if len(shape_coords) == 3:\n                    # Determine if it's an L or reverse-L\n                    coords = sorted(shape_coords) #sort by row, then by column\n                    \n                    if (coords[1][0] == coords[0][0]  # two in the same row\n                        and coords[2][0] == coords[1][0] + 1):\n                        objects.append((\"L\", coords[0][0], coords[0][1])) # L shape, store the top-left\n                        \n                    elif (coords[1][0] == coords[0][0] +1 # two in the same column\n                        and coords[2][0] == coords[1][0]):\n                         objects.append((\"reverse-L\", coords[0][0], coords[0][1]))  # Reverse-L, store top-left\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    objects = find_objects(input_grid, 8)\n\n    for shape, r, c in objects:\n        if shape == \"L\":\n            # Change cell to the right to blue (1), if the cell is 0\n            if c + 2 < output_grid.shape[1] and output_grid[r, c + 2] == 0:  # Check bounds and color\n                output_grid[r, c + 2] = 1\n        elif shape == \"reverse-L\":\n            # Change cell to the left to blue (1), if the cell is 0\n            if c - 1 >= 0 and output_grid[r, c - 1] == 0:  # Check bounds and color\n                output_grid[r, c - 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4408,
+    "candidates_token_count": 876,
+    "total_token_count": 5284,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 11979,
+    "candidates": 2778,
+    "total": 14757,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000312,
+    "total_elapsed": 29.930578,
+    "response_times": [
+      0.000321,
+      0.000298,
+      0.000343,
+      0.000312
+    ]
+  },
+  "response_file": "004-response.json"
+}

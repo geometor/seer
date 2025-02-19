@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies azure (8) colored L-shaped objects and recolors the corner cell of each object that is furthest away from other objects to blue (1).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds contiguous regions of the specified color.\n\n    Args:\n        grid: The input grid.\n        color: The color to search for.\n\n    Returns:\n        A list of objects, where each object is a set of (row, col) coordinates.\n    \"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, current_object):\n        if (\n            row < 0\n            or row >= rows\n            or col < 0\n            or col >= cols\n            or (row, col) in visited\n            or grid[row, col] != color\n        ):\n            return\n        visited.add((row, col))\n        current_object.add((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_object = set()\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef calculate_centroid(object_coords):\n    \"\"\"Calculates the centroid of a set of coordinates.\"\"\"\n    if not object_coords:\n        return None\n    sum_row = sum(coord[0] for coord in object_coords)\n    sum_col = sum(coord[1] for coord in object_coords)\n    return (sum_row / len(object_coords), sum_col / len(object_coords))\n\ndef find_furthest_corner(object_coords, other_objects_coords):\n    \"\"\"\n    Finds the corner cell within an object that is furthest from the centroids of other objects.\n    \n    Args:\n        object_coords: Coordinates of the object.\n        other_objects_coords: list of coordinates of other objects\n\n    Returns:\n        Coordinates of the furthest corner.\n    \"\"\"\n    \n    #if there are no other objects, return the centroid of current object\n    if not other_objects_coords:\n        return calculate_centroid(object_coords)\n\n    # Calculate the centroid of all the other objects together\n    all_other_coords = set()\n    for other_obj in other_objects_coords:\n        all_other_coords.update(other_obj)\n    \n    other_centroid = calculate_centroid(all_other_coords)\n\n    #find the corner cells\n    corner_cells = []\n    for cell in object_coords:\n        neighbors = 0\n        for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            new_row, new_col = cell[0] + dx, cell[1] + dy\n            if (new_row, new_col) in object_coords:\n                neighbors +=1\n        if neighbors == 2:\n            corner_cells.append(cell)\n\n    #find the furthest corner from other objects centroid\n    furthest_corner = None\n    max_distance = -1\n\n    for corner in corner_cells:\n        distance = (corner[0] - other_centroid[0]) ** 2 + (corner[1] - other_centroid[1]) ** 2\n        if distance > max_distance:\n            max_distance = distance\n            furthest_corner = corner\n            \n    return furthest_corner\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by recoloring specific cells of azure objects to blue.\n    \"\"\"\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find all azure objects\n    azure_objects = find_objects(output_grid, 8)\n    \n    #create list to store coordinates of all objects other than current\n    other_objects_coords = []\n\n    # Iterate through each azure object\n    for i, azure_object in enumerate(azure_objects):\n        #get coordinates of all other objects\n        other_objects_coords = azure_objects[:i] + azure_objects[i+1:]\n        \n        # Find the corner cell furthest away from other objects\n        furthest_cell = find_furthest_corner(azure_object, other_objects_coords)\n        \n        if furthest_cell:\n            # Recolor the furthest cell to blue (1)\n            output_grid[furthest_cell[0], furthest_cell[1]] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4118,
+    "candidates_token_count": 1132,
+    "total_token_count": 5250,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 11551,
+    "candidates": 2757,
+    "total": 14308,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000277,
+    "total_elapsed": 30.351102,
+    "response_times": [
+      0.000379,
+      0.000334,
+      0.00028,
+      0.000277
+    ]
+  },
+  "response_file": "004-response.json"
+}

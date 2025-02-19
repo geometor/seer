@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Objects:** Locate all objects (contiguous regions) of color 8 (azure) in the input grid.\n2.  **Preserve Azure Objects:** The shape, size, and location of all azure colored objects are kept the same in the output grid.\n3.  **Change color to blue:** Go over the cells of the azure objects one by one, starting from top to bottom. For each azure object, locate the azure color cell that is highest and furthest to the *left*. Change the color of this cell from 8 (azure) to 1 (blue).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds contiguous regions of the specified color in the grid.\n    Returns a list of sets, where each set contains the coordinates of an object.\n    \"\"\"\n    visited = set()\n    objects = []\n\n    def dfs(row, col, current_object):\n        \"\"\"\n        Depth-First Search helper to find connected cells of the same color.\n        \"\"\"\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        current_object.add((row, col))\n        # Check adjacent cells (up, down, left, right)\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_object = set()\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    for obj in azure_objects:\n        # Find the highest (min row) and *leftmost* (min col) cell\n        top_left_cell = None\n        for row, col in obj:\n            if top_left_cell is None:\n                top_left_cell = (row, col)\n            else:\n                if row < top_left_cell[0] or (row == top_left_cell[0] and col < top_left_cell[1]):\n                    top_left_cell = (row,col)\n\n\n        # Change the color of the top-left cell to blue (1)\n        output_grid[top_left_cell] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4872,
+    "candidates_token_count": 677,
+    "total_token_count": 5549,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 12276,
+    "candidates": 3046,
+    "total": 15322,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000311,
+    "total_elapsed": 31.904774,
+    "response_times": [
+      0.000306,
+      0.00034,
+      0.000133,
+      0.000311
+    ]
+  },
+  "response_file": "004-response.json"
+}

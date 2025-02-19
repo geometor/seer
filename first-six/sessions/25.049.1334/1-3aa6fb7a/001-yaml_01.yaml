@@ -1,0 +1,20 @@
+task_context: "Grid transformation based on color '8' count and row index parity."
+transformation_rule: "For each row, count occurrences of color '8'. If count is 1, change adjacent '0' to '1' based on row index parity (even row: left, odd row: right)."
+objects:
+  - type: "color_block"
+    color: 8
+    role: "trigger_action"
+  - type: "cell"
+    color: 0
+    role: "target_cell"
+  - type: "cell"
+    color: 1
+    role: "output_color"
+predicates:
+  - "has_color_count_one"
+  - "is_even_row_index"
+  - "is_odd_row_index"
+  - "is_adjacent_left_zero"
+  - "is_adjacent_right_zero"
+actions:
+  - "change_cell_color_to_1"

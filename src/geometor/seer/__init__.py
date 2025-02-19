@@ -9,4 +9,5 @@ __licence__ = "MIT"
 """
 Seer package.
 """
-from .oracle import Oracle
+from geometor.seer.seer import Seer
+from geometor.seer.tasks.tasks import Tasks

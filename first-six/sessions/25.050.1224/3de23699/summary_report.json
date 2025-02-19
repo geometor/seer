@@ -1,0 +1,424 @@
+{
+  "response_report": [
+    {
+      "response_file": "001-response.json",
+      "token_usage": {
+        "prompt": 1589,
+        "candidates": 630,
+        "total": 2219,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 9.499944
+      }
+    },
+    {
+      "response_file": "002-response.json",
+      "token_usage": {
+        "prompt": 2308,
+        "candidates": 253,
+        "total": 2561,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 40.896137
+      }
+    },
+    {
+      "response_file": "003-response.json",
+      "token_usage": {
+        "prompt": 3256,
+        "candidates": 1160,
+        "total": 4416,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 14.44456
+      }
+    },
+    {
+      "response_file": "004-response.json",
+      "token_usage": {
+        "prompt": 4504,
+        "candidates": 253,
+        "total": 4757,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 3.202702
+      }
+    },
+    {
+      "response_file": "005-response.json",
+      "token_usage": {
+        "prompt": 5574,
+        "candidates": 1159,
+        "total": 6733,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 12.563194
+      }
+    },
+    {
+      "response_file": "006-response.json",
+      "token_usage": {
+        "prompt": 6821,
+        "candidates": 423,
+        "total": 7244,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 4.453149
+      }
+    },
+    {
+      "response_file": "007-response.json",
+      "token_usage": {
+        "prompt": 8189,
+        "candidates": 1118,
+        "total": 9307,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 12.275771
+      }
+    },
+    {
+      "response_file": "008-response.json",
+      "token_usage": {
+        "prompt": 9396,
+        "candidates": 431,
+        "total": 9827,
+        "cached": 0
+      },
+      "timing": {
+        "response_time": 4.748821
+      }
+    }
+  ],
+  "test_report": {
+    "002": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 1
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (4,4) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (4,8) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      }
+    ],
+    "003": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 3 3 0 0\n0 3 3 0 0\n0 0 0 0 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,5) (3,3) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "3 3 3 0 3\n0 3 3 0 0\n3 0 0 0 3",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 5
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "0 3 3 0 0\n0 3 3 0 0\n0 0 0 0 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,5) (4,4) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "0 3 3 0 0\n0 3 3 0 0\n0 0 0 0 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,5) (4,8) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      }
+    ],
+    "004": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 1
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (4,4) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "0 4 4\n4 4 4\n0 4 4",
+        "status": "ERROR: operands could not be broadcast together with shapes (3,3) (4,8) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      }
+    ],
+    "005": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (3,3) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "6 6 0 6\n0 6 0 0\n6 6 6 0\n6 6 6 6",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 4
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (4,8) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      }
+    ],
+    "006": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (3,3) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "6 6 0 6\n0 6 0 0\n6 6 6 0\n6 6 6 6",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 4
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,4) (4,8) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      }
+    ],
+    "007": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 0 8 8 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (3,3) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 0 8 8 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "8 0 0 8 8 0 0 8\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n8 0 0 0 0 8 8 8",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (4,4) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "8 0 0 8 8 0 0 8\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n8 0 0 0 0 8 8 8",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 6
+      }
+    ],
+    "008": [
+      {
+        "example": 1,
+        "input": "0 0 0 0 0 0 0\n0 4 0 0 0 4 0\n0 0 0 2 0 0 0\n0 0 2 2 2 0 0\n0 0 0 2 2 0 0\n0 4 0 0 0 4 0\n0 0 0 0 0 0 0",
+        "expected_output": "0 4 0\n4 4 4\n0 4 4",
+        "transformed_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 0 8 8 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (3,3) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 0 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 2 2 0 0 0 0\n0 0 0 2 2 0 2 0 0\n0 0 2 0 0 2 0 0 0\n0 3 0 0 0 0 0 3 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 3 3 0 0\n0 3 3 0 3\n3 0 0 3 0",
+        "transformed_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 0 8 8 0",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (3,5) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 0 8 0 0 0 0 0 0 0 0\n0 0 0 0 8 8 8 0 0 0 0 0 0 0\n0 0 0 0 0 8 8 0 0 0 0 0 0 0\n0 0 0 6 0 0 0 0 6 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 6 0 0\n0 6 0 0\n6 6 6 0\n0 6 6 0",
+        "transformed_output": "8 0 0 8 8 0 0 8\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n8 0 0 0 0 8 8 8",
+        "status": "ERROR: operands could not be broadcast together with shapes (4,8) (4,4) ",
+        "size_correct": false,
+        "color_palette_correct": false,
+        "correct_pixel_counts": false,
+        "pixels_off": "N/A"
+      },
+      {
+        "example": 4,
+        "input": "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 4 4 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 4 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 4 0 4 0 0 0 0 0 0 0 0\n0 0 8 0 0 0 0 0 0 0 0 8 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "expected_output": "0 0 0 8 8 0 0 0\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n0 0 0 0 8 0 8 0",
+        "transformed_output": "8 0 0 8 8 0 0 8\n0 0 8 8 0 0 0 0\n0 0 0 0 0 0 8 0\n8 0 0 0 0 8 8 8",
+        "status": "FAILED",
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": false,
+        "pixels_off": 6
+      }
+    ]
+  }
+}

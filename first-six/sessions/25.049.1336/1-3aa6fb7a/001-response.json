@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "**Natural Language Program:**\n\n1. **Identify '8' Objects:** Detect all contiguous regions of color '8' in the input grid. Consider each region as a distinct object.\n2. **Bounding Box Calculation:** For each identified '8' object, determine its bounding box. This box is defined by the minimum and maximum row and column indices that enclose the object.\n3. **Object Sorting:** Sort the '8' objects based on the row index of the top boundary of their bounding boxes in ascending order. If row indices are the same, sort by the column index of the left boundary.\n4. **Transformation - First Object:** For the first object in the sorted list:\n    - Locate the top-right corner of its bounding box.\n    - Check the cell immediately to the right of this corner.\n    - If this cell is within the grid boundaries and its color is '0', change its color to '1'.\n5. **Transformation - Second Object:** For the second object in the sorted list:\n    - Locate the bottom-left corner of its bounding box.\n    - Check the cell immediately below this corner.\n    - If this cell is within the grid boundaries and its color is '0', change its color to '1'.\n\nThis program describes how to transform the input grid into the output grid by identifying and modifying cells adjacent to regions of color '8' based on their sorted order and bounding box properties."
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1669,
+    "candidates_token_count": 299,
+    "total_token_count": 1968,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 1669,
+    "candidates": 299,
+    "total": 1968,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000372,
+    "total_elapsed": 19.424755,
+    "response_times": [
+      0.000372
+    ]
+  },
+  "response_file": "001-response.json"
+}

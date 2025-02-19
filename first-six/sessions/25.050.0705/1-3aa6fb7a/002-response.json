@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe azure L-shaped objects are unchanged. Blue pixels (color 1) are added, if possible, horizontally adjacent (left/right) to azure pixels belonging to an L-shaped structure, where such addition does not change the overall L shape of the object.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"\n    Finds contiguous regions of the same color in the grid.\n    Returns a dictionary where keys are colors and values are lists of pixel coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(r, c, color, obj):\n        if (r, c) in visited or r < 0 or r >= rows or c < 0 or c >= cols or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        obj.append((r, c))\n        dfs(r + 1, c, color, obj)\n        dfs(r - 1, c, color, obj)\n        dfs(r, c + 1, color, obj)\n        dfs(r, c - 1, color, obj)\n\n    for r in range(rows):\n        for c in range(cols):\n            if (r, c) not in visited:\n                color = grid[r, c]\n                obj = []\n                dfs(r, c, color, obj)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(obj)\n    return objects\n\ndef is_l_shape(obj, grid):\n    \"\"\"\n    Checks if a given object (list of coordinates) forms an L-shape.\n    \"\"\"\n    if len(obj) != 3:\n        return False\n\n    # Convert coordinates to numpy array for easier calculations\n    coords = np.array(obj)\n    \n    # Calculate differences between coordinates\n    diffs = np.diff(coords, axis=0)\n\n    \n    if not (np.all(diffs[:, 0] >= 0) or np.all(diffs[:, 0] <= 0)):\n        return False\n        \n    if not (np.all(diffs[:, 1] >= 0) or np.all(diffs[:,1] <= 0)):\n        return False\n    \n    # check that is an \"L\" and not a line\n    \n    d1 = [ obj[1][0] - obj[0][0] , obj[1][1] - obj[0][1] ]\n    d2 = [ obj[2][0] - obj[1][0] , obj[2][1] - obj[1][1] ]\n\n    if d1[0] != 0 and d1[1] != 0: return False\n    if d2[0] != 0 and d2[1] != 0: return False\n\n    return True\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    objects = get_objects(input_grid)\n\n    if 8 in objects:\n        for obj in objects[8]:\n            if is_l_shape(obj, input_grid):\n                #find topleft and bottomright\n                obj_coords = np.array(obj)\n                top_left_index = np.argmin(obj_coords.sum(axis=1))\n                bottom_right_index = np.argmax(obj_coords.sum(axis=1))\n                top_left = obj[top_left_index]\n                bottom_right = obj[bottom_right_index]\n                \n                # Add blue pixel to the right of top_left, within bounds.\n                if top_left[1] + 1 < cols:\n                  output_grid[top_left[0], top_left[1] + 1] = 1\n                # Add blue pixel to the left of bottom_right, within bounds\n                if bottom_right[1] -1 >= 0:\n                  output_grid[bottom_right[0] , bottom_right[1] - 1] = 1\n                  \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2147,
+    "candidates_token_count": 980,
+    "total_token_count": 3127,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3816,
+    "candidates": 1369,
+    "total": 5185,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000317,
+    "total_elapsed": 23.231715,
+    "response_times": [
+      0.000393,
+      0.000317
+    ]
+  },
+  "response_file": "002-response.json"
+}

@@ -48,7 +48,7 @@ def summarize_session(session_dir, log_error, display_response):
                     total_tests = 0
                     for file_results in test_report.values():
                         passed_count = sum(
-                            1 for res in file_results if res.get("status") == "pass"
+                            1 for res in file_results if res.get("status") == "PASSED"
                         )
                         total_tests = len(file_results)  # all results in file have same len
                         max_passed = max(max_passed, passed_count)
@@ -295,7 +295,8 @@ def _create_test_table(grouped_test_results):
         for result in test_results:
             if "example" in result:
                 # --- Emoji Logic ---
-                status = "✅" if result.get("status") == "pass" else "❌"
+                status = result.get("status")
+
                 size_correct = "✅" if result.get("size_correct") is True else "❌" if result.get("size_correct") is False else "N/A"
                 palette_correct = "✅" if result.get("color_palette_correct") is True else "❌" if result.get("color_palette_correct") is False else "N/A"
                 color_count_correct = "✅" if result.get("correct_pixel_counts") is True else "❌" if result.get("correct_pixel_counts") is False else "N/A"

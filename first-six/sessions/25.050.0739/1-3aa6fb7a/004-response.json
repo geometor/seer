@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies isolated azure (8) colored cells and changes their color to blue (1).\nAn isolated cell is one that has no adjacent neighbors of the same color (8).  Adjacency is defined as sharing an edge (horizontal or vertical), not just a corner.\nAll other cells, including non-isolated azure cells and cells of other colors, remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef _is_isolated(grid, row, col, color):\n    \"\"\"Checks if a cell at (row, col) of the given color is isolated.\"\"\"\n    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n        nr, nc = row + dr, col + dc\n        if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1] and grid[nr, nc] == color:\n            return False  # Found a neighbor of the same color\n    return True\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by changing isolated azure (8) cells to blue (1).\n    \"\"\"\n    output_grid = np.copy(input_grid)  # Initialize output_grid as a copy of the input\n\n    # Iterate through each cell in the grid\n    for row in range(output_grid.shape[0]):\n        for col in range(output_grid.shape[1]):\n            # Check if the cell is azure (8) and isolated\n            if output_grid[row, col] == 8 and _is_isolated(output_grid, row, col, 8):\n                output_grid[row, col] = 1  # Change to blue (1)\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4178,
+    "candidates_token_count": 395,
+    "total_token_count": 4573,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 10987,
+    "candidates": 2082,
+    "total": 13069,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000286,
+    "total_elapsed": 24.866281,
+    "response_times": [
+      0.000353,
+      0.000233,
+      0.000291,
+      0.000286
+    ]
+  },
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,26 @@
+task_context: "grid transformation"
+transformation_rule: "conditional color change based on block of 8s length and row position"
+objects:
+  - type: "block of color 8"
+    properties:
+      - "length"
+      - "position (row, column)"
+predicates:
+  - "is_length_one(block)"
+  - "is_row_in_top_half(row_index)"
+  - "is_row_in_bottom_half(row_index)"
+  - "is_cell_to_right_color_0(block)"
+  - "is_cell_to_left_color_0(block)"
+actions:
+  - "change_cell_to_color_1(cell)"
+step_by_step_transformation:
+  - "for each row in the grid:"
+  - "  identify contiguous blocks of color 8"
+  - "  for each block:"
+  - "    determine block length"
+  - "    if block length is 1:"
+  - "      get row index of the block"
+  - "      if row index < 4:"
+  - "        check cell to the right; if color 0, change to 1"
+  - "      else if row index >= 4:"
+  - "        check cell to the left; if color 0, change to 1"

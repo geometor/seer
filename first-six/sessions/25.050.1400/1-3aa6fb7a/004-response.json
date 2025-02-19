@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFor each 8-connected region of color 8, change the color of the cell to the right of the topmost cell and to the left of the bottommost cell to color 1, provided they are within the grid and are not already color 8.\n\"\"\"\n\nimport numpy as np\n\ndef find_regions(grid, color):\n    # Use DFS to find connected regions of the specified color\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    def dfs(row, col, current_region):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_region.append((row, col))\n        # Check 8-connected neighbors\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                dfs(row + dr, col + dc, current_region)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_region = []\n                dfs(row, col, current_region)\n                regions.append(current_region)\n    return regions\n\ndef find_top_bottom_cells(region):\n    # Find top-most and bottom-most cells in a region\n    top_most = min(region, key=lambda x: (x[0], x[1]))\n    bottom_most = max(region, key=lambda x: (x[0], x[1])) # corrected to use max, not min\n    return top_most, bottom_most\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find all regions of color 8\n    regions = find_regions(output_grid, 8)\n\n    # Process each region\n    for region in regions:\n        # Find top-most and bottom-most cells\n        top_most, bottom_most = find_top_bottom_cells(region)\n\n        # Modify cell to the right of top-most\n        right_cell = (top_most[0], top_most[1] + 1)\n        if right_cell[1] < cols and output_grid[right_cell] != 8:\n            output_grid[right_cell] = 1\n\n        # Modify cell to the left of bottom-most\n        left_cell = (bottom_most[0], bottom_most[1] - 1)\n        if left_cell[1] >= 0 and output_grid[left_cell] != 8:\n            output_grid[left_cell] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4397,
+    "candidates_token_count": 706,
+    "total_token_count": 5103,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 7.000201
+  },
+  "response_file": "004-response.json"
+}

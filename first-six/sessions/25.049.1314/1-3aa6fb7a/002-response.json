@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe task is to identify connected regions of color '8' in the input grid. For each such region, a transformation is applied based on its vertical position in the grid.\n\n1. **Identify Connected Regions:** Find all groups of connected cells that have the color '8'. Connectivity is defined as being adjacent horizontally or vertically.\n2. **Calculate Average Row Index for Each Region:** For each connected region, calculate the average row index of all cells belonging to that region.\n3. **Determine Transformation Rule based on Average Row Index:**\n    - Calculate a threshold row index as the integer division of the grid height by 2. In this case, grid height is 7, so the threshold is 7 // 2 = 3.\n    - **If the average row index of a region is less than the threshold (3):**\n        a. Find the topmost row that contains any cell of this region.\n        b. Within this topmost row, find the cell with the smallest column index that belongs to the region. Let's call this cell the \"top-leftmost\" cell.\n        c. Change the color of the cell immediately to the right of this \"top-leftmost\" cell to '1', provided that this neighbor is within the grid boundaries.\n    - **Otherwise (if the average row index is greater than or equal to the threshold 3):**\n        a. Find the bottommost row that contains any cell of this region.\n        b. Within this bottommost row, find the cell with the largest column index that belongs to the region. Let's call this cell the \"bottom-rightmost\" cell.\n        c. Change the color of the cell immediately to the left of this \"bottom-rightmost\" cell to '1', provided that this neighbor is within the grid boundaries.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import measurements\n\ndef find_connected_regions(grid, color):\n    \"\"\"\n    Finds connected regions of a specific color in the grid.\n\n    Args:\n        grid: The input grid.\n        color: The color to find connected regions for.\n\n    Returns:\n        A list of coordinates, where each coordinate set represents a connected region.\n    \"\"\"\n    labeled_grid, num_labels = measurements.label(grid == color)\n    regions = []\n    for label in range(1, num_labels + 1):\n        regions.append(np.array(np.where(labeled_grid == label)).T)\n    return regions\n\ndef calculate_average_row_index(region):\n    \"\"\"\n    Calculates the average row index of a region.\n\n    Args:\n        region: A list of coordinates representing the region.\n\n    Returns:\n        The average row index.\n    \"\"\"\n    return np.mean(region[:, 0])\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rules.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    regions = find_connected_regions(input_grid, 8)\n    threshold = input_grid.shape[0] // 2\n\n    for region in regions:\n        avg_row_index = calculate_average_row_index(region)\n\n        if avg_row_index < threshold:\n            # Topmost row\n            topmost_row = np.min(region[:, 0])\n            # Top-leftmost cell in the topmost row\n            top_leftmost_col = np.min(region[region[:, 0] == topmost_row, 1])\n            # Change the cell to the right to '1' if within bounds\n            if top_leftmost_col + 1 < output_grid.shape[1]:\n                output_grid[topmost_row, top_leftmost_col + 1] = 1\n        else:\n            # Bottommost row\n            bottommost_row = np.max(region[:, 0])\n            # Bottom-rightmost cell in the bottommost row\n            bottom_rightmost_col = np.max(region[region[:, 0] == bottommost_row, 1])\n            # Change the cell to the left to '1' if within bounds\n            if bottom_rightmost_col - 1 >= 0:\n                output_grid[bottommost_row, bottom_rightmost_col - 1] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2190,
+    "candidates_token_count": 987,
+    "total_token_count": 3177,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3859,
+    "candidates": 1412,
+    "total": 5271,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000119,
+    "total_elapsed": 30.030117,
+    "response_times": [
+      0.000376,
+      0.000119
+    ]
+  },
+  "response_file": "002-response.json"
+}

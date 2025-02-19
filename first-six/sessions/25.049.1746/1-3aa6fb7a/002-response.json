@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies single-pixel azure (color 8) objects in the input grid. For each identified azure pixel, the adjacent pixel in the clockwise direction (starting from the top: top, right, bottom, left) is changed to blue (color 1).\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"\n    Returns a dictionary of neighbor coordinates (top, right, bottom, left) for a given cell.\n    Out-of-bounds neighbors are not included.\n    \"\"\"\n    rows, cols = grid.shape\n    neighbors = {}\n    if row > 0:\n        neighbors['top'] = (row - 1, col)\n    if col < cols - 1:\n        neighbors['right'] = (row, col + 1)\n    if row < rows - 1:\n        neighbors['bottom'] = (row + 1, col)\n    if col > 0:\n        neighbors['left'] = (row, col - 1)\n    return neighbors\n  \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each cell of the input grid\n    for row in range(rows):\n        for col in range(cols):\n            # Check if the current cell is azure (color 8)\n            if input_grid[row, col] == 8:\n                # Get the neighbors\n                neighbors = get_neighbors(input_grid,row,col)\n\n                is_single = True\n                for direction, coord in neighbors.items():\n                  if input_grid[coord] == 8:\n                    is_single = False\n                    break\n\n                if is_single:\n                  # one position clockwise\n                  if 'top' in neighbors:\n                      output_grid[neighbors['top']] = 1\n                  elif 'right' in neighbors:\n                    output_grid[neighbors['right']] = 1\n                  elif 'bottom' in neighbors:\n                    output_grid[neighbors['bottom']] = 1\n                  elif 'left' in neighbors:\n                    output_grid[neighbors['left']] = 1\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2127,
+    "candidates_token_count": 517,
+    "total_token_count": 2644,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3796,
+    "candidates": 883,
+    "total": 4679,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000299,
+    "total_elapsed": 11.169145,
+    "response_times": [
+      0.000349,
+      0.000299
+    ]
+  },
+  "response_file": "002-response.json"
+}

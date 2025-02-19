@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe positions of red cells are moved based on the existence of yellow cells vertically. If there are any yellow blocks in the same column, the red cell will be placed on top of it. If not, then it is placed on row 7.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    # Find coordinates of all cells with the given color\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None  # Return None if no object of the specified color is found\n    return coords\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid based on the observed rule.\n    The positions of red cells are determined based on the positions of the yellow\n    square.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    red_coords_input = find_object(input_grid, 2)\n    yellow_coords_output = find_object(output_grid, 4)\n    yellow_columns = []\n\n    if yellow_coords_output is not None:\n      yellow_columns = np.unique(yellow_coords_output[:, 1])\n\n    if red_coords_input is not None:\n      for coord in red_coords_input:\n        x = coord[1]\n        output_grid[coord[0]][coord[1]] = 1\n        has_yellow = False\n        if yellow_coords_output is not None:\n            for y_coord in yellow_coords_output:\n                if y_coord[1] == x:\n                    #find topmost yellow block\n                    top_yellow = output_grid.shape[0]\n                    for yel_y in yellow_columns:\n                      if yel_y == x:\n                        for k in range(output_grid.shape[0]):\n                          if output_grid[k][yel_y] == 4:\n                            top_yellow = k\n                            break\n                        break\n\n                    output_grid[top_yellow-1][x] = 2\n                    has_yellow= True\n                    break\n        if not has_yellow:\n            output_grid[6][x] = 2\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6484,
+    "candidates_token_count": 500,
+    "total_token_count": 6984,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 25.755344
+  },
+  "response_file": "006-response.json"
+}

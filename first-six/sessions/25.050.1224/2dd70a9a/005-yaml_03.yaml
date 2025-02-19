@@ -1,0 +1,30 @@
+input_grid:
+  size: 15x15
+  objects:
+    - color: 8 (azure)
+      shape: scattered single cells and small clusters
+      notes: Acts as a boundary and seed for green expansion.
+    - color: 0 (white)
+      shape: background
+      notes: Fills most of the empty space.
+    - color: 2 (red)
+      shape: 1x2 block
+      position: (9, 1) and (9, 2)
+      notes: Remains static.
+    - color: 3 (green)
+      shape: two adjacent cells
+      position: (5, 1) and (5, 2)
+      notes: Agents for transformation.
+
+output_grid:
+  size: 15x15
+  objects:
+    - color: 8 (azure)
+      notes: Unchanged.
+    - color: 0 (white)
+      notes: Unchanged.
+    - color: 2 (red)
+      notes: Unchanged.
+    - color: 3 (green)
+      shape: Horizontal segments.
+      notes: Multiple expansions, each triggered by nearby azure and previous green positions.

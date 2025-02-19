@@ -1,0 +1,41 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule consists of adding a blue pixel (color 1) to the right side of the top-left pixel of each separate region of azure pixels (color 8).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds connected regions of the specified color in the grid.\n    Returns a list of objects, where each object is a list of (row, col) coordinates.\n    \"\"\"\n    visited = set()\n    objects = []\n\n    def dfs(row, col, current_object):\n        \"\"\"Depth-First Search helper function.\"\"\"\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        current_object.append((row, col))\n\n        # Explore adjacent cells\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef find_top_left(object_coords):\n    \"\"\"\n    Finds the top-left coordinate of an object.\n    \"\"\"\n    min_row = float('inf')\n    min_col = float('inf')\n    for row, col in object_coords:\n        if row < min_row:\n            min_row = row\n            min_col = col\n        elif row == min_row and col < min_col:\n            min_col = col\n    return (min_row, min_col)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Add a blue pixel (color 1) to the right of the top-left pixel of each separate region of azure pixels (color 8).\n    \"\"\"\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find all azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # For each azure object, place a blue pixel to the right of its top-left pixel\n    for obj in azure_objects:\n        top_left = find_top_left(obj)\n        blue_pixel_row = top_left[0]\n        blue_pixel_col = top_left[1] + 1\n\n        # Check boundaries before placing the blue pixel\n        if 0 <= blue_pixel_row < output_grid.shape[0] and 0 <= blue_pixel_col < output_grid.shape[1]:\n            output_grid[blue_pixel_row, blue_pixel_col] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2290,
+    "candidates_token_count": 730,
+    "total_token_count": 3020,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 3959,
+    "candidates": 1257,
+    "total": 5216,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000251,
+    "total_elapsed": 15.495568,
+    "response_times": [
+      0.000442,
+      0.000251
+    ]
+  },
+  "response_file": "002-response.json"
+}

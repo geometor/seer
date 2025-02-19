@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransformation Rule:\n\n1.  **Identify Objects:** Find all distinct azure (color code 8) objects in the input grid.\n2.  **Calculate Centroids:** For each identified azure object, calculate its centroid.\n3.  **Paint Centroids:** Change the color of the cells corresponding to the calculated centroids to blue (color code 1).\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import measurements\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds contiguous regions of the specified color in the grid.\n    Returns a list of coordinates for each object found.\n    \"\"\"\n    mask = (grid == color).astype(int)\n    labeled_array, num_features = measurements.label(mask)\n    objects = []\n    for i in range(1, num_features + 1):\n        coords = np.array(np.where(labeled_array == i)).T\n        objects.append(coords)\n    return objects\n\ndef calculate_centroid(coords):\n    \"\"\"\n    Calculates the centroid of a set of coordinates.\n    \"\"\"\n    return np.mean(coords, axis=0).astype(int)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    # Initialize output grid as a copy of the input grid\n    output_grid = input_grid.copy()\n\n    # Find all azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # Calculate the centroid for each azure object and paint it blue\n    for obj_coords in azure_objects:\n        centroid = calculate_centroid(obj_coords)\n        output_grid[centroid[0], centroid[1]] = 1  # Paint the centroid blue\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4317,
+    "candidates_token_count": 403,
+    "total_token_count": 4720,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 11455,
+    "candidates": 2227,
+    "total": 13682,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000312,
+    "total_elapsed": 25.81872,
+    "response_times": [
+      0.000429,
+      0.000306,
+      0.000315,
+      0.000312
+    ]
+  },
+  "response_file": "004-response.json"
+}

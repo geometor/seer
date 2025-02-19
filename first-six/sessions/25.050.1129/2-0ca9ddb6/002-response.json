@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies single red (2) and blue (1) cells in the input grid.\nIt preserves these cells in the output. A yellow (4) cross is created around the red cell,\nand an orange (7) cross is created around the blue cell. The crosses are formed by placing\nthe respective colors one cell away in each cardinal direction (up, down, left, right).\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    # Find the coordinates of a single-cell object of the specified color.\n    coords = np.where(grid == color)\n    if len(coords[0]) > 0:\n      return (coords[0][0], coords[1][0])\n    return None\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    grid_size = input_grid.shape\n\n    # Find the red and blue cells.\n    red_pos = find_object(input_grid, 2)\n    blue_pos = find_object(input_grid, 1)\n    \n    # create yellow cross around red cell.\n    if red_pos:\n      row, col = red_pos\n      if row > 0:\n        output_grid[row-1, col] = 4\n      if row < grid_size[0] -1:\n        output_grid[row+1, col] = 4\n      if col > 0:\n        output_grid[row, col-1] = 4\n      if col < grid_size[1] - 1:\n        output_grid[row, col+1] = 4\n\n    # create orange cross around blue cell\n    if blue_pos:\n      row, col = blue_pos\n      if row > 0:\n        output_grid[row - 1, col] = 7\n      if row < grid_size[0] - 1:\n        output_grid[row + 1, col] = 7\n      if col > 0:\n        output_grid[row, col-1] = 7\n      if col < grid_size[1] - 1:\n          output_grid[row, col + 1] = 7      \n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2489,
+    "candidates_token_count": 534,
+    "total_token_count": 3023,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.503152
+  },
+  "response_file": "002-response.json"
+}

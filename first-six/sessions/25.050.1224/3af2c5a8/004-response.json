@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule scales the input grid by a factor of 2 in both dimensions.\nIt replicates 2x2 squares of the input color (3, green) wherever two pixels were orthogonally adjacent.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows * 2, cols * 2), dtype=int)\n\n    for i in range(rows):\n        for j in range(cols):\n            output_grid[2*i, 2*j] = input_grid[i,j]\n            output_grid[2*i+1, 2*j] = input_grid[i,j]\n            output_grid[2*i, 2*j+1] = input_grid[i,j]\n            output_grid[2*i+1, 2*j+1] = input_grid[i,j]\n    return output_grid.tolist()\n\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3964,
+    "candidates_token_count": 262,
+    "total_token_count": 4226,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 3.386408
+  },
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,43 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies azure L-shaped (3 cells) objects within the grid. For each of those objects, it locates a cell on its top-right corner and colors it in blue. Other cells are kept unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds L-shaped objects of a specified color in the grid.\n    Returns a list of coordinate tuples, each representing an L-shape.  \n    An L shape is defined by these relative coordinates:\n      (0,0) (1,0)\n            (1,1)\n      and rotations.\n    Each coordinate returned contains the \"corner\" of the L.\n    \"\"\"\n    \n    l_shapes = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            # Check for the four possible L-shape orientations\n            if grid[r, c] == color and grid[r + 1, c] == color and grid[r + 1, c + 1] == color:\n                l_shapes.append((r, c))  # Top-left corner\n            if grid[r, c] == color and grid[r, c+1] == color and grid[r+1, c] == color:\n                l_shapes.append((r,c))\n            if grid[r, c+1] == color and grid[r+1, c+1] == color and grid[r+1, c] == color:\n                l_shapes.append((r,c))\n            if grid[r, c] == color and grid[r, c + 1] == color and grid[r + 1, c + 1] == color:\n                l_shapes.append((r, c))  # Top-left corner\n\n    return l_shapes\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Find azure L-shapes, and change the color of cell adjacent to its top-right to blue.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    l_shapes = find_l_shapes(input_grid, 8)\n\n    for r, c in l_shapes:\n      # determine the orientation and find the top-right corner\n      if input_grid[r,c] == 8 and input_grid[r+1,c] == 8 and input_grid[r+1,c+1] == 8: # original orientation\n        # change top-right cell to blue if it is white\n        if r < input_grid.shape[0] -1 and c < input_grid.shape[1] -2 and input_grid[r,c+2] == 0:\n          output_grid[r,c+2] = 1\n      if input_grid[r,c] == 8 and input_grid[r,c+1] == 8 and input_grid[r+1,c] == 8: # 90 degree\n        if r > 0  and c < input_grid.shape[1] -1 and input_grid[r-1,c] == 0:\n          output_grid[r-1,c] = 1\n\n      if input_grid[r,c+1] == 8 and input_grid[r+1,c] == 8 and input_grid[r+1,c+1] == 8: #270 degree\n        if r < input_grid.shape[0] -1 and c >0 and input_grid[r+1,c-1] == 0:\n          output_grid[r+1,c-1] = 1\n      if input_grid[r,c] == 8 and input_grid[r,c+1] == 8 and input_grid[r+1,c+1] == 8: # 180 degree\n        if c < input_grid.shape[1] - 1 and r < input_grid.shape[0] -2 and input_grid[r+2,c+1] == 0:\n          output_grid[r+2,c+1] = 1\n      \n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4547,
+    "candidates_token_count": 981,
+    "total_token_count": 5528,
+    "cached_content_token_count": 0
+  },
+  "token_totals": {
+    "prompt": 12335,
+    "candidates": 3034,
+    "total": 15369,
+    "cached": 0
+  },
+  "timing": {
+    "response_time": 0.000305,
+    "total_elapsed": 33.325649,
+    "response_times": [
+      0.000225,
+      0.00021,
+      0.000314,
+      0.000305
+    ]
+  },
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,35 @@
+input_grid:
+  size: 10x10
+  objects:
+    - color: 8 (azure)
+      shape: scattered single cells
+      notes: Acts as a boundary for the green expansion.
+    - color: 0 (white)
+      shape: background
+      notes: Fills most of the empty space.
+    - color: 2 (red)
+      shape: single cells, 1x1
+      position: (6,5) and (7,5)
+      notes: remain unchanged.
+    - color: 3 (green)
+      shape: single cells
+      position: (1,1) and (2,1)
+      notes: These will be the agents of transformation.
+
+output_grid:
+  size: 10x10
+  objects:
+    - color: 8 (azure)
+      shape: Same as the input shape
+      notes: this color maintain its input shape
+    - color: 0 (white)
+      shape: background.
+      notes: Fills most of the empty space.
+    - color: 2 (red)
+      shape: single cells, 1x1
+      position: (6,5) and (7,5)
+      notes: Unchanged.
+    - color: 3 (green)
+      shape: horizontal segments
+      position: row 3.
+      notes:  Expands horizontally until it hits an azure (color 8) cell.
