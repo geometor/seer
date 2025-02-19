@@ -11,7 +11,7 @@ class GeminiClient:
     def __init__(self, config: dict, role: str):
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-        role_config = config[role]
+        role_config = config["roles"][role]  # Access roles dictionary
         self.model_name = role_config["model_name"]
 
         with open(role_config["system_context_file"], "r") as f:
@@ -44,3 +44,4 @@ class GeminiClient:
         except Exception as e:
             # TODO: Handle exceptions as needed
             raise e
+
