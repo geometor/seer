@@ -13,8 +13,8 @@ def summarize_session(session_dir, log_error, display_response):
     """
     session_summary = []
 
-    # Iterate through each task directory
-    for task_dir in session_dir.iterdir():
+    # Iterate through each task directory, sorting them by name
+    for task_dir in sorted(session_dir.iterdir()):
         if not task_dir.is_dir():
             # TODO: handle situation
             continue
