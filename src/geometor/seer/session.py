@@ -11,6 +11,8 @@ from pathlib import Path
 from datetime import datetime
 import json
 from rich.markdown import Markdown
+from rich.table import Table
+from rich.console import Console
 from rich import print
 
 
@@ -304,71 +306,126 @@ class Session:
                 self.log_error(f"Error reading or parsing {respfile}: {e}")
         return resplist
 
-    def create_summary_report(self, resplist, task_dir):
-        """Creates a summary report (Markdown and JSON) of token usage, timing, and test results."""
+    def _create_response_table(self, resplist):
+        """Creates a rich.table.Table for the response report."""
+        table = Table(title="Response Report")
+        table.add_column("Response File", style="cyan", no_wrap=True)
+        table.add_column("Prompt Tokens", justify="right")
+        table.add_column("Candidate Tokens", justify="right")
+        table.add_column("Total Tokens", justify="right")
+        table.add_column("Cached Tokens", justify="right")
+        table.add_column("Response Time (s)", justify="right")
+        table.add_column("Total Elapsed (s)", justify="right")
 
-        # --- Response Report ---
-        response_report_md = "# Response Report\n\n"
-        response_report_md += "| Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
-        response_report_md += "|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
-
-        response_report_json = []
         total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         total_response_time = 0
 
-        # Use a copy of resplist and sort it by response_file
-        sorted_resplist = sorted(resplist.copy(), key=lambda x: x.get("response_file", ""))
+        sorted_resplist = sorted(resplist, key=lambda x: x.get("response_file", ""))
 
-        for data in sorted_resplist:  # Iterate over the sorted copy
-            response_report_md += f"| {data.get('response_file', 'N/A')} | {data['token_totals'].get('prompt', 0)} | {data['token_totals'].get('candidates', 0)} | {data['token_totals'].get('total', 0)} | {data['token_totals'].get('cached', 0)} | {data['timing']['response_time']:.4f} | {data['timing']['total_elapsed']:.4f} |\n"
-
-            response_report_json.append({
-                "response_file": data.get("response_file", "N/A"),
-                "token_usage": data["token_totals"],
-                "timing": data["timing"],
-            })
+        for data in sorted_resplist:
+            table.add_row(
+                data.get("response_file", "N/A"),
+                str(data["token_totals"].get("prompt", 0)),
+                str(data["token_totals"].get("candidates", 0)),
+                str(data["token_totals"].get("total", 0)),
+                str(data["token_totals"].get("cached", 0)),
+                f"{data['timing']['response_time']:.4f}",
+                f"{data['timing']['total_elapsed']:.4f}",
+            )
 
             for key in total_tokens:
                 total_tokens[key] += data["token_totals"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
 
-        response_report_md += (
-            f"| **Total**     | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
+        # Add a summary row
+        table.add_row(
+            "Total",
+            str(total_tokens["prompt"]),
+            str(total_tokens["candidates"]),
+            str(total_tokens["total"]),
+            str(total_tokens["cached"]),
+            f"{total_response_time:.4f}",
+            "",
+            style="bold",
         )
+        return table
+
+    def _create_test_table(self, grouped_test_results):
+        """Creates a rich.table.Table for the test report."""
+        tables = {}
+        for file_index, test_results in grouped_test_results.items():
+            table = Table(title=f"Code File: {file_index}")
+            table.add_column("Example", style="cyan")
+            table.add_column("Status")
+            table.add_column("size")
+            table.add_column("palette")
+            table.add_column("color count")
+            table.add_column("diff pixels")
+
+            for result in test_results:
+                if "example" in result:
+                    table.add_row(
+                        result["example"],
+                        result["status"],
+                        result.get("size_correct", "N/A"),
+                        result.get("color_palette_correct", "N/A"),
+                        result.get("correct_pixel_counts", "N/A"),
+                        result.get("pixels_off", "N/A"),
+                    )
+                elif "captured_output" in result:
+                    table.add_row("Captured Output", result["captured_output"])
+                elif "code_execution_error" in result:
+                    table.add_row("Code Execution Error", result["code_execution_error"])
+            tables[file_index] = table
+        return tables
+
+    def create_summary_report(self, resplist, task_dir):
+        """Creates a summary report (Markdown and JSON) using rich.table.Table."""
+
+        # --- Response Report ---
+        response_table = self._create_response_table(resplist)
 
         # --- Test Report ---
-        test_report_md = "# Test Report\n\n"
-        test_report_json = {}
-
-        # Collect and group test results by code file, sorting the files
         grouped_test_results = {}
-        for py_file in sorted(task_dir.glob("*-py_*.json")):  # Sort here
+        for py_file in sorted(task_dir.glob("*-py_*.json")):
             try:
                 with open(py_file, "r") as f:
                     test_results = json.load(f)
-                    # Extract the file index from the filename (e.g., "002" from "002-py_01.json")
                     file_index = py_file.stem.split("-")[0]
                     grouped_test_results[file_index] = test_results
             except Exception as e:
                 print(f"Failed to load test results from {py_file}: {e}")
                 self.log_error(f"Failed to load test results from {py_file}: {e}")
 
-        # Sort the grouped test results by file index
         sorted_grouped_test_results = dict(sorted(grouped_test_results.items()))
+        test_tables = self._create_test_table(sorted_grouped_test_results)
 
-        # Create Markdown table
-        for file_index, test_results in sorted_grouped_test_results.items():  # Iterate over sorted dictionary
-            test_report_md += f"## Code File: {file_index}\n\n"
-            test_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
-            test_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
+        # --- Combine Reports and Save ---
+        console = Console(record=True)  # Use record=True to capture output
+        console.print(response_table)
+        for table in test_tables.values():
+            console.print(table)
 
+        report_md = console.export_text()  # Export captured output as plain text
+        report_md_file = "summary_report.md"
+        self._write_to_file(report_md_file, report_md)
+
+        # --- JSON Report (Keep as before, but use sorted data) ---
+        response_report_json = []
+        for data in sorted(resplist, key=lambda x: x.get("response_file", "")):
+            response_report_json.append({
+                "response_file": data.get("response_file", "N/A"),
+                "token_usage": data["token_totals"],
+                "timing": data["timing"],
+            })
+
+        test_report_json = {}
+        for file_index, test_results in sorted_grouped_test_results.items():
             test_report_json[file_index] = []
-
             for result in test_results:
                 if "example" in result:
-                    test_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
                     test_report_json[file_index].append(
-                        {  # append to correct file index
+                        {
                             "example": result["example"],
                             "input": result["input"],
                             "expected_output": result["expected_output"],
@@ -385,44 +442,25 @@ class Session:
                         }
                     )
                 elif "captured_output" in result:
-                    test_report_md += f"| Captured Output |  |  |  |  |\n"
-                    test_report_md += f"|---|---|---|---|---|\n"
-                    test_report_md += (
-                        f"|  | ```{result['captured_output']}``` |  |  |  |\n"
-                    )
                     test_report_json[file_index].append(
                         {"captured_output": result["captured_output"]}
                     )
-
                 elif "code_execution_error" in result:
-                    test_report_md += (
-                        f"| Code Execution Error |  |  |  |  |\n"
-                    )
-                    test_report_md += f"|---|---|---|---|---|\n"
-                    test_report_md += (
-                        f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
-                    )
                     test_report_json[file_index].append(
                         {"code_execution_error": result["code_execution_error"]}
                     )
 
-            test_report_md += "\n"
-
-        # --- Combine Reports and Save ---
-        report_md = response_report_md + test_report_md
-        report_json = {"response_report": response_report_json, "test_report": test_report_json}
-
-        report_md_file = "summary_report.md"
+        report_json = {
+            "response_report": response_report_json,
+            "test_report": test_report_json,
+        }
         report_json_file = "summary_report.json"
-
-        self._write_to_file(report_md_file, report_md)
-        # Corrected line: Use _write_to_file for JSON too
         self._write_to_file(report_json_file, json.dumps(report_json, indent=2))
 
         # Display report
         self.display_response(
             [report_md], 0, "Task Summary", {}
-        )  # prompt_count=0, as this isn't a regular prompt/response
+        )  # prompt_count=0
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
@@ -434,6 +472,84 @@ class Session:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
 
+
+    def _create_session_response_table(self, session_response_report_json):
+        """Creates a rich table for the session-level response summary."""
+        table = Table(title="Session Response Summary")
+        table.add_column("Task ID", style="cyan", no_wrap=True)
+        table.add_column("Response File", style="cyan", no_wrap=True)
+        table.add_column("Prompt Tokens", justify="right")
+        table.add_column("Candidate Tokens", justify="right")
+        table.add_column("Total Tokens", justify="right")
+        table.add_column("Cached Tokens", justify="right")
+        table.add_column("Response Time (s)", justify="right")
+        table.add_column("Total Elapsed (s)", justify="right")
+
+        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        total_response_time = 0
+
+        for response in session_response_report_json:
+            task_id = response.get("response_file", "N/A").split("-")[0]
+            table.add_row(
+                task_id,
+                response.get("response_file", "N/A"),
+                str(response["token_usage"].get("prompt", 0)),
+                str(response["token_usage"].get("candidates", 0)),
+                str(response["token_usage"].get("total", 0)),
+                str(response["token_usage"].get("cached", 0)),
+                f"{response['timing']['response_time']:.4f}",
+                f"{response['timing']['total_elapsed']:.4f}",
+            )
+            for key in total_tokens:
+                total_tokens[key] += response["token_usage"].get(key, 0)
+            total_response_time += response["timing"]["response_time"]
+
+        table.add_row(
+            "Total",
+            "",
+            str(total_tokens["prompt"]),
+            str(total_tokens["candidates"]),
+            str(total_tokens["total"]),
+            str(total_tokens["cached"]),
+            f"{total_response_time:.4f}",
+            "",
+            style="bold",
+        )
+        return table
+
+    def _create_session_test_table(self, session_test_report_json):
+        """Creates rich tables for the session-level test summary."""
+        all_tables = {}
+        for task_id, test_report in session_test_report_json.items():
+            task_tables = {}
+            for file_index, file_results in test_report.items():
+                table = Table(title=f"Task: {task_id}, Code File: {file_index}")
+                table.add_column("Example", style="cyan")
+                table.add_column("Status")
+                table.add_column("size")
+                table.add_column("palette")
+                table.add_column("color count")
+                table.add_column("diff pixels")
+
+                for result in file_results:
+                    if "example" in result:
+                        table.add_row(
+                            result["example"],
+                            result["status"],
+                            result.get("size_correct", "N/A"),
+                            result.get("color_palette_correct", "N/A"),
+                            result.get("correct_pixel_counts", "N/A"),
+                            result.get("pixels_off", "N/A"),
+                        )
+                    elif "captured_output" in result:
+                        table.add_row("Captured Output", result["captured_output"])
+                    elif "code_execution_error" in result:
+                        table.add_row(
+                            "Code Execution Error", result["code_execution_error"]
+                        )
+                task_tables[file_index] = table
+            all_tables[task_id] = task_tables
+        return all_tables
 
     def create_session_summary_report(self):
         """
@@ -463,77 +579,41 @@ class Session:
                         print(
                             f"Error reading or parsing {summary_report_json_path}: {e}"
                         )
-                        self.session.log_error(
+                        self.log_error(
                             f"Error reading or parsing {summary_report_json_path}: {e}"
                         )
 
-        # Combine into a session-level report
+        # --- Create Markdown Report ---
+        # Response Report
+        response_table = self._create_session_response_table(
+            session_response_report_json
+        )
+
+        # Test Report
+        test_tables = self._create_session_test_table(session_test_report_json)
+
+        # Combine and output using Console
+        console = Console(record=True)
+        console.print(response_table)
+        for task_tables in test_tables.values():
+            for table in task_tables.values():
+                console.print(table)
+
+        session_summary_report_md = console.export_text()
+        session_summary_report_md_file = "session_summary_report.md"
+        self._write_to_file_session(
+            session_summary_report_md_file, session_summary_report_md
+        )
+
+        # --- JSON report (keep structure) ---
         session_summary_report = {
             "response_report": session_response_report_json,
             "test_report": session_test_report_json,
         }
-
-        # Write the session summary report to the session directory
         session_summary_report_json_file = "session_summary_report.json"
-        self._write_to_file_session(  # Use the session-level writing method
+        self._write_to_file_session(
             session_summary_report_json_file,
             json.dumps(session_summary_report, indent=2),
-        )
-
-        # --- Create Markdown Report ---
-        session_summary_report_md = "# Session Summary Report\n\n"
-
-        # Response Report
-        session_summary_report_md += "## Response Summary\n\n"
-        session_summary_report_md += "| Task ID | Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
-        session_summary_report_md += "|-------|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
-
-        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
-        total_response_time = 0
-
-        for response in session_response_report_json:
-            task_id = response.get("response_file", "N/A").split("-")[0]
-            session_summary_report_md += f"| {task_id} | {response.get('response_file', 'N/A')} | {response['token_usage'].get('prompt', 0)} | {response['token_usage'].get('candidates', 0)} | {response['token_usage'].get('total', 0)} | {response['token_usage'].get('cached', 0)} | {response['timing']['response_time']:.4f} | {response['timing']['total_elapsed']:.4f} |\n"
-
-            for key in total_tokens:
-                total_tokens[key] += response["token_usage"].get(key, 0)
-            total_response_time += response["timing"]["response_time"]
-
-        session_summary_report_md += f"| **Total** | | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
-
-        # Test Report - More complex due to nested structure
-        session_summary_report_md += "## Test Summary\n\n"
-        for task_id, test_report in session_test_report_json.items():
-            session_summary_report_md += f"### Task: {task_id}\n\n"
-            for file_index, file_results in test_report.items():
-                session_summary_report_md += f"#### Code File: {file_index}\n\n"
-                session_summary_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
-                session_summary_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
-                for result in file_results:
-                    if "example" in result:
-                        session_summary_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
-                    elif "captured_output" in result:
-                        session_summary_report_md += (
-                            f"| Captured Output |  |  |  |  |\n"
-                        )
-                        session_summary_report_md += f"|---|---|---|---|---|\n"
-                        session_summary_report_md += (
-                            f"|  | ```{result['captured_output']}``` |  |  |  |\n"
-                        )
-                    elif "code_execution_error" in result:
-                        session_summary_report_md += (
-                            f"| Code Execution Error |  |  |  |  |\n"
-                        )
-                        session_summary_report_md += f"|---|---|---|---|---|\n"
-                        session_summary_report_md += (
-                            f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
-                        )
-                session_summary_report_md += "\n"
-
-        # Write the session summary report (Markdown) to the session directory
-        session_summary_report_md_file = "session_summary_report.md"
-        self._write_to_file_session(
-            session_summary_report_md_file, session_summary_report_md
         )
 
         # Display report
@@ -555,4 +635,4 @@ class Session:
                 f.write(content)
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
-            self.session.log_error(f"Error writing to file {file_name}: {e}")
+            self.log_error(f"Error writing to file {file_name}: {e}")
