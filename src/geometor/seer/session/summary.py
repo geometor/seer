@@ -27,8 +27,11 @@ def summarize_session(session_dir, log_error, display_response):
                         task_total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
                         task_total_response_time = 0
                         for response in task_summary.get("response_report", []):
-                            for key in task_total_tokens:
-                                task_total_tokens[key] += response["token_usage"].get(key, 0)
+                            # Correctly use the individual response's usage_metadata
+                            task_total_tokens["prompt"] += response["token_usage"].get("prompt", 0)
+                            task_total_tokens["candidates"] += response["token_usage"].get("candidates", 0)
+                            task_total_tokens["total"] += response["token_usage"].get("total", 0)
+                            task_total_tokens["cached"] += response["token_usage"].get("cached", 0)
                             task_total_response_time += response["timing"]["response_time"]
 
                         # Aggregate data into a single dictionary
@@ -148,8 +151,13 @@ def summarize_task(task_dir, log_error):
     for data in sorted(resplist, key=lambda x: x.get("response_file", "")):
         response_report_json.append({
             "response_file": data.get("response_file", "N/A"),
-            "token_usage": data["token_totals"],
-            "timing": data["timing"],
+            "token_usage": {
+                "prompt": data["usage_metadata"].get("prompt_token_count", 0),
+                "candidates": data["usage_metadata"].get("candidates_token_count", 0),
+                "total": data["usage_metadata"].get("total_token_count", 0),
+                "cached": data["usage_metadata"].get("cached_token_count", 0)
+            },
+            "timing": data["timing"]
         })
 
     test_report_json = {}
@@ -213,9 +221,9 @@ def _create_response_table(resplist):
     table.add_column("cached", justify="right")
     table.add_column("total", justify="right")
     table.add_column("Time (s)", justify="right")
-    table.add_column("Elapsed (s)", justify="right")
+    # Removed "Elapsed (s)"
 
-    total_tokens = {"prompt_total_tokens": 0, "candidates_total_tokens": 0, "total_total_tokens": 0, "cached_total_tokens": 0}
+    total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
     total_response_time = 0
 
     sorted_resplist = sorted(resplist, key=lambda x: x.get("response_file", ""))
@@ -228,22 +236,24 @@ def _create_response_table(resplist):
             str(data["usage_metadata"].get("cached_token_count", 0)),
             str(data["usage_metadata"].get("total_token_count", 0)),
             f"{data['timing']['response_time']:.4f}",
-            f"{data['timing']['total_elapsed']:.4f}",
+            # Removed "Elapsed (s)"
         )
 
-        for key in total_tokens:
-            total_tokens[key] += data["usage_metadata"].get(key, 0)
+        total_tokens["prompt"] += data["usage_metadata"].get("prompt_token_count", 0)
+        total_tokens["candidates"] += data["usage_metadata"].get("candidates_token_count", 0)
+        total_tokens["total"] += data["usage_metadata"].get("total_token_count", 0)
+        total_tokens["cached"] += data["usage_metadata"].get("cached_token_count", 0)
         total_response_time += data["timing"]["response_time"]
 
     # Add a summary row
     table.add_row(
         "TOTAL",
-        str(total_tokens["prompt_total_tokens"]),
-        str(total_tokens["candidates_total_tokens"]),
-        str(total_tokens["cached_total_tokens"]),
-        str(total_tokens["total_total_tokens"]),
+        str(total_tokens["prompt"]),
+        str(total_tokens["candidates"]),
+        str(total_tokens["cached"]),
+        str(total_tokens["total"]),
         f"{total_response_time:.4f}",
-        "",
+        "",  # Removed "Elapsed (s)"
         style="bold",
     )
     return table

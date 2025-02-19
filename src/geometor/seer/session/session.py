@@ -347,4 +347,5 @@ class Session:
         """Runs all tasks in the session."""
         for task in self.tasks:
             self.run_task(task)
-        summarize_session(self.session_dir, self.session.log_error, self.session.display_response)
+        summarize_session(self.session_dir, self.log_error, self.display_response)
+
