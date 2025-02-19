@@ -190,6 +190,7 @@ class Session:
         response_times: list,
         start_time,
         description,
+        elapsed_time,
     ):
         # Unpack the response and write elements to a markdown file
         response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
@@ -205,7 +206,7 @@ class Session:
             self.log_error(f"Error writing response Markdown to file: {e}")
 
         # Call display_response here
-        self.display_response(response_parts, prompt_count, description, response.to_dict())
+        self.display_response(response_parts, prompt_count, description, response.to_dict(), elapsed_time)
 
     def log_error(self, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -241,6 +242,7 @@ class Session:
         prompt_count: int,
         description: str,
         respdict: dict,
+        elapsed_time: float,
     ):
         """Displays the response using rich.markdown.Markdown."""
         banner = self._format_banner(prompt_count, description)  # Use the banner
@@ -263,10 +265,11 @@ class Session:
             markdown_text += json.dumps(timing, indent=2)
             markdown_text += "\n```\n"
             # Add elapsed time display here:
-            total_elapsed_time = timing.get("total_elapsed")
-            if total_elapsed_time is not None:
-                markdown_text += f"\n**Total Elapsed Time:** {total_elapsed_time:.4f} seconds\n"
-
+            #  total_elapsed_time = timing.get("total_elapsed") # REMOVE
+            #  if total_elapsed_time is not None: # REMOVE
+            #      markdown_text += f"\n**Total Elapsed Time:** {total_elapsed_time:.4f} seconds\n" # REMOVE
+        # Use elapsed_time directly
+        markdown_text += f"\n**Total Elapsed Time:** {elapsed_time:.4f} seconds\n"
 
         markdown = Markdown(markdown_text)
         print()

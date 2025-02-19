@@ -103,7 +103,7 @@ class Seer:
                 prompt.append("\n")
 
             instructions = [self.nlp_instructions]
-            response_parts, _ = self._generate( # Receive and discard elapsed_time
+            response_parts, elapsed_time = self._generate(
                 "dreamer",
                 history,
                 prompt,
@@ -122,7 +122,7 @@ class Seer:
                 )
             ]
             prompt = [""]
-            response_parts, _ = self._generate(  # Use coder_client, Receive and discard elapsed_time
+            response_parts, elapsed_time = self._generate(
                 "coder",
                 history,
                 prompt,
@@ -208,9 +208,10 @@ class Seer:
             self.response_times,
             self.start_time,
             description=description,
+            elapsed_time=elapsed_time, # Pass elapsed time
         )
 
-        return response_parts, elapsed_time # Return elapsed time
+        return response_parts, elapsed_time
 
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
