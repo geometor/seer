@@ -103,7 +103,7 @@ class Seer:
                 prompt.append("\n")
 
             instructions = [self.nlp_instructions]
-            response = self._generate(
+            response_parts, _ = self._generate( # Receive and discard elapsed_time
                 "dreamer",
                 history,
                 prompt,
@@ -112,7 +112,7 @@ class Seer:
                 description=f"example_{i} - NLP",
             )
             history.extend(prompt)
-            history.extend(response)
+            history.extend(response_parts)
 
             # coder prompt
             instructions = [
@@ -122,7 +122,7 @@ class Seer:
                 )
             ]
             prompt = [""]
-            response = self._generate(  # Use coder_client
+            response_parts, _ = self._generate(  # Use coder_client, Receive and discard elapsed_time
                 "coder",
                 history,
                 prompt,
@@ -131,7 +131,7 @@ class Seer:
                 description=f"example_{i} - CODE",
             )
             history.extend(prompt)
-            history.extend(response)
+            history.extend(response_parts)
 
     def _review_programs(self, instructions):
         """
@@ -160,6 +160,7 @@ class Seer:
         """
         Generate content from the model with standardized logging and function call handling.
         Now accepts role_name instead of client object.
+        Returns elapsed time.
         """
         self.prompt_count += 1
 
@@ -178,10 +179,14 @@ class Seer:
         )
 
         client = self.roles[role_name]  # Look up the client
+        start_time = datetime.now()  # Record start time
         response = client.generate_content(
             total_prompt,
             tools=tools,
         )
+        end_time = datetime.now()  # Record end time
+        elapsed_time = (end_time - start_time).total_seconds()
+
 
         self.session.log_response_json(
             response,
@@ -205,7 +210,7 @@ class Seer:
             description=description,
         )
 
-        return response_parts
+        return response_parts, elapsed_time # Return elapsed time
 
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
