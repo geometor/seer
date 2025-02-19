@@ -367,10 +367,10 @@ class Session:
                     table.add_row(
                         result["example"],
                         result["status"],
-                        result.get("size_correct", "N/A"),
-                        result.get("color_palette_correct", "N/A"),
-                        result.get("correct_pixel_counts", "N/A"),
-                        result.get("pixels_off", "N/A"),
+                        str(result.get("size_correct", "N/A")),
+                        str(result.get("color_palette_correct", "N/A")),
+                        str(result.get("correct_pixel_counts", "N/A")),
+                        str(result.get("pixels_off", "N/A")),
                     )
                 elif "captured_output" in result:
                     table.add_row("Captured Output", result["captured_output"])
@@ -536,10 +536,10 @@ class Session:
                         table.add_row(
                             result["example"],
                             result["status"],
-                            result.get("size_correct", "N/A"),
-                            result.get("color_palette_correct", "N/A"),
-                            result.get("correct_pixel_counts", "N/A"),
-                            result.get("pixels_off", "N/A"),
+                            str(result.get("size_correct", "N/A")),  # Convert to string
+                            str(result.get("color_palette_correct", "N/A")),  # Convert to string
+                            str(result.get("correct_pixel_counts", "N/A")),  # Convert to string
+                            str(result.get("pixels_off", "N/A")),  # Convert to string
                         )
                     elif "captured_output" in result:
                         table.add_row("Captured Output", result["captured_output"])
