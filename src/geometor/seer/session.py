@@ -134,10 +134,9 @@ class Session:
             print(f"Error writing total prompt to file: {e}")
             self.log_error(f"Error writing total prompt to file: {e}")
 
-    def log_response(
+    def log_response_json(
         self,
         response,
-        response_parts,
         prompt_count: int,
         token_counts: dict,
         response_times: list,
@@ -176,6 +175,16 @@ class Session:
             print(f"Error writing response JSON to file: {e}")
             self.log_error(f"Error writing response JSON to file: {e}")
 
+    def log_response_md(
+        self,
+        response,
+        response_parts,
+        prompt_count: int,
+        token_counts: dict,
+        response_times: list,
+        start_time,
+        description
+    ):
         # Unpack the response and write elements to a markdown file
         response_md_file = self.task_dir / f"{prompt_count:03d}-response.md"
         banner = self._format_banner(prompt_count, description)
@@ -185,6 +194,17 @@ class Session:
             f.write("---\n")
             f.write("\n".join(response_parts))
 
+
+        #TODO: refactor with log_response_json
+        # Prepare the response data dictionary
+        response_data = response.to_dict()
+        #  response_data["token_totals"] = token_counts.copy()
+        #  response_data["timing"] = {
+            #  "response_time": response_times,
+            #  "total_elapsed": total_elapsed,
+            #  "response_times": response_times.copy(),
+        #  }
+        #  response_data["response_file"] = str(response_file.name)  # Add filename for report
         # Call display_response here
         self.display_response(response_parts, prompt_count, description, response_data)
 
@@ -413,3 +433,126 @@ class Session:
         except (IOError, PermissionError) as e:
             print(f"Error writing to file {file_name}: {e}")
             self.log_error(f"Error writing to file {file_name}: {e}")
+
+
+    def create_session_summary_report(self):
+        """
+        Creates a session-level summary report by aggregating task summary reports.
+        """
+        session_response_report_json = []
+        session_test_report_json = {}
+
+        # Iterate through each task directory
+        for task_dir in self.session_dir.iterdir():
+            if task_dir.is_dir():
+                summary_report_json_path = task_dir / "summary_report.json"
+                if summary_report_json_path.exists():
+                    try:
+                        with open(summary_report_json_path, "r") as f:
+                            task_summary = json.load(f)
+                            # Aggregate response reports
+                            session_response_report_json.extend(
+                                task_summary.get("response_report", [])
+                            )
+                            # Aggregate test reports, keyed by task ID
+                            task_id = task_dir.name
+                            session_test_report_json[task_id] = task_summary.get(
+                                "test_report", {}
+                            )
+                    except (IOError, json.JSONDecodeError) as e:
+                        print(
+                            f"Error reading or parsing {summary_report_json_path}: {e}"
+                        )
+                        self.session.log_error(
+                            f"Error reading or parsing {summary_report_json_path}: {e}"
+                        )
+
+        # Combine into a session-level report
+        session_summary_report = {
+            "response_report": session_response_report_json,
+            "test_report": session_test_report_json,
+        }
+
+        # Write the session summary report to the session directory
+        session_summary_report_json_file = "session_summary_report.json"
+        self._write_to_file_session(  # Use the session-level writing method
+            session_summary_report_json_file,
+            json.dumps(session_summary_report, indent=2),
+        )
+
+        # --- Create Markdown Report ---
+        session_summary_report_md = "# Session Summary Report\n\n"
+
+        # Response Report
+        session_summary_report_md += "## Response Summary\n\n"
+        session_summary_report_md += "| Task ID | Response File | Prompt Tokens | Candidate Tokens | Total Tokens | Cached Tokens | Response Time (s) | Total Elapsed (s) |\n"
+        session_summary_report_md += "|-------|---------------|---------------|------------------|--------------|---------------|-------------------|-------------------|\n"
+
+        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        total_response_time = 0
+
+        for response in session_response_report_json:
+            task_id = response.get("response_file", "N/A").split("-")[0]
+            session_summary_report_md += f"| {task_id} | {response.get('response_file', 'N/A')} | {response['token_usage'].get('prompt', 0)} | {response['token_usage'].get('candidates', 0)} | {response['token_usage'].get('total', 0)} | {response['token_usage'].get('cached', 0)} | {response['timing']['response_time']:.4f} | {response['timing']['total_elapsed']:.4f} |\n"
+
+            for key in total_tokens:
+                total_tokens[key] += response["token_usage"].get(key, 0)
+            total_response_time += response["timing"]["response_time"]
+
+        session_summary_report_md += f"| **Total** | | **{total_tokens['prompt']}** | **{total_tokens['candidates']}** | **{total_tokens['total']}** | **{total_tokens['cached']}** | **{total_response_time:.4f}** |  |\n\n"
+
+        # Test Report - More complex due to nested structure
+        session_summary_report_md += "## Test Summary\n\n"
+        for task_id, test_report in session_test_report_json.items():
+            session_summary_report_md += f"### Task: {task_id}\n\n"
+            for file_index, file_results in test_report.items():
+                session_summary_report_md += f"#### Code File: {file_index}\n\n"
+                session_summary_report_md += "| Example | Status | size | palette | color count | diff pixels |\n"
+                session_summary_report_md += "|---------|--------|------|---------|-------------|-------------|\n"
+                for result in file_results:
+                    if "example" in result:
+                        session_summary_report_md += f"| {result['example']} | {result['status']} | {result.get('size_correct', 'N/A')} | {result.get('color_palette_correct', 'N/A')} | {result.get('correct_pixel_counts', 'N/A')} | {result.get('pixels_off', 'N/A')} |\n"
+                    elif "captured_output" in result:
+                        session_summary_report_md += (
+                            f"| Captured Output |  |  |  |  |\n"
+                        )
+                        session_summary_report_md += f"|---|---|---|---|---|\n"
+                        session_summary_report_md += (
+                            f"|  | ```{result['captured_output']}``` |  |  |  |\n"
+                        )
+                    elif "code_execution_error" in result:
+                        session_summary_report_md += (
+                            f"| Code Execution Error |  |  |  |  |\n"
+                        )
+                        session_summary_report_md += f"|---|---|---|---|---|\n"
+                        session_summary_report_md += (
+                            f"|  | ```{result['code_execution_error']}``` |  |  |  |\n"
+                        )
+                session_summary_report_md += "\n"
+
+        # Write the session summary report (Markdown) to the session directory
+        session_summary_report_md_file = "session_summary_report.md"
+        self._write_to_file_session(
+            session_summary_report_md_file, session_summary_report_md
+        )
+
+        # Display report
+        self.display_response(
+            [session_summary_report_md],
+            0,
+            "Session Summary",
+            {},
+        )
+
+    def _write_to_file_session(self, file_name, content):
+        """
+        Writes content to a file in the session directory.
+        Distinct from _write_to_file, which writes to task directory.
+        """
+        file_path = self.session_dir / file_name
+        try:
+            with open(file_path, "w") as f:
+                f.write(content)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to file {file_name}: {e}")
+            self.session.log_error(f"Error writing to file {file_name}: {e}")
