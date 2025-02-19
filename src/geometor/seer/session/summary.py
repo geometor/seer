@@ -42,14 +42,30 @@ def summarize_session(session_dir, log_error, display_response):
                     task_total_response_time += response["timing"]["response_time"]
                     task_total_elapsed_time += response["timing"].get("total_elapsed", 0)  # Sum elapsed times
 
+                # --- Best Test Score ---
+                best_test_score = "N/A"  # Default if no tests
+                test_report = task_summary.get("test_report", {})
+                if test_report:
+                    max_passed = 0
+                    total_tests = 0
+                    for file_results in test_report.values():
+                        passed_count = sum(
+                            1 for res in file_results if res.get("status") == "pass"
+                        )
+                        total_tests = len(file_results)  # all results in file have same len
+                        max_passed = max(max_passed, passed_count)
+                    if total_tests > 0:  # Avoid division by zero
+                        best_test_score = f"{max_passed}/{total_tests}"
+
                 # Aggregate data into a single dictionary
                 session_summary.append(
                     {
                         "task_id": task_id,
                         "total_tokens": task_total_tokens,
                         "total_response_time": task_total_response_time,
-                        "total_elapsed_time": task_total_elapsed_time, # Add to session summary
-                        "test_report": task_summary.get("test_report", {}),  # Keep test report for drill-down if needed
+                        "total_elapsed_time": task_total_elapsed_time,
+                        "test_report": task_summary.get("test_report", {}),  # Keep test report
+                        "best_test_score": best_test_score, # Add to session summary
                     }
                 )
         except (IOError, json.JSONDecodeError) as e:
@@ -93,7 +109,8 @@ def _create_session_summary_table(session_summary):
     table.add_column("total", justify="right")
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
-    table.add_column("Elapsed (s)", justify="right") # Add elapsed time column
+    table.add_column("Elapsed (s)", justify="right")
+    table.add_column("Test Score", justify="center")  # Add test score column
 
     for task_summary in session_summary:
         table.add_row(
@@ -103,7 +120,8 @@ def _create_session_summary_table(session_summary):
             str(task_summary["total_tokens"]["total"]),
             str(task_summary["total_tokens"]["cached"]),
             f"{task_summary['total_response_time']:.4f}",
-            f"{task_summary['total_elapsed_time']:.4f}",  # Display elapsed time
+            f"{task_summary['total_elapsed_time']:.4f}",
+            task_summary["best_test_score"],  # Display best test score
         )
     return table
 
