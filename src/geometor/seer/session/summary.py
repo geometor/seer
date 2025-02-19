@@ -84,14 +84,14 @@ def create_session_summary_report(session_dir, log_error, display_response):
 def _create_session_response_table(session_response_report_json):
     """Creates a rich table for the session-level response summary."""
     table = Table(title="Session Response Summary")
-    table.add_column("Task ID", style="cyan", no_wrap=True)
-    table.add_column("Response File", style="cyan", no_wrap=True)
-    table.add_column("Prompt Tokens", justify="right")
-    table.add_column("Candidate Tokens", justify="right")
-    table.add_column("Total Tokens", justify="right")
-    table.add_column("Cached Tokens", justify="right")
-    table.add_column("Response Time (s)", justify="right")
-    table.add_column("Total Elapsed (s)", justify="right")
+    table.add_column("Task", style="cyan", no_wrap=True)
+    table.add_column("File", style="cyan", no_wrap=True)
+    table.add_column("Prompt", justify="right")
+    table.add_column("Candidate", justify="right")
+    table.add_column("Total", justify="right")
+    table.add_column("Cached", justify="right")
+    table.add_column("Resp Time", justify="right")
+    table.add_column("Elapsed", justify="right")
 
     total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
     total_response_time = 0
@@ -134,11 +134,11 @@ def _create_session_test_table(session_test_report_json):
         for file_index, file_results in test_report.items():
             table = Table(title=f"Task: {task_id}, Code File: {file_index}")
             table.add_column("Example", style="cyan")
-            table.add_column("Status")
+            table.add_column("Stat")
             table.add_column("size")
             table.add_column("palette")
-            table.add_column("color count")
-            table.add_column("diff pixels")
+            table.add_column("colors")
+            table.add_column("diff")
 
             for result in file_results:
                 if "example" in result:
