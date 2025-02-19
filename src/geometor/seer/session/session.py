@@ -367,8 +367,8 @@ class Session:
             for result in test_results:
                 if "example" in result:
                     table.add_row(
-                        result["example"],
-                        result["status"],
+                        str(result["example"]),
+                        str(result["status"]),
                         str(result.get("size_correct", "N/A")),
                         str(result.get("color_palette_correct", "N/A")),
                         str(result.get("correct_pixel_counts", "N/A")),
@@ -478,4 +478,3 @@ class Session:
     # Removed: _create_session_test_table
     # Removed: create_session_summary_report
     # Removed: _write_to_file_session
-
