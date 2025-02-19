@@ -11,7 +11,7 @@ def summarize_session(session_dir, log_error, display_response):
     """
     Creates a session-level summary report by aggregating task summary reports.
     """
-    session_summary_data = []
+    session_summary = []
 
     # Iterate through each task directory
     for task_dir in session_dir.iterdir():
@@ -32,7 +32,7 @@ def summarize_session(session_dir, log_error, display_response):
                             task_total_response_time += response["timing"]["response_time"]
 
                         # Aggregate data into a single dictionary
-                        session_summary_data.append(
+                        session_summary.append(
                             {
                                 "task_id": task_id,
                                 "total_tokens": task_total_tokens,
@@ -48,7 +48,7 @@ def summarize_session(session_dir, log_error, display_response):
                         f"Error reading or parsing {summary_report_json_path}: {e}"
                     )
 
-    summary_table = _create_session_summary_table(session_summary_data)
+    summary_table = _create_session_summary_table(session_summary)
 
     console = Console(record=True)
     console.print(Markdown("# Session Summary"))
@@ -62,7 +62,7 @@ def summarize_session(session_dir, log_error, display_response):
 
     # --- JSON report ---
     session_summary_report = {
-        "summary_data": session_summary_data,  # Use the aggregated data
+        "summary": session_summary,  # Use the aggregated data
     }
     session_summary_report_json_file = "session_summary_report.json"
     _write_to_file_session(
@@ -72,7 +72,7 @@ def summarize_session(session_dir, log_error, display_response):
     )
 
 
-def _create_session_summary_table(session_summary_data):
+def _create_session_summary_table(session_summary):
     """Creates a rich table for the session-level summary."""
     table = Table(title="Session Summary")
     table.add_column("task", style="cyan", no_wrap=True)
@@ -82,14 +82,14 @@ def _create_session_summary_table(session_summary_data):
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
 
-    for task_data in session_summary_
+    for task_summary in session_summary:
         table.add_row(
-            task_data["task_id"],
-            str(task_data["total_tokens"]["prompt"]),
-            str(task_data["total_tokens"]["candidates"]),
-            str(task_data["total_tokens"]["total"]),
-            str(task_data["total_tokens"]["cached"]),
-            f"{task_data['total_response_time']:.4f}",
+            task_summary["task_id"],
+            str(task_summary["total_tokens"]["prompt"]),
+            str(task_summary["total_tokens"]["candidates"]),
+            str(task_summary["total_tokens"]["total"]),
+            str(task_summary["total_tokens"]["cached"]),
+            f"{task_summary['total_response_time']:.4f}",
         )
     return table
 
@@ -113,7 +113,7 @@ def summarize_task(task_dir, log_error):
     """Creates a summary report (Markdown and JSON) using rich.table.Table."""
 
     # Gather response data and create summary report
-    resplist = gather_response_data(task_dir, log_error)
+    resplist = gather_response(task_dir, log_error)
 
     # Response Report
     response_table = _create_response_table(resplist)
@@ -190,7 +190,7 @@ def summarize_task(task_dir, log_error):
     report_json_file = "summary_report.json"
     _write_to_file_task(task_dir, report_json_file, json.dumps(report_json, indent=2))
 
-def gather_response_data(task_dir, log_error):
+def gather_response(task_dir, log_error):
     """Gathers data from all response.json files in the task directory."""
     resplist = []
     for respfile in task_dir.glob("*-response.json"):
