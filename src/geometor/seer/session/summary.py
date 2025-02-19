@@ -294,13 +294,20 @@ def _create_test_table(grouped_test_results):
 
         for result in test_results:
             if "example" in result:
+                # --- Emoji Logic ---
+                status = "✅" if result.get("status") == "pass" else "❌"
+                size_correct = "✅" if result.get("size_correct") is True else "❌" if result.get("size_correct") is False else "N/A"
+                palette_correct = "✅" if result.get("color_palette_correct") is True else "❌" if result.get("color_palette_correct") is False else "N/A"
+                color_count_correct = "✅" if result.get("correct_pixel_counts") is True else "❌" if result.get("correct_pixel_counts") is False else "N/A"
+                pixels_off = str(result.get("pixels_off", "N/A"))
+
                 table.add_row(
                     str(result["example"]),
-                    str(result["status"]),
-                    str(result.get("size_correct", "N/A")),
-                    str(result.get("color_palette_correct", "N/A")),
-                    str(result.get("correct_pixel_counts", "N/A")),
-                    str(result.get("pixels_off", "N/A")),
+                    status,
+                    size_correct,
+                    palette_correct,
+                    color_count_correct,
+                    pixels_off,
                 )
             elif "captured_output" in result:
                 table.add_row("Captured Output", result["captured_output"])
