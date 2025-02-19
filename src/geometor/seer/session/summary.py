@@ -143,18 +143,18 @@ def _create_session_test_table(session_test_report_json):
             for result in file_results:
                 if "example" in result:
                     table.add_row(
-                        result["example"],
-                        result["status"],
-                        str(result.get("size_correct", "N/A")),  # Convert to string
-                        str(result.get("color_palette_correct", "N/A")),  # Convert to string
-                        str(result.get("correct_pixel_counts", "N/A")),  # Convert to string
-                        str(result.get("pixels_off", "N/A")),  # Convert to string
+                        str(result["example"]),
+                        str(result["status"]),
+                        str(result.get("size_correct", "N/A")),
+                        str(result.get("color_palette_correct", "N/A")),
+                        str(result.get("correct_pixel_counts", "N/A")),
+                        str(result.get("pixels_off", "N/A")),
                     )
                 elif "captured_output" in result:
-                    table.add_row("Captured Output", result["captured_output"])
+                    table.add_row("Captured Output", str(result["captured_output"]))
                 elif "code_execution_error" in result:
                     table.add_row(
-                        "Code Execution Error", result["code_execution_error"]
+                        "Code Execution Error", str(result["code_execution_error"])
                     )
             task_tables[file_index] = table
         all_tables[task_id] = task_tables
