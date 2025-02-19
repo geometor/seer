@@ -82,13 +82,13 @@ def _create_session_summary_table(session_summary_data):
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
 
-    for task_data in session_summary_data:
+    for task_data in session_summary_
         table.add_row(
             task_data["task_id"],
-            str(task_data["token_usage"]["prompt"]),
-            str(task_data["token_usage"]["candidates"]),
-            str(task_data["token_usage"]["total"]),
-            str(task_data["token_usage"]["cached"]),
+            str(task_data["total_tokens"]["prompt"]),
+            str(task_data["total_tokens"]["candidates"]),
+            str(task_data["total_tokens"]["total"]),
+            str(task_data["total_tokens"]["cached"]),
             f"{task_data['total_response_time']:.4f}",
         )
     return table
