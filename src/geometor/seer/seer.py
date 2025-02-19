@@ -220,7 +220,9 @@ class Seer:
                         #  response_parts.append("\n*text:*\n")
                         response_parts.append(part.text + "\n")
                         # Check for triple backticks and write to file
-                        self._write_extracted_content(part.text)
+                        self.session._write_extracted_content(
+                            part.text, self.prompt_count, self.extracted_file_counts, self.task
+                        )  # Use session method
 
                     if part.executable_code:
                         response_parts.append("\n*code_execution:*\n")
@@ -229,7 +231,7 @@ class Seer:
                         code_file_path = (
                             self.session.task_dir / f"{self.prompt_count:03d}-code.py"
                         )
-                        self._write_to_file(code_file_path, code)
+                        self.session._write_to_file(code_file_path, code) # Use session method
 
                         # Call _test_code and extend response_parts
                         test_results = self.verifier.test_code(
@@ -243,9 +245,9 @@ class Seer:
                         output = part.code_execution_result.output
                         response_parts.append(f"outcome: {outcome}\n")
                         response_parts.append(f"```\n{output}\n```\n")
-                        self._write_to_file(
+                        self.session._write_to_file(
                             f"{self.prompt_count:03d}-code_result.txt", output
-                        )
+                        ) # Use session method
 
                     if part.function_call:
                         function_call_found = True
@@ -269,42 +271,6 @@ class Seer:
             response_parts.append(error_msg + "\n")
 
         return response_parts, function_call_found, last_result
-
-    def _write_extracted_content(self, text):
-        """Extracts content enclosed in triple backticks and writes it to files."""
-        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
-        for file_type, content in matches:
-            file_type = file_type.lower() if file_type else "txt"
-            if file_type == "python":
-                file_type = "py"  # Correct extension
-            if file_type not in self.extracted_file_counts:
-                file_type = "txt"
-
-            self.extracted_file_counts[file_type] += 1
-            count = self.extracted_file_counts[file_type]
-            file_name = f"{self.prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
-            file_path = self.session.task_dir / file_name
-
-            self._write_to_file(file_name, content)
-
-            # If it's a Python file, also run tests
-            if file_type == "py":
-                test_results = self.verifier.test_code(
-                    content, file_path, self.task
-                )  # Pass task
-                # Write test results to file
-                test_results_file = Path(f"{file_path.stem}.md")
-                self._write_to_file(test_results_file, "".join(test_results))
-
-    def _write_to_file(self, file_name, content):
-        """Writes content to a file in the task directory."""
-        file_path = self.session.task_dir / file_name  # Always use task_dir
-        try:
-            with open(file_path, "w") as f:
-                f.write(content)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing to file {file_name}: {e}")
-            self.session.log_error(f"Error writing to file {file_name}: {e}")
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""

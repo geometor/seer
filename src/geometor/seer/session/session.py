@@ -1,3 +1,4 @@
+# src/geometor/seer/session/session.py
 """
 Manages a session for interacting with the Seer, handling logging, and task execution.
 
@@ -14,6 +15,7 @@ from rich.markdown import Markdown
 from rich.table import Table
 from rich.console import Console
 from rich import print
+import re  # Import the 're' module
 
 from geometor.seer.session.summary import summarize_session, summarize_task
 
@@ -37,8 +39,8 @@ class Session:
         #  Write system and task context to files
         try:
             self._write_context_files(
-                config["dreamer"]["system_context_file"],
-                config["coder"]["system_context_file"],
+                config["roles"]["dreamer"]["system_context_file"],
+                config["roles"]["coder"]["system_context_file"],
                 config["task_context_file"],
             )
         except (FileNotFoundError, IOError, PermissionError) as e:
@@ -295,6 +297,43 @@ class Session:
         print()
         print(markdown)
 
+    def _write_extracted_content(self, text, prompt_count, extracted_file_counts, task):
+        """Extracts content enclosed in triple backticks and writes it to files."""
+        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
+        for file_type, content in matches:
+            file_type = file_type.lower() if file_type else "txt"
+            if file_type == "python":
+                file_type = "py"  # Correct extension
+            if file_type not in extracted_file_counts:
+                file_type = "txt"
+
+            extracted_file_counts[file_type] += 1
+            count = extracted_file_counts[file_type]
+            file_name = f"{prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
+            file_path = self.task_dir / file_name
+
+            self._write_to_file(file_name, content)
+
+            # If it's a Python file, also run tests
+            if file_type == "py":
+                test_results = task.verifier.test_code(
+                    content, file_path, task
+                )  # Pass task
+                # Write test results to file
+                test_results_file = Path(f"{file_path.stem}.md")
+                self._write_to_file(test_results_file, "".join(test_results))
+
+
+    def _write_to_file(self, file_name, content):
+        """Writes content to a file in the task directory."""
+        file_path = self.task_dir / file_name  # Always use task_dir
+        try:
+            with open(file_path, "w") as f:
+                f.write(content)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing to file {file_name}: {e}")
+            self.log_error(f"Error writing to file {file_name}: {e}")
+
     def run_task(self, task):
         """Runs a single task."""
         print(f"Running task: {task.id}")
@@ -308,4 +347,4 @@ class Session:
         """Runs all tasks in the session."""
         for task in self.tasks:
             self.run_task(task)
-        summarize_session(self.session_dir, self.log_error, self.display_response)
+        summarize_session(self.session_dir, self.session.log_error, self.session.display_response)
