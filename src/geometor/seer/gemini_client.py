@@ -5,58 +5,21 @@ from pathlib import Path
 import google.generativeai as genai
 from google.api_core import retry
 from typing import List, Any, Dict, Callable
-#  from .client import Client
 
 
-class GeminiClient():
-    """
-    Initialize the GeminiClient with model configuration and system instructions.
-
-    parameters
-    ----------
-    model_name : :class:`python:str`
-        Name of the Gemini model to use.
-    instructions_file : :class:`python:str`
-        Path to the instructions file.
-    """
-
+class GeminiClient:
     def __init__(self, config: dict, instructions: str):
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         #  self.model_name = model_name
         self.model_name = config["model_name"]
 
-        #  script_dir = Path(__file__).parent.absolute()
-        #  instructions_file = script_dir / instructions_file
-
-        #  with open(instructions_file, "r") as f:
-            #  instruction = f.read().strip()
-
         self.model = genai.GenerativeModel(
-            #  model_name=self.model_name,
-            #  system_instruction=instructions,
             model_name=config["model_name"],
             generation_config=config["generation_config"],
             system_instruction=instructions,
         )
 
     def generate_content(self, prompt: List[str], tools: List[Callable] = None) -> Any:
-        """
-        Generate content from the Gemini model based on the provided prompt.
-
-        parameters
-        ----------
-        prompt : list
-            The prompt to send to the model.
-        tools : str or list
-            Optional tools or functions the model can use.
-            "code_execution"
-
-        returns
-        -------
-        response : GeminiResponse
-            the model's response.
-
-        """
         try:
             if tools and tools != "code_execution":
                 tool_config = {"function_calling_config": {"mode": "ANY"}}
