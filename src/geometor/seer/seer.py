@@ -12,11 +12,9 @@ import numpy as np
 import os
 import re
 import ast
-import contextlib
-import io
 
-from geometor.seer.tasks import Tasks, Task, Grid
-from geometor.seer.oracle import Oracle
+from geometor.seer.tasks import Tasks, Task, Grid, Grids
+#  from geometor.seer.oracle import Oracle  # Removed
 
 from geometor.seer.gemini_client import GeminiClient as Client
 from geometor.seer.exceptions import (
@@ -27,6 +25,7 @@ from geometor.seer.exceptions import (
     FunctionExecutionError,
 )
 from geometor.seer.session import Session
+from geometor.seer.verifier import Verifier  # Added
 from geometor.seer.session.summary import summarize_session
 
 
@@ -40,14 +39,12 @@ class Seer:
         self.start_time = datetime.now()
         self.response_times = []
 
-        self.dreamer_client = Client(
-            self.config, "dreamer"
-        )
+        self.dreamer_client = Client(self.config, "dreamer")
         self.coder_client = Client(
             self.config, "coder"
         )
-        self.oracle_client = Oracle(self.oracle_config, "oracle")  # Keep Oracle as is, for now
-
+        self.verifier = Verifier()  # Simplified instantiation
+        
         with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
         with open(config["investigate_code"], "r") as f:
@@ -234,7 +231,7 @@ class Seer:
                         self._write_to_file(code_file_path, code)
 
                         # Call _test_code and extend response_parts
-                        test_results = self.oracle_client.test_code(
+                        test_results = self.verifier.test_code(
                             code, code_file_path, self.task
                         )
                         response_parts.extend(test_results)
@@ -291,7 +288,7 @@ class Seer:
 
             # If it's a Python file, also run tests
             if file_type == "py":
-                test_results = self.oracle_client.test_code(
+                test_results = self.verifier.test_code(
                     content, file_path, self.task
                 )  # Pass task
                 # Write test results to file
