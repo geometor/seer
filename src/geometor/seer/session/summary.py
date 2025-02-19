@@ -2,6 +2,7 @@
 summary report functions
 """
 import json
+from rich.markdown import Markdown
 from rich.table import Table
 from rich.console import Console
 
@@ -49,6 +50,7 @@ def create_session_summary_report(session_dir, log_error, display_response):
 
     # Combine and output using Console
     console = Console(record=True)
+    console.print(Markdown("# Session Summary"))
     console.print(response_table)
     for task_tables in test_tables.values():
         for table in task_tables.values():
@@ -73,12 +75,12 @@ def create_session_summary_report(session_dir, log_error, display_response):
     )
 
     # Display report
-    display_response(
-        [session_summary_report_md],
-        0,
-        "Session Summary",
-        {},
-    )
+    #  display_response(
+        #  [session_summary_report_md],
+        #  0,
+        #  "Session Summary",
+        #  {},
+    #  )
 
 
 def _create_session_response_table(session_response_report_json):
