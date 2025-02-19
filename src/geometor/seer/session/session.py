@@ -38,11 +38,12 @@ class Session:
 
         #  Write system and task context to files
         try:
-            self._write_context_files(
-                config["roles"]["dreamer"]["system_context_file"],
-                config["roles"]["coder"]["system_context_file"],
-                config["task_context_file"],
-            )
+            self._write_context_files()
+            #  self._write_context_files(
+            #      config["roles"]["dreamer"]["system_context_file"],
+            #      config["roles"]["coder"]["system_context_file"],
+            #      config["task_context_file"],
+            #  )
         except (FileNotFoundError, IOError, PermissionError) as e:
             print(f"Error writing context files: {e}")
             self.log_error(f"Error writing context files: {e}")
@@ -56,26 +57,40 @@ class Session:
 
         self.display_config()  # display config at start of session
 
-    def _write_context_files(
-        self,
-        dreamer_system_context_file: str,
-        coder_system_context_file: str,
-        task_context_file: str,
-    ):
-        with open(dreamer_system_context_file, "r") as f:
-            dreamer_system_context = f.read().strip()
-        with open(coder_system_context_file, "r") as f:
-            coder_system_context = f.read().strip()
-        with open(task_context_file, "r") as f:
-            task_context = f.read().strip()
+    #  def _write_context_files(
+    #      self,
+    #      dreamer_system_context_file: str,
+    #      coder_system_context_file: str,
+    #      task_context_file: str,
+    #  ):
+    def _write_context_files(self):
+        """Writes system context files for each role and the task context."""
+        for role_name, role_config in self.config["roles"].items():
+            system_context_file = role_config["system_context_file"]
+            with open(system_context_file, "r") as f:
+                system_context = f.read().strip()
+            (self.session_dir / f"{role_name}_system_context.md").write_text(
+                system_context
+            )
 
-        (self.session_dir / "dreamer_system_context.md").write_text(
-            dreamer_system_context
-        )
-        (self.session_dir / "builder_system_context.md").write_text(
-            coder_system_context
-        )
+        with open(self.config["task_context_file"], "r") as f:
+            task_context = f.read().strip()
         (self.session_dir / "task_context.md").write_text(task_context)
+
+        #  with open(dreamer_system_context_file, "r") as f:
+        #      dreamer_system_context = f.read().strip()
+        #  with open(coder_system_context_file, "r") as f:
+        #      coder_system_context = f.read().strip()
+        #  with open(task_context_file, "r") as f:
+        #      task_context = f.read().strip()
+
+        #  (self.session_dir / "dreamer_system_context.md").write_text(
+        #      dreamer_system_context
+        #  )
+        #  (self.session_dir / "builder_system_context.md").write_text(
+        #      coder_system_context
+        #  )
+        #  (self.session_dir / "task_context.md").write_text(task_context)
 
     def _format_banner(self, prompt_count: int, description: str) -> str:
         """Helper function to format the banner."""
