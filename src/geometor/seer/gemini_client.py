@@ -8,15 +8,23 @@ from typing import List, Any, Dict, Callable
 
 
 class GeminiClient:
-    def __init__(self, config: dict, instructions: str):
+    def __init__(self, config: dict, role: str):
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        #  self.model_name = model_name
-        self.model_name = config["model_name"]
+
+        role_config = config[role]
+        self.model_name = role_config["model_name"]
+
+        with open(role_config["system_context_file"], "r") as f:
+            system_context = f.read().strip()
+        with open(config["task_context_file"], "r") as f:
+            task_context = f.read().strip()
+
+        instructions = f"{system_context}\n\n{task_context}"
 
         self.model = genai.GenerativeModel(
-            model_name=config["model_name"],
-            generation_config=config["generation_config"],
-            system_instruction=instructions,
+            model_name=role_config["model_name"],
+            generation_config=role_config["generation_config"],
+            system_instruction=instructions,  # Corrected line
         )
 
     def generate_content(self, prompt: List[str], tools: List[Callable] = None) -> Any:

@@ -44,16 +44,6 @@ class Seer:
         self.coder_config = config["coder"]
         self.oracle_config = config["oracle"]
 
-        with open(self.dreamer_config["system_context_file"], "r") as f:
-            self.dreamer_system_context = f.read().strip()
-        with open(self.coder_config["system_context_file"], "r") as f:
-            self.coder_system_context = f.read().strip()
-        with open(self.oracle_config["system_context_file"], "r") as f:
-            self.oracle_system_context = f.read().strip()
-
-        with open(config["task_context_file"], "r") as f:
-            self.task_context = f.read().strip()
-
         with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
         with open(config["investigate_code"], "r") as f:
@@ -63,12 +53,12 @@ class Seer:
         self.current_iteration = 0
 
         self.dreamer_client = Client(
-            self.dreamer_config, f"{self.dreamer_system_context}\n\n{self.task_context}"
+            self.config, "dreamer"
         )
         self.coder_client = Client(
-            self.coder_config, f"{self.coder_system_context}\n\n{self.task_context}"
+            self.config, "coder"
         )
-        self.oracle_client = Oracle(self.oracle_config, self.oracle_system_context)
+        self.oracle_client = Oracle(self.oracle_config, "oracle")  # Keep Oracle as is, for now
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
