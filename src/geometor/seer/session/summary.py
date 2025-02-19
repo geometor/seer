@@ -11,8 +11,7 @@ def create_session_summary_report(session_dir, log_error, display_response):
     """
     Creates a session-level summary report by aggregating task summary reports.
     """
-    session_response_report_json = []
-    session_test_report_json = {}
+    session_summary_data = []
 
     # Iterate through each task directory
     for task_dir in session_dir.iterdir():
@@ -22,14 +21,24 @@ def create_session_summary_report(session_dir, log_error, display_response):
                 try:
                     with open(summary_report_json_path, "r") as f:
                         task_summary = json.load(f)
-                        # Aggregate response reports
-                        session_response_report_json.extend(
-                            task_summary.get("response_report", [])
-                        )
-                        # Aggregate test reports, keyed by task ID
                         task_id = task_dir.name
-                        session_test_report_json[task_id] = task_summary.get(
-                            "test_report", {}
+
+                        # Calculate task totals
+                        task_total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+                        task_total_response_time = 0
+                        for response in task_summary.get("response_report", []):
+                            for key in task_total_tokens:
+                                task_total_tokens[key] += response["token_usage"].get(key, 0)
+                            task_total_response_time += response["timing"]["response_time"]
+
+                        # Aggregate data into a single dictionary
+                        session_summary_data.append(
+                            {
+                                "task_id": task_id,
+                                "total_tokens": task_total_tokens,
+                                "total_response_time": task_total_response_time,
+                                "test_report": task_summary.get("test_report", {}),  # Keep test report for drill-down if needed
+                            }
                         )
                 except (IOError, json.JSONDecodeError) as e:
                     print(
@@ -40,21 +49,12 @@ def create_session_summary_report(session_dir, log_error, display_response):
                     )
 
     # --- Create Markdown Report ---
-    # Response Report
-    response_table = _create_session_response_table(
-        session_response_report_json
-    )
-
-    # Test Report
-    test_tables = _create_session_test_table(session_test_report_json)
+    summary_table = _create_session_summary_table(session_summary_data)
 
     # Combine and output using Console
     console = Console(record=True)
     console.print(Markdown("# Session Summary"))
-    console.print(response_table)
-    for task_tables in test_tables.values():
-        for table in task_tables.values():
-            console.print(table)
+    console.print(summary_table)
 
     session_summary_report_md = console.export_text()
     session_summary_report_md_file = "session_summary_report.md"
@@ -62,10 +62,9 @@ def create_session_summary_report(session_dir, log_error, display_response):
         session_dir, session_summary_report_md_file, session_summary_report_md
     )
 
-    # --- JSON report (keep structure) ---
+    # --- JSON report ---
     session_summary_report = {
-        "response_report": session_response_report_json,
-        "test_report": session_test_report_json,
+        "summary_data": session_summary_data,  # Use the aggregated data
     }
     session_summary_report_json_file = "session_summary_report.json"
     _write_to_file_session(
@@ -74,93 +73,27 @@ def create_session_summary_report(session_dir, log_error, display_response):
         json.dumps(session_summary_report, indent=2),
     )
 
-    # Display report
-    #  display_response(
-        #  [session_summary_report_md],
-        #  0,
-        #  "Session Summary",
-        #  {},
-    #  )
 
+def _create_session_summary_table(session_summary_data):
+    """Creates a rich table for the session-level summary."""
+    table = Table(title="Session Summary")
+    table.add_column("Task ID", style="cyan", no_wrap=True)
+    table.add_column("Prompt Tokens", justify="right")
+    table.add_column("Candidate Tokens", justify="right")
+    table.add_column("Total Tokens", justify="right")
+    table.add_column("Cached Tokens", justify="right")
+    table.add_column("Total Response Time (s)", justify="right")
 
-def _create_session_response_table(session_response_report_json):
-    """Creates a rich table for the session-level response summary."""
-    table = Table(title="Session Response Summary")
-    table.add_column("Task", style="cyan", no_wrap=True)
-    table.add_column("File", style="cyan", no_wrap=True)
-    table.add_column("Prompt", justify="right")
-    table.add_column("Candidate", justify="right")
-    table.add_column("Total", justify="right")
-    table.add_column("Cached", justify="right")
-    table.add_column("Resp Time", justify="right")
-    table.add_column("Elapsed", justify="right")
-
-    total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
-    total_response_time = 0
-
-    for response in session_response_report_json:
-        task_id = response.get("response_file", "N/A").split("-")[0]
+    for task_data in session_summary_
         table.add_row(
-            task_id,
-            response.get("response_file", "N/A"),
-            str(response["token_usage"].get("prompt", 0)),
-            str(response["token_usage"].get("candidates", 0)),
-            str(response["token_usage"].get("total", 0)),
-            str(response["token_usage"].get("cached", 0)),
-            f"{response['timing']['response_time']:.4f}",
-            f"{response['timing']['total_elapsed']:.4f}",
+            task_data["task_id"],
+            str(task_data["total_tokens"]["prompt"]),
+            str(task_data["total_tokens"]["candidates"]),
+            str(task_data["total_tokens"]["total"]),
+            str(task_data["total_tokens"]["cached"]),
+            f"{task_data['total_response_time']:.4f}",
         )
-        for key in total_tokens:
-            total_tokens[key] += response["token_usage"].get(key, 0)
-        total_response_time += response["timing"]["response_time"]
-
-    table.add_row(
-        "Total",
-        "",
-        str(total_tokens["prompt"]),
-        str(total_tokens["candidates"]),
-        str(total_tokens["total"]),
-        str(total_tokens["cached"]),
-        f"{total_response_time:.4f}",
-        "",
-        style="bold",
-    )
     return table
-
-
-def _create_session_test_table(session_test_report_json):
-    """Creates rich tables for the session-level test summary."""
-    all_tables = {}
-    for task_id, test_report in session_test_report_json.items():
-        task_tables = {}
-        for file_index, file_results in test_report.items():
-            table = Table(title=f"Task: {task_id}, Code File: {file_index}")
-            table.add_column("Example", style="cyan")
-            table.add_column("Stat")
-            table.add_column("size")
-            table.add_column("palette")
-            table.add_column("colors")
-            table.add_column("diff")
-
-            for result in file_results:
-                if "example" in result:
-                    table.add_row(
-                        str(result["example"]),
-                        str(result["status"]),
-                        str(result.get("size_correct", "N/A")),
-                        str(result.get("color_palette_correct", "N/A")),
-                        str(result.get("correct_pixel_counts", "N/A")),
-                        str(result.get("pixels_off", "N/A")),
-                    )
-                elif "captured_output" in result:
-                    table.add_row("Captured Output", str(result["captured_output"]))
-                elif "code_execution_error" in result:
-                    table.add_row(
-                        "Code Execution Error", str(result["code_execution_error"])
-                    )
-            task_tables[file_index] = table
-        all_tables[task_id] = task_tables
-    return all_tables
 
 
 def _write_to_file_session(session_dir, file_name, content):
