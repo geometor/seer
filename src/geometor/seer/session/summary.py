@@ -248,7 +248,7 @@ def _create_response_table(resplist):
             str(data["usage_metadata"].get("cached_token_count", 0)),
             str(data["usage_metadata"].get("total_token_count", 0)),
             f"{data['timing']['response_time']:.4f}",
-            f"{data['timing']['total_elapsed']:.4f}",  # Display elapsed time
+            f"{data['timing'].get('total_elapsed', 0.0):.4f}",  # Display elapsed time, handle missing key
         )
 
         total_tokens["prompt"] += data["usage_metadata"].get("prompt_token_count", 0)
