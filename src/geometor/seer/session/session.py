@@ -143,10 +143,8 @@ class Session:
     def log_response_json(
         self,
         response,
-        prompt_count: int,
-        token_counts: dict,
-        response_times: list,
-        start_time,
+        prompt_count,
+        response_time,
     ):
         response_start = datetime.now()
         response_file = self.task_dir / f"{prompt_count:03d}-response.json"
@@ -154,25 +152,27 @@ class Session:
 
         # Get token counts and update totals (passed in)
         metadata = response.to_dict().get("usage_metadata", {})
-        token_counts["prompt"] += metadata.get("prompt_token_count", 0)
-        token_counts["candidates"] += metadata.get("candidates_token_count", 0)
-        token_counts["total"] += metadata.get("total_token_count", 0)
-        token_counts["cached"] += metadata.get("cached_content_token_count", 0)
+        #  token_counts["prompt"] += metadata.get("prompt_token_count", 0)
+        #  token_counts["candidates"] += metadata.get("candidates_token_count", 0)
+        #  token_counts["total"] += metadata.get("total_token_count", 0)
+        #  token_counts["cached"] += metadata.get("cached_content_token_count", 0)
 
-        response_end = datetime.now()
-        response_time = (response_end - response_start).total_seconds()
-        total_elapsed = (response_end - start_time).total_seconds()
-        response_times.append(response_time)
+        #  response_end = datetime.now()
+        #  response_time = (response_end - response_start).total_seconds()
+        #  total_elapsed = (response_end - start_time).total_seconds()
+        #  response_times.append(response_time)
 
         # Prepare the response data dictionary
         response_data = response.to_dict()
-        response_data["token_totals"] = token_counts.copy()
+        #  response_data["token_totals"] = token_counts.copy()
         response_data["timing"] = {
             "response_time": response_time,
-            "total_elapsed": total_elapsed,
-            "response_times": response_times.copy(),
+            #  "total_elapsed": total_elapsed,
+            #  "response_times": response_times.copy(),
         }
-        response_data["response_file"] = str(response_file.name)  # Add filename for report
+        response_data["response_file"] = str(
+            response_file.name
+        )  # Add filename for report
 
         try:
             with open(response_file, "w") as f:
@@ -206,7 +206,9 @@ class Session:
             self.log_error(f"Error writing response Markdown to file: {e}")
 
         # Call display_response here
-        self.display_response(response_parts, prompt_count, description, response.to_dict(), elapsed_time)
+        self.display_response(
+            response_parts, prompt_count, description, response.to_dict(), elapsed_time
+        )
 
     def log_error(self, error_message: str, context: str = ""):
         error_log_file = self.session_dir / "error_log.txt"  # Log to session dir
@@ -275,7 +277,6 @@ class Session:
         print()
         print(markdown)
 
-
     def display_config(self):
         """Displays the configuration information using rich.markdown.Markdown."""
         markdown_text = f"# {self.timestamp}\n\n"
@@ -297,7 +298,9 @@ class Session:
         print()
         print(markdown)
 
-    def _write_extracted_content(self, text, prompt_count, extracted_file_counts, task, verifier):
+    def _write_extracted_content(
+        self, text, prompt_count, extracted_file_counts, task, verifier
+    ):
         """Extracts content enclosed in triple backticks and writes it to files."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
@@ -316,13 +319,10 @@ class Session:
 
             # If it's a Python file, also run tests
             if file_type == "py":
-                test_results = verifier.test_code(
-                    content, file_path, task
-                )  # Pass task
+                test_results = verifier.test_code(content, file_path, task)  # Pass task
                 # Write test results to file
                 test_results_file = Path(f"{file_path.stem}.md")
                 self._write_to_file(test_results_file, "".join(test_results))
-
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
@@ -340,8 +340,7 @@ class Session:
         self.task_dir = self.session_dir / task.id
         self.task_dir.mkdir(parents=True, exist_ok=True)
         self.seer.solve(task, self)
-        summarize_task(self.task_dir, self.log_error) # Summarize after each task
-
+        summarize_task(self.task_dir, self.log_error)  # Summarize after each task
 
     def run_all_tasks(self):
         """Runs all tasks in the session."""
