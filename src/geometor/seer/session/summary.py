@@ -288,7 +288,7 @@ def _create_test_table(grouped_test_results):
         tables[file_index] = table
     return tables
 
-def _write_to_file_task(task_dir, file_name, content):
+def _write_to_file_task(task_dir, file_name, content, log_error):
     """Writes content to a file in the task directory."""
     file_path = task_dir / file_name  # Use task_dir
     try:
