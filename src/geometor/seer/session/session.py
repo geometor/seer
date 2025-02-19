@@ -98,6 +98,13 @@ class Session:
         task_folder = self.task_dir.name  # Get the task folder name
         return f"# {task_folder} • {prompt_count:03d} • {description}\n"
 
+    def log_prompt_image(self, image, prompt_count: int, description: str):
+        """Saves an image and returns its filename."""
+        image_filename = f"{prompt_count:03d}-{description}.png"
+        image_path = self.task_dir / image_filename
+        image.save(image_path)
+        return image_filename
+
     def log_prompt(
         self,
         prompt: list,
@@ -107,24 +114,40 @@ class Session:
     ):
         prompt_file = self.task_dir / f"{prompt_count:03d}-prompt.md"
         banner = self._format_banner(prompt_count, description)
-        image_count = 0
+        image_count = 0  # Keep track of images within the prompt
         try:
             with open(prompt_file, "w") as f:
                 f.write(f"{banner}\n")
                 f.write("---\n")
                 f.write("\n")
                 for i, part in enumerate(prompt):  # Use enumerate to get index
-                    if hasattr(part, "save"):  # Check if it's an image
-                        image_count += 1
+                    #  if hasattr(part, "save"):  # Check if it's an image # REMOVE
+                    if isinstance(part, str) and part.startswith("![Image]"): # NEW
+                        # Assume it's already an image filename string
+                        f.write(part) # NEW
+                    #  if hasattr(part, "save"):  # Check if it's an image # REMOVE
+                    #      image_count += 1 # REMOVE
 
-                        image_filename = (
-                            f"{prompt_count:03d}-{description}-{image_count}.png"
-                        )
-                        image_path = self.task_dir / image_filename
-                        part.save(image_path)
-                        f.write(f"![Image]({image_filename})\n")
-                    else:
-                        f.write(str(part))
+                    #      image_filename = ( # REMOVE
+                    #          f"{prompt_count:03d}-{description}-{image_count}.png" # REMOVE
+                    #      ) # REMOVE
+                    #      image_path = self.task_dir / image_filename # REMOVE
+                    #      part.save(image_path) # REMOVE
+                    #      f.write(f"![Image]({image_filename})\n") # REMOVE
+                    else: # NEW
+                        f.write(str(part)) # NEW
+                #  for i, part in enumerate(prompt):  # Use enumerate to get index # REMOVE
+                #      if hasattr(part, "save"):  # Check if it's an image # REMOVE
+                #          image_count += 1 # REMOVE
+
+                #          image_filename = ( # REMOVE
+                #              f"{prompt_count:03d}-{description}-{image_count}.png" # REMOVE
+                #          ) # REMOVE
+                #          image_path = self.task_dir / image_filename # REMOVE
+                #          part.save(image_path) # REMOVE
+                #          f.write(f"![Image]({image_filename})\n") # REMOVE
+                #      else: # REMOVE
+                #          f.write(str(part)) # REMOVE
                 f.write("\n")
                 for part in instructions:
                     f.write(str(part))
@@ -231,7 +254,10 @@ class Session:
             with open(error_log_file, "a") as f:
                 f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}\n")
                 if context:
-                    f.write(f"Context: {context}\n")
+                    if isinstance(context, str):
+                        f.write(f"Context: {context}\n")
+                    else:
+                        f.write(f"Context: {str(context)}\n")
                 f.write("\n")
         except (IOError, PermissionError) as e:
             print(f"FATAL: Error writing to error log: {e}")

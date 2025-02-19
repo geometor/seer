@@ -93,13 +93,19 @@ class Seer:
                 "\n```\n\n",
             ]
             if include_images:
-                prompt.append(pair.input.to_image())
+                # Get image filename from log_prompt
+                input_image_filename = self.session.log_prompt_image(pair.input, self.prompt_count, f"example_{i}_input")
+                prompt.append(f"![Image]({input_image_filename})\n")
+                #  prompt.append(pair.input.to_image()) # OLD
                 prompt.append("\n")
             prompt.append("\n**output**\n```\n")
             prompt.append(output_grid_str)
             prompt.append("\n```\n\n")
             if include_images:
-                prompt.append(pair.output.to_image())
+                # Get image filename from log_prompt
+                output_image_filename = self.session.log_prompt_image(pair.output, self.prompt_count, f"example_{i}_output")
+                prompt.append(f"![Image]({output_image_filename})\n")
+                #  prompt.append(pair.output.to_image()) # OLD
                 prompt.append("\n")
 
             instructions = [self.nlp_instructions]
