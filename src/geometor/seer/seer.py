@@ -13,7 +13,7 @@ import os
 import re
 import ast
 
-from geometor.seer.tasks import Tasks, Task, Grid, Grids
+from geometor.seer.tasks import Tasks, Task, Grid
 #  from geometor.seer.oracle import Oracle  # Removed
 
 from geometor.seer.gemini_client import GeminiClient as Client
@@ -26,7 +26,7 @@ from geometor.seer.exceptions import (
 )
 from geometor.seer.session import Session
 from geometor.seer.verifier import Verifier  # Added
-from geometor.seer.session.summary import summarize_session
+from geometor.seer.session.summary import summarize_session, summarize_task
 
 
 class Seer:
@@ -42,6 +42,9 @@ class Seer:
         self.dreamer_client = Client(self.config, "dreamer")
         self.coder_client = Client(
             self.config, "coder"
+        )
+        self.oracle_client = Client(
+            self.config, "oracle"
         )
         self.verifier = Verifier()  # Simplified instantiation
         
@@ -75,7 +78,7 @@ class Seer:
         #  self._review_programs()
         #  self._run_solution_loop()
 
-        self.session.summarize_task()
+        summarize_task(self.session.task_dir, self.session.log_error)
 
     def _investigate_examples(self, examples, include_images=True):
         """
