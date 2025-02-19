@@ -40,9 +40,13 @@ class Seer:
         self.start_time = datetime.now()
         self.response_times = []
 
-        self.dreamer_config = config["dreamer"]
-        self.coder_config = config["coder"]
-        self.oracle_config = config["oracle"]
+        self.dreamer_client = Client(
+            self.config, "dreamer"
+        )
+        self.coder_client = Client(
+            self.config, "coder"
+        )
+        self.oracle_client = Oracle(self.oracle_config, "oracle")  # Keep Oracle as is, for now
 
         with open(config["investigate_nlp"], "r") as f:
             self.nlp_instructions = f.read().strip()
@@ -52,13 +56,6 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
-        self.dreamer_client = Client(
-            self.config, "dreamer"
-        )
-        self.coder_client = Client(
-            self.config, "coder"
-        )
-        self.oracle_client = Oracle(self.oracle_config, "oracle")  # Keep Oracle as is, for now
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
