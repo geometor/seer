@@ -32,7 +32,6 @@ def summarize_session(session_dir, log_error, display_response):
                 # Calculate task totals
                 task_total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
                 task_total_response_time = 0
-                task_total_elapsed_time = 0  # Initialize total elapsed time
                 for response in task_summary.get("response_report", []):
                     # Correctly use the individual response's usage_metadata
                     task_total_tokens["prompt"] += response["token_usage"].get("prompt", 0)
@@ -40,7 +39,6 @@ def summarize_session(session_dir, log_error, display_response):
                     task_total_tokens["total"] += response["token_usage"].get("total", 0)
                     task_total_tokens["cached"] += response["token_usage"].get("cached", 0)
                     task_total_response_time += response["timing"]["response_time"]
-                    task_total_elapsed_time += response["timing"].get("total_elapsed", 0)  # Sum elapsed times
 
                 # --- Best Test Score ---
                 best_test_score = "N/A"  # Default if no tests
@@ -63,7 +61,6 @@ def summarize_session(session_dir, log_error, display_response):
                         "task_id": task_id,
                         "total_tokens": task_total_tokens,
                         "total_response_time": task_total_response_time,
-                        "total_elapsed_time": task_total_elapsed_time,
                         "test_report": task_summary.get("test_report", {}),  # Keep test report
                         "best_test_score": best_test_score, # Add to session summary
                     }
@@ -109,7 +106,6 @@ def _create_session_summary_table(session_summary):
     table.add_column("total", justify="right")
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
-    table.add_column("Elapsed (s)", justify="right")
     table.add_column("Test Score", justify="center")  # Add test score column
 
     for task_summary in session_summary:
@@ -120,7 +116,6 @@ def _create_session_summary_table(session_summary):
             str(task_summary["total_tokens"]["total"]),
             str(task_summary["total_tokens"]["cached"]),
             f"{task_summary['total_response_time']:.4f}",
-            f"{task_summary['total_elapsed_time']:.4f}",
             task_summary["best_test_score"],  # Display best test score
         )
     return table
@@ -250,11 +245,9 @@ def _create_response_table(resplist):
     table.add_column("cached", justify="right")
     table.add_column("total", justify="right")
     table.add_column("Time (s)", justify="right")
-    table.add_column("Elapsed (s)", justify="right") # Add elapsed time column
 
     total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
     total_response_time = 0
-    total_elapsed_time = 0  # Initialize
 
     sorted_resplist = sorted(resplist, key=lambda x: x.get("response_file", ""))
 
@@ -266,7 +259,6 @@ def _create_response_table(resplist):
             str(data["usage_metadata"].get("cached_token_count", 0)),
             str(data["usage_metadata"].get("total_token_count", 0)),
             f"{data['timing']['response_time']:.4f}",
-            f"{data['timing'].get('total_elapsed', 0.0):.4f}",  # Display elapsed time, handle missing key
         )
 
         total_tokens["prompt"] += data["usage_metadata"].get("prompt_token_count", 0)
@@ -274,7 +266,6 @@ def _create_response_table(resplist):
         total_tokens["total"] += data["usage_metadata"].get("total_token_count", 0)
         total_tokens["cached"] += data["usage_metadata"].get("cached_token_count", 0)
         total_response_time += data["timing"].get("response_time", 0) # handle missing
-        total_elapsed_time += data["timing"].get("total_elapsed", 0) # Sum
 
     # Add a summary row
     table.add_row(
@@ -284,7 +275,6 @@ def _create_response_table(resplist):
         str(total_tokens["cached"]),
         str(total_tokens["total"]),
         f"{total_response_time:.4f}",
-        f"{total_elapsed_time:.4f}",  # Display total elapsed time
         style="bold",
     )
     return table
