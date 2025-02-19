@@ -11,8 +11,8 @@ from pathlib import Path
 from datetime import datetime
 import json
 from rich.markdown import Markdown
-#  from rich.table import Table  # Removed
-#  from rich.console import Console  # Removed
+from rich.table import Table  
+from rich.console import Console  
 from rich import print
 
 from geometor.seer.session.summary import create_session_summary_report
