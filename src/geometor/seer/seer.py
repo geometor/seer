@@ -191,9 +191,7 @@ class Seer:
         self.session.log_response_json(
             response,
             self.prompt_count,
-            self.token_counts,
-            self.response_times,
-            self.start_time,
+            elapsed_time,
         )
 
         response_parts, function_call_found, last_result = self._process_response(
