@@ -15,7 +15,7 @@ from rich.table import Table
 from rich.console import Console  
 from rich import print
 
-from geometor.seer.session.summary import create_session_summary_report
+from geometor.seer.session.summary import summarize_session
 
 
 class Session:
@@ -310,16 +310,22 @@ class Session:
 
     def _create_response_table(self, resplist):
         """Creates a rich.table.Table for the response report."""
-        table = Table(title="Response Report")
-        table.add_column("Response File", style="cyan", no_wrap=True)
-        table.add_column("Prompt Tokens", justify="right")
-        table.add_column("Candidate Tokens", justify="right")
-        table.add_column("Total Tokens", justify="right")
-        table.add_column("Cached Tokens", justify="right")
-        table.add_column("Response Time (s)", justify="right")
-        table.add_column("Total Elapsed (s)", justify="right")
+          #  "usage_metadata": {
+            #  "prompt_token_count": 4118,
+            #  "candidates_token_count": 1132,
+            #  "total_token_count": 5250,
+            #  "cached_content_token_count": 0
+          #  },
+        table = Table(title="Task Responses")
+        table.add_column("file", style="cyan", no_wrap=True)
+        table.add_column("prompt", justify="right")
+        table.add_column("candidate", justify="right")
+        table.add_column("cached", justify="right")
+        table.add_column("total", justify="right")
+        table.add_column("Time (s)", justify="right")
+        table.add_column("Elapsed (s)", justify="right")
 
-        total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        total_tokens = {"prompt_total_tokens": 0, "candidates_total_tokens": 0, "total_total_tokens": 0, "cached_total_tokens": 0}
         total_response_time = 0
 
         sorted_resplist = sorted(resplist, key=lambda x: x.get("response_file", ""))
@@ -327,30 +333,31 @@ class Session:
         for data in sorted_resplist:
             table.add_row(
                 data.get("response_file", "N/A"),
-                str(data["token_totals"].get("prompt", 0)),
-                str(data["token_totals"].get("candidates", 0)),
-                str(data["token_totals"].get("total", 0)),
-                str(data["token_totals"].get("cached", 0)),
+                str(data["usage_metadata"].get("prompt_token_count", 0)),
+                str(data["usage_metadata"].get("candidates_token_count", 0)),
+                str(data["usage_metadata"].get("cached_token_count", 0)),
+                str(data["usage_metadata"].get("total_token_count", 0)),
                 f"{data['timing']['response_time']:.4f}",
                 f"{data['timing']['total_elapsed']:.4f}",
             )
 
             for key in total_tokens:
-                total_tokens[key] += data["token_totals"].get(key, 0)
+                total_tokens[key] += data["usage_metadata"].get(key, 0)
             total_response_time += data["timing"]["response_time"]
 
         # Add a summary row
         table.add_row(
-            "Total",
-            str(total_tokens["prompt"]),
-            str(total_tokens["candidates"]),
-            str(total_tokens["total"]),
-            str(total_tokens["cached"]),
+            "TOTAL",
+            str(total_tokens["prompt_total_tokens"]),
+            str(total_tokens["candidates_total_tokens"]),
+            str(total_tokens["cached_total_tokens"]),
+            str(total_tokens["total_total_tokens"]),
             f"{total_response_time:.4f}",
             "",
             style="bold",
         )
         return table
+
 
     def _create_test_table(self, grouped_test_results):
         """Creates a rich.table.Table for the test report."""
@@ -381,15 +388,19 @@ class Session:
             tables[file_index] = table
         return tables
 
-    def create_summary_report(self, resplist, task_dir):
+    def summarize_task(self):
         """Creates a summary report (Markdown and JSON) using rich.table.Table."""
 
-        # --- Response Report ---
+
+        # Gather response data and create summary report
+        resplist = self.gather_response_data(self.task_dir)
+
+        # Response Report 
         response_table = self._create_response_table(resplist)
 
-        # --- Test Report ---
+        # Test Report
         grouped_test_results = {}
-        for py_file in sorted(task_dir.glob("*-py_*.json")):
+        for py_file in sorted(self.task_dir.glob("*-py_*.json")):
             try:
                 with open(py_file, "r") as f:
                     test_results = json.load(f)
@@ -402,8 +413,8 @@ class Session:
         sorted_grouped_test_results = dict(sorted(grouped_test_results.items()))
         test_tables = self._create_test_table(sorted_grouped_test_results)
 
-        # --- Combine Reports and Save ---
         console = Console(record=True)  # Use record=True to capture output
+        console.print(Markdown("# Task Summary"))
         console.print(response_table)
         for table in test_tables.values():
             console.print(table)
@@ -460,9 +471,9 @@ class Session:
         self._write_to_file(report_json_file, json.dumps(report_json, indent=2))
 
         # Display report
-        self.display_response(
-            [report_md], 0, "Task Summary", {}
-        )  # prompt_count=0
+        #  self.display_response(
+            #  [report_md], 0, "Task Summary", {}
+        #  )  # prompt_count=0
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""

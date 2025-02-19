@@ -7,7 +7,7 @@ from rich.table import Table
 from rich.console import Console
 
 
-def create_session_summary_report(session_dir, log_error, display_response):
+def summarize_session(session_dir, log_error, display_response):
     """
     Creates a session-level summary report by aggregating task summary reports.
     """
@@ -82,7 +82,7 @@ def _create_session_summary_table(session_summary_data):
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
 
-    for task_data in session_summary_
+    for task_data in session_summary_data:
         table.add_row(
             task_data["task_id"],
             str(task_data["total_tokens"]["prompt"]),
