@@ -17,12 +17,12 @@ def summarize_session(session_dir, log_error, display_response):
     for task_dir in session_dir.iterdir():
         if not task_dir.is_dir():
             # TODO: handle situation
-            return
+            continue
 
         summary_report_json_path = task_dir / "summary_report.json"
-        if summary_report_json_path.exists():
-            # TODO: handle situation
-            return
+        #  if summary_report_json_path.exists():
+            #  # TODO: handle situation
+            #  return
 
         try:
             with open(summary_report_json_path, "r") as f:
