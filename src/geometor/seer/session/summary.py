@@ -144,7 +144,7 @@ def summarize_task(task_dir, log_error):
 
     report_md = console.export_text()  # Export captured output as plain text
     report_md_file = "summary_report.md"
-    _write_to_file_task(task_dir, report_md_file, report_md)
+    _write_to_file_task(task_dir, report_md_file, report_md, log_error)
 
     # --- JSON Report (Keep as before, but use sorted data) ---
     response_report_json = []
@@ -196,7 +196,7 @@ def summarize_task(task_dir, log_error):
         "test_report": test_report_json,
     }
     report_json_file = "summary_report.json"
-    _write_to_file_task(task_dir, report_json_file, json.dumps(report_json, indent=2))
+    _write_to_file_task(task_dir, report_json_file, json.dumps(report_json, indent=2), log_error)
 
 def gather_response(task_dir, log_error):
     """Gathers data from all response.json files in the task directory."""
