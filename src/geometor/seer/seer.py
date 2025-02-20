@@ -75,8 +75,45 @@ class Seer:
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
         self._investigate_examples(task.train)
-        #  self._review_programs()
-        #  self._run_solution_loop()
+
+        # --- Main loop for code generation and refinement ---
+        for iteration in range(self.max_iterations):
+            self.current_iteration = iteration + 1  # Start from 1
+            print(f"Iteration: {self.current_iteration} / {self.max_iterations}")
+
+            # coder prompt
+            instructions = [
+                self.code_instructions.format(
+                    input_grid_rows=task.train[0].input.to_python_string(),  # Use first example for initial prompt
+                    expected_output_grid_rows=task.train[0].output.to_python_string(),
+                )
+            ]
+            prompt = [""]
+            response_parts, elapsed_time = self._generate(
+                "coder",
+                history,
+                prompt,
+                instructions,
+                description=f"Iteration {self.current_iteration} - CODE",
+            )
+            history.extend(prompt)
+            history.extend(response_parts)
+
+            # Process the response and check for refinement
+            response_parts, refine_needed, train_results, test_results, code, base_filename = self._process_response(
+                response_parts, None, history  # Pass appropriate arguments
+            )
+
+            if not refine_needed:
+                print("All tests passed! Exiting loop.")
+                break  # Exit loop if all tests pass
+
+            if refine_needed:
+                print("Refining code...")
+                self.refine_code(train_results, test_results, code, base_filename)
+
+        else:  # This 'else' belongs to the 'for' loop
+            print("Max iterations reached without solving the task.")
 
         summarize_task(self.session.task_dir, self.session.log_error)
 
@@ -308,8 +345,11 @@ class Seer:
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
-        #  function_call_found = False
-        #  last_result = None
+        refine_needed = False  # Flag to indicate if refinement is needed
+        train_results = None
+        test_results = None
+        code = None
+        base_filename = None
 
         if not response.candidates:  # Check if candidates is not empty
             # Handle the case where response.candidates is empty
@@ -319,7 +359,7 @@ class Seer:
             response_parts.append("\n*error:*\n")  # Add an error indicator to response
             response_parts.append(error_msg + "\n")
 
-            return response_parts  # , function_call_found, last_result
+            return response_parts, refine_needed, train_results, test_results, code, base_filename
 
         if not hasattr(response.candidates[0].content, "parts"):
             # Handle the case where response.candidates is empty
@@ -329,7 +369,7 @@ class Seer:
             response_parts.append("\n*error:*\n")  # Add an error indicator to response
             response_parts.append(error_msg + "\n")
 
-            return response_parts  # , function_call_found, last_result
+            return response_parts, refine_needed, train_results, test_results, code, base_filename
 
         for part in response.candidates[0].content.parts:
             if part.text:
@@ -337,8 +377,10 @@ class Seer:
                 response_parts.append(part.text + "\n")
                 # Extract code blocks and write to files
                 extracted_code = self._parse_code_text(part.text)
-                for file_type, code, base_filename in extracted_code:
+                for file_type, extracted_code_content, extracted_base_filename in extracted_code:
                     if file_type == "py":
+                        code = extracted_code_content  # Store the code
+                        base_filename = extracted_base_filename # Store base_filename
                         # Pass base_filename to test_code
                         train_results = self.verifier.test_code(
                             "example",
@@ -372,16 +414,8 @@ class Seer:
                                 self.task,
                                 base_filename + "-test",
                             )
-
                         else:
-                            #  # Construct a new prompt for dreamer and coder
-                            #  new_prompt = ["\nPrevious Test Results:\n"] + test_results + ["\nPlease fix the errors.\n"]
-                            #  # Call _generate recursively.  Need to track history.
-                            #  response_parts, _ = self._generate("dreamer", [], new_prompt, [self.nlp_instructions], description="test_failure_dreamer")
-                            #  response_parts, _ = self._generate("coder", [], ["\nPrevious Test Results:\n"] + test_results, [self.code_instructions], description="test_failure_coder")
-                            #  pass  # we will handle this in a future turn
-                            # Call refine_code if training failed
-                            self.refine_code(train_results, None, code, base_filename) # Note: No test_results if train failed
+                            refine_needed = True  # Set the flag!
 
             if part.executable_code:
                 response_parts.append("\n*code_execution:*\n")
@@ -418,7 +452,7 @@ class Seer:
                 response_parts.append(f"{result}\n")
                 response_parts.append(f"{msg}\n")
 
-        return response_parts  # , function_call_found, last_result
+        return response_parts, refine_needed, train_results, test_results, code, base_filename
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""
