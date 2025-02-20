@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 class Verifier:
-    def test_code(self, code, code_file_path, task):
+    def test_code(self, code, task_dir, task):
         """Executes and validates the generated code, writing results to a file."""
         test_results_str = ""
         test_results_json = []  # Store results for JSON output
@@ -18,8 +18,8 @@ class Verifier:
             output_capture = io.StringIO()
             with contextlib.redirect_stdout(output_capture):
                 exec(
-                    compile(tree, filename=str(code_file_path), mode="exec"), namespace
-                )
+                    compile(tree, filename="<string>", mode="exec"), namespace
+                )  # filename is not important
 
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
@@ -52,9 +52,9 @@ class Verifier:
                             )
                             transformed_image = transformed_grid.to_image()
                             image_filename = (
-                                f"{code_file_path.stem}-example_{i + 1}-transformed.png"
+                                f"{task_dir.name}-example_{i + 1}-transformed.png"  # Use task_dir.name
                             )
-                            image_path = code_file_path.parent / image_filename # Use code_file_path's directory
+                            image_path = task_dir / image_filename # Use task_dir
                             transformed_image.save(image_path)
                             #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
 
@@ -113,8 +113,8 @@ class Verifier:
             test_results_json.append({"code_execution_error": str(e)})
 
         # Save test results as JSON
-        test_results_json_file = Path(f"{code_file_path.stem}.json")
-        with open(code_file_path.parent / test_results_json_file, "w") as f:
+        test_results_json_file = Path(f"{task_dir.name}.json") # Use task_dir.name
+        with open(task_dir / test_results_json_file, "w") as f: # Use task_dir
             json.dump(test_results_json, f, indent=2)
 
 

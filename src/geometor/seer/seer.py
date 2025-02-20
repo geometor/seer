@@ -251,30 +251,27 @@ class Seer:
                             self.task, # NEW
                             self.verifier # NEW
                         ) # NEW
-                        # Check for triple backticks and write to file # REMOVE
-                        #  self.session._write_extracted_content( # REMOVE
-                        #      part.text, self.prompt_count, self.extracted_file_counts, self.task, self.verifier # REMOVE
-                        #  )  # Use session method # REMOVE
                         for file_type, content in extracted_code:
                             if file_type == "py": # NEW
-                                test_results = self.verifier.test_code(content, file_path, task) # NEW
+                                test_results = self.verifier.test_code(content, self.session.task_dir, self.task) # NEW
                                 test_results_file = Path( # NEW
-                                    f"{file_path.stem()}.md" # NEW
+                                    f"{self.session.task_dir.name}.md" # NEW
                                 )  # Create Path object for .md file # NEW
-                                self._write_to_file(test_results_file, "".join(test_results)) # NEW
+                                with open(self.session.task_dir / test_results_file, "w") as f:
+                                    f.write("".join(test_results))
 
                     if part.executable_code:
                         response_parts.append("\n*code_execution:*\n")
                         code = part.executable_code.code
                         response_parts.append(f"```python\n{code}\n```\n")
-                        code_file_path = (
-                            self.session.task_dir / f"{self.prompt_count:03d}-code.py"
-                        )
-                        self.session._write_to_file(code_file_path, code) # Use session method
+                        #  code_file_path = ( # REMOVE
+                        #      self.session.task_dir / f"{self.prompt_count:03d}-code.py" # REMOVE
+                        #  ) # REMOVE
+                        #  self.session._write_to_file(code_file_path, code) # Use session method # REMOVE
 
                         # Call _test_code and extend response_parts
                         test_results = self.verifier.test_code(
-                            code, code_file_path, self.task
+                            code, self.session.task_dir, self.task
                         )
                         response_parts.extend(test_results)
 
