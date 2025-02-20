@@ -243,21 +243,21 @@ class Seer:
                         #  response_parts.append("\n*text:*\n")
                         response_parts.append(part.text + "\n")
                         # Extract code blocks and write to files
-                        extracted_code = self._parse_code_text(part.text)  # NEW
-                        self.session._write_code_text( # NEW
-                            extracted_code, # NEW
-                            self.prompt_count, # NEW
-                            self.extracted_file_counts, # NEW
-                            self.task, # NEW
-                            self.verifier # NEW
-                        ) # NEW
+                        extracted_code = self._parse_code_text(part.text)
+                        self.session._write_code_text(
+                            extracted_code,
+                            self.prompt_count,
+                            self.extracted_file_counts,
+                            self.task,
+                            self.verifier
+                        )
                         for file_type, content in extracted_code:
-                            if file_type == "py": # NEW
-                                test_results = self.verifier.test_code(content, self.session.task_dir, self.task) # NEW
-                                test_results_file = Path( # NEW
-                                    f"{self.session.task_dir.name}.md" # NEW
-                                )  # Create Path object for .md file # NEW
-                                with open(self.session.task_dir / test_results_file, "w") as f:
+                            if file_type == "py":
+                                test_results = self.verifier.test_code(content, self.session.task_dir, self.task)
+                                test_results_md_file = Path(
+                                    f"{self.session.task_dir.name}-{self.prompt_count:03d}.md"
+                                )  # Create Path object for .md file
+                                with open(self.session.task_dir / test_results_md_file, "w") as f:
                                     f.write("".join(test_results))
 
                     if part.executable_code:
