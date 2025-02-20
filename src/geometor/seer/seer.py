@@ -293,9 +293,44 @@ class Seer:
                         with open(test_results_md_file, "w") as f:
                             f.write("".join(test_results))
 
-                        # TODO: check test results - 
-                        # if all examples pass then we should run the test input from the task through the function
-                        # if it doesn't pass - then we should give our results back to dreamer and coder in a new function
+                        # Check test results
+                        all_tests_passed = all(
+                            result.get("status") == "PASSED"
+                            for result in self.verifier.test_results
+                        )
+                        if all_tests_passed:
+                            # Run the test input through the function
+                            try:
+                                tree = ast.parse(content)
+                                namespace = {}
+                                exec(compile(tree, filename="<string>", mode="exec"), namespace)
+                                if "transform" in namespace:
+                                    test_input_grid = self.task.test[0].input.grid  # Assuming single test input
+                                    transformed_test_output = namespace["transform"](test_input_grid)
+
+                                    # Log the transformed output
+                                    transformed_test_grid = Grid(transformed_test_output, self.task.id, 'test', 0, 'transformed')
+                                    transformed_test_image = transformed_test_grid.to_image()
+                                    test_image_filename = f"{base_filename}-test_output.png"
+                                    test_image_path = self.session.task_dir / test_image_filename
+                                    transformed_test_image.save(test_image_path)
+                                    response_parts.append(f"\nTest Input Transformed Output:\n![Image]({test_image_filename})\n")
+                                else:
+                                    error_msg = "transform function not found in code"
+                                    self.session.log_error(error_msg, content)
+                                    response_parts.append(f"\n*error:*\n{error_msg}\n")
+
+                            except Exception as e:
+                                error_msg = f"Error running transform on test input: {e}"
+                                self.session.log_error(error_msg, content)
+                                response_parts.append(f"\n*error:*\n{error_msg}\n")
+                        else:
+                            #  # Construct a new prompt for dreamer and coder
+                            #  new_prompt = ["\nPrevious Test Results:\n"] + test_results + ["\nPlease fix the errors.\n"]
+                            #  # Call _generate recursively.  Need to track history.
+                            #  response_parts, _ = self._generate("dreamer", [], new_prompt, [self.nlp_instructions], description="test_failure_dreamer")
+                            #  response_parts, _ = self._generate("coder", [], ["\nPrevious Test Results:\n"] + test_results, [self.code_instructions], description="test_failure_coder")
+                            pass # we will handle this in a future turn
 
             if part.executable_code:
                 response_parts.append("\n*code_execution:*\n")
