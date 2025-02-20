@@ -121,19 +121,21 @@ class Verifier:
                     test_results_str += f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
 
                     # Generate and save image of transformed output
-                    transformed_grid = Grid(
-                        np.array(
-                            [int(x) for x in result["transformed_output"].split()],
-                            dtype=int,
-                        ).reshape(
+                    try:
+                        # Use the shape of the ACTUAL transformed output
+                        transformed_grid = Grid(
                             np.array(
-                                task.train[result["example"] - 1].output.grid
-                            ).shape
-                        ),
-                        task.id,
-                        "train",
-                        result["example"] - 1,  # Adjust index for 0-based
-                        "transformed",
+                                [int(x) for x in result["transformed_output"].split()],
+                                dtype=int,
+                            ).reshape(transformed_output.shape),  # Use transformed_output.shape
+                            task.id,
+                            "train",
+                            result["example"] - 1,  # Adjust index for 0-based
+                            "transformed",
+                        )
+                    except ValueError as e:
+                        test_results_str += f"**ERROR**: Could not create grid from transformed output: {e}\n"
+                        continue  # Skip image creation and go to the next result
                     )
                     transformed_image = transformed_grid.to_image()
                     image_filename = f"{base_filename}-example_{result['example']}.png"
