@@ -15,6 +15,7 @@ import re
 import ast
 
 from geometor.seer.tasks import Tasks, Task, Grid
+
 #  from geometor.seer.oracle import Oracle  # Removed
 
 from geometor.seer.gemini_client import GeminiClient as Client
@@ -53,7 +54,6 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
 
-
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
@@ -64,6 +64,9 @@ class Seer:
         """
         Main method to orchestrate the task solving workflow.
         """
+        self.session.task_dir = self.session.session_dir / task.id
+        self.session.task_dir.mkdir(parents=True, exist_ok=True)
+
         self.prompt_count = 0
         self.task = task
         history = [""]
@@ -95,7 +98,9 @@ class Seer:
             ]
             if include_images:
                 # Get image filename from log_prompt
-                input_image_filename = self.session.log_prompt_image(pair.input, self.prompt_count, f"example_{i}_input")
+                input_image_filename = self.session.log_prompt_image(
+                    pair.input, self.prompt_count, f"example_{i}_input"
+                )
                 prompt.append(f"![Image]({input_image_filename})\n")
                 #  prompt.append(pair.input.to_image()) # OLD
                 prompt.append("\n")
@@ -104,7 +109,9 @@ class Seer:
             prompt.append("\n```\n\n")
             if include_images:
                 # Get image filename from log_prompt
-                output_image_filename = self.session.log_prompt_image(pair.output, self.prompt_count, f"example_{i}_output")
+                output_image_filename = self.session.log_prompt_image(
+                    pair.output, self.prompt_count, f"example_{i}_output"
+                )
                 prompt.append(f"![Image]({output_image_filename})\n")
                 #  prompt.append(pair.output.to_image()) # OLD
                 prompt.append("\n")
@@ -194,14 +201,13 @@ class Seer:
         end_time = datetime.now()  # Record end time
         elapsed_time = (end_time - start_time).total_seconds()
 
-
         self.session.log_response_json(
             response,
             self.prompt_count,
             elapsed_time,
         )
 
-        response_parts, function_call_found, last_result = self._process_response(
+        response_parts = self._process_response(
             response, functions, total_prompt
         )
 
@@ -210,10 +216,8 @@ class Seer:
             response_parts,
             self.prompt_count,
             self.token_counts,
-            self.response_times,
-            self.start_time,
             description=description,
-            elapsed_time=elapsed_time, # Pass elapsed time
+            elapsed_time=elapsed_time,  # Pass elapsed time
         )
 
         return response_parts, elapsed_time
@@ -244,78 +248,13 @@ class Seer:
             extracted_code.append((file_type, content, base_filename))
         return extracted_code
 
-
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
-        function_call_found = False
-        last_result = None
+        #  function_call_found = False
+        #  last_result = None
 
-        if response.candidates:  # Check if candidates is not empty
-            if hasattr(response.candidates[0].content, "parts"):
-                for part in response.candidates[0].content.parts:
-                    if part.text:
-                        #  response_parts.append("\n*text:*\n")
-                        response_parts.append(part.text + "\n")
-                        # Extract code blocks and write to files
-                        extracted_code = self._parse_code_text(part.text)
-                        #  self.session._write_code_text( # REMOVED
-                        #      extracted_code, # REMOVED
-                        #      self.prompt_count, # REMOVED
-                        #      self.extracted_file_counts, # REMOVED
-                        #      self.task, # REMOVED
-                        #      self.verifier # REMOVED
-                        #  ) # REMOVED
-                        for file_type, content, base_filename in extracted_code:
-                            if file_type == "py":
-                                # Pass base_filename to test_code
-                                test_results = self.verifier.test_code(
-                                    content, self.session.task_dir, self.task, base_filename
-                                )
-                                # Use base_filename for .md file
-                                test_results_md_file = self.session.task_dir / f"{base_filename}.md"
-                                with open(test_results_md_file, "w") as f:
-                                    f.write("".join(test_results))
-
-                    if part.executable_code:
-                        response_parts.append("\n*code_execution:*\n")
-                        code = part.executable_code.code
-                        response_parts.append(f"```python\n{code}\n```\n")
-                        #  code_file_path = ( # REMOVE
-                        #      self.session.task_dir / f"{self.prompt_count:03d}-code.py" # REMOVE
-                        #  ) # REMOVE
-                        #  self.session._write_to_file(code_file_path, code) # Use session method # REMOVE
-
-                        # Call _test_code and extend response_parts
-                        test_results = self.verifier.test_code(
-                            code, self.session.task_dir, self.task
-                        )
-                        response_parts.extend(test_results)
-
-                    if part.code_execution_result:
-                        response_parts.append("\n*code_execution_result:*\n")
-                        outcome = part.code_execution_result.outcome
-                        output = part.code_execution_result.output
-                        response_parts.append(f"outcome: {outcome}\n")
-                        response_parts.append(f"```\n{output}\n```\n")
-                        self.session._write_to_file(
-                            f"{self.prompt_count:03d}-code_result.txt", output
-                        ) # Use session method
-
-                    if part.function_call:
-                        function_call_found = True
-                        response_parts.append("\n*function_call:*\n")
-                        response_parts.append(part.function_call.name + "\n")
-
-                        result, msg = self._call_function(
-                            part.function_call, functions, total_prompt
-                        )
-                        last_result = msg
-
-                        response_parts.append("\nresult:\n")
-                        response_parts.append(f"{result}\n")
-                        response_parts.append(f"{msg}\n")
-        else:
+        if not response.candidates:  # Check if candidates is not empty
             # Handle the case where response.candidates is empty
             error_msg = "No candidates returned in response."
             print(f"\nERROR: {error_msg}")
@@ -323,7 +262,77 @@ class Seer:
             response_parts.append("\n*error:*\n")  # Add an error indicator to response
             response_parts.append(error_msg + "\n")
 
-        return response_parts, function_call_found, last_result
+            return response_parts  # , function_call_found, last_result
+
+        if not hasattr(response.candidates[0].content, "parts"):
+            # Handle the case where response.candidates is empty
+            error_msg = "No content parts in response."
+            print(f"\nERROR: {error_msg}")
+            self.session.log_error(error_msg, "".join(total_prompt))
+            response_parts.append("\n*error:*\n")  # Add an error indicator to response
+            response_parts.append(error_msg + "\n")
+
+            return response_parts  # , function_call_found, last_result
+
+        for part in response.candidates[0].content.parts:
+            if part.text:
+                #  response_parts.append("\n*text:*\n")
+                response_parts.append(part.text + "\n")
+                # Extract code blocks and write to files
+                extracted_code = self._parse_code_text(part.text)
+                for file_type, content, base_filename in extracted_code:
+                    if file_type == "py":
+                        # Pass base_filename to test_code
+                        test_results = self.verifier.test_code(
+                            content, self.session.task_dir, self.task, base_filename
+                        )
+                        # Use base_filename for .md file
+                        test_results_md_file = (
+                            self.session.task_dir / f"{base_filename}.md"
+                        )
+                        with open(test_results_md_file, "w") as f:
+                            f.write("".join(test_results))
+
+                        # TODO: check test results - 
+                        # if all examples pass then we should run the test input from the task through the function
+                        # if it doesn't pass - then we should give our results back to dreamer and coder in a new function
+
+            if part.executable_code:
+                response_parts.append("\n*code_execution:*\n")
+                code = part.executable_code.code
+                response_parts.append(f"```python\n{code}\n```\n")
+
+                # Call _test_code and extend response_parts
+                test_results = self.verifier.test_code(
+                    code, self.session.task_dir, self.task
+                )
+                response_parts.extend(test_results)
+
+            if part.code_execution_result:
+                response_parts.append("\n*code_execution_result:*\n")
+                outcome = part.code_execution_result.outcome
+                output = part.code_execution_result.output
+                response_parts.append(f"outcome: {outcome}\n")
+                response_parts.append(f"```\n{output}\n```\n")
+                self.session._write_to_file(
+                    f"{self.prompt_count:03d}-code_result.txt", output
+                )  # Use session method
+
+            if part.function_call:
+                function_call_found = True
+                response_parts.append("\n*function_call:*\n")
+                response_parts.append(part.function_call.name + "\n")
+
+                result, msg = self._call_function(
+                    part.function_call, functions, total_prompt
+                )
+                #  last_result = msg
+
+                response_parts.append("\nresult:\n")
+                response_parts.append(f"{result}\n")
+                response_parts.append(f"{msg}\n")
+
+        return response_parts  # , function_call_found, last_result
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""
@@ -360,9 +369,6 @@ class Seer:
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:
-            self.session.task_dir = self.session.session_dir / task.id
-            self.session.task_dir.mkdir(parents=True, exist_ok=True)
-
             self.solve(task)
 
         summarize_session(
