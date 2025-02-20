@@ -283,9 +283,10 @@ class Seer:
                 for file_type, content, base_filename in extracted_code:
                     if file_type == "py":
                         # Pass base_filename to test_code
-                        test_results = self.verifier.test_code(
+                        test_results, test_results_json = self.verifier.test_code(
                             content, self.session.task_dir, self.task, base_filename
                         )
+                        print(test_results_json)
                         # Use base_filename for .md file
                         test_results_md_file = (
                             self.session.task_dir / f"{base_filename}.md"
@@ -295,8 +296,8 @@ class Seer:
 
                         # Check test results
                         all_tests_passed = all(
-                            result.get("status") == "PASSED"
-                            for result in self.verifier.test_results
+                            result.get("status") == True
+                            for result in test_results_json
                         )
                         if all_tests_passed:
                             # Run the test input through the function

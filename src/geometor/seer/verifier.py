@@ -52,7 +52,7 @@ class Verifier:
                             )
                             transformed_image = transformed_grid.to_image()
                             image_filename = (
-                                f"{task_dir.name}-example_{i + 1}-transformed.png"  # Use task_dir.name
+                                f"{base_filename}-example_{i + 1}.png"  # Use task_dir.name
                             )
                             image_path = task_dir / image_filename # Use task_dir
                             transformed_image.save(image_path)
@@ -86,10 +86,10 @@ class Verifier:
 
                             if not np.array_equal(transformed_output, expected_output):
                                 test_results_str += f"**FAILED!**\n"
-                                example_result["status"] = "FAILED"
+                                example_result["status"] = False
                             else:
-                                test_results_str += f"  PASSED\n"
-                                example_result["status"] = "PASSED"
+                                test_results_str += f"PASSED\n"
+                                example_result["status"] = True
                         except Exception as e:
                             test_results_str += (
                                 f"  Error during validation for example {i + 1}: {e}\n"
@@ -118,7 +118,7 @@ class Verifier:
             json.dump(test_results_json, f, indent=2)
 
 
-        return [test_results_str]  # return the string
+        return test_results_str, test_results_json
 
     def analyze_results(self, test_results_str):
         """Analyzes the test results and provides feedback."""
