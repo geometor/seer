@@ -21,7 +21,7 @@ class Verifier:
         except SyntaxError as e:
             raise  # Re-raise SyntaxError to be handled by caller
 
-    def test_code(self, code, task_dir, task, base_filename):
+    def test_code(self, train_set, code, task_dir, task_pairs, base_filename):
         """Executes and validates the generated code, returning results as a list of dicts."""
         test_results_json = []  # Store results for JSON output
 
@@ -36,12 +36,12 @@ class Verifier:
             # Capture stdout - still needed for print statements in code
             output_capture = io.StringIO()
             with contextlib.redirect_stdout(output_capture):
-                for i, pair in enumerate(task.train):
+                for i, pair in enumerate(task_pairs):
                     input_grid = pair.input.grid
                     expected_output = pair.output.grid
 
                     example_result = {
-                        "example": i + 1,
+                        train_set: i + 1,
                         "input": pair.input.to_string(),
                         "expected_output": pair.output.to_string(),
                     }
