@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 class Verifier:
-    def test_code(self, code, task_dir, task):
+    def test_code(self, code, task_dir, task, base_filename):  # Add base_filename
         """Executes and validates the generated code, writing results to a file."""
         test_results_str = ""
         test_results_json = []  # Store results for JSON output
@@ -112,9 +112,9 @@ class Verifier:
             test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             test_results_json.append({"code_execution_error": str(e)})
 
-        # Save test results as JSON
-        test_results_json_file = Path(f"{task_dir.name}.json") # Use task_dir.name
-        with open(task_dir / test_results_json_file, "w") as f: # Use task_dir
+        # Use base_filename for JSON
+        test_results_json_file = task_dir / f"{base_filename}.json"
+        with open(test_results_json_file, "w") as f:
             json.dump(test_results_json, f, indent=2)
 
 

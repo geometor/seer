@@ -219,14 +219,29 @@ class Seer:
         return response_parts, elapsed_time
 
     def _parse_code_text(self, text):
-        """Extracts code blocks enclosed in triple backticks."""
+        """Extracts code blocks, writes them, and returns file info."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         extracted_code = []
         for file_type, content in matches:
             file_type = file_type.lower() if file_type else "txt"
             if file_type == "python":
-                file_type = "py"  # Correct extension
-            extracted_code.append((file_type, content))
+                file_type = "py"
+
+            # Write to file and get the *full path*
+            file_path_str = self.session._write_code_text(
+                [(file_type, content)],
+                self.prompt_count,
+                self.extracted_file_counts,
+                self.task,
+                self.verifier,
+            )
+            file_path = Path(file_path_str)
+            # Get just the filename from the Path object.
+            filename = file_path.name
+            # Return filename (without extension)
+            base_filename = file_path.stem
+
+            extracted_code.append((file_type, content, base_filename))
         return extracted_code
 
 
@@ -244,20 +259,22 @@ class Seer:
                         response_parts.append(part.text + "\n")
                         # Extract code blocks and write to files
                         extracted_code = self._parse_code_text(part.text)
-                        self.session._write_code_text(
-                            extracted_code,
-                            self.prompt_count,
-                            self.extracted_file_counts,
-                            self.task,
-                            self.verifier
-                        )
-                        for file_type, content in extracted_code:
+                        #  self.session._write_code_text( # REMOVED
+                        #      extracted_code, # REMOVED
+                        #      self.prompt_count, # REMOVED
+                        #      self.extracted_file_counts, # REMOVED
+                        #      self.task, # REMOVED
+                        #      self.verifier # REMOVED
+                        #  ) # REMOVED
+                        for file_type, content, base_filename in extracted_code:
                             if file_type == "py":
-                                test_results = self.verifier.test_code(content, self.session.task_dir, self.task)
-                                test_results_md_file = Path(
-                                    f"{self.session.task_dir.name}-{self.prompt_count:03d}.md"
-                                )  # Create Path object for .md file
-                                with open(self.session.task_dir / test_results_md_file, "w") as f:
+                                # Pass base_filename to test_code
+                                test_results = self.verifier.test_code(
+                                    content, self.session.task_dir, self.task, base_filename
+                                )
+                                # Use base_filename for .md file
+                                test_results_md_file = self.session.task_dir / f"{base_filename}.md"
+                                with open(test_results_md_file, "w") as f:
                                     f.write("".join(test_results))
 
                     if part.executable_code:
