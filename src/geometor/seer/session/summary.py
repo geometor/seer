@@ -279,6 +279,15 @@ def _create_response_table(resplist):
     )
     return table
 
+def _get_status_emoji(status):
+    """Returns an emoji based on the status."""
+    if status is True:
+        return "✅"
+    elif status is False:
+        return "❌"
+    else:
+        return "N/A"
+
 
 def _create_test_table(grouped_test_results):
     """Creates a rich.table.Table for the test report."""
@@ -295,12 +304,11 @@ def _create_test_table(grouped_test_results):
         for result in test_results:
             if "example" in result:
                 # --- Emoji Logic ---
-                #  status = result.get("status")
+                status = _get_status_emoji(result.get("status"))
+                size_correct = _get_status_emoji(result.get("size_correct"))
+                palette_correct = _get_status_emoji(result.get("color_palette_correct"))
+                color_count_correct = _get_status_emoji(result.get("correct_pixel_counts"))
 
-                status = "✅" if result.get("status") is True else "❌" if result.get("status") is False else "N/A"
-                size_correct = "✅" if result.get("size_correct") is True else "❌" if result.get("size_correct") is False else "N/A"
-                palette_correct = "✅" if result.get("color_palette_correct") is True else "❌" if result.get("color_palette_correct") is False else "N/A"
-                color_count_correct = "✅" if result.get("correct_pixel_counts") is True else "❌" if result.get("correct_pixel_counts") is False else "N/A"
                 pixels_off = str(result.get("pixels_off", "N/A"))
 
                 table.add_row(
