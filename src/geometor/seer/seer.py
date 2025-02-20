@@ -1,3 +1,4 @@
+# src/geometor/seer/seer.py
 """
 The Seer class orchestrates the process of solving tasks.
 
@@ -217,6 +218,18 @@ class Seer:
 
         return response_parts, elapsed_time
 
+    def _parse_code_text(self, text):
+        """Extracts code blocks enclosed in triple backticks."""
+        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
+        extracted_code = []
+        for file_type, content in matches:
+            file_type = file_type.lower() if file_type else "txt"
+            if file_type == "python":
+                file_type = "py"  # Correct extension
+            extracted_code.append((file_type, content))
+        return extracted_code
+
+
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
@@ -229,10 +242,19 @@ class Seer:
                     if part.text:
                         #  response_parts.append("\n*text:*\n")
                         response_parts.append(part.text + "\n")
-                        # Check for triple backticks and write to file
-                        self.session._write_extracted_content(
-                            part.text, self.prompt_count, self.extracted_file_counts, self.task, self.verifier
-                        )  # Use session method
+                        # Extract code blocks and write to files
+                        extracted_code = self._parse_code_text(part.text)  # NEW
+                        self.session._write_code_text( # NEW
+                            extracted_code, # NEW
+                            self.prompt_count, # NEW
+                            self.extracted_file_counts, # NEW
+                            self.task, # NEW
+                            self.verifier # NEW
+                        ) # NEW
+                        # Check for triple backticks and write to file # REMOVE
+                        #  self.session._write_extracted_content( # REMOVE
+                        #      part.text, self.prompt_count, self.extracted_file_counts, self.task, self.verifier # REMOVE
+                        #  )  # Use session method # REMOVE
 
                     if part.executable_code:
                         response_parts.append("\n*code_execution:*\n")

@@ -339,33 +339,55 @@ class Session:
         print()
         print(markdown)
 
-    def _write_extracted_content(
-        self, text, prompt_count, extracted_file_counts, task, verifier
-    ):
-        """Extracts content enclosed in triple backticks and writes it to files."""
-        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
-        for file_type, content in matches:
-            file_type = file_type.lower() if file_type else "txt"
-            if file_type == "python":
-                file_type = "py"  # Correct extension
-            if file_type not in extracted_file_counts:
-                file_type = "txt"
+    def _write_extracted_content( # REMOVE
+        self, text, prompt_count, extracted_file_counts, task, verifier # REMOVE
+    ): # REMOVE
+        """Extracts content enclosed in triple backticks and writes it to files.""" # REMOVE
+        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL) # REMOVE
+        for file_type, content in matches: # REMOVE
+            file_type = file_type.lower() if file_type else "txt" # REMOVE
+            if file_type == "python": # REMOVE
+                file_type = "py"  # Correct extension # REMOVE
+            if file_type not in extracted_file_counts: # REMOVE
+                file_type = "txt" # REMOVE
 
-            extracted_file_counts[file_type] += 1
-            count = extracted_file_counts[file_type]
-            file_name = f"{prompt_count:03d}-{file_type}_{count:02d}.{file_type}"
-            file_path = self.task_dir / file_name
+            extracted_file_counts[file_type] += 1 # REMOVE
+            count = extracted_file_counts[file_type] # REMOVE
+            file_name = f"{prompt_count:03d}-{file_type}_{count:02d}.{file_type}" # REMOVE
+            file_path = self.task_dir / file_name # REMOVE
 
-            self._write_to_file(file_name, content)
+            self._write_to_file(file_name, content) # REMOVE
 
-            # If it's a Python file, also run tests
-            if file_type == "py":
-                test_results = verifier.test_code(content, file_path, task)  # Pass task
-                # Write test results to file
-                test_results_file = Path(f"{file_path.stem}.md")
-                self._write_to_file(test_results_file, "".join(test_results))
+            # If it's a Python file, also run tests # REMOVE
+            if file_type == "py": # REMOVE
+                test_results = verifier.test_code(content, file_path, task)  # Pass task # REMOVE
+                # Write test results to file # REMOVE
+                test_results_file = Path(f"{file_path.stem()}.md") # REMOVE
+                self._write_to_file(test_results_file, "".join(test_results)) # REMOVE
 
-                # TODO: review the test results - 
+                # TODO: review the test results - # REMOVE
+
+    def _write_code_text( # NEW
+        self, extracted_code, prompt_count, extracted_file_counts, task, verifier # NEW
+    ):  # NEW
+        """Writes extracted code blocks to files and runs tests on Python files.""" # NEW
+        for file_type, content in extracted_code: # NEW
+            if file_type not in extracted_file_counts: # NEW
+                file_type = "txt"  # Default to txt for unknown types # NEW
+
+            extracted_file_counts[file_type] += 1 # NEW
+            count = extracted_file_counts[file_type] # NEW
+            file_name = f"{prompt_count:03d}-{file_type}_{count:02d}.{file_type}" # NEW
+            file_path = self.task_dir / file_name # NEW
+
+            self._write_to_file(file_name, content) # NEW
+
+            if file_type == "py": # NEW
+                test_results = verifier.test_code(content, file_path, task) # NEW
+                test_results_file = Path( # NEW
+                    f"{file_path.stem()}.md" # NEW
+                )  # Create Path object for .md file # NEW
+                self._write_to_file(test_results_file, "".join(test_results)) # NEW
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""
