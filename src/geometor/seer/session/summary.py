@@ -48,7 +48,7 @@ def summarize_session(session_dir, log_error, display_response):
                     total_tests = 0
                     for file_results in test_report.values():
                         passed_count = sum(
-                            1 for res in file_results if res.get("status") == "PASSED"
+                            1 for res in file_results if res.get("status") == True
                         )
                         total_tests = len(file_results)  # all results in file have same len
                         max_passed = max(max_passed, passed_count)
@@ -151,8 +151,8 @@ def summarize_task(task_dir, log_error):
         try:
             with open(py_file, "r") as f:
                 test_results = json.load(f)
-                file_index = py_file.stem.split("-")[0]
-                grouped_test_results[file_index] = test_results
+                #  file_index = py_file.stem.split("-")[0]
+                grouped_test_results[py_file] = test_results
         except Exception as e:
             print(f"Failed to load test results from {py_file}: {e}")
             log_error(f"Failed to load test results from {py_file}: {e}")
