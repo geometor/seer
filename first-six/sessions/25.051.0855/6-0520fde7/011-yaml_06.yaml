@@ -1,0 +1,27 @@
+task: 010-py_07
+summary: |
+  The task involves extracting a 3x3 subgrid from the input.  The center of this subgrid
+  corresponds to the vertically middle gray pixel in the input. The transformation
+  modifies this 3x3 subgrid. The central pixel of the subgrid is always turned red.
+  Additionally, pixels that were gray in the input, and are directly above or below
+  the central gray pixel, are ALSO turned red, but ONLY if they would fall inside the 3x3 subgrid.
+  All other cells within the 3x3 extracted subgrid are white. The output grid is always 3x3.
+objects:
+  - object_1:
+      type: pixel
+      color: gray (5)
+      properties:
+        - vertically middle
+        - center of 3x3 subgrid
+  - object_2:
+      type: pixel
+      color: any
+      properties: all pixels within the 3x3 region
+  - object_3:
+      type: pixel
+      color: red (2)
+      properties: center of the output subgrid
+  - object_4:
+          type: pixel
+          color: red (2)
+          properties: vertical neighbours of the gray pixel in the input IF and ONLY if the neighbour is in the output

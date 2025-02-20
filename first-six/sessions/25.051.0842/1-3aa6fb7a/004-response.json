@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n\n1. **Identify 2x1 Azure Rectangles:** Find all vertical 2x1 rectangles (objects) of azure color (8) within the input grid.\n\n2. **Add Blue Cells:**  For each identified azure rectangle:\n   -  Find the *top* azure cell. Add a blue cell (1) immediately to the *right* of this top cell.\n   -  Find the *bottom* azure cell. Add a blue cell (1) immediately to the *left* of the bottom cell.\n\n3. **Preserve Other Cells:**  All other cells in the input grid that are not part of the identified 2x1 azure rectangles remain unchanged in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds contiguous regions of the same color and returns them as a list of objects.\n    Each object is a dictionary with 'color' and 'positions' (list of (row, col) tuples).\n    \"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, positions):\n        if (row, col) in visited or not (0 <= row < rows and 0 <= col < cols) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        positions.append((row, col))\n        dfs(row + 1, col, color, positions)\n        dfs(row - 1, col, color, positions)\n        dfs(row, col + 1, color, positions)\n        dfs(row, col - 1, color, positions)\n\n    for row in range(rows):\n        for col in range(cols):\n            if (row, col) not in visited:\n                color = grid[row, col]\n                positions = []\n                dfs(row, col, color, positions)\n                if positions:\n                    objects.append({'color': color, 'positions': positions})\n    return objects\n\ndef is_2x1_vertical_rectangle(positions):\n    \"\"\"\n    Checks if the given positions form a 2x1 vertical rectangle.\n    \"\"\"\n    if len(positions) != 2:\n        return False\n    row1, col1 = positions[0]\n    row2, col2 = positions[1]\n    return (col1 == col2) and (abs(row1 - row2) == 1)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    For each 2x1 azure rectangle, add a blue (1) cell to the\n    right of its top cell, and to the left of its bottom cell.\n    \"\"\"\n    output_grid = np.copy(input_grid) # Initialize the output grid as a copy of the input grid.\n    objects = find_objects(input_grid) # Find all objects in the input grid.\n\n    for obj in objects: # Iterate over each found object.\n        if obj['color'] == 8 and is_2x1_vertical_rectangle(obj['positions']): # Check if the object is a 2x1 vertical azure rectangle.\n            # Sort positions to ensure we get top and bottom cells correctly.\n            positions = sorted(obj['positions'])\n            top_row, top_col = positions[0]  # Get the row and column of the top cell.\n            bottom_row, bottom_col = positions[1] # Get the row and column of the bottom cell.\n\n            # Add a blue cell to the right of the top cell.\n            if top_col + 1 < output_grid.shape[1]:  # Check if adding a column is within bounds.\n                output_grid[top_row, top_col + 1] = 1 # Set the cell to blue (1).\n\n            # Add a blue cell to the left of the bottom cell.\n            if bottom_col - 1 >= 0: # Check if subtracting a column is within bounds.\n                output_grid[bottom_row, bottom_col - 1] = 1 # Set the cell to blue (1).\n\n    return output_grid # Return the modified grid.\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3703,
+    "candidates_token_count": 950,
+    "total_token_count": 4653,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.19427
+  },
+  "response_file": "004-response.json"
+}

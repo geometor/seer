@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Find all objects.\n2. Move each object at the bottom, preserving the column position and stacking if necessary.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds all distinct single-cell objects in the grid.\n    Returns a dictionary of color: (row, col) pairs.\n    \"\"\"\n    objects = {}\n    for r, row in enumerate(grid):\n        for c, color in enumerate(row):\n            if color != 0:\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append((r, c))\n    return objects\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)\n    objects = find_objects(input_grid)\n\n    # Create a dictionary to track the next available row for each column\n    next_available_row = {col: input_grid.shape[0] - 1 for col in range(input_grid.shape[1])}\n\n    # Iterate through each object and move it down\n    for color, positions in objects.items():\n        for r, c in positions:\n          output_grid[next_available_row[c], c] = color\n          next_available_row[c] -= 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4148,
+    "candidates_token_count": 322,
+    "total_token_count": 4470,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 3.399441
+  },
+  "response_file": "006-response.json"
+}

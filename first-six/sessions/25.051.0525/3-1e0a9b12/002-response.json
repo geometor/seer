@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule involves moving every non-zero object down to the last available row of the grid, while retaining the horizontal order. All the objects from the first row drop down to the last row. The order of the colored objects from the last row of the input is preserved, and the zero-colored cells in the last row are the only ones to change.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving each non-zero colored cell to the last row,\n    maintaining their original horizontal order.\n    \"\"\"\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the dimensions of the grid\n    rows, cols = input_grid.shape\n\n    # Create a list to store non-zero elements and their original column indices\n    non_zero_elements = []\n\n    # Iterate through the input grid to find non-zero elements\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                non_zero_elements.append((input_grid[r, c], c))\n\n    # Sort the non-zero elements by their column index to maintain horizontal order\n    non_zero_elements.sort(key=lambda x: x[1])\n\n    # Clear the last row of the output grid\n    output_grid[rows - 1, :] = 0\n\n    # Place the non-zero elements in the last row of the output grid\n    for i, (value, _) in enumerate(non_zero_elements):\n        output_grid[rows - 1, i] = value\n    \n    # move non_zero objects to their new positions in the last row\n    for c in range(cols):\n      for r in range(rows):\n        if input_grid[r,c] != 0:\n          output_grid[rows-1,c] = input_grid[r,c]\n          if r != rows -1:\n            output_grid[r,c] = 0\n    \n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1588,
+    "candidates_token_count": 485,
+    "total_token_count": 2073,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.784964
+  },
+  "response_file": "002-response.json"
+}

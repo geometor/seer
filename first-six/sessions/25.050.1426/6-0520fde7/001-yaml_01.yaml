@@ -1,0 +1,15 @@
+task_context:
+  input_grid_shape: variable
+  output_grid_shape: fixed_3x3
+  color_palette: [0, 1, 2, 5] # White, Blue, Red, Gray
+  transformation_type: object_detection_and_fixed_output
+  input_objects:
+    color_1_regions: scattered_blue_regions
+    color_5_column: vertical_column_of_gray
+  output_object:
+    single_red_pixel: center_of_3x3_grid
+
+transformation_observations:
+  input_contains_vertical_gray_column: true
+  output_is_fixed_3x3_with_center_red_pixel: true
+  transformation_logic: "If the input grid contains a vertical column of gray color (5), the output is a fixed 3x3 grid with a red pixel (2) in the center and white color (0) elsewhere. The input's content otherwise is ignored."

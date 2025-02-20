@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation preserves the azure (8) objects and adds blue (1) cells immediately to the right of the first azure element of a vertical line, and to the left of the second element of a horizontal line.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find objects of a specific color in the grid.\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n\n        # Check all 4 directions (up, down, left, right)\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef check_line_orientation(obj):\n\n    if len(obj) < 2:\n        return \"point\"  # Not a line\n\n    # Extract row and column coordinates\n    rows, cols = zip(*obj)\n\n    if len(set(rows)) == 1:\n        return \"horizontal\"  # All rows are the same\n    elif len(set(cols)) == 1:\n        return \"vertical\"  # All columns are the same\n    else:\n        return \"diagonal\"\n\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find objects of color 8 (azure)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Preserve azure objects and add blue cells based on their positions\n    for obj in azure_objects:\n        orientation = check_line_orientation(obj)\n\n        if orientation == \"vertical\":\n            first_element = obj[0]\n            r, c = first_element\n            if c + 1 < cols and output_grid[r, c + 1] != 8:\n                 output_grid[r, c + 1] = 1  # Paint blue to the right\n\n        elif orientation == \"horizontal\":\n\n            second_element = obj[1]\n            r,c = second_element\n            if c - 1 >= 0 and output_grid[r, c - 1] != 8:\n                 output_grid[r, c-1] = 1 # Paint blue to the left\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1654,
+    "candidates_token_count": 723,
+    "total_token_count": 2377,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 7.294657
+  },
+  "response_file": "002-response.json"
+}

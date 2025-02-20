@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation preserves all single cells of colors 2, 1, and 6.  New color cells are added in specific patterns around the original positions of color 2 and color 1 cells.\n\nFor each cell of color 2:\n- Two cells of color 4 are placed in the row above, one column to the left and right.\n- Two cells of color 4 are placed in the row below, one column to the left and right.\n\nFor each cell of color 1:\n- A cell of color 7 is placed in the row above.\n- Cells of color 7 fill the 3x3 neighborhood around the original cell, *excluding* the cell itself and the cells *horizontally adjacent* to it.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find coordinates of all cells with the specified color.\n    return np.array(np.where(grid == color)).T\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the objects of color 2, 1 and 6.  These are all single cells.\n    objects_2 = find_objects(input_grid, 2)\n    objects_1 = find_objects(input_grid, 1)\n    objects_6 = find_objects(input_grid, 6)\n\n    # Apply rules for object of color 2.\n    for obj_2 in objects_2:\n        row, col = obj_2\n        if row - 1 >= 0:\n            if col - 1 >= 0:\n                output_grid[row - 1, col - 1] = 4\n            if col + 1 < output_grid.shape[1]:\n                output_grid[row - 1, col + 1] = 4\n        if row + 1 < output_grid.shape[0]:\n            if col - 1 >= 0:\n                output_grid[row + 1, col - 1] = 4\n            if col + 1 < output_grid.shape[1]:\n                output_grid[row + 1, col + 1] = 4\n\n    # Apply rules for object of color 1.\n    for obj_1 in objects_1:\n        row, col = obj_1\n        if 0 <= row - 1 < output_grid.shape[0]:\n            output_grid[row - 1, col] = 7  # Above\n\n        # 3x3 neighborhood excluding horizontal neighbors\n        for i in range(max(0, row - 1), min(row + 2, output_grid.shape[0])):\n            for j in range(max(0, col - 1), min(col + 2, output_grid.shape[1])):\n                if (i, j) != (row, col) and j != col:  # Exclude the cell itself and horizontal neighbors\n                    output_grid[i, j] = 7\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6374,
+    "candidates_token_count": 700,
+    "total_token_count": 7074,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.847426
+  },
+  "response_file": "010-response.json"
+}

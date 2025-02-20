@@ -1,0 +1,19 @@
+task: 010_place_blue_near_azure
+objects:
+  isolated_azure:
+    description: Single azure (8) cells that are not adjacent (even diagonally) to other azure cells.
+    properties:
+      color: 8
+      isolated: True  # Custom property to denote isolation
+  blue_marker:
+    description: Blue (1) cells placed near isolated azure cells.
+    properties:
+      color: 1
+
+transformations:
+  - description: Place a blue cell to the right of the topmost isolated azure cell.
+    condition: The azure cell is the topmost isolated one.
+    action: Place blue (1) to the immediate right.
+  - description: Place a blue cell to the left of any other isolated azure cell.
+    condition: The azure cell is isolated but *not* the topmost.
+    action: Place blue (1) to the immediate left.

@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies cells of color 2 and color 1 as anchor points for transformations. For each cell of color 2, it inserts cells of color 4 diagonally above and below it (one position away).  For each cell of color 1, it creates a 3x3 grid of color 7 centered on that cell, while preserving the original color 1 cell. Border conditions are handled to prevent out-of-bounds access. Overlapping regions caused by multiple color 1 cells are correctly merged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find coordinates of all cells with the specified color.\n    return np.array(np.where(grid == color)).T\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    \n    # Find the objects of color 2 and 1.\n    objects_2 = find_objects(input_grid, 2)\n    objects_1 = find_objects(input_grid, 1)\n\n    # Apply rules for object of color 2.\n    for obj_2 in objects_2:\n        row, col = obj_2\n        if row > 0 and col > 0:\n          output_grid[row - 1, col - 1] = 4\n        if row > 0 and col < output_grid.shape[1]-1:\n          output_grid[row - 1, col + 1] = 4\n        if row < output_grid.shape[0]-1 and col > 0:\n          output_grid[row + 1, col - 1] = 4\n        if row < output_grid.shape[0]-1 and col < output_grid.shape[1]-1:\n          output_grid[row + 1, col + 1] = 4\n    \n    # Apply rules for object of color 1\n    for obj_1 in objects_1:\n        row, col = obj_1\n        for i in range(max(0, row - 1), min(output_grid.shape[0], row + 2)):\n            for j in range(max(0, col - 1), min(output_grid.shape[1], col + 2)):\n                if (i,j) != (row, col):\n                     output_grid[i,j] = 7\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4161,
+    "candidates_token_count": 561,
+    "total_token_count": 4722,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 21.394545
+  },
+  "response_file": "004-response.json"
+}

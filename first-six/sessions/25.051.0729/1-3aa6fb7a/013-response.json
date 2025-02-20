@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms the input grid by placing blue cells (color 1) near isolated azure cells (color 8).\nThe topmost isolated azure cell gets a blue cell to its right, and all other isolated azure cells get a blue cell to their left.\n\"\"\"\n\nimport numpy as np\n\ndef find_isolated_cells(grid, color):\n    \"\"\"Finds isolated cells of a given color, considering diagonal adjacency.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    isolated_cells = []\n\n    def flood_fill(r, c):\n        \"\"\"Performs a flood fill to find connected components.\"\"\"\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n            visited[r, c] or grid[r, c] != color):\n            return []\n\n        visited[r, c] = True\n        component = [(r, c)]\n\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                component.extend(flood_fill(r + dr, c + dc))\n        return component\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                component = flood_fill(r, c)\n                if len(component) == 1:\n                    isolated_cells.append(component[0])\n    return isolated_cells\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find isolated azure (color 8) cells\n    isolated_azure_cells = find_isolated_cells(input_grid, 8)\n\n    # Sort isolated cells by row, then column\n    isolated_azure_cells.sort()\n\n    # Apply the transformation based on the position of isolated azure cells\n    if isolated_azure_cells:\n        # Top isolated azure cell: place blue cell to the right\n        top_azure_row, top_azure_col = isolated_azure_cells[0]\n        if top_azure_col + 1 < cols:  # Check bounds\n            output_grid[top_azure_row, top_azure_col + 1] = 1 # Place blue cell\n\n        # All other isolated azure cells: place blue cell to the left\n        for i in range(1, len(isolated_azure_cells)):\n            azure_row, azure_col = isolated_azure_cells[i]\n            if azure_col - 1 >= 0:  # Check bounds\n                output_grid[azure_row, azure_col - 1] = 1 # Place blue cell\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2751,
+    "candidates_token_count": 662,
+    "total_token_count": 3413,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 13.48098
+  },
+  "response_file": "013-response.json"
+}

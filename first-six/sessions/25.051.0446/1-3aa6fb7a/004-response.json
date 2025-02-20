@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe L shapes of azure color are kept, and in each \"corner\" a blue pixel is created, inside the L-shape, at a Manhattan distance of 1 of the meeting of the two segments of the L.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds L-shaped objects of a specified color in the grid.\n    Returns a list of dictionaries, each containing the 'elbow' and 'leg' coordinates.\n    \"\"\"\n    l_shapes = []\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_l):\n        visited[r, c] = True\n        current_l.append((r, c))\n\n        neighbors = [(r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)]\n        for nr, nc in neighbors:\n            if is_valid(nr, nc) and not visited[nr, nc] and grid[nr, nc] == color:\n                dfs(nr, nc, current_l)\n    \n    # Find the first point of the L.\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r,c] == color and not visited[r,c]:\n                current_l = []\n                dfs(r,c,current_l)\n                \n                # Check if this forms the L.\n                if len(current_l) == 3:\n                  # determine elbow.\n                  elbow_candidates = []\n                  for r_test,c_test in current_l:\n                    count = 0\n                    neighbors = [(r_test - 1, c_test), (r_test + 1, c_test), (r_test, c_test - 1), (r_test, c_test + 1)]\n                    for nr, nc in neighbors:\n                      if (nr,nc) in current_l:\n                        count += 1\n                    if count == 2:\n                      elbow_candidates.append((r_test,c_test))\n\n                  if len(elbow_candidates) == 1:\n                    l_shapes.append({\"elbow\": elbow_candidates[0], \"legs\": current_l})\n\n    return l_shapes\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Keep the L shapes of azure color, and in each \"corner\" a blue pixel is created,\n    inside the L-shape, at a Manhattan distance of 1 of the meeting of the two segments.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure = 8\n    blue = 1\n\n    l_shapes = find_l_shapes(input_grid, azure)\n\n    for l_shape in l_shapes:\n        elbow_row, elbow_col = l_shape['elbow']\n        \n        #find insertion points:\n        insertion_points = []\n        for leg_row, leg_col in l_shape[\"legs\"]:\n          if (leg_row,leg_col) != (elbow_row,elbow_col):\n            insertion_points.append((leg_row,leg_col))\n        \n        # insert points\n        for ins_row, ins_col in insertion_points:\n          output_grid[ins_row,ins_col] = blue\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3373,
+    "candidates_token_count": 823,
+    "total_token_count": 4196,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.809505
+  },
+  "response_file": "004-response.json"
+}

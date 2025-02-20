@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is a color mapping:\n1. Identify vertical lines of the same color.\n2. Map colors:\n   - Replace color 2 (red) with color 6 (magenta).\n   - Replace color 3 (green) with color 4 (yellow).\n   - Replace color 8 (azure) with color 9 (maroon).\n3. Preserve the structure and positions of the lines.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified color mapping rule.\n    \"\"\"\n    # Create a copy of the input grid to modify.\n    output_grid = np.copy(input_grid)\n\n    # Apply the color mapping.\n    for i in range(output_grid.shape[0]):\n        for j in range(output_grid.shape[1]):\n            if output_grid[i, j] == 2:\n                output_grid[i, j] = 6\n            elif output_grid[i, j] == 3:\n                output_grid[i, j] = 4\n            elif output_grid[i, j] == 8:\n                output_grid[i, j] = 9\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2604,
+    "candidates_token_count": 286,
+    "total_token_count": 2890,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 2.941401
+  },
+  "response_file": "006-response.json"
+}

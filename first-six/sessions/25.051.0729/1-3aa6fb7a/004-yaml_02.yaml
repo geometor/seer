@@ -1,0 +1,74 @@
+observations:
+  example_1:
+    input:
+      objects:
+        - color: 8 (azure)
+          instances:
+            - shape: single cell
+              position: (1, 1) # row, col
+            - shape: L-shape (2x2 block missing one cell)
+              position: Top-left corner at (2, 1)
+            - shape: L-shape (2x2 block missing one cell)
+              position: Top-left corner at (3, 4)
+            - shape: single cell
+              position: (4, 5)
+      
+    output:
+        objects:
+        - color: 8 (azure)
+          instances:
+            - shape: single cell
+              position: (1, 1)
+            - shape: L-shape (2x2 block missing one cell)
+              position:  Top-left corner at (2, 1)
+            - shape: L-shape (2x2 block missing one cell)
+              position: Top-left corner at (3, 4)
+            - shape: single cell
+              position: (4, 5)
+        - color: 1 (blue)
+          instances:
+            - shape: single cell
+              position: (1,2)
+            - shape: single cell
+              position: (4,4)
+  example_2:
+    input:
+      objects:
+       - color: 8
+         instances:
+           - shape: L (two cells)
+             position: Top-left at (0, 4)
+           - shape: single
+             position: (1, 5)
+           - shape: single
+             position: (2, 2)
+           - shape: L (two cells)
+             position: Top-left at (3, 2)
+           - shape: single
+             position: (5, 4)
+           - shape: L (two cells)
+             position: Top-left at (6,3)
+    output:
+      objects:
+       - color: 8
+         instances:
+           - shape: L (two cells)
+             position: Top-left at (0, 4)
+           - shape: single
+             position: (1, 5)
+           - shape: single
+             position: (2, 2)
+           - shape: L (two cells)
+             position: Top-left at (3, 2)
+           - shape: single
+             position: (5, 4)
+           - shape: L (two cells)
+             position: Top-left at (6,3)
+       - color: 1
+         instances:
+           - shape: single
+             position: (1, 4)
+           - shape: single
+             position: (2,3)
+           - shape: single
+             position: (5,3)

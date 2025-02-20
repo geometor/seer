@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule involves keeping the existing 2x1 azure rectangles and adding a new blue (1) cell to the right of their top cells, and a blue (1) cell before their bottom cell.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds contiguous regions of the same color and returns them as a list of objects.\n    Each object is a dictionary with 'color' and 'positions' (list of (row, col) tuples).\n    \"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, positions):\n        if (row, col) in visited or not (0 <= row < rows and 0 <= col < cols) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        positions.append((row, col))\n        dfs(row + 1, col, color, positions)\n        dfs(row - 1, col, color, positions)\n        dfs(row, col + 1, color, positions)\n        dfs(row, col - 1, color, positions)\n\n    for row in range(rows):\n        for col in range(cols):\n            if (row, col) not in visited:\n                color = grid[row, col]\n                positions = []\n                dfs(row, col, color, positions)\n                if positions:\n                    objects.append({'color': color, 'positions': positions})\n    return objects\n\ndef is_2x1_vertical_rectangle(positions):\n    \"\"\"\n    Checks if the given positions form a 2x1 vertical rectangle.\n    \"\"\"\n    if len(positions) != 2:\n        return False\n    row1, col1 = positions[0]\n    row2, col2 = positions[1]\n    return (col1 == col2) and (abs(row1 - row2) == 1)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    For each 2x1 azure rectangle, add a blue (1) cell to the\n    right of its top cell, and before its bottom cell.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    objects = find_objects(input_grid)\n\n    for obj in objects:\n        if obj['color'] == 8 and is_2x1_vertical_rectangle(obj['positions']):\n            # Sort positions to ensure we get top and bottom cells correctly\n            positions = sorted(obj['positions'])\n            top_row, top_col = positions[0]\n            bottom_row, bottom_col = positions[1]\n\n            # Add blue cell to the right of the top cell\n            if top_col + 1 < output_grid.shape[1]:\n                output_grid[top_row, top_col + 1] = 1\n\n            # Add blue cell before the bottom cell\n            if bottom_col -1 >=0:\n                 if bottom_row+1 == output_grid.shape[0]:\n                    output_grid[bottom_row, bottom_col - 1] = 1\n                 else:\n                    output_grid[bottom_row, bottom_col-1] = 1\n            elif bottom_col>=0 :\n                if bottom_row+1 == output_grid.shape[0]:\n                    output_grid[bottom_row, bottom_col] = 1\n                else:\n                    output_grid[bottom_row, bottom_col] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1754,
+    "candidates_token_count": 817,
+    "total_token_count": 2571,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.220622
+  },
+  "response_file": "002-response.json"
+}

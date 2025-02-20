@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation uses each red and blue cell in the input as anchor points to create new colored cells in the output. Yellow cells are placed relative to each red cell, and orange cells cluster around each blue cell. The positions of the original red, azure, and blue cells are unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find the coordinates of all instances of a specific color in the grid.\n    coords = np.argwhere(grid == color)\n    return coords.tolist() if coords.size > 0 else []\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid.\n    output_grid = input_grid.copy()\n\n    # Find all red (color 2) and blue (color 1) cells.\n    red_positions = find_objects(input_grid, 2)\n    blue_positions = find_objects(input_grid, 1)\n\n    # Place yellow cells relative to each red cell.\n    for red_pos in red_positions:\n        yellow_row = red_pos[0] - 2\n        if yellow_row >= 0:\n            output_grid[yellow_row, red_pos[1]] = 4\n            #check for index out of bounds\n            if red_pos[1] + 2 < output_grid.shape[1]:\n                output_grid[yellow_row, red_pos[1] + 2] = 4\n        yellow_row = red_pos[0] - 1\n        if yellow_row-1 >= 0:\n          output_grid[yellow_row-1, red_pos[1]] = 4\n          #check for index out of bounds\n          if red_pos[1] + 2 < output_grid.shape[1]:\n            output_grid[yellow_row-1, red_pos[1] + 2] = 4\n\n    # Create orange cells around each blue cell.\n    for blue_pos in blue_positions:\n        #check for index out of bounds\n        if blue_pos[1] - 1 >= 0:\n            output_grid[blue_pos[0], blue_pos[1] - 1] = 7  # Left\n        if blue_pos[1] + 1 < output_grid.shape[1]:\n            output_grid[blue_pos[0], blue_pos[1] + 1] = 7  # Right\n        if blue_pos[0] + 1 < output_grid.shape[0]:\n            output_grid[blue_pos[0] + 1, blue_pos[1]] = 7  # Down\n            output_grid[blue_pos[0] + 1, blue_pos[1] + 0] = 7 #Added +0 to avoid overwrite\n        # Added this:\n        if blue_pos[0] + 1 < output_grid.shape[0] and blue_pos[1] - 1 >= 0 :\n            output_grid[blue_pos[0] + 1, blue_pos[1] -1] = 7\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3598,
+    "candidates_token_count": 724,
+    "total_token_count": 4322,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.563468
+  },
+  "response_file": "004-response.json"
+}

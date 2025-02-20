@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify all objects composed of color 8.\nPlace a cell of color 1 directly above the top of each vertical line object of color 8,\n  only if there is a cell of color 0 above the azure object.\nPlace a cell of color 1 directly to the left of the leftmost cell of each horizontal line object of color 8,\n  only if there is a cell of color 0 to the left.\nPreserve all existing objects of color 8.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all objects of a given color in the grid.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, current_object):\n        \"\"\"Depth-first search to find contiguous cells of the same color.\"\"\"\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_vertical_line(obj):\n    \"\"\"Checks if an object is a vertical line.\"\"\"\n    rows = sorted(list(set([cell[0] for cell in obj])))\n    cols = sorted(list(set([cell[1] for cell in obj])))\n    if len(cols) == 1 and len(rows) > 1:\n        return True\n    return False\n\ndef is_horizontal_line(obj):\n    \"\"\"Checks if an object is a horizontal line.\"\"\"\n    rows = sorted(list(set([cell[0] for cell in obj])))\n    cols = sorted(list(set([cell[1] for cell in obj])))\n    if len(rows) == 1 and len(cols) > 1:\n        return True\n    return False\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rules.\"\"\"\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = input_grid.copy()\n    # Find all objects of color 8\n    objects_8 = find_objects(input_grid, 8)\n\n    for obj in objects_8:\n        # Check if the object is a vertical line\n        if is_vertical_line(obj):\n            top_row = min(cell[0] for cell in obj)\n            top_col = obj[0][1]\n            # Check for color 0 above and place color 1 if true\n            if top_row > 0 and input_grid[top_row - 1, top_col] == 0:\n                output_grid[top_row - 1, top_col] = 1\n\n        # Check if the object is a horizontal line\n        elif is_horizontal_line(obj):\n            left_col = min(cell[1] for cell in obj)\n            left_row = obj[0][0]\n            # Check for color 0 to the left and place color 1 if true\n            if left_col > 0 and input_grid[left_row, left_col - 1] == 0:\n                output_grid[left_row, left_col - 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3835,
+    "candidates_token_count": 901,
+    "total_token_count": 4736,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.143749
+  },
+  "response_file": "004-response.json"
+}

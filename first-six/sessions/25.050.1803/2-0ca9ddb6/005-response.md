@@ -1,0 +1,16 @@
+# 2-0ca9ddb6 • 005 • example_3 - NLP
+
+---
+```yaml
+task_context: "The task is to transform an input grid to an output grid by altering the neighboring cells of specific colored cells. Red cells affect diagonal neighbors and blue cells affect orthogonal neighbors."
+natural_language_program: |
+  1. Initialize the output grid as a direct copy of the input grid.
+  2. Iterate through each cell of the input grid, identifying each cell by its row and column index.
+  3. For each cell, check if its value is non-zero (greater than 0).
+  4. If the cell's value is non-zero, determine its color.
+  5. If the color of the cell is red (color code 2), then for each of the four diagonal neighbor positions (top-left, top-right, bottom-left, bottom-right) relative to the current cell, set the value of the cell at that position in the output grid to yellow (color code 4). Ensure that these neighbor positions are within the grid boundaries.
+  6. If the color of the cell is blue (color code 1), then for each of the four orthogonal neighbor positions (up, down, left, right) relative to the current cell, set the value of the cell at that position in the output grid to orange (color code 7). Ensure that these neighbor positions are within the grid boundaries.
+  7. After iterating through all cells and applying the neighbor modifications based on cell colors, the resulting output grid is the final transformed grid.
+  8. It is important to note that the original non-zero cells in the input grid retain their original colors and positions in the output grid.
+  9. Cells that were initially zero in the input grid will remain zero in the output grid unless they are modified by becoming neighbors of a red or blue cell as per steps 5 and 6.
+```

@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is a complete, one-to-one color mapping.  Every instance of a specific color in the input grid is replaced by a corresponding color in the output grid, maintaining the original grid's structure. Here are the specific steps:\n\n1.  Iterate: Examine each cell in the input grid.\n2.  Map: For each cell, apply the following color mapping:\n    *   If the color is 1, replace it with 5.\n    *   If the color is 2, replace it with 6.\n    *   If the color is 3, replace it with 4.\n    *   If the color is 4, replace it with 3.\n    *   If the color is 5, replace it with 1.\n    *   If the color is 6, replace it with 2.\n    *   If the color is 8, replace it with 9.\n    *   If the color is 9, replace it with 8.\n    *   If the color is any other value, leave it as it.\n3. Preserve Structure: The position of each cell is preserved in output. The overall structure, including vertical lines of the same colors, remains the same; only the color values change.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the complete color mapping rule.\n    \"\"\"\n    # Create a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Define the color mapping.\n    mapping = {\n        1: 5,\n        2: 6,\n        3: 4,\n        4: 3,\n        5: 1,\n        6: 2,\n        8: 9,\n        9: 8,\n    }\n\n    # Iterate over each cell of the grid.\n    for i in range(output_grid.shape[0]):\n        for j in range(output_grid.shape[1]):\n            # Apply the mapping if the color is in the mapping dictionary.\n            if output_grid[i, j] in mapping:\n                output_grid[i, j] = mapping[output_grid[i, j]]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2676,
+    "candidates_token_count": 509,
+    "total_token_count": 3185,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.794232
+  },
+  "response_file": "008-response.json"
+}

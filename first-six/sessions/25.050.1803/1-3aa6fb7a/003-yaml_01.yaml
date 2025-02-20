@@ -1,0 +1,27 @@
+task_context: "grid transformation"
+transformation_rule: "add blue cell adjacent to azure regions based on shape lean"
+objects:
+  - azure_region:
+      color: 8
+      properties:
+        - bounding_box
+        - centroid_column
+        - bounding_box_center_column
+        - lean_direction: ["left", "right"]
+  - blue_cell:
+      color: 1
+      action: "add adjacent to azure region"
+predicates:
+  - is_connected: "cells of same color are adjacent"
+  - is_right_leaning: "centroid_column > bounding_box_center_column"
+  - is_left_or_centered_leaning: "centroid_column <= bounding_box_center_column"
+actions:
+  - identify_azure_regions: "find all connected components of color 8"
+  - calculate_bounding_box: "find min/max row/col of region"
+  - calculate_centroid_column: "average column index of region cells"
+  - calculate_bounding_box_center_column: "average min/max column of bounding box"
+  - compare_columns: "centroid_column vs bounding_box_center_column"
+  - place_blue_cell_left: "at (min_r, min_c) if right-leaning"
+  - place_blue_cell_right: "at (min_r, max_c + 1) if left/centered-leaning"
+  - preserve_azure_region: "keep azure cells unchanged"
+  - maintain_background: "keep non-azure and non-modified cells as white"

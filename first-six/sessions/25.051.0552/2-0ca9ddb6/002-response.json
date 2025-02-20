@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies single-cell objects in the input, retains them and creates a cross pattern from adjacent cells around them in the output using distinct colors for different objects of the input.\n\"\"\"\n\nimport numpy as np\n\ndef find_single_cell_objects(grid):\n    # Find single-cell objects and their positions\n    objects = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                # Check if it's a single-cell object\n                is_single = True\n                for dr in [-1, 0, 1]:\n                    for dc in [-1, 0, 1]:\n                        if (dr != 0 or dc != 0) and 0 <= r + dr < rows and 0 <= c + dc < cols:\n                            if grid[r + dr, c + dc] == grid[r, c]:\n                                is_single = False\n                                break\n                    if not is_single:\n                        break\n                if is_single:\n                    objects.append((grid[r, c], (r, c)))\n    return objects\n\ndef draw_cross(grid, position, color):\n    # Draw a cross pattern around the given position with specified color.\n    r, c = position\n    rows, cols = grid.shape\n    # Define cross positions: up, down, left, right\n    cross_positions = [(r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)]\n    for cross_pos in cross_positions:\n      cr, cc = cross_pos\n      if 0 <= cr < rows and 0 <= cc < cols:\n          grid[cr, cc] = color\n\n    return grid\n\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find single-cell objects\n    single_cell_objects = find_single_cell_objects(input_grid)\n\n    # Draw cross for each single cell object based on the color of input cell\n    for color, pos in single_cell_objects:\n        if color == 2:  # Red cell\n            output_grid = draw_cross(output_grid, pos, 4)  # Yellow cross\n        elif color == 1:  # Blue cell\n            output_grid = draw_cross(output_grid, pos, 7)  # Orange cross\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1927,
+    "candidates_token_count": 585,
+    "total_token_count": 2512,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.094515
+  },
+  "response_file": "002-response.json"
+}

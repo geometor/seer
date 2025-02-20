@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransformation Rule: Move all non-zero colored cells to the bottom-most available row within their respective columns, maintaining their relative order, and fill the remaining cells with zeros. This simulates a \"gravity\" effect where colored cells fall to the bottom.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving non-zero cells to the bottom of their columns,\n    preserving their original order.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    input_grid = np.array(input_grid)  # Convert to NumPy array immediately\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid) # Initialize output grid with zeros\n\n    for j in range(cols):\n        # Get the non-zero elements in the current column.\n        column_values = input_grid[:, j]\n        non_zero_values = column_values[column_values != 0]\n\n        # Place the non-zero elements at the bottom of the output column.\n        output_grid[rows - len(non_zero_values):, j] = non_zero_values\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2920,
+    "candidates_token_count": 296,
+    "total_token_count": 3216,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 3.693895
+  },
+  "response_file": "012-response.json"
+}

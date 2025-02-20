@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransformation Rule: Within each column, move all non-zero cells to the bottom, maintaining their original relative order. Fill the remaining upper cells in each column with zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by applying a column-wise gravity effect.\n    Non-zero elements \"fall\" to the bottom, preserving their relative order.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    input_grid = np.array(input_grid)  # Convert to NumPy array\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)  # Initialize output with zeros\n\n    # Iterate over each column\n    for j in range(cols):\n        # Get the non-zero elements in the current column\n        non_zero_elements = [input_grid[i, j] for i in range(rows) if input_grid[i, j] != 0]\n\n        # Fill the bottom of the output column with the non-zero elements\n        for k, value in enumerate(non_zero_elements):\n            output_grid[rows - len(non_zero_elements) + k, j] = value\n\n    return output_grid.tolist() # Convert back to list of lists\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2969,
+    "candidates_token_count": 317,
+    "total_token_count": 3286,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 9.274087
+  },
+  "response_file": "004-response.json"
+}

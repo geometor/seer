@@ -1,0 +1,40 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```yaml\ntask_context: \"The task involves identifying connected components of color 8 (azure) within the input grid. For each component, the goal is to locate its 'end points'\u2014cells within the component that have exactly one neighbor of the same color. Once the end points are identified, the 'top-most' and 'bottom-most' end points are determined based on their row and column indices. A color 1 (blue) cell is then placed to the right of the 'top-most' end point and to the left of the 'bottom-most' end point in the output grid. If no modifications are needed for a cell, it retains its original color from the input grid.\"\nnatural_language_program: |\n  For each connected component of color 8 in the input grid:\n  1. Identify all cells that comprise the connected component.\n  2. Within each component, determine the \"end points,\" which are cells having exactly one neighbor of the same color (8).\n  3. From the identified end points, find the \"top-most\" end point (minimum row index, then minimum column index if tied).\n  4. Also, find the \"bottom-most\" end point (maximum row index, then minimum column index if tied).\n  5. In the output grid, modify the cell immediately to the right of the \"top-most\" end point to color 1 (blue).\n  6. Similarly, modify the cell immediately to the left of the \"bottom-most\" end point to color 1 (blue).\n  7. Any cell in the output grid not affected by steps 5 or 6 should retain its original color from the input grid.\n```\n```python\n\"\"\"\nFor each connected component of color 8 in the input grid:\n1. Identify all cells that comprise the connected component.\n2. Within each component, determine the \"end points,\" which are cells having exactly one neighbor of the same color (8).\n3. From the identified end points, find the \"top-most\" end point (minimum row index, then minimum column index if tied).\n4. Also, find the \"bottom-most\" end point (maximum row index, then minimum column index if tied).\n5. In the output grid, modify the cell immediately to the right of the \"top-most\" end point to color 1 (blue).\n6. Similarly, modify the cell immediately to the left of the \"bottom-most\" end point to color 1 (blue).\n7. Any cell in the output grid not affected by steps 5 or 6 should retain its original color from the input grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, r, c):\n    \"\"\" Get valid neighbors of a cell. \"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if r > 0:\n        neighbors.append((r - 1, c))\n    if r < rows - 1:\n        neighbors.append((r + 1, c))\n    if c > 0:\n        neighbors.append((r, c - 1))\n    if c < cols - 1:\n        neighbors.append((r, c + 1))\n    return neighbors\n\ndef find_connected_components(grid, color):\n    \"\"\" Find all connected components of a given color. \"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    components = []\n\n    def dfs(r, c, current_component):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_component.append((r, c))\n        for nr, nc in get_neighbors(grid, r, c):\n            dfs(nr, nc, current_component)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                current_component = []\n                dfs(r, c, current_component)\n                components.append(current_component)\n    return components\n\ndef find_end_points(grid, component):\n    \"\"\" Find end points in a component. \"\"\"\n    end_points = []\n    for r, c in component:\n        neighbors = get_neighbors(grid, r, c)\n        count = 0\n        for nr, nc in neighbors:\n            if (nr, nc) in component:\n                count += 1\n        if count == 1:\n            end_points.append((r, c))\n    return end_points\n\ndef find_top_most_end_point(end_points):\n    \"\"\" Find the top-most end point. \"\"\"\n    return min(end_points, key=lambda x: (x[0], x[1]))\n\ndef find_bottom_most_end_point(end_points):\n    \"\"\" Find the bottom-most end point. \"\"\"\n    return max(end_points, key=lambda x: (x[0], x[1]))\n\ndef transform(input_grid):\n    \"\"\" Transform the input grid according to the specified rules. \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    components = find_connected_components(input_grid, 8)\n\n    for component in components:\n        end_points = find_end_points(input_grid, component)\n        if end_points:\n            top_most = find_top_most_end_point(end_points)\n            bottom_most = find_bottom_most_end_point(end_points)\n\n            # Place color 1 to the right of top-most\n            if top_most[1] + 1 < output_grid.shape[1]:\n                output_grid[top_most[0], top_most[1] + 1] = 1\n\n            # Place color 1 to the left of bottom-most\n            if bottom_most[1] - 1 >= 0:\n                output_grid[bottom_most[0], bottom_most[1] - 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 2397,
+            "end_index": 2655,
+            "uri": "https://github.com/Anuj-cs20/IIITDMK_CSE_Coursework",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3102,
+    "candidates_token_count": 1404,
+    "total_token_count": 4506,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 11.954741
+  },
+  "response_file": "004-response.json"
+}

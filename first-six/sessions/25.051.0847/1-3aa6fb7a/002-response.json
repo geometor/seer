@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid has two azure (color 8) L-shaped objects. Add a blue (color 1) pixel to fill the empty corner of each L-shape, thus forming 2x2 squares.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shape_corner(grid, color):\n    \"\"\"\n    Finds the missing corner of an L-shaped object.\n    \"\"\"\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            subgrid = grid[r:r+2, c:c+2]\n            if np.count_nonzero(subgrid == color) == 3:\n                # Find the empty corner\n                for i in range(2):\n                    for j in range(2):\n                        if subgrid[i, j] == 0:\n                            return (r + i, c + j)\n    return None\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by filling the empty corner of each L-shape with blue pixel.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    \n    # Find the missing corner of the first L-shape (top-left)\n    corner1 = find_l_shape_corner(output_grid, 8)\n    if corner1:\n        output_grid[corner1] = 1\n\n     # Iterate in the reverse order to find the second L-shape (bottom-right). This helps avoid finding the top L a second time\n    rows,cols = output_grid.shape\n    for r in reversed(range(rows - 1)):\n        for c in reversed(range(cols - 1)):\n             subgrid = output_grid[r:r+2, c:c+2]\n             if np.count_nonzero(subgrid == 8) == 3:\n                for i in range(2):\n                    for j in range(2):\n                        if subgrid[i,j] == 0:\n                            output_grid[r + i, c+ j] = 1\n                            break\n                    else:\n                      continue\n                    break\n        else:\n            continue\n        break\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1805,
+    "candidates_token_count": 510,
+    "total_token_count": 2315,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.707432
+  },
+  "response_file": "002-response.json"
+}

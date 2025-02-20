@@ -225,8 +225,8 @@ class Session:
         response_parts,
         prompt_count: int,
         token_counts: dict,
-        response_times: list,
-        start_time,
+        #  response_times: list,
+        #  start_time,
         description,
         elapsed_time,
     ):
@@ -382,12 +382,8 @@ class Session:
 
             self._write_to_file(file_name, content) # NEW
 
-            if file_type == "py": # NEW
-                test_results = verifier.test_code(content, file_path, task) # NEW
-                test_results_file = Path( # NEW
-                    f"{file_path.stem()}.md" # NEW
-                )  # Create Path object for .md file # NEW
-                self._write_to_file(test_results_file, "".join(test_results)) # NEW
+            return file_path
+
 
     def _write_to_file(self, file_name, content):
         """Writes content to a file in the task directory."""

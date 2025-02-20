@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation operates on each column independently. It identifies the non-zero elements (colored blocks) within each column of the input grid. These non-zero elements are then moved to the bottom of the corresponding column in the output grid, maintaining their original vertical order. The remaining cells at the top of the column in the output grid are filled with zeros (white color).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by pushing all non-zero values in each column to the bottom.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Iterate over each column\n    for j in range(cols):\n        # Extract non-zero values from the current column\n        non_zero_values = input_grid[:, j][input_grid[:, j] != 0]\n        # Calculate the starting row index for placing non-zero values\n        start_row = rows - len(non_zero_values)\n        # Place the non-zero values at the bottom of the output column\n        output_grid[start_row:, j] = non_zero_values\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2489,
+    "candidates_token_count": 288,
+    "total_token_count": 2777,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 3.635885
+  },
+  "response_file": "006-response.json"
+}

@@ -76,44 +76,6 @@ class Seer:
 
         self._investigate_examples(task.train)
 
-        # --- Main loop for code generation and refinement ---
-        for iteration in range(self.max_iterations):
-            self.current_iteration = iteration + 1  # Start from 1
-            print(f"Iteration: {self.current_iteration} / {self.max_iterations}")
-
-            # coder prompt
-            instructions = [
-                self.code_instructions.format(
-                    input_grid_rows=task.train[0].input.to_python_string(),  # Use first example for initial prompt
-                    expected_output_grid_rows=task.train[0].output.to_python_string(),
-                )
-            ]
-            prompt = [""]
-            response_parts, elapsed_time = self._generate(
-                "coder",
-                history,
-                prompt,
-                instructions,
-                description=f"Iteration {self.current_iteration} - CODE",
-            )
-            history.extend(prompt)
-            history.extend(response_parts)
-
-            # Process the response and check for refinement
-            response_parts, refine_needed, train_results, test_results, code, base_filename = self._process_response(
-                response_parts, None, history  # Pass appropriate arguments
-            )
-
-            if not refine_needed:
-                print("All tests passed! Exiting loop.")
-                break  # Exit loop if all tests pass
-
-            if refine_needed:
-                print("Refining code...")
-                self.refine_code(train_results, test_results, code, base_filename)
-
-        else:  # This 'else' belongs to the 'for' loop
-            print("Max iterations reached without solving the task.")
 
         summarize_task(self.session.task_dir, self.session.log_error)
 
@@ -154,14 +116,23 @@ class Seer:
                 prompt.append("\n")
 
             instructions = [self.nlp_instructions]
-            response_parts, elapsed_time = self._generate(
-                "dreamer",
-                history,
-                prompt,
-                instructions,
-                #  tools=None,
-                description=f"example_{i} - NLP",
-            )
+            (
+                response,
+                response_parts,
+                refine_needed,
+                train_results,
+                test_results,
+                code,
+                base_filename,
+                elapsed_time
+            ) = self._generate(
+                    "dreamer",
+                    history,
+                    prompt,
+                    instructions,
+                    #  tools=None,
+                    description=f"example_{i} - NLP",
+                )
             history.extend(prompt)
             history.extend(response_parts)
 
@@ -173,7 +144,16 @@ class Seer:
                 )
             ]
             prompt = [""]
-            response_parts, elapsed_time = self._generate(
+            (
+                response,
+                response_parts,
+                refine_needed,
+                train_results,
+                test_results,
+                code,
+                base_filename,
+                elapsed_time
+            ) = self._generate(
                 "coder",
                 history,
                 prompt,
@@ -184,6 +164,9 @@ class Seer:
             history.extend(prompt)
             history.extend(response_parts)
 
+            if refine_needed:
+                self.refine_code(train_results, test_results, code, base_filename)
+
     def _review_programs(self, instructions):
         """
         summarize observations on pairs
@@ -191,7 +174,16 @@ class Seer:
 
         prompt = [""]
         instructions = [""]
-        self._generate(
+        (
+            response,
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+            elapsed_time
+        ) = self._generate(
             prompt,
             instructions,
             #  tools="code_execution",
@@ -244,28 +236,44 @@ class Seer:
             elapsed_time,
         )
 
-        response_parts, *remaining_return_values = self._process_response(response, functions, total_prompt)
+        (
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+        ) = self._process_response(response, functions, total_prompt)
 
         # Flatten response_parts before logging
-        flat_response_parts = []
-        for part in response_parts:
-            if isinstance(part, str):
-                flat_response_parts.append(part)
-            elif isinstance(part, list):
-                flat_response_parts.extend(part)  # Extend, not append
-            else:
-                flat_response_parts.append(str(part)) #Ensure it is a string
+        #  flat_response_parts = []
+        #  for part in response_parts:
+            #  if isinstance(part, str):
+                #  flat_response_parts.append(part)
+            #  elif isinstance(part, list):
+                #  flat_response_parts.extend(part)  # Extend, not append
+            #  else:
+                #  flat_response_parts.append(str(part))  # Ensure it is a string
 
         self.session.log_response_md(
             response,
-            flat_response_parts,  # Pass the flattened list
+            response_parts,  # Pass the flattened list
             self.prompt_count,
             self.token_counts,
             description=description,
             elapsed_time=elapsed_time,  # Pass elapsed time
         )
 
-        return [flat_response_parts, elapsed_time] + remaining_return_values
+        return (
+            response,
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+            elapsed_time
+        )
 
     def _parse_code_text(self, text):
         """Extracts code blocks, writes them, and returns file info."""
@@ -306,9 +314,13 @@ class Seer:
         for i, result in enumerate(train_results):
             dreamer_prompt.append(f"\n**Example {i+1}:**\n")
             dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
-            dreamer_prompt.append(f"Expected Output:\n```\n{result['expected_output']}\n```\n")
-            if 'transformed_output' in result:
-                dreamer_prompt.append(f"Transformed Output:\n```\n{result['transformed_output']}\n```\n")
+            dreamer_prompt.append(
+                f"Expected Output:\n```\n{result['expected_output']}\n```\n"
+            )
+            if "transformed_output" in result:
+                dreamer_prompt.append(
+                    f"Transformed Output:\n```\n{result['transformed_output']}\n```\n"
+                )
                 # Add images
                 image_filename = f"{base_filename}-train-example_{i+1}.png"
                 dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
@@ -316,20 +328,33 @@ class Seer:
             dreamer_prompt.append(f"Status: {result['status']}\n")
 
         if test_results:  # Only include if there are test results
-           dreamer_prompt.append("\nTest Set Results (if applicable):\n")
-           for i, result in enumerate(test_results):
+            dreamer_prompt.append("\nTest Set Results (if applicable):\n")
+            for i, result in enumerate(test_results):
                 dreamer_prompt.append(f"\n**Test Example {i+1}:**\n")
                 dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
-                dreamer_prompt.append(f"Expected Output:\n```\n{result['expected_output']}\n```\n")
-                if 'transformed_output' in result:
-                    dreamer_prompt.append(f"Transformed Output:\n```\n{result['transformed_output']}\n```\n")
+                dreamer_prompt.append(
+                    f"Expected Output:\n```\n{result['expected_output']}\n```\n"
+                )
+                if "transformed_output" in result:
+                    dreamer_prompt.append(
+                        f"Transformed Output:\n```\n{result['transformed_output']}\n```\n"
+                    )
                     # Add images
                     image_filename = f"{base_filename}-test-example_{i+1}.png"
                     dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
                 dreamer_prompt.append(f"Status: {result['status']}\n")
 
         instructions = [self.nlp_instructions]  # Use existing nlp_instructions
-        response_parts, elapsed_time = self._generate(
+        (
+            response,
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+            elapsed_time
+        ) = self._generate(
             "dreamer",
             history,
             dreamer_prompt,
@@ -341,8 +366,19 @@ class Seer:
 
         # Construct the coder prompt
         coder_prompt = [""]  # Start with an empty prompt for coder
-        instructions = [self.code_instructions] # Use existing code instructions.  May need adjustment later.
-        response_parts, elapsed_time = self._generate(
+        instructions = [
+            self.code_instructions
+        ]  # Use existing code instructions.  May need adjustment later.
+        (
+            response,
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+            elapsed_time
+        ) = self._generate(
             "coder",
             history,
             coder_prompt,
@@ -369,7 +405,14 @@ class Seer:
             response_parts.append("\n*error:*\n")  # Add an error indicator to response
             response_parts.append(error_msg + "\n")
 
-            return response_parts, refine_needed, train_results, test_results, code, base_filename
+            return (
+                response_parts,
+                refine_needed,
+                train_results,
+                test_results,
+                code,
+                base_filename,
+            )
 
         if not hasattr(response.candidates[0].content, "parts"):
             # Handle the case where response.candidates is empty
@@ -379,7 +422,14 @@ class Seer:
             response_parts.append("\n*error:*\n")  # Add an error indicator to response
             response_parts.append(error_msg + "\n")
 
-            return response_parts, refine_needed, train_results, test_results, code, base_filename
+            return (
+                response_parts,
+                refine_needed,
+                train_results,
+                test_results,
+                code,
+                base_filename,
+            )
 
         for part in response.candidates[0].content.parts:
             if part.text:
@@ -387,10 +437,14 @@ class Seer:
                 response_parts.append(part.text + "\n")
                 # Extract code blocks and write to files
                 extracted_code = self._parse_code_text(part.text)
-                for file_type, extracted_code_content, extracted_base_filename in extracted_code:
+                for (
+                    file_type,
+                    extracted_code_content,
+                    extracted_base_filename,
+                ) in extracted_code:
                     if file_type == "py":
                         code = extracted_code_content  # Store the code
-                        base_filename = extracted_base_filename # Store base_filename
+                        base_filename = extracted_base_filename  # Store base_filename
                         # Pass base_filename to test_code
                         train_results = self.verifier.test_code(
                             "example",
@@ -462,7 +516,14 @@ class Seer:
                 response_parts.append(f"{result}\n")
                 response_parts.append(f"{msg}\n")
 
-        return response_parts, refine_needed, train_results, test_results, code, base_filename
+        return (
+            response_parts,
+            refine_needed,
+            train_results,
+            test_results,
+            code,
+            base_filename,
+        )
 
     def _call_function(self, function_call, functions, total_prompt):
         """Execute a function call with improved error handling."""

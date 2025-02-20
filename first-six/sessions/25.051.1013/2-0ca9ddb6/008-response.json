@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Preserve Existing Cells: Keep all azure (8), red (2), blue (1), and magenta (6) cells from the input grid in the output grid.\n\n2. Red Cell Action (Yellow Diagonals): For each red cell (2):\n    *   Place a yellow cell (4) diagonally up and to the left.\n    *   Place a yellow cell (4) diagonally up and to the right.\n\n3. Blue Cell Action (Orange L-Shape): For each blue cell (1):\n    *   Place an orange cell (7) directly to the left.\n    *   Place an orange cell (7) directly below.\n    *  Place an orange cell (7) diagonally down and to the left.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds the positions of all single-cell objects of the specified color.\"\"\"\n    coords = np.argwhere(grid == color)\n    # Convert to list of tuples\n    return [tuple(coord) for coord in coords]\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rules.\"\"\"\n    output_grid = np.copy(input_grid)\n\n    # Find all red and blue cells\n    red_positions = find_objects(input_grid, 2)\n    blue_positions = find_objects(input_grid, 1)\n\n    # Red cell actions: add yellow cells for each red cell\n    for red_pos in red_positions:\n        if red_pos[0] - 1 >= 0 and red_pos[1] - 1 >= 0:\n            output_grid[red_pos[0] - 1, red_pos[1] - 1] = 4  # Up-Left\n        if red_pos[0] - 1 >= 0 and red_pos[1] + 1 < output_grid.shape[1]:\n            output_grid[red_pos[0] - 1, red_pos[1] + 1] = 4  # Up-Right\n\n    # Blue cell actions: add orange cells in L-shape\n    for blue_pos in blue_positions:\n        if blue_pos[1] - 1 >= 0:\n            output_grid[blue_pos[0], blue_pos[1] - 1] = 7  # Left\n        if blue_pos[0] + 1 < output_grid.shape[0] and blue_pos[1] - 1 >= 0:\n            output_grid[blue_pos[0] + 1, blue_pos[1] - 1] = 7  # Down-Left\n        if blue_pos[0] + 1 < output_grid.shape[0]:\n            output_grid[blue_pos[0] + 1, blue_pos[1]] = 7 # Down\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4419,
+    "candidates_token_count": 659,
+    "total_token_count": 5078,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.284378
+  },
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,23 @@
+task_context: "ARC-AGI grid puzzle transformation"
+transformation_rule: "Identify leftmost and rightmost blocks of azure color. Add a blue cell to the right of the first cell (reading order) of the leftmost block and to the left of the last cell (reading order) of the rightmost block."
+objects:
+  - type: "azure block"
+    color: 8
+    properties:
+      - "contiguous region"
+      - "minimum column index"
+      - "first cell (reading order)"
+      - "last cell (reading order)"
+  - type: "blue cell"
+    color: 1
+    actions:
+      - "add to the right of first cell of leftmost azure block"
+      - "add to the left of last cell of rightmost azure block"
+predicates:
+  - "is_leftmost_block(azure_block)"
+  - "is_rightmost_block(azure_block)"
+  - "first_cell_in_reading_order(azure_block) -> cell"
+  - "last_cell_in_reading_order(azure_block) -> cell"
+actions:
+  - "add_cell_to_right(cell, color=1)"
+  - "add_cell_to_left(cell, color=1)"

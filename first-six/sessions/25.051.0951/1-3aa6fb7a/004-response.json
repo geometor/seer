@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n\n1.  **Identify Objects:** Find all vertical azure (color 8) lines that are exactly 2 pixels high and 1 pixel wide.\n\n2.  **Transformation Rule:** For *each* identified 2x1 azure line:\n    *   Place a blue pixel (color 1) immediately to the right of the *top* pixel of the azure line.\n    *   If there's another azure line starting at the row below the first azure line, insert the blue line to the right of the *lower* pixel of the first line.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_lines(grid, color, height, width):\n    \"\"\"\n    Find vertical lines of specified color, height, and width in the grid.\n    \"\"\"\n    lines = []\n    rows, cols = grid.shape\n    for r in range(rows - height + 1):\n        for c in range(cols - width + 1):\n            if all(grid[r+i, c] == color for i in range(height)):\n                lines.append((r, c))\n    return lines\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule:\n    1. Find 2x1 vertical lines of azure color.\n    2. Add one blue pixel at the upper-right of each of these lines,\n     except if there are adjacent azure lines.\n    \"\"\"\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n\n    # Find all 2x1 vertical lines of color 8 (azure)\n    azure_lines = find_vertical_lines(input_grid, 8, 2, 1)\n\n    # For each azure line, place a blue pixel (color 1) to the right of the top pixel\n    for i, line in enumerate(azure_lines):\n        r, c = line\n        if c + 1 < output_grid.shape[1]:  # Check bounds\n          if (r+1, c) in azure_lines: # Check for vertically adjacent lines\n            output_grid[r+1,c+1] = 1\n          else:\n            output_grid[r, c + 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2935,
+    "candidates_token_count": 524,
+    "total_token_count": 3459,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.612503
+  },
+  "response_file": "004-response.json"
+}
