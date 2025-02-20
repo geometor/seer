@@ -7,68 +7,80 @@ import json
 from pathlib import Path
 
 class Verifier:
-    def test_code(self, code, task_dir, task, base_filename):
-        """Executes and validates the generated code, returning results as a list of dicts."""
-        test_results_json = []  # Store results for JSON output
+    def get_transform_function(self, code):
+        """Parses the code, finds the 'transform' function, and returns it."""
         try:
             tree = ast.parse(code)
             namespace = {}
-            # Capture stdout
-            output_capture = io.StringIO()
-            with contextlib.redirect_stdout(output_capture):
-                exec(
-                    compile(tree, filename="<string>", mode="exec"), namespace
-                )  # filename is not important
-
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                    for i, pair in enumerate(task.train):
-                        input_grid = pair.input.grid
-                        expected_output = pair.output.grid
+                    exec(compile(tree, filename="<string>", mode="exec"), namespace)
+                    return namespace.get("transform")  # Returns None if not found
+            return None  # Explicitly return None if no transform function
+        except SyntaxError as e:
+            raise  # Re-raise SyntaxError to be handled by caller
 
-                        example_result = {
-                            "example": i + 1,
-                            "input": pair.input.to_string(),
-                            "expected_output": pair.output.to_string(),
-                        }
-                        try:
-                            transformed_output = namespace["transform"](input_grid)
+    def test_code(self, code, task_dir, task, base_filename):
+        """Executes and validates the generated code, returning results as a list of dicts."""
+        test_results_json = []  # Store results for JSON output
 
-                            example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
+        try:
+            transform_function = self.get_transform_function(code)
+            if transform_function is None:
+                test_results_json.append({"code_execution_error": "transform function not found"})
+                return test_results_json
 
-                            # --- Calculate Statistics ---
-                            size_correct = transformed_output.shape == expected_output.shape
-                            example_result["size_correct"] = size_correct
+            # Capture stdout - still needed for print statements in code
+            output_capture = io.StringIO()
+            with contextlib.redirect_stdout(output_capture):
 
-                            transformed_colors = set(np.unique(transformed_output))
-                            expected_colors = set(np.unique(expected_output))
-                            color_palette_correct = transformed_colors.issubset(expected_colors)
-                            example_result["color_palette_correct"] = color_palette_correct
+                for i, pair in enumerate(task.train):
+                    input_grid = pair.input.grid
+                    expected_output = pair.output.grid
 
-                            transformed_counts = dict(zip(*np.unique(transformed_output, return_counts=True)))
-                            expected_counts = dict(zip(*np.unique(expected_output, return_counts=True)))
-                            correct_pixel_counts = transformed_counts == expected_counts
-                            example_result["correct_pixel_counts"] = correct_pixel_counts
+                    example_result = {
+                        "example": i + 1,
+                        "input": pair.input.to_string(),
+                        "expected_output": pair.output.to_string(),
+                    }
+                    try:
+                        transformed_output = transform_function(input_grid)
 
-                            pixels_off = np.sum(transformed_output != expected_output)
-                            example_result["pixels_off"] = int(pixels_off)  # Ensure it's a standard int
+                        example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
+
+                        # --- Calculate Statistics ---
+                        size_correct = transformed_output.shape == expected_output.shape
+                        example_result["size_correct"] = size_correct
+
+                        transformed_colors = set(np.unique(transformed_output))
+                        expected_colors = set(np.unique(expected_output))
+                        color_palette_correct = transformed_colors.issubset(expected_colors)
+                        example_result["color_palette_correct"] = color_palette_correct
+
+                        transformed_counts = dict(zip(*np.unique(transformed_output, return_counts=True)))
+                        expected_counts = dict(zip(*np.unique(expected_output, return_counts=True)))
+                        correct_pixel_counts = transformed_counts == expected_counts
+                        example_result["correct_pixel_counts"] = correct_pixel_counts
+
+                        pixels_off = np.sum(transformed_output != expected_output)
+                        example_result["pixels_off"] = int(pixels_off)  # Ensure it's a standard int
 
 
-                            if not np.array_equal(transformed_output, expected_output):
-                                example_result["status"] = False
-                            else:
-                                example_result["status"] = True
-                        except Exception as e:
-                            example_result["status"] = f"ERROR: {e}"
+                        if not np.array_equal(transformed_output, expected_output):
+                            example_result["status"] = False
+                        else:
+                            example_result["status"] = True
+                    except Exception as e:
+                        example_result["status"] = f"ERROR: {e}"
 
-                        test_results_json.append(example_result)
+                    test_results_json.append(example_result)
 
             captured_output = output_capture.getvalue()
             if captured_output:
                 test_results_json.append({"captured_output": captured_output})
 
-
         except SyntaxError as e:
+            # Catch SyntaxError from get_transform_function
             test_results_json.append({"code_execution_error": str(e)})
 
         except Exception as e:
