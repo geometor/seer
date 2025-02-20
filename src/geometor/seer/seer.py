@@ -246,6 +246,65 @@ class Seer:
             extracted_code.append((file_type, content, base_filename))
         return extracted_code
 
+    def refine_code(self, train_results, test_results, code, base_filename):
+        """
+        Refines the generated code based on test results, using the dreamer/coder pattern.
+        """
+        history = [""]
+
+        # Construct the dreamer prompt
+        dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
+        dreamer_prompt.append("\nTrain Set Results:\n")
+
+        for i, result in enumerate(train_results):
+            dreamer_prompt.append(f"\n**Example {i+1}:**\n")
+            dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
+            dreamer_prompt.append(f"Expected Output:\n```\n{result['expected_output']}\n```\n")
+            if 'transformed_output' in result:
+                dreamer_prompt.append(f"Transformed Output:\n```\n{result['transformed_output']}\n```\n")
+                # Add images
+                image_filename = f"{base_filename}-train-example_{i+1}.png"
+                dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
+
+            dreamer_prompt.append(f"Status: {result['status']}\n")
+
+        if test_results:  # Only include if there are test results
+           dreamer_prompt.append("\nTest Set Results (if applicable):\n")
+           for i, result in enumerate(test_results):
+                dreamer_prompt.append(f"\n**Test Example {i+1}:**\n")
+                dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
+                dreamer_prompt.append(f"Expected Output:\n```\n{result['expected_output']}\n```\n")
+                if 'transformed_output' in result:
+                    dreamer_prompt.append(f"Transformed Output:\n```\n{result['transformed_output']}\n```\n")
+                    # Add images
+                    image_filename = f"{base_filename}-test-example_{i+1}.png"
+                    dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
+                dreamer_prompt.append(f"Status: {result['status']}\n")
+
+        instructions = [self.nlp_instructions]  # Use existing nlp_instructions
+        response_parts, elapsed_time = self._generate(
+            "dreamer",
+            history,
+            dreamer_prompt,
+            instructions,
+            description=f"refine_code - NLP",
+        )
+        history.extend(dreamer_prompt)
+        history.extend(response_parts)
+
+        # Construct the coder prompt
+        coder_prompt = [""]  # Start with an empty prompt for coder
+        instructions = [self.code_instructions] # Use existing code instructions.  May need adjustment later.
+        response_parts, elapsed_time = self._generate(
+            "coder",
+            history,
+            coder_prompt,
+            instructions,
+            description=f"refine_code - CODE",
+        )
+        history.extend(coder_prompt)
+        history.extend(response_parts)
+
     def _process_response(self, response, functions, total_prompt):
         """Processes the response from the Gemini model."""
         response_parts = []
@@ -320,7 +379,9 @@ class Seer:
                             #  # Call _generate recursively.  Need to track history.
                             #  response_parts, _ = self._generate("dreamer", [], new_prompt, [self.nlp_instructions], description="test_failure_dreamer")
                             #  response_parts, _ = self._generate("coder", [], ["\nPrevious Test Results:\n"] + test_results, [self.code_instructions], description="test_failure_coder")
-                            pass  # we will handle this in a future turn
+                            #  pass  # we will handle this in a future turn
+                            # Call refine_code if training failed
+                            self.refine_code(train_results, None, code, base_filename) # Note: No test_results if train failed
 
             if part.executable_code:
                 response_parts.append("\n*code_execution:*\n")
