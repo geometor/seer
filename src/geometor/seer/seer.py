@@ -255,6 +255,13 @@ class Seer:
                         #  self.session._write_extracted_content( # REMOVE
                         #      part.text, self.prompt_count, self.extracted_file_counts, self.task, self.verifier # REMOVE
                         #  )  # Use session method # REMOVE
+                        for file_type, content in extracted_code:
+                            if file_type == "py": # NEW
+                                test_results = self.verifier.test_code(content, file_path, task) # NEW
+                                test_results_file = Path( # NEW
+                                    f"{file_path.stem()}.md" # NEW
+                                )  # Create Path object for .md file # NEW
+                                self._write_to_file(test_results_file, "".join(test_results)) # NEW
 
                     if part.executable_code:
                         response_parts.append("\n*code_execution:*\n")
