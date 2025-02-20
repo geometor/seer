@@ -184,3 +184,16 @@ class Verifier:
         # sophisticated.
         analysis = self.analyze_results(test_results_str)
         return f"{analysis}\n\nPrevious prompt:\n{previous_prompt}\n\nFix the errors."
+
+    def test_test_input(self, transform_function, test_input_grid, task_id, task_dir, base_filename):
+        """Tests the transform function on the test input and saves the result."""
+        try:
+            transformed_test_output = transform_function(test_input_grid)
+            transformed_test_grid = Grid(transformed_test_output, task_id, 'test', 0, 'transformed')
+            transformed_test_image = transformed_test_grid.to_image()
+            test_image_filename = f"{base_filename}-test_output.png"
+            test_image_path = task_dir / test_image_filename
+            transformed_test_image.save(test_image_path)
+            return test_image_filename
+        except Exception as e:
+            return f"Error running transform on test input: {e}"

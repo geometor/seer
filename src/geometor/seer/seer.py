@@ -295,30 +295,23 @@ class Seer:
                         )
                         if all_tests_passed:
                             # Run the test input through the function
-                            try:
-                                tree = ast.parse(content)
-                                namespace = {}
-                                exec(compile(tree, filename="<string>", mode="exec"), namespace)
-                                if "transform" in namespace:
-                                    test_input_grid = self.task.test[0].input.grid  # Assuming single test input
-                                    transformed_test_output = namespace["transform"](test_input_grid)
-
-                                    # Log the transformed output
-                                    transformed_test_grid = Grid(transformed_test_output, self.task.id, 'test', 0, 'transformed')
-                                    transformed_test_image = transformed_test_grid.to_image()
-                                    test_image_filename = f"{base_filename}-test_output.png"
-                                    test_image_path = self.session.task_dir / test_image_filename
-                                    transformed_test_image.save(test_image_path)
-                                    response_parts.append(f"\nTest Input Transformed Output:\n![Image]({test_image_filename})\n")
+                            transform_function = self.verifier.get_transform_function(content)
+                            if transform_function:
+                                test_input_grid = self.task.test[0].input.grid
+                                test_output_filename = self.verifier.test_test_input(
+                                    transform_function, test_input_grid, self.task.id, self.session.task_dir, base_filename
+                                )
+                                if test_output_filename.startswith("Error"):
+                                    # Log the error
+                                    self.session.log_error(test_output_filename, content)
+                                    response_parts.append(f"\n*error:*\n{test_output_filename}\n")
                                 else:
-                                    error_msg = "transform function not found in code"
-                                    self.session.log_error(error_msg, content)
-                                    response_parts.append(f"\n*error:*\n{error_msg}\n")
-
-                            except Exception as e:
-                                error_msg = f"Error running transform on test input: {e}"
+                                    response_parts.append(f"\nTest Input Transformed Output:\n![Image]({test_output_filename})\n")
+                            else:
+                                error_msg = "transform function not found in code"
                                 self.session.log_error(error_msg, content)
                                 response_parts.append(f"\n*error:*\n{error_msg}\n")
+
                         else:
                             #  # Construct a new prompt for dreamer and coder
                             #  new_prompt = ["\nPrevious Test Results:\n"] + test_results + ["\nPlease fix the errors.\n"]
