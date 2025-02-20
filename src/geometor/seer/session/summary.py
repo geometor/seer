@@ -151,8 +151,8 @@ def summarize_task(task_dir, log_error):
         try:
             with open(py_file, "r") as f:
                 test_results = json.load(f)
-                #  file_index = py_file.stem.split("-")[0]
-                grouped_test_results[py_file] = test_results
+                file_index = py_file.stem  # Use .stem directly
+                grouped_test_results[file_index] = test_results
         except Exception as e:
             print(f"Failed to load test results from {py_file}: {e}")
             log_error(f"Failed to load test results from {py_file}: {e}")
