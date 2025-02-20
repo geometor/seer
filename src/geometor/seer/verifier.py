@@ -7,9 +7,8 @@ import json
 from pathlib import Path
 
 class Verifier:
-    def test_code(self, code, task_dir, task, base_filename):  # Add base_filename
-        """Executes and validates the generated code, writing results to a file."""
-        test_results_str = ""
+    def test_code(self, code, task_dir, task, base_filename):
+        """Executes and validates the generated code, returning results as a list of dicts."""
         test_results_json = []  # Store results for JSON output
         try:
             tree = ast.parse(code)
@@ -23,12 +22,10 @@ class Verifier:
 
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef) and node.name == "transform":
-                    test_results_str += "\n# validation:*\n"
                     for i, pair in enumerate(task.train):
                         input_grid = pair.input.grid
                         expected_output = pair.output.grid
 
-                        test_results_str += f"\n## example {i + 1}\n"
                         example_result = {
                             "example": i + 1,
                             "input": pair.input.to_string(),
@@ -36,27 +33,6 @@ class Verifier:
                         }
                         try:
                             transformed_output = namespace["transform"](input_grid)
-                            test_results_str += (
-                                f"*input:*\n```\n{pair.input.to_string()}\n```\n"
-                            )
-                            test_results_str += f"*expected output:*\n```\n{pair.output.to_string()}\n```\n"
-                            test_results_str += f"*transformed output:*\n```\n{Grid(transformed_output, '', '', '', '').to_string()}\n```\n"
-
-                            # Generate and save image of transformed output
-                            transformed_grid = Grid(
-                                transformed_output,
-                                task.id,
-                                "train",
-                                i,
-                                "transformed",
-                            )
-                            transformed_image = transformed_grid.to_image()
-                            image_filename = (
-                                f"{base_filename}-example_{i + 1}.png"  # Use task_dir.name
-                            )
-                            image_path = task_dir / image_filename # Use task_dir
-                            transformed_image.save(image_path)
-                            #  test_results_str += f"  Transformed Output Image: ![Transformed Output]({image_filename})\n"
 
                             example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
 
@@ -77,48 +53,86 @@ class Verifier:
                             pixels_off = np.sum(transformed_output != expected_output)
                             example_result["pixels_off"] = int(pixels_off)  # Ensure it's a standard int
 
-                            # --- Update test_results_str with Statistics ---
-                            test_results_str += f"  Size Correct: {size_correct}\n"
-                            test_results_str += f"  Color Palette Correct: {color_palette_correct}\n"
-                            test_results_str += f"  Pixel Counts Correct: {correct_pixel_counts}\n"
-                            test_results_str += f"  Pixels Off: {pixels_off}\n"
-
 
                             if not np.array_equal(transformed_output, expected_output):
-                                test_results_str += f"**FAILED!**\n"
                                 example_result["status"] = False
                             else:
-                                test_results_str += f"PASSED\n"
                                 example_result["status"] = True
                         except Exception as e:
-                            test_results_str += (
-                                f"  Error during validation for example {i + 1}: {e}\n"
-                            )
                             example_result["status"] = f"ERROR: {e}"
 
                         test_results_json.append(example_result)
 
             captured_output = output_capture.getvalue()
             if captured_output:
-                test_results_str += f"*captured output:*\n```\n{captured_output}\n```\n"
                 test_results_json.append({"captured_output": captured_output})
 
 
         except SyntaxError as e:
-            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             test_results_json.append({"code_execution_error": str(e)})
 
         except Exception as e:
-            test_results_str += f"\n*code_execution_error:*\n```\n{e}\n```\n"
             test_results_json.append({"code_execution_error": str(e)})
 
-        # Use base_filename for JSON
+        return test_results_json
+
+    def write_test_results(self, test_results_json, task_dir, task, base_filename):
+        """Formats test results as Markdown and writes to file, including saving images."""
+        test_results_str = ""
+
+        for result in test_results_json:
+            if "example" in result:  # It's an example result
+                test_results_str += f"\n## example {result['example']}\n"
+                test_results_str += f"*input:*\n```\n{result['input']}\n```\n"
+                test_results_str += f"*expected output:*\n```\n{result['expected_output']}\n```\n"
+
+                if "transformed_output" in result:
+                    test_results_str += f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
+
+                    # Generate and save image of transformed output
+                    transformed_grid = Grid(
+                        np.array([int(x) for x in result['transformed_output'].split()], dtype=int).reshape(np.array(task.train[result['example']-1].output.grid).shape),
+                        task.id,
+                        "train",
+                        result['example'] - 1,  # Adjust index for 0-based
+                        "transformed",
+                    )
+                    transformed_image = transformed_grid.to_image()
+                    image_filename = (
+                        f"{base_filename}-example_{result['example']}.png"
+                    )
+                    image_path = task_dir / image_filename
+                    transformed_image.save(image_path)
+
+                test_results_str += f"  Size Correct: {result['size_correct']}\n"
+                test_results_str += f"  Color Palette Correct: {result['color_palette_correct']}\n"
+                test_results_str += f"  Pixel Counts Correct: {result['correct_pixel_counts']}\n"
+                test_results_str += f"  Pixels Off: {result['pixels_off']}\n"
+
+                if result['status'] is True:
+                    test_results_str += "PASSED\n"
+                elif result['status'] is False:
+                    test_results_str += "**FAILED!**\n"
+                else:  # Error case
+                    test_results_str += f"**ERROR**: {result['status']}\n"
+
+            elif "captured_output" in result:
+                test_results_str += f"*captured output:*\n```\n{result['captured_output']}\n```\n"
+            elif "code_execution_error" in result:
+                test_results_str += f"\n*code_execution_error:*\n```\n{result['code_execution_error']}\n```\n"
+
+        # Write Markdown results
+        test_results_md_file = task_dir / f"{base_filename}.md"
+        with open(test_results_md_file, "w") as f:
+            f.write(test_results_str)
+
+        # Write JSON results
         test_results_json_file = task_dir / f"{base_filename}.json"
         with open(test_results_json_file, "w") as f:
             json.dump(test_results_json, f, indent=2)
 
+        return test_results_str
 
-        return test_results_str, test_results_json
 
     def analyze_results(self, test_results_str):
         """Analyzes the test results and provides feedback."""
