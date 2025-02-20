@@ -244,18 +244,28 @@ class Seer:
             elapsed_time,
         )
 
-        response_parts = self._process_response(response, functions, total_prompt)
+        response_parts, *remaining_return_values = self._process_response(response, functions, total_prompt)
+
+        # Flatten response_parts before logging
+        flat_response_parts = []
+        for part in response_parts:
+            if isinstance(part, str):
+                flat_response_parts.append(part)
+            elif isinstance(part, list):
+                flat_response_parts.extend(part)  # Extend, not append
+            else:
+                flat_response_parts.append(str(part)) #Ensure it is a string
 
         self.session.log_response_md(
             response,
-            response_parts,
+            flat_response_parts,  # Pass the flattened list
             self.prompt_count,
             self.token_counts,
             description=description,
             elapsed_time=elapsed_time,  # Pass elapsed time
         )
 
-        return response_parts, elapsed_time
+        return [flat_response_parts, elapsed_time] + remaining_return_values
 
     def _parse_code_text(self, text):
         """Extracts code blocks, writes them, and returns file info."""
