@@ -286,7 +286,7 @@ def _create_test_table(grouped_test_results):
     for file_index, test_results in grouped_test_results.items():
         table = Table(title=f"Code File: {file_index}")
         table.add_column("Example", style="cyan")
-        table.add_column("Status")
+        table.add_column("status")
         table.add_column("size")
         table.add_column("palette")
         table.add_column("color count")
@@ -295,8 +295,9 @@ def _create_test_table(grouped_test_results):
         for result in test_results:
             if "example" in result:
                 # --- Emoji Logic ---
-                status = result.get("status")
+                #  status = result.get("status")
 
+                status = "✅" if result.get("status") is True else "❌" if result.get("status") is False else "N/A"
                 size_correct = "✅" if result.get("size_correct") is True else "❌" if result.get("size_correct") is False else "N/A"
                 palette_correct = "✅" if result.get("color_palette_correct") is True else "❌" if result.get("color_palette_correct") is False else "N/A"
                 color_count_correct = "✅" if result.get("correct_pixel_counts") is True else "❌" if result.get("correct_pixel_counts") is False else "N/A"
