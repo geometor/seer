@@ -48,6 +48,12 @@ class Verifier:
                     try:
                         transformed_output = transform_function(input_grid)
 
+                        # ADD THESE LINES: Check for None return value
+                        if transformed_output is None:
+                            example_result["status"] = "ERROR: transform function returned None"
+                            test_results_json.append(example_result)
+                            continue  # Skip to the next iteration
+
                         example_result["transformed_output"] = Grid(
                             transformed_output, "", "", "", ""
                         ).to_string()
