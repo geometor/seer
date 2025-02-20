@@ -6,6 +6,7 @@ from geometor.seer.tasks import Grid
 import json
 from pathlib import Path
 
+
 class Verifier:
     def get_transform_function(self, code):
         """Parses the code, finds the 'transform' function, and returns it."""
@@ -27,13 +28,14 @@ class Verifier:
         try:
             transform_function = self.get_transform_function(code)
             if transform_function is None:
-                test_results_json.append({"code_execution_error": "transform function not found"})
+                test_results_json.append(
+                    {"code_execution_error": "transform function not found"}
+                )
                 return test_results_json
 
             # Capture stdout - still needed for print statements in code
             output_capture = io.StringIO()
             with contextlib.redirect_stdout(output_capture):
-
                 for i, pair in enumerate(task.train):
                     input_grid = pair.input.grid
                     expected_output = pair.output.grid
@@ -46,7 +48,9 @@ class Verifier:
                     try:
                         transformed_output = transform_function(input_grid)
 
-                        example_result["transformed_output"] = Grid(transformed_output, '', '', '', '').to_string()
+                        example_result["transformed_output"] = Grid(
+                            transformed_output, "", "", "", ""
+                        ).to_string()
 
                         # --- Calculate Statistics ---
                         size_correct = transformed_output.shape == expected_output.shape
@@ -54,17 +58,24 @@ class Verifier:
 
                         transformed_colors = set(np.unique(transformed_output))
                         expected_colors = set(np.unique(expected_output))
-                        color_palette_correct = transformed_colors.issubset(expected_colors)
+                        color_palette_correct = transformed_colors.issubset(
+                            expected_colors
+                        )
                         example_result["color_palette_correct"] = color_palette_correct
 
-                        transformed_counts = dict(zip(*np.unique(transformed_output, return_counts=True)))
-                        expected_counts = dict(zip(*np.unique(expected_output, return_counts=True)))
+                        transformed_counts = dict(
+                            zip(*np.unique(transformed_output, return_counts=True))
+                        )
+                        expected_counts = dict(
+                            zip(*np.unique(expected_output, return_counts=True))
+                        )
                         correct_pixel_counts = transformed_counts == expected_counts
                         example_result["correct_pixel_counts"] = correct_pixel_counts
 
                         pixels_off = np.sum(transformed_output != expected_output)
-                        example_result["pixels_off"] = int(pixels_off)  # Ensure it's a standard int
-
+                        example_result["pixels_off"] = int(
+                            pixels_off
+                        )  # Ensure it's a standard int
 
                         if not np.array_equal(transformed_output, expected_output):
                             example_result["status"] = False
@@ -96,40 +107,53 @@ class Verifier:
             if "example" in result:  # It's an example result
                 test_results_str += f"\n## example {result['example']}\n"
                 test_results_str += f"*input:*\n```\n{result['input']}\n```\n"
-                test_results_str += f"*expected output:*\n```\n{result['expected_output']}\n```\n"
+                test_results_str += (
+                    f"*expected output:*\n```\n{result['expected_output']}\n```\n"
+                )
 
                 if "transformed_output" in result:
                     test_results_str += f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
 
                     # Generate and save image of transformed output
                     transformed_grid = Grid(
-                        np.array([int(x) for x in result['transformed_output'].split()], dtype=int).reshape(np.array(task.train[result['example']-1].output.grid).shape),
+                        np.array(
+                            [int(x) for x in result["transformed_output"].split()],
+                            dtype=int,
+                        ).reshape(
+                            np.array(
+                                task.train[result["example"] - 1].output.grid
+                            ).shape
+                        ),
                         task.id,
                         "train",
-                        result['example'] - 1,  # Adjust index for 0-based
+                        result["example"] - 1,  # Adjust index for 0-based
                         "transformed",
                     )
                     transformed_image = transformed_grid.to_image()
-                    image_filename = (
-                        f"{base_filename}-example_{result['example']}.png"
-                    )
+                    image_filename = f"{base_filename}-example_{result['example']}.png"
                     image_path = task_dir / image_filename
                     transformed_image.save(image_path)
 
-                test_results_str += f"  Size Correct: {result['size_correct']}\n"
-                test_results_str += f"  Color Palette Correct: {result['color_palette_correct']}\n"
-                test_results_str += f"  Pixel Counts Correct: {result['correct_pixel_counts']}\n"
-                test_results_str += f"  Pixels Off: {result['pixels_off']}\n"
+                test_results_str += f"Size Correct: {result.get('size_correct')}\n"
+                test_results_str += (
+                    f"Color Palette Correct: {result.get('color_palette_correct')}\n"
+                )
+                test_results_str += (
+                    f"Pixel Counts Correct: {result.get('correct_pixel_counts')}\n"
+                )
+                test_results_str += f"Pixels Off: {result.get('pixels_off')}\n"
 
-                if result['status'] is True:
+                if result["status"] is True:
                     test_results_str += "PASSED\n"
-                elif result['status'] is False:
+                elif result["status"] is False:
                     test_results_str += "**FAILED!**\n"
                 else:  # Error case
                     test_results_str += f"**ERROR**: {result['status']}\n"
 
             elif "captured_output" in result:
-                test_results_str += f"*captured output:*\n```\n{result['captured_output']}\n```\n"
+                test_results_str += (
+                    f"*captured output:*\n```\n{result['captured_output']}\n```\n"
+                )
             elif "code_execution_error" in result:
                 test_results_str += f"\n*code_execution_error:*\n```\n{result['code_execution_error']}\n```\n"
 
@@ -144,7 +168,6 @@ class Verifier:
             json.dump(test_results_json, f, indent=2)
 
         return test_results_str
-
 
     def analyze_results(self, test_results_str):
         """Analyzes the test results and provides feedback."""
