@@ -123,33 +123,30 @@ class Verifier:
                     # Generate and save image of transformed output
                     try:
                         # Use the shape of the ACTUAL transformed output
+                        grid = []
+                        for row in result["transformed_output"].split("\n"):
+                            grid.append(row.split())
+
                         transformed_grid = Grid(
-                            np.array(
-                                [int(x) for x in result["transformed_output"].split()],
-                                dtype=int,
-                            ).reshape(transformed_output.shape),  # Use transformed_output.shape
-                            task.id,
-                            "train",
-                            result["example"] - 1,  # Adjust index for 0-based
-                            "transformed",
+                            grid,
+                            "",
+                            "",
+                            "",  
+                            "",
                         )
                     except ValueError as e:
                         test_results_str += f"**ERROR**: Could not create grid from transformed output: {e}\n"
                         continue  # Skip image creation and go to the next result
-                    )
+                    
                     transformed_image = transformed_grid.to_image()
                     image_filename = f"{base_filename}-example_{result['example']}.png"
                     image_path = task_dir / image_filename
                     transformed_image.save(image_path)
 
-                test_results_str += f"Size Correct: {result.get('size_correct')}\n"
-                test_results_str += (
-                    f"Color Palette Correct: {result.get('color_palette_correct')}\n"
-                )
-                test_results_str += (
-                    f"Pixel Counts Correct: {result.get('correct_pixel_counts')}\n"
-                )
-                test_results_str += f"Pixels Off: {result.get('pixels_off')}\n"
+                test_results_str += f"size: {result.get('size_correct')}\n"
+                test_results_str += f"palette: {result.get('color_palette_correct')}\n"
+                test_results_str += f"color count: {result.get('correct_pixel_counts')}\n"
+                test_results_str += f"pixels off: {result.get('pixels_off')}\n"
 
                 if result["status"] is True:
                     test_results_str += "PASSED\n"

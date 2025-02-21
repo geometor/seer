@@ -77,8 +77,8 @@ class Seer:
         self._investigate_examples(task.train)
 
 
-        if self.all_tests_passed:  # Check if all tests passed
-            return                 # Return early if they did
+        #  if self.all_tests_passed:  # Check if all tests passed
+            #  return                 # Return early if they did
         summarize_task(self.session.task_dir, self.session.log_error)
 
     def _investigate_examples(self, examples, include_images=True):
@@ -173,29 +173,6 @@ class Seer:
             if self.all_tests_passed:  # Check if all tests passed
                 break                   # Break the loop if they did
 
-    def _review_programs(self, instructions):
-        """
-        summarize observations on pairs
-        """
-
-        prompt = [""]
-        instructions = [""]
-        (
-            response,
-            response_parts,
-            refine_needed,
-            train_results,
-            test_results,
-            code,
-            base_filename,
-            elapsed_time
-        ) = self._generate(
-            prompt,
-            instructions,
-            #  tools="code_execution",
-            description=f"example_summary",
-        )
-
     def _generate(
         self,
         role_name,
@@ -250,16 +227,6 @@ class Seer:
             code,
             base_filename,
         ) = self._process_response(response, functions, total_prompt)
-
-        # Flatten response_parts before logging
-        #  flat_response_parts = []
-        #  for part in response_parts:
-            #  if isinstance(part, str):
-                #  flat_response_parts.append(part)
-            #  elif isinstance(part, list):
-                #  flat_response_parts.extend(part)  # Extend, not append
-            #  else:
-                #  flat_response_parts.append(str(part))  # Ensure it is a string
 
         self.session.log_response_md(
             response,
