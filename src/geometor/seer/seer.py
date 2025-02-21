@@ -123,10 +123,9 @@ class Seer:
                 response,
                 response_parts,
                 refine_needed,
-                train_results,
-                test_results,
                 code,
                 base_filename,
+                extracted_code_list, # Get extracted code
                 elapsed_time
             ) = self._generate(
                     "dreamer",
@@ -150,11 +149,10 @@ class Seer:
             (
                 response,
                 response_parts,
-                refine_needed,
-                train_results,
-                test_results,
+                refine_needed, # This will be from parsing, not testing
                 code,
                 base_filename,
+                extracted_code_list,  # Get extracted code
                 elapsed_time
             ) = self._generate(
                 "coder",
@@ -167,11 +165,57 @@ class Seer:
             history.extend(prompt)
             history.extend(response_parts)
 
-            if refine_needed:
-                self.refine_code(train_results, test_results, code, base_filename)
+            # --- CODE TESTING (Now happens here) ---
+            train_results = []
+            test_results = []
+            # Iterate and test *all* code blocks
+            for file_type, extracted_code_content, extracted_base_filename in extracted_code_list:
+                if file_type == "py":
+                    code = extracted_code_content  # Update 'code'
+                    base_filename = extracted_base_filename # Update 'base_filename'
 
-            if self.all_tests_passed:  # Check if all tests passed
-                break                   # Break the loop if they did
+                    current_train_results = self.verifier.test_code(
+                        "example", code, self.session.task_dir, self.task.train, base_filename
+                    )
+                    self.verifier.write_test_results(
+                        current_train_results,
+                        self.session.task_dir,
+                        self.task,
+                        base_filename + "-train",
+                    )
+                    train_results.extend(current_train_results)
+
+                    all_train_passed = all(
+                        result.get("status") is True for result in current_train_results
+                    )
+                    if all_train_passed:
+                        current_test_results = self.verifier.test_code(
+                            "example", code, self.session.task_dir, self.task.test, base_filename
+                        )
+                        self.verifier.write_test_results(
+                            current_test_results,
+                            self.session.task_dir,
+                            self.task,
+                            base_filename + "-test",
+                        )
+                        test_results.extend(current_test_results)
+
+                        all_test_passed = all(
+                            result.get("status") is True for result in current_test_results
+                        )
+                        if all_test_passed:
+                            self.all_tests_passed = True  # Set global flag
+                    else:
+                        refine_needed = True  # Set refine_needed if train fails
+
+            if self.all_tests_passed:
+                break
+            elif refine_needed:
+                self.refine_code(train_results, test_results, code, base_filename)
+                if self.all_tests_passed:
+                    break
+
+        summarize_task(self.session.task_dir, self.session.log_error) # moved here
 
     def _generate(
         self,
@@ -184,9 +228,7 @@ class Seer:
         description="",
     ):
         """
-        Generate content from the model with standardized logging and function call handling.
-        Now accepts role_name instead of client object.
-        Returns elapsed time.
+        Generate content from the model, handling logging.
         """
         self.prompt_count += 1
 
@@ -222,29 +264,38 @@ class Seer:
         (
             response_parts,
             refine_needed,
-            train_results,
-            test_results,
-            code,
-            base_filename,
+            extracted_code_list, # Receive extracted code
         ) = self._process_response(response, functions, total_prompt)
 
         self.session.log_response_md(
             response,
-            response_parts,  # Pass the flattened list
+            response_parts,
             self.prompt_count,
             self.token_counts,
             description=description,
-            elapsed_time=elapsed_time,  # Pass elapsed time
+            elapsed_time=elapsed_time,
         )
+
+        #  train_results = []     # REMOVE
+        #  test_results = []      # REMOVE
+        code = None           # Initialize to None
+        base_filename = None  # Initialize
+
+        # Iterate to find *last* code block.  Important for refine_code
+        for file_type, extracted_code_content, extracted_base_filename in extracted_code_list:
+            if file_type == "py":
+                code = extracted_code_content
+                base_filename = extracted_base_filename
 
         return (
             response,
             response_parts,
             refine_needed,
-            train_results,
-            test_results,
-            code,
-            base_filename,
+            #  train_results,  # REMOVE
+            #  test_results,   # REMOVE
+            code,           # Return *last* code
+            base_filename,  # Return *last* base_filename
+            extracted_code_list,  # Return code list
             elapsed_time
         )
 
@@ -322,10 +373,9 @@ class Seer:
             response,
             response_parts,
             refine_needed,
-            train_results,
-            test_results,
             code,
             base_filename,
+            extracted_code_list,
             elapsed_time
         ) = self._generate(
             "dreamer",
@@ -346,10 +396,9 @@ class Seer:
             response,
             response_parts,
             refine_needed,
-            train_results,
-            test_results,
             code,
             base_filename,
+            extracted_code_list,
             elapsed_time
         ) = self._generate(
             "coder",
@@ -365,11 +414,12 @@ class Seer:
         """Processes the response from the Gemini model."""
         response_parts = []
         refine_needed = False  # Flag to indicate if refinement is needed
-        train_results = None
-        test_results = None
-        code = None
-        self.all_tests_passed = False  # Initialize
-        base_filename = None
+        #  train_results = None  # REMOVE
+        #  test_results = None   # REMOVE
+        #  code = None           # REMOVE
+        self.all_tests_passed = False  # Keep this, though it might not be used here
+        #  base_filename = None  # REMOVE
+        extracted_code_list = []  # Store extracted code blocks
 
         if not response.candidates:  # Check if candidates is not empty
             # Handle the case where response.candidates is empty
@@ -382,10 +432,11 @@ class Seer:
             return (
                 response_parts,
                 refine_needed,
-                train_results,
-                test_results,
-                code,
-                base_filename,
+                #  train_results,  # REMOVE
+                #  test_results,   # REMOVE
+                #  code,           # REMOVE
+                #  base_filename,  # REMOVE
+                extracted_code_list, # Return extracted code
             )
 
         if not hasattr(response.candidates[0].content, "parts"):
@@ -399,10 +450,11 @@ class Seer:
             return (
                 response_parts,
                 refine_needed,
-                train_results,
-                test_results,
-                code,
-                base_filename,
+                #  train_results,  # REMOVE
+                #  test_results,   # REMOVE
+                #  code,           # REMOVE
+                #  base_filename,  # REMOVE
+                extracted_code_list, # Return extracted code
             )
 
         for part in response.candidates[0].content.parts:
@@ -411,58 +463,9 @@ class Seer:
                 response_parts.append(part.text + "\n")
                 # Extract code blocks and write to files
                 extracted_code = self._parse_code_text(part.text)
-                for (
-                    file_type,
-                    extracted_code_content,
-                    extracted_base_filename,
-                ) in extracted_code:
-                    if file_type == "py":
-                        code = extracted_code_content  # Store the code
-                        base_filename = extracted_base_filename  # Store base_filename
-                        # Pass base_filename to test_code
-                        train_results = self.verifier.test_code(
-                            "example",
-                            code,
-                            self.session.task_dir,
-                            self.task.train,
-                            base_filename,
-                        )
-                        self.verifier.write_test_results(
-                            train_results,
-                            self.session.task_dir,
-                            self.task,
-                            base_filename + "-train",
-                        )
+                extracted_code_list.extend(extracted_code)  # Accumulate code blocks
 
-                        # Check results
-                        all_train_passed = all(
-                            result.get("status") is True for result in train_results
-                        )
-                        if all_train_passed:
-                            # Only run tests if train is successful
-                            test_results = self.verifier.test_code(
-                                "example",
-                                code,
-                                self.session.task_dir,
-                                self.task.test,
-                                base_filename,
-                            )
-                            self.verifier.write_test_results(
-                                test_results,
-                                self.session.task_dir,
-                                self.task,
-                                base_filename + "-test",
-                            )
-
-                            all_test_passed = all(
-                                result.get("status") is True for result in test_results
-                            )
-                            if all_test_passed:
-                                self.all_tests_passed = True  # Set global flag
-                        else:
-                            refine_needed = True  # Set the flag!
-                            
-            if part.executable_code:
+            if part.executable_code: # REMOVE
                 response_parts.append("\n*code_execution:*\n")
                 code = part.executable_code.code
                 response_parts.append(f"```python\n{code}\n```\n")
@@ -473,7 +476,7 @@ class Seer:
                 )
                 response_parts.extend(test_results)
 
-            if part.code_execution_result:
+            if part.code_execution_result: # REMOVE
                 response_parts.append("\n*code_execution_result:*\n")
                 outcome = part.code_execution_result.outcome
                 output = part.code_execution_result.output
@@ -483,7 +486,7 @@ class Seer:
                     f"{self.prompt_count:03d}-code_result.txt", output
                 )  # Use session method
 
-            if part.function_call:
+            if part.function_call: # UNCHANGED
                 function_call_found = True
                 response_parts.append("\n*function_call:*\n")
                 response_parts.append(part.function_call.name + "\n")
@@ -500,10 +503,11 @@ class Seer:
         return (
             response_parts,
             refine_needed,
-            train_results,
-            test_results,
-            code,
-            base_filename,
+            #  train_results,  # REMOVE
+            #  test_results,   # REMOVE
+            #  code,           # REMOVE
+            #  base_filename,  # REMOVE
+            extracted_code_list, # Return extracted code
         )
 
     def _call_function(self, function_call, functions, total_prompt):
