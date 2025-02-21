@@ -77,6 +77,8 @@ class Seer:
         self._investigate_examples(task.train)
 
 
+        if self.all_tests_passed:  # Check if all tests passed
+            return                 # Return early if they did
         summarize_task(self.session.task_dir, self.session.log_error)
 
     def _investigate_examples(self, examples, include_images=True):
@@ -84,6 +86,7 @@ class Seer:
         investigate all training pairs
         """
         history = [""]
+        self.all_tests_passed = False  # Initialize the flag
 
         for i, pair in enumerate(examples, 1):
             input_grid_str = pair.input.to_string()
@@ -166,6 +169,9 @@ class Seer:
 
             if refine_needed:
                 self.refine_code(train_results, test_results, code, base_filename)
+
+            if self.all_tests_passed:  # Check if all tests passed
+                break                   # Break the loop if they did
 
     def _review_programs(self, instructions):
         """
@@ -395,6 +401,7 @@ class Seer:
         train_results = None
         test_results = None
         code = None
+        self.all_tests_passed = False  # Initialize
         base_filename = None
 
         if not response.candidates:  # Check if candidates is not empty
@@ -465,6 +472,7 @@ class Seer:
                             result.get("status") is True for result in train_results
                         )
                         if all_train_passed:
+                            # Only run tests if train is successful
                             test_results = self.verifier.test_code(
                                 "example",
                                 code,
@@ -478,9 +486,15 @@ class Seer:
                                 self.task,
                                 base_filename + "-test",
                             )
+
+                            all_test_passed = all(
+                                result.get("status") is True for result in test_results
+                            )
+                            if all_test_passed:
+                                self.all_tests_passed = True  # Set global flag
                         else:
                             refine_needed = True  # Set the flag!
-
+                            
             if part.executable_code:
                 response_parts.append("\n*code_execution:*\n")
                 code = part.executable_code.code
