@@ -75,6 +75,8 @@ def test_code(code, task_dir, task_pairs):
                 test_results_json.append(example_result)
                 continue
 
+            # --- MODIFIED: Store the NumPy array ---
+            example_result["transformed_output_array"] = transformed_output
             example_result["transformed_output"] = Grid(
                 transformed_output, "", "", "", ""
             ).to_string()
@@ -131,26 +133,28 @@ def write_test_results(test_results_json, task_dir, base_filename):
 
                 # Generate and save image of transformed output
                 try:
-                    # Use the shape of the ACTUAL transformed output
-                    grid = []
-                    for row in result["transformed_output"].split("\n"):
-                        grid.append(row.split())
-
+                    # --- MODIFIED SECTION ---
+                    # Directly use the NumPy array from the test results.
+                    transformed_output = result['transformed_output_array'] # NEW KEY
                     transformed_grid = Grid(
-                        grid,
-                        "",
+                        transformed_output,  # Pass the NumPy array directly
+                        "",  # These arguments are not used by to_image()
                         "",
                         "",
                         "",
                     )
+                    transformed_image = transformed_grid.to_image()
+                    # --- END MODIFIED SECTION ---
+                    image_filename = f"{base_filename}-example_{result['example']}.png"
+                    image_path = task_dir / image_filename
+                    transformed_image.save(image_path)
+
                 except ValueError as e:
                     test_results_str += f"**ERROR**: Could not create grid from transformed output: {e}\n"
                     continue  # Skip image creation and go to the next result
-
-                transformed_image = transformed_grid.to_image()
-                image_filename = f"{base_filename}-example_{result['example']}.png"
-                image_path = task_dir / image_filename
-                transformed_image.save(image_path)
+                except Exception as e: # Catch the PIL error
+                    test_results_str += f"**ERROR**: Could not save image: {e}\n"
+                    continue
 
             test_results_str += f"size: {result.get('size_correct')}\n"
             test_results_str += f"palette: {result.get('color_palette_correct')}\n"
@@ -182,5 +186,3 @@ def write_test_results(test_results_json, task_dir, base_filename):
         json.dump(test_results_json, f, indent=2)
 
     return test_results_str
-
-
