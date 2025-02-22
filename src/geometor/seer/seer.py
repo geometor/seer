@@ -49,6 +49,7 @@ class Seer:
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
+        self.task_solved = False  # Initialize task_solved flag
 
     def run(self, tasks):
         """
@@ -86,6 +87,7 @@ class Seer:
         investigate all training pairs
         """
         history = [""]
+        self.task_solved = False  # Reset at the start of each task
 
         for i, pair in enumerate(task.train, 1):
             input_grid_str = pair.input.to_string()
@@ -130,6 +132,8 @@ class Seer:
             history.extend(response_parts)
 
             self._test_extracted_codelist(extracted_code_list, task)
+            if self.task_solved:  # Check if solved
+                break  # Exit the loop if solved
 
             # coder prompt
             instructions = [
@@ -155,6 +159,8 @@ class Seer:
             history.extend(response_parts)
 
             self._test_extracted_codelist(extracted_code_list, task)
+            if self.task_solved: # Check if solved
+                break # Exit loop
 
     def _test_extracted_codelist(self, extracted_code_list, task):
         # TODO: this function cannot call refine if we are already in a refine loop
@@ -196,7 +202,8 @@ class Seer:
                         result.get("status") is True for result in test_results
                     )
                     if all_test_passed:
-                        break
+                        self.task_solved = True  # Set the flag
+                        break  # Exit the loop *after* setting the flag
                 else:
                     if self.current_iteration <= self.max_iterations:
                         self.refine(
@@ -469,4 +476,3 @@ class Seer:
         error_msg = "Failed to get valid function call after maximum retries"
         print(f"\nERROR: {error_msg}")
         self.session.log_error(error_msg, "".join(total_prompt))
-
