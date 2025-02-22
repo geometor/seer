@@ -47,7 +47,7 @@ def summarize_session(session):
                     total_tests = 0
                     for file_results in test_report.values():
                         passed_count = sum(
-                            1 for res in file_results if res.get("status") == True
+                            1 for res in file_results if res.get("match") == True
                         )
                         total_tests = len(file_results)  # all results in file have same len
                         max_passed = max(max_passed, passed_count)
@@ -194,7 +194,7 @@ def summarize_task(task_dir, log_error):
                         "input": result["input"],
                         "expected_output": result["expected_output"],
                         "transformed_output": result.get("transformed_output", ""),
-                        "status": result["status"],
+                        "match": result["match"],
                         "size_correct": result.get("size_correct", "N/A"),
                         "color_palette_correct": result.get(
                             "color_palette_correct", "N/A"
@@ -203,6 +203,7 @@ def summarize_task(task_dir, log_error):
                             "correct_pixel_counts", "N/A"
                         ),
                         "pixels_off": result.get("pixels_off", "N/A"),
+                        "percent_correct": result.get("percent_correct", "N/A"),
                     }
                 )
             elif "captured_output" in result:
@@ -294,29 +295,32 @@ def _create_test_table(grouped_test_results):
     for file_index, test_results in grouped_test_results.items():
         table = Table(title=f"Code File: {file_index}")
         table.add_column("Example", style="cyan")
-        table.add_column("status")
+        table.add_column("match")
         table.add_column("size")
         table.add_column("palette")
         table.add_column("color count")
         table.add_column("diff pixels")
+        table.add_column("%")
 
         for result in test_results:
             if "example" in result:
                 # --- Emoji Logic ---
-                status = _get_status_emoji(result.get("status"))
+                match = _get_status_emoji(result.get("match"))
                 size_correct = _get_status_emoji(result.get("size_correct"))
                 palette_correct = _get_status_emoji(result.get("color_palette_correct"))
                 color_count_correct = _get_status_emoji(result.get("correct_pixel_counts"))
 
                 pixels_off = str(result.get("pixels_off", "N/A"))
+                percent_correct = float(result.get("percent_correct", 0))
 
                 table.add_row(
                     str(result["example"]),
-                    status,
+                    match,
                     size_correct,
                     palette_correct,
                     color_count_correct,
                     pixels_off,
+                    f"{percent_correct:.2f}"
                 )
             elif "captured_output" in result:
                 table.add_row("Captured Output", result["captured_output"])
