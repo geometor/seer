@@ -62,11 +62,18 @@ def test_code(code, task_dir, task_pairs):
                 test_results_json.append(example_result)
                 continue
 
-            # ADD THESE LINES: Check for None return value
+            # ADD THESE LINES: Check for None return value and convert to NumPy array
             if transformed_output is None:
                 example_result["match"] = "ERROR: transform function returned None"
                 test_results_json.append(example_result)
                 continue  # Skip to the next iteration
+
+            try:
+                transformed_output = np.array(transformed_output)  # Convert to NumPy array
+            except Exception as e:
+                example_result["match"] = f"ERROR: Could not convert output to NumPy array: {e}"
+                test_results_json.append(example_result)
+                continue
 
             example_result["transformed_output"] = Grid(
                 transformed_output, "", "", "", ""
