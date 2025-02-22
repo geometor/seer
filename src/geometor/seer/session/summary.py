@@ -12,56 +12,39 @@ def summarize_session(session):
     """
     session_summary = []
 
-    # Iterate through each task directory, sorting them by name
     for task_dir in sorted(session.session_dir.iterdir()):
         if not task_dir.is_dir():
-            # TODO: handle situation
             continue
 
         summary_report_json_path = task_dir / "summary_report.json"
-        #  if summary_report_json_path.exists():
-            #  # TODO: handle situation
-            #  return
 
         try:
             with open(summary_report_json_path, "r") as f:
                 task_summary = json.load(f)
                 task_id = task_dir.name
 
-                # Calculate task totals
                 task_total_tokens = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
                 task_total_response_time = 0
                 for response in task_summary.get("response_report", []):
-                    # Correctly use the individual response's usage_metadata
                     task_total_tokens["prompt"] += response["token_usage"].get("prompt", 0)
                     task_total_tokens["candidates"] += response["token_usage"].get("candidates", 0)
                     task_total_tokens["total"] += response["token_usage"].get("total", 0)
                     task_total_tokens["cached"] += response["token_usage"].get("cached", 0)
                     task_total_response_time += response["response_time"]
 
-                # --- Best Test Score ---
-                best_test_score = "N/A"  # Default if no tests
-                test_report = task_summary.get("test_report", {})
-                if test_report:
-                    max_passed = 0
-                    total_tests = 0
-                    for file_results in test_report.values():
-                        passed_count = sum(
-                            1 for res in file_results if res.get("match") == True
-                        )
-                        total_tests = len(file_results)  # all results in file have same len
-                        max_passed = max(max_passed, passed_count)
-                    if total_tests > 0:  # Avoid division by zero
-                        best_test_score = f"{max_passed}/{total_tests}"
+                # --- Get data from task summary ---
+                best_train_results = task_summary.get("best_train_results", {"passed": 0, "total": 0})
+                best_test_results = task_summary.get("best_test_results", {"passed": 0, "total": 0})
+                test_solved = task_summary.get("test_solved", False)
 
-                # Aggregate data into a single dictionary
                 session_summary.append(
                     {
                         "task_id": task_id,
                         "total_tokens": task_total_tokens,
                         "total_response_time": task_total_response_time,
-                        "test_report": task_summary.get("test_report", {}),  # Keep test report
-                        "best_test_score": best_test_score, # Add to session summary
+                        "best_train_results": best_train_results,  # Add to session summary
+                        "best_test_results": best_test_results,    # Add to session summary
+                        "test_solved": test_solved,                # Add to session summary
                     }
                 )
         except (IOError, json.JSONDecodeError) as e:
@@ -84,9 +67,8 @@ def summarize_session(session):
         session.session_dir, session_summary_report_md_file, session_summary_report_md
     )
 
-    # --- JSON report ---
     session_summary_report = {
-        "summary": session_summary,  # Use the aggregated data
+        "summary": session_summary,
     }
     session_summary_report_json_file = "session_summary_report.json"
     _write_to_file_session(
@@ -94,6 +76,7 @@ def summarize_session(session):
         session_summary_report_json_file,
         json.dumps(session_summary_report, indent=2),
     )
+
 
 
 def _create_session_summary_table(session_summary):
@@ -105,7 +88,10 @@ def _create_session_summary_table(session_summary):
     table.add_column("total", justify="right")
     table.add_column("cached", justify="right")
     table.add_column("time (s)", justify="right")
-    table.add_column("Test Score", justify="center")  # Add test score column
+    table.add_column("Train Score", justify="center")  # Add train score
+    table.add_column("Test Score", justify="center")   # Add test score
+    table.add_column("Solved", justify="center")       # Add solved column
+
 
     for task_summary in session_summary:
         table.add_row(
@@ -115,7 +101,9 @@ def _create_session_summary_table(session_summary):
             str(task_summary["total_tokens"]["total"]),
             str(task_summary["total_tokens"]["cached"]),
             f"{task_summary['total_response_time']:.4f}",
-            task_summary["best_test_score"],  # Display best test score
+            f"{task_summary['best_train_results']['passed']}/{task_summary['best_train_results']['total']}",  # Display best train score
+            f"{task_summary['best_test_results']['passed']}/{task_summary['best_test_results']['total']}",    # Display best test score
+            "✅" if task_summary["test_solved"] else "❌",  # Solved status
         )
     return table
 
@@ -136,21 +124,17 @@ def _write_to_file_session(session_dir, file_name, content):
         raise
 
 def summarize_task(task_dir, log_error):
-    """Creates a summary report (Markdown and JSON) using rich.table.Table."""
+    """Creates a summary report (Markdown and JSON) and returns a summary dict."""
 
-    # Gather response data and create summary report
     resplist = gather_response(task_dir, log_error)
-
-    # Response Report
     response_table = _create_response_table(resplist)
 
-    # Test Report
     grouped_test_results = {}
     for py_file in sorted(task_dir.glob("*-py_*.json")):
         try:
             with open(py_file, "r") as f:
                 test_results = json.load(f)
-                file_index = py_file.stem  # Use .stem directly
+                file_index = py_file.stem
                 grouped_test_results[file_index] = test_results
         except Exception as e:
             print(f"Failed to load test results from {py_file}: {e}")
@@ -159,17 +143,43 @@ def summarize_task(task_dir, log_error):
     sorted_grouped_test_results = dict(sorted(grouped_test_results.items()))
     test_tables = _create_test_table(sorted_grouped_test_results)
 
-    console = Console(record=True)  # Use record=True to capture output
+    # --- Calculate Best Train and Test Results ---
+    best_train_results = {"passed": 0, "total": 0}
+    best_test_results = {"passed": 0, "total": 0}
+    test_solved = False
+
+    for file_index, results in sorted_grouped_test_results.items():
+        if file_index.endswith("-train"):
+            passed_count = sum(1 for res in results if res.get("match") is True)
+            if results:  # Check if results is not empty
+                total_count = len(results)
+                if passed_count > best_train_results["passed"]:
+                    best_train_results["passed"] = passed_count
+                    best_train_results["total"] = total_count
+
+        elif file_index.endswith("-test"):
+            passed_count = sum(1 for res in results if res.get("match") is True)
+            if results:  # Check if results is not empty
+                total_count = len(results)
+                if passed_count > best_test_results["passed"]:
+                    best_test_results["passed"] = passed_count
+                    best_test_results["total"] = total_count
+
+    if best_test_results["total"] > 0 and best_test_results["passed"] == best_test_results["total"]:
+        test_solved = True
+
+
+    console = Console(record=True)
     console.print(Markdown("# Task Summary"))
     console.print(response_table)
     for table in test_tables.values():
         console.print(table)
 
-    report_md = console.export_text()  # Export captured output as plain text
+    report_md = console.export_text()
     report_md_file = "summary_report.md"
     _write_to_file_task(task_dir, report_md_file, report_md, log_error)
 
-    # --- JSON Report (Keep as before, but use sorted data) ---
+    # --- JSON Report ---
     response_report_json = []
     for data in sorted(resplist, key=lambda x: x.get("response_file", "")):
         response_report_json.append({
@@ -218,9 +228,18 @@ def summarize_task(task_dir, log_error):
     report_json = {
         "response_report": response_report_json,
         "test_report": test_report_json,
+        "best_train_results": best_train_results,  # Add to JSON
+        "best_test_results": best_test_results,    # Add to JSON
+        "test_solved": test_solved,                # Add to JSON
     }
     report_json_file = "summary_report.json"
     _write_to_file_task(task_dir, report_json_file, json.dumps(report_json, indent=2), log_error)
+
+    return {  # Return the summary data
+        "best_train_results": best_train_results,
+        "best_test_results": best_test_results,
+        "test_solved": test_solved,
+    }
 
 def gather_response(task_dir, log_error):
     """Gathers data from all response.json files in the task directory."""
@@ -338,3 +357,4 @@ def _write_to_file_task(task_dir, file_name, content, log_error):
     except (IOError, PermissionError) as e:
         print(f"Error writing to file {file_name}: {e}")
         log_error(f"Error writing to file {file_name}: {e}")
+
