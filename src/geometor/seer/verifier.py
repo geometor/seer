@@ -95,11 +95,12 @@ def test_code(code, task_dir, task_pairs):
             correct_pixel_counts = transformed_counts == expected_counts
             example_result["correct_pixel_counts"] = correct_pixel_counts
 
-            pixels_off = int(np.sum(transformed_output != expected_output))
-            example_result["pixels_off"] = pixels_off
-            example_result["percent_correct"] = 100 * (
-                ( expected_output.size - pixels_off ) / expected_output.size
-            )
+            if size_correct:
+                pixels_off = int(np.sum(transformed_output != expected_output))
+                example_result["pixels_off"] = pixels_off
+                example_result["percent_correct"] = 100 * (
+                    ( expected_output.size - pixels_off ) / expected_output.size
+                )
 
             if not np.array_equal(transformed_output, expected_output):
                 example_result["match"] = False
@@ -183,35 +184,3 @@ def write_test_results(test_results_json, task_dir, base_filename):
     return test_results_str
 
 
-#  def analyze_results(test_results_str):
-#  """Analyzes the test results and provides feedback."""
-#  # Placeholder for analysis logic.  This is where the core of the
-#  # Oracle's "intelligence" will reside.  For now, it's very basic.
-#  if "FAILED" in test_results_str:
-#  return "The code failed some tests.  Review the errors and try again."
-#  else:
-#  return "The code passed all tests."
-
-#  def generate_next_prompt(test_results_str, previous_prompt):
-#  """Generates the next prompt for the coder based on test results."""
-#  # Placeholder for prompt generation.  This will also become more
-#  # sophisticated.
-#  analysis = analyze_results(test_results_str)
-#  return f"{analysis}\n\nPrevious prompt:\n{previous_prompt}\n\nFix the errors."
-
-#  def test_test_input(
-#  transform_function, test_input_grid, task_id, task_dir, base_filename
-#  ):
-#  """Tests the transform function on the test input and saves the result."""
-#  try:
-#  transformed_test_output = transform_function(test_input_grid)
-#  transformed_test_grid = Grid(
-#  transformed_test_output, task_id, "test", 0, "transformed"
-#  )
-#  transformed_test_image = transformed_test_grid.to_image()
-#  test_image_filename = f"{base_filename}-test_output.png"
-#  test_image_path = task_dir / test_image_filename
-#  transformed_test_image.save(test_image_path)
-#  return test_image_filename
-#  except Exception as e:
-#  return f"Error running transform on test input: {e}"
