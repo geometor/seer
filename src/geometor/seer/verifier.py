@@ -20,6 +20,7 @@ def get_transform_function(code):
     except SyntaxError as e:
         raise  # Re-raise SyntaxError to be handled by caller
 
+
 def test_code(code, task_dir, task_pairs):
     """Executes and validates the generated code, returning results as a list of dicts."""
     test_results_json = []  # Store results for JSON output
@@ -56,14 +57,14 @@ def test_code(code, task_dir, task_pairs):
             try:
                 transformed_output = transform_function(input_grid)
             except Exception as e:
-                example_result["status"] = f"ERROR: {e}"
+                example_result["match"] = f"ERROR: {e}"
                 example_result["function_output"] = output_capture.getvalue()
                 test_results_json.append(example_result)
                 continue
 
             # ADD THESE LINES: Check for None return value
             if transformed_output is None:
-                example_result["status"] = "ERROR: transform function returned None"
+                example_result["match"] = "ERROR: transform function returned None"
                 test_results_json.append(example_result)
                 continue  # Skip to the next iteration
 
@@ -83,25 +84,25 @@ def test_code(code, task_dir, task_pairs):
             transformed_counts = dict(
                 zip(*np.unique(transformed_output, return_counts=True))
             )
-            expected_counts = dict(
-                zip(*np.unique(expected_output, return_counts=True))
-            )
+            expected_counts = dict(zip(*np.unique(expected_output, return_counts=True)))
             correct_pixel_counts = transformed_counts == expected_counts
             example_result["correct_pixel_counts"] = correct_pixel_counts
 
-            pixels_off = np.sum(transformed_output != expected_output)
-            example_result["pixels_off"] = int(
-                pixels_off
-            )  # Ensure it's a standard int
+            pixels_off = int(np.sum(transformed_output != expected_output))
+            example_result["pixels_off"] = pixels_off
+            example_result["percent_correct"] = 100 * (
+                ( expected_output.size - pixels_off ) / expected_output.size
+            )
 
             if not np.array_equal(transformed_output, expected_output):
-                example_result["status"] = False
+                example_result["match"] = False
             else:
-                example_result["status"] = True
+                example_result["match"] = True
 
             test_results_json.append(example_result)
 
     return test_results_json
+
 
 def write_test_results(test_results_json, task_dir, base_filename):
     """Formats test results as Markdown and writes to file, including saving images."""
@@ -116,7 +117,9 @@ def write_test_results(test_results_json, task_dir, base_filename):
             )
 
             if "transformed_output" in result:
-                test_results_str += f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
+                test_results_str += (
+                    f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
+                )
 
                 # Generate and save image of transformed output
                 try:
@@ -143,17 +146,15 @@ def write_test_results(test_results_json, task_dir, base_filename):
 
             test_results_str += f"size: {result.get('size_correct')}\n"
             test_results_str += f"palette: {result.get('color_palette_correct')}\n"
-            test_results_str += (
-                f"color count: {result.get('correct_pixel_counts')}\n"
-            )
+            test_results_str += f"color count: {result.get('correct_pixel_counts')}\n"
             test_results_str += f"pixels off: {result.get('pixels_off')}\n"
 
-            if result["status"] is True:
+            if result["match"] is True:
                 test_results_str += "PASSED\n"
-            elif result["status"] is False:
+            elif result["match"] is False:
                 test_results_str += "**FAILED!**\n"
             else:  # Error case
-                test_results_str += f"**ERROR**: {result['status']}\n"
+                test_results_str += f"**ERROR**: {result['match']}\n"
 
         elif "captured_output" in result:
             test_results_str += (
@@ -174,35 +175,36 @@ def write_test_results(test_results_json, task_dir, base_filename):
 
     return test_results_str
 
+
 #  def analyze_results(test_results_str):
-    #  """Analyzes the test results and provides feedback."""
-    #  # Placeholder for analysis logic.  This is where the core of the
-    #  # Oracle's "intelligence" will reside.  For now, it's very basic.
-    #  if "FAILED" in test_results_str:
-        #  return "The code failed some tests.  Review the errors and try again."
-    #  else:
-        #  return "The code passed all tests."
+#  """Analyzes the test results and provides feedback."""
+#  # Placeholder for analysis logic.  This is where the core of the
+#  # Oracle's "intelligence" will reside.  For now, it's very basic.
+#  if "FAILED" in test_results_str:
+#  return "The code failed some tests.  Review the errors and try again."
+#  else:
+#  return "The code passed all tests."
 
 #  def generate_next_prompt(test_results_str, previous_prompt):
-    #  """Generates the next prompt for the coder based on test results."""
-    #  # Placeholder for prompt generation.  This will also become more
-    #  # sophisticated.
-    #  analysis = analyze_results(test_results_str)
-    #  return f"{analysis}\n\nPrevious prompt:\n{previous_prompt}\n\nFix the errors."
+#  """Generates the next prompt for the coder based on test results."""
+#  # Placeholder for prompt generation.  This will also become more
+#  # sophisticated.
+#  analysis = analyze_results(test_results_str)
+#  return f"{analysis}\n\nPrevious prompt:\n{previous_prompt}\n\nFix the errors."
 
 #  def test_test_input(
-    #  transform_function, test_input_grid, task_id, task_dir, base_filename
+#  transform_function, test_input_grid, task_id, task_dir, base_filename
 #  ):
-    #  """Tests the transform function on the test input and saves the result."""
-    #  try:
-        #  transformed_test_output = transform_function(test_input_grid)
-        #  transformed_test_grid = Grid(
-            #  transformed_test_output, task_id, "test", 0, "transformed"
-        #  )
-        #  transformed_test_image = transformed_test_grid.to_image()
-        #  test_image_filename = f"{base_filename}-test_output.png"
-        #  test_image_path = task_dir / test_image_filename
-        #  transformed_test_image.save(test_image_path)
-        #  return test_image_filename
-    #  except Exception as e:
-        #  return f"Error running transform on test input: {e}"
+#  """Tests the transform function on the test input and saves the result."""
+#  try:
+#  transformed_test_output = transform_function(test_input_grid)
+#  transformed_test_grid = Grid(
+#  transformed_test_output, task_id, "test", 0, "transformed"
+#  )
+#  transformed_test_image = transformed_test_grid.to_image()
+#  test_image_filename = f"{base_filename}-test_output.png"
+#  test_image_path = task_dir / test_image_filename
+#  transformed_test_image.save(test_image_path)
+#  return test_image_filename
+#  except Exception as e:
+#  return f"Error running transform on test input: {e}"
