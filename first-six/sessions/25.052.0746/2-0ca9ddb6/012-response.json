@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Cells:** Locate all cells with the colors red (2) and blue (1).\n\n2.  **Create Surrounding Plus Shapes:**\n    *   For each red cell (color 2), create a \"plus\" shape using yellow (color 4) in the four cells directly adjacent (up, down, left, right) to the red cell.  Do *not* change the color of the red cell itself.\n    *   For each blue cell (color 1), create a \"plus\" shape using orange (color 7) in the four cells directly adjacent (up, down, left, right) to the blue cell. Do *not* change the color of the blue cell itself.\n\n3.  **Preserve Other Cells:** All other cells in the grid (those that are not red or blue, and are not part of a plus shape drawn around a red or blue cell) retain their original color.\n\"\"\"\n\nimport numpy as np\n\ndef create_plus_shape_around(grid, center, color):\n    \"\"\"Creates a plus shape around a center cell with a specified color,\n    without changing the center cell itself.\"\"\"\n    rows, cols = grid.shape\n    offsets = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right\n    for dr, dc in offsets:\n        r, c = center[0] + dr, center[1] + dc\n        if 0 <= r < rows and 0 <= c < cols:\n            grid[r, c] = color\n    return grid\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 2:  # Red cell\n                # Create yellow plus shape *around* the red cell\n                output_grid = create_plus_shape_around(output_grid, (r, c), 4)\n            elif input_grid[r, c] == 1:  # Blue cell\n                # Create orange plus shape *around* the blue cell\n                output_grid = create_plus_shape_around(output_grid, (r, c), 7)\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3493,
+    "candidates_token_count": 546,
+    "total_token_count": 4039,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.001364
+  },
+  "response_file": "012-response.json"
+}

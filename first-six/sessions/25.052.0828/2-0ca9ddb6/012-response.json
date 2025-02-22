@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule involves creating a yellow cross around each red cell and placing orange cells around each blue cell in the cardinal directions.\n\n1. Copy the input grid to the output grid.\n2. Find all red (2) and blue (1) cells in the input grid.\n3. For each red cell:\n    - Place a yellow (4) cell one position above, below, to the left, and to the right.\n4. For each blue cell:\n    - Place an orange (7) cell one position above, below, to the left, and to the right.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find the coordinates of all single-cell objects of the specified color.\n    coords = np.where(grid == color)\n    return list(zip(coords[0], coords[1]))\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find all red (2) and blue (1) cells.\n    red_positions = find_objects(input_grid, 2)\n    blue_positions = find_objects(input_grid, 1)\n\n    # Create yellow crosses around each red cell.\n    for y, x in red_positions:\n        if y > 0:\n            output_grid[y-1, x] = 4  # Above\n        if y < output_grid.shape[0]-1:\n            output_grid[y+1, x] = 4  # Below\n        if x > 0:\n            output_grid[y, x-1] = 4  # Left\n        if x < output_grid.shape[1]-1:\n            output_grid[y, x+1] = 4  # Right\n\n    # Create orange surrounds for each blue cell.\n    for y, x in blue_positions:\n        if y > 0:\n            output_grid[y-1, x] = 7  # Above\n        if y < output_grid.shape[0]-1:\n            output_grid[y+1, x] = 7  # Below\n        if x > 0:\n            output_grid[y, x-1] = 7  # Left\n        if x < output_grid.shape[1]-1:\n            output_grid[y, x+1] = 7  # Right\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2850,
+    "candidates_token_count": 564,
+    "total_token_count": 3414,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.095526
+  },
+  "response_file": "012-response.json"
+}

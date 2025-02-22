@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe output preserves the azure colored object and adds a blue pixel adjacent to the azure object, to the right of its top-left corner, and one to the left of the bottom-right one.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # find azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # add blue pixels\n    for obj in azure_objects:\n        # sort object coordinates to find top-left and bottom-right\n        sorted_obj = sorted(obj, key=lambda x: (x[0], x[1]))\n        top_left = sorted_obj[0]\n        bottom_right = sorted_obj[-1]\n        # adjust for the 2x1 vertical rectangle object shape assumption\n        if len(obj) > 1 and top_left[0] == sorted_obj[1][0] -1 and top_left[1] == sorted_obj[1][1]:\n            top_left_corner = top_left\n        elif len(obj) > 1:\n            top_left_corner = (sorted_obj[1][0], sorted_obj[1][1])\n        else:\n            top_left_corner = top_left\n        \n        if len(obj) > 1 and bottom_right[0] == sorted_obj[-2][0] + 1 and bottom_right[1] == sorted_obj[-2][1]:\n           bottom_right_corner = bottom_right\n        elif len(obj) > 1:\n             bottom_right_corner = (sorted_obj[-2][0], sorted_obj[-2][1])\n        else:\n            bottom_right_corner = bottom_right\n\n        #Add to the right of top left corner\n        if top_left_corner[1] + 1 < output_grid.shape[1]:\n          output_grid[top_left_corner[0], top_left_corner[1] + 1] = 1\n        #Add to the left of the bottom right corner\n        if bottom_right_corner[1] -1 >= 0:\n          output_grid[bottom_right_corner[0], bottom_right_corner[1] - 1] = 1\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1703,
+    "candidates_token_count": 809,
+    "total_token_count": 2512,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.394419,
+  "response_file": "002-response.json"
+}

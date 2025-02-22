@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe program consists of finding all azure L-shaped objects, and inserting a\nblue pixel inside each \"L\".\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color, shape):\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n\n        visited.add((r, c))\n        current_object.append((r, c))\n\n        neighbors = [(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)]\n        for nr, nc in neighbors:\n            dfs(nr, nc, current_object)\n    \n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r,c] == color and (r,c) not in visited:\n                current_object = []\n                dfs(r,c,current_object)\n\n                # simplified shape determination\n                if len(current_object) > 1:\n                    objects.append(current_object)\n    return objects\n                \n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # Find azure objects\n    azure_objects = find_objects(input_grid, 8, \"L\")\n\n    # Add a blue pixel inside each azure L-shape\n    for obj in azure_objects:\n        if len(obj) == 3: #check it's an L shape\n            sorted_obj = sorted(obj)\n            # check for L vs reverse L\n            if (sorted_obj[0][0] == sorted_obj[1][0] and sorted_obj[1][1] == sorted_obj[2][1]): #check rows and columns\n                # L shape, add pixel at +1,+1 from top\n                output_grid[sorted_obj[0][0] + 1, sorted_obj[0][1] + 1] = 1\n            elif (sorted_obj[0][1] == sorted_obj[1][1] and sorted_obj[1][0] == sorted_obj[2][0]): #reversed L\n                # reverse L shape, add pixel at -1,-1 from bottom\n                output_grid[sorted_obj[2][0] -1, sorted_obj[2][1]-1]=1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3472,
+    "candidates_token_count": 626,
+    "total_token_count": 4098,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.690177,
+  "response_file": "006-response.json"
+}

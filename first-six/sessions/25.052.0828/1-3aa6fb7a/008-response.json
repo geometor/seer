@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Azure Objects: Locate all connected regions (objects) of color 8 (azure) in the input grid.\n\n2. Process Each Azure Object: For each identified azure object:\n   - Check for Vertical Line: Determine if the object is a vertical line. A vertical line has all its cells in the same column. Also, a vertical line has a length of 2.\n   - Vertical Line Action: If it's a vertical line of length 2, place a blue (color 1) pixel immediately to the *right* of the *top-most* cell of the azure line.\n   - Other Shapes (Horizontal Line and others): if the object is not vertical, place a blue pixel immediately *to the left* of the *right-most* cell of the azure object.\n   - Boundary condition: Check that after calculating the position where a blue pixel will be added, this new position is inside the boundaries of the image.\n\n3. Preserve Other Colors: All other cells in the input grid that are not part of the processed azure objects remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds connected components of a specific color in the grid.\n    Returns a list of lists, where each inner list contains the coordinates of an object.\n    \"\"\"\n    objects = []\n    visited = set()\n\n    def is_valid(x, y):\n        return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]\n\n    def dfs(x, y):\n        if (x, y) in visited or not is_valid(x, y) or grid[x, y] != color:\n            return []\n\n        visited.add((x, y))\n        object_coords = [(x, y)]\n\n        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n            object_coords.extend(dfs(x + dx, y + dy))\n\n        return object_coords\n\n    for x in range(grid.shape[0]):\n        for y in range(grid.shape[1]):\n            if grid[x, y] == color:\n                found_object = dfs(x, y)\n                if found_object:\n                    objects.append(found_object)\n\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    for obj in azure_objects:\n        # Sort by x and then y to find top-most point\n        sorted_by_x = sorted(obj, key=lambda p: (p[0], p[1]))\n        top_most = sorted_by_x[0]\n\n        # Sort by y in reverse order to find right-most point\n        sorted_by_y_desc = sorted(obj, key=lambda p: p[1], reverse=True)\n        right_most = sorted_by_y_desc[0]\n\n        # Check if it's a vertical line (all y-coordinates are the same) and length is 2\n        if all(p[1] == sorted_by_x[0][1] for p in sorted_by_x) and len(obj) == 2:\n            # Place blue to the right of the top-most cell\n            new_x, new_y = top_most[0], top_most[1] + 1\n            if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n                output_grid[new_x, new_y] = 1\n        else:\n            # Place blue to the left of the right-most cell\n            new_x, new_y = right_most[0], right_most[1] - 1\n            if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n                output_grid[new_x, new_y] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2746,
+    "candidates_token_count": 961,
+    "total_token_count": 3707,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.303927
+  },
+  "response_file": "008-response.json"
+}

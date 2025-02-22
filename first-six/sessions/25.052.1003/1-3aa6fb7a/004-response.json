@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCopies azure L-shapes from the input grid to the output grid and inserts a blue cell to the right of the vertical \"tip\" of each L-shape.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"Finds L-shaped objects of a specified color in the grid.\"\"\"\n    l_shapes = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            if grid[r, c] == color:\n                # Check for L shape (2x2 block with one cell missing)\n                if grid[r+1, c] == color and grid[r, c+1] == color and grid[r+1,c+1] !=color:  # Top-left corner\n                   l_shapes.append( ((r, c), (r+1, c), (r, c+1)) )\n                if grid[r, c] == color and grid[r+1, c] == color and grid[r+1,c+1] == color and grid[r, c+1] !=color:  # mirrored L\n                   l_shapes.append( ((r, c), (r+1, c), (r+1, c+1)) )\n\n\n    return l_shapes\n\ndef get_tip_coordinates(l_shape_coordinates):\n    \"\"\"Calculates tip for the vertical bar in L shape\"\"\"\n    #find lowest x\n    coords = sorted(l_shape_coordinates, key=lambda item: item[0], reverse=True)\n\n    if coords[0][0] > coords[1][0] and coords[0][0] > coords[2][0]:\n       return (coords[0][0], coords[0][1]+1)\n    #find largest x\n    coords = sorted(l_shape_coordinates, key=lambda item: item[0])\n    if coords[0][0] < coords[1][0] and coords[0][0] < coords[2][0]:\n        return (coords[0][0], coords[0][1]+1)\n\n    return None\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find L-shapes of color 8 (azure)\n    l_shapes = find_l_shapes(input_grid, 8)\n\n    # Insert blue cells\n    for l_shape in l_shapes:\n        # find the \"tip\" coordinate of the L shape\n        tip_coord = get_tip_coordinates(l_shape)\n\n        if tip_coord is not None:\n           # add a blue cell next to the tip\n           if tip_coord[0] < rows and tip_coord[1] < cols: # Check bounds\n              output_grid[tip_coord] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3455,
+    "candidates_token_count": 693,
+    "total_token_count": 4148,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.495743
+  },
+  "response_file": "004-response.json"
+}

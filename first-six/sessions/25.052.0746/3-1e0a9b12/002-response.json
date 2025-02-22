@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation moves all non-zero colored cells to the last row available, keeping their original colors. The colored objects do not change color, they are just translated.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero colored cells to the\n    last row available, preserving their original x-coordinates and colors.\n    \"\"\"\n    # Initialize the output grid as a copy of the input grid with all zeros.\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Create a dictionary to store the next available row index for each column.\n    next_available_row = {col: rows - 1 for col in range(cols)}\n\n    # Iterate through the input grid to find and move non-zero cells.\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                # Get the color of the current cell.\n                color = input_grid[r, c]\n                # Get the next available row index for the current column.\n                row_index = next_available_row[c]\n                # Place the cell in the output grid.\n                output_grid[row_index, c] = color\n                # Update the next available row index for this column.\n                next_available_row[c] -= 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1658,
+    "candidates_token_count": 334,
+    "total_token_count": 1992,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.246241
+  },
+  "response_file": "002-response.json"
+}

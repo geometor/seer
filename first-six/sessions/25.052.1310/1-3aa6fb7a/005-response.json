@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Azure Objects: Find all contiguous regions of azure (color 8) pixels in the input grid. Each of these regions is considered an object.\n\n2. Extend Each Azure Object: For *each* azure object:\n    *   Iterate through all the pixels composing each Azure Object\n    *   For each pixel, check for adjacent pixels in all four directions (up, down, left, right).\n    *   If any direct adjacent pixel is 0 (white/background), then change it to 1 (Blue)\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Iterate through each azure object\n    for obj in azure_objects:\n        #Iterate through each pixel of the object\n        for r, c in obj:\n            # Check adjacent pixels and change 0 to 1\n            if r > 0 and output_grid[r-1, c] == 0:\n                output_grid[r-1, c] = 1\n            if r < output_grid.shape[0] - 1 and output_grid[r+1, c] == 0:\n                output_grid[r+1, c] = 1\n            if c > 0 and output_grid[r, c-1] == 0:\n                output_grid[r, c-1] = 1\n            if c < output_grid.shape[1] - 1 and output_grid[r, c+1] == 0:\n                output_grid[r, c+1] = 1\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2742,
+    "candidates_token_count": 660,
+    "total_token_count": 3402,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.472572,
+  "response_file": "005-response.json"
+}

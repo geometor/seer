@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies two mirrored \"L\"-shaped azure objects in the input grid.\nAdds a blue pixel inside each L-shape, relative to its corner and direction:\n- 'up': blue pixel below and to the right of the corner.\n- 'down': blue pixel above and to the left of the corner.\n- 'right': blue pixel below and to the left of the corner\n- 'left': blue pixel above and to the right of the corner\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds L-shaped objects of a specified color in the grid.\n    Returns a list of coordinates representing the corner pixel of each L-shape,\n    and a direction ('up', 'down', 'left', 'right').\n    \"\"\"\n    rows, cols = grid.shape\n    l_shapes = []\n\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            if grid[r, c] == color:\n                # Check for L shapes\n                if grid[r + 1, c] == color and grid[r, c + 1] == color:  # Top-left L\n                    l_shapes.append( ((r, c), 'up') )\n                elif grid[r - 1, c] == color and grid[r, c - 1] == color: # Bottom-right L\n                    l_shapes.append( ((r,c), 'down') )\n                elif grid[r - 1, c] == color and grid[r, c + 1] == color: # Top-right L\n                     l_shapes.append( ((r, c), 'right') )\n                elif grid[r + 1, c] == color and grid[r, c - 1] == color:  #Bottom-left L\n                     l_shapes.append( ((r,c), 'left'))\n\n    # Remove duplicates, keeping only unique L-shape corners.\n    unique_l_shapes = []\n    seen_corners = set()\n\n    for corner, direction in l_shapes:\n      if corner not in seen_corners:\n        unique_l_shapes.append((corner, direction))\n        seen_corners.add(corner)\n\n    return unique_l_shapes\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure = 8\n    blue = 1\n\n    # Find the corner coordinates and directions of all azure L-shapes\n    l_shapes = find_l_shapes(input_grid, azure)\n\n    # Insert blue pixels based on L-shape orientation\n    for (r, c), direction in l_shapes:\n        # Check the orientation and place blue pixel\n        if direction == 'up':\n          output_grid[r + 1, c + 1] = blue\n        elif direction == 'down':\n          output_grid[r - 1, c - 1] = blue\n        elif direction == 'right':\n          output_grid[r - 1, c + 1] = blue\n        elif direction == 'left':\n          output_grid[r + 1, c - 1] = blue\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4955,
+    "candidates_token_count": 748,
+    "total_token_count": 5703,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.761813,
+  "response_file": "008-response.json"
+}

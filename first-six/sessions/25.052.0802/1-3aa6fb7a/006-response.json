@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation preserves azure (8) objects. It adds a blue cell (1) to the left of horizontal azure lines and to the right of vertical azure lines. Single-cell azure objects are preserved without adding any blue cells.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find all objects of a specific color in the grid.\n    objects = []\n    visited = set()\n\n    def is_valid(x, y):\n        return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]\n\n    def dfs(x, y, current_object):\n        if (x, y) in visited or not is_valid(x, y) or grid[x, y] != color:\n            return\n        visited.add((x, y))\n        current_object.append((x, y))\n        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n            dfs(x + dx, y + dy, current_object)\n\n    for x in range(grid.shape[0]):\n        for y in range(grid.shape[1]):\n            if grid[x, y] == color and (x, y) not in visited:\n                current_object = []\n                dfs(x, y, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_vertical_line(obj, grid):\n    #Checks if an object is a vertical line.\n\n    if len(obj) < 2:\n        return False\n\n    xs = [p[0] for p in obj]\n    ys = [p[1] for p in obj]\n\n    if len(set(ys)) == 1: #all in the same column\n        return True\n    return False\n\ndef is_horizontal_line(obj, grid):\n   # Checks if an object is a horizontal line\n\n    if len(obj) < 2:\n        return False\n\n    xs = [p[0] for p in obj]\n    ys = [p[1] for p in obj]\n\n    if len(set(xs)) == 1:  # All in the same row\n        return True\n    return False\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n    # Find all objects with color 8 (azure)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Iterate through each azure object\n    for obj in azure_objects:\n        if is_vertical_line(obj, input_grid):\n          #add blue to the right\n          obj_sorted_by_row = sorted(obj, key = lambda p: p[0])\n          highest_row_point = obj_sorted_by_row[-1]\n          new_x = highest_row_point[0]\n          new_y = highest_row_point[1] + 1\n          if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n            output_grid[new_x, new_y] = 1\n\n        elif is_horizontal_line(obj, input_grid):\n          # add blue to the left\n          obj_sorted_by_col = sorted(obj, key=lambda p: p[1])\n          lowest_col_point = obj_sorted_by_col[0]\n\n          new_x = lowest_col_point[0]\n          new_y = lowest_col_point[1] - 1\n          if 0 <= new_x < output_grid.shape[0] and 0 <= new_y < output_grid.shape[1]:\n             output_grid[new_x, new_y] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3199,
+    "candidates_token_count": 896,
+    "total_token_count": 4095,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 7.428456
+  },
+  "response_file": "006-response.json"
+}

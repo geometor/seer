@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input consists of azure (color 8) L-shaped objects.  The output preserves these objects and adds two blue (color 1) cells. One blue cell is placed immediately to the right of the corner of any L-shape that has a \"Top-Left Corner\" orientation. The other blue cell is placed immediately to the left of the corner of any L-shape that has a \"Bottom-Right Corner\" orientation.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all L-shaped objects (3 contiguous cells) of a given color.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(r, c, current_object):\n        if (r < 0 or r >= grid.shape[0] or c < 0 or c >= grid.shape[1] or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                if len(current_object) == 3:  # Check if it's an L-shape (3 cells)\n                    objects.append(current_object)\n    return objects\n\ndef get_corner(obj):\n    \"\"\"Identifies the corner cell of an L-shaped object.\"\"\"\n    rows, cols = zip(*obj)\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n\n    for r, c in obj:\n        neighbors = 0\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            nr, nc = r + dr, c + dc\n            if (nr, nc) in obj:\n                neighbors += 1\n        if neighbors == 2:  # Corner cell has exactly two neighbors within the object\n            return (r, c)\n    return None  # Should not happen, but for safety\n\ndef get_orientation(obj, corner):\n    \"\"\"Determines the orientation of the L-shape.\"\"\"\n    r, c = corner\n    rows, cols = zip(*obj)\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n    \n    if r == min_row and c == min_col:\n      return \"Top-Left\"\n    if r == min_row and c == max_col:\n      return \"Top-Right\"\n    if r == max_row and c == min_col:\n      return \"Bottom-Left\"\n    if r == max_row and c == max_col:\n      return \"Bottom-Right\"\n      \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the L-shape rule.\"\"\"\n    output_grid = np.copy(input_grid)  # Initialize output_grid as a copy of input_grid\n    azure_objects = find_objects(input_grid, 8) # Find azure L-shaped objects\n\n    for obj in azure_objects: # Iterate over each found object\n        corner = get_corner(obj)  # Determine the corner cell\n        if corner is None:\n            continue  # Skip if no corner found (shouldn't happen)\n        orientation = get_orientation(obj, corner) # Determine the orientation\n\n        r, c = corner   # Get corner coordinates\n        if orientation == \"Top-Left\":  # If Top-Left, add blue to the right\n            if c + 1 < output_grid.shape[1]:\n                output_grid[r, c + 1] = 1\n        elif orientation == \"Bottom-Right\":  # If Bottom-Right, add blue to the left\n            if c - 1 >= 0:\n                output_grid[r, c - 1] = 1\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3948,
+    "candidates_token_count": 1031,
+    "total_token_count": 4979,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.627108
+  },
+  "response_file": "008-response.json"
+}

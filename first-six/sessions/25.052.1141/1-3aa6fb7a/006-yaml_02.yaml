@@ -1,0 +1,36 @@
+task: 005-color_and_fill
+summary: |
+  The task involves placing a blue (1) pixel adjacent to azure (8) rectangles
+  (either 2x1 or 1x2) in specific positions based on whether a 2x2 azure square could be
+  formed. It favors completing the 2x2 azure square if possible. If not, and the completion
+  can *only* be done in one direction, a blue pixel is placed to force this azure square
+  completion if done.
+
+objects:
+  - name: azure_rectangle_v
+    type: rectangle
+    color: 8
+    size: 2x1
+    position: variable
+
+  - name: azure_rectangle_h
+    type: rectangle
+    color: 8
+    size: 1x2
+    position: variable
+
+  - name: blue_pixel
+    type: pixel
+    color: 1
+    size: 1x1
+    position: strategically placed adjacent to azure rectangles
+
+predicates:
+  - can_form_2x2_square_right: Checks if a 2x1 azure rectangle can form a 2x2 square to its right.
+  - can_form_2x2_square_left: Checks if a 2x1 azure rectangle can form a 2x2 square to its left.
+  - can_form_2x2_square_below: Checks if a 1x2 azure rectangle can form a 2x2 square below it.
+  - can_form_2x2_square_above: Checks if a 1x2 azure rectangle can form a 2x2 square above it.
+
+actions:
+  - place_blue_left: Places a blue pixel to the immediate left of a 2x1 azure rectangle.
+  - place_blue_above: Places a blue pixel immediately above a 1x2 azure rectangle.

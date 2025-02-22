@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe task involves placing a blue (1) pixel adjacent to azure (8) rectangles\n(either 2x1 or 1x2) in specific positions based on whether a 2x2 azure square could be\nformed. It favors completing the 2x2 azure square if possible. If not, and the completion\ncan *only* be done in one direction, a blue pixel is placed to force this azure square\ncompletion if done.\n\"\"\"\n\nimport numpy as np\n\ndef find_2x1_vertical_rectangles(grid, color):\n    \"\"\"\n    Finds the coordinates of 2x1 vertical rectangles of the specified color.\n    Returns a list of tuples, where each tuple contains the top and bottom coordinates of a rectangle.\n    \"\"\"\n    rectangles = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols):\n            if grid[r, c] == color and grid[r + 1, c] == color:\n                rectangles.append(((r, c), (r + 1, c)))\n    return rectangles\n\ndef find_1x2_horizontal_rectangles(grid, color):\n    \"\"\"\n    Finds coordinates of 1x2 horizontal rectangles\n    \"\"\"\n    rectangles = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols-1):\n            if grid[r,c] == color and grid[r,c+1] == color:\n                rectangles.append(((r,c),(r,c+1)))\n    return rectangles\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the refined rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_rectangles_v = find_2x1_vertical_rectangles(output_grid, 8)\n    azure_rectangles_h = find_1x2_horizontal_rectangles(output_grid, 8)\n\n    for top_coord, bottom_coord in azure_rectangles_v:\n        r_top, c_top = top_coord\n        r_bot, c_bot = bottom_coord\n\n        # Check if a 2x2 square can *only* be formed to the right\n        can_form_right = (c_top + 1 < output_grid.shape[1] and\n                          output_grid[r_top, c_top + 1] == 8 and\n                          output_grid[r_bot, c_bot + 1] == 8)\n        \n        can_form_left = (c_top -1 >= 0 and \n                        output_grid[r_top, c_top -1] == 8 and\n                        output_grid[r_bot, c_top -1] == 8)\n\n        if can_form_right and not can_form_left:\n            if c_top - 1 >= 0:\n                output_grid[r_top, c_top - 1] = 1  # Place blue to the left\n\n    for left_coord, right_coord in azure_rectangles_h:\n        r_left, c_left = left_coord\n        r_right, c_right = right_coord\n\n        #Check if 2x2 can only be formed below\n        can_form_below = (r_left + 1 < output_grid.shape[0] and\n                         output_grid[r_left + 1, c_left] == 8 and\n                         output_grid[r_right + 1, c_right] == 8)\n\n        can_form_above = (r_left -1 >= 0 and\n                          output_grid[r_left - 1, c_left] == 8 and\n                         output_grid[r_left - 1, c_right] == 8)\n        \n        if can_form_below and not can_form_above:\n            if r_left - 1 >= 0:\n                output_grid[r_left - 1, c_left] = 1  # Place blue above\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3615,
+    "candidates_token_count": 955,
+    "total_token_count": 4570,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.243904,
+  "response_file": "007-response.json"
+}

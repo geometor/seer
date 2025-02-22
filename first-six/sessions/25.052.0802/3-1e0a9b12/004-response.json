@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-white cells to the last row,\n    maintaining their original column order and stacking them.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)\n    last_row = output_grid.shape[0] - 1\n\n    for j in range(input_grid.shape[1]):\n        # Collect all non-white cells from the current column\n        non_white_cells = []\n        for i in range(input_grid.shape[0]):\n            if input_grid[i, j] != 0:\n                non_white_cells.append(input_grid[i, j])\n\n        # Place the collected non-white cells in the last row, stacking them\n        for k, color in enumerate(non_white_cells):\n            output_grid[last_row - len(non_white_cells) + 1 + k, j] = color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2343,
+    "candidates_token_count": 237,
+    "total_token_count": 2580,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 2.698762
+  },
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Azure Objects: Locate all contiguous regions of azure (color 8) pixels in the input grid.\n2. Preserve Azure Objects: Copy the azure objects to the output grid.\n3. Add Blue Pixels: For each azure object:\n   a. Find the top-right corner and bottom-left corner of the azure object.\n   b. Add a blue pixel (color 1) immediately to the right of the top-right corner.\n   c. Add a blue pixel (color 1) immediately to the left of the bottom-left corner.\n4. If the blue pixel to be placed would exceed the limit of the grid, ignore that rule.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # find azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # add blue pixels\n    for obj in azure_objects:\n        # Find top-right and bottom-left corners\n        rows, cols = zip(*obj)\n        top_right_corner = (min(rows), max(cols))\n        bottom_left_corner = (max(rows), min(cols))\n\n        # Add blue pixel to the right of the top-right corner\n        if top_right_corner[1] + 1 < output_grid.shape[1]:\n            output_grid[top_right_corner[0], top_right_corner[1] + 1] = 1\n\n        # Add blue pixel to the left of the bottom-left corner\n        if bottom_left_corner[1] - 1 >= 0:\n            output_grid[bottom_left_corner[0], bottom_left_corner[1] - 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3685,
+    "candidates_token_count": 682,
+    "total_token_count": 4367,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.49135,
+  "response_file": "006-response.json"
+}

@@ -1,6 +1,6 @@
 output_dir: "./sessions"
 
-roles:  # Added roles level
+roles:  
   dreamer:
     model_name: gemini-2.0-pro-exp-02-05
     generation_config:
@@ -21,7 +21,7 @@ roles:  # Added roles level
       response_mime_type: "text/plain"
     system_context_file: "config/system_coder.md"
 
-  oracle:  # New Oracle configuration
+  oracle:  
     model_name: gemini-2.0-pro-exp-02-05  # Or a different model if desired
     generation_config:
       temperature: 1.0
@@ -32,8 +32,12 @@ roles:  # Added roles level
     system_context_file: "config/system_oracle.md" # New context file
 
 task_context_file: "config/task_context.md"
-investigate_nlp: "config/investigate_nlp.md"
-investigate_code: "config/investigate_code.md"
+instructions:
+  investigate_dreamer: "config/investigate_dreamer.md"
+  investigate_coder: "config/investigate_coder.md"
+  refine_dreamer: "config/refine_dreamer.md"
+  refine_coder: "config/refine_coder.md"
+
 max_iterations: 1
 
 templates:

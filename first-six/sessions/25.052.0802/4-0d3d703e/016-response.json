@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is a color substitution based on a mapping\nderived from example input-output pairs. The spatial structure is preserved.\nIf an input color is encountered that wasn't seen in the examples,\nthe original color is kept.\n\"\"\"\n\nimport numpy as np\n\ndef build_color_map(example_inputs, example_outputs):\n    \"\"\"Builds a color mapping dictionary from example input/output pairs.\"\"\"\n    color_map = {}\n    for input_grid, output_grid in zip(example_inputs, example_outputs):\n        for i in range(input_grid.shape[0]):\n            for j in range(input_grid.shape[1]):\n                input_color = input_grid[i, j]\n                output_color = output_grid[i, j]\n                color_map[input_color] = output_color\n    return color_map\n\ndef transform(input_grid, example_inputs, example_outputs):\n    \"\"\"\n    Transforms the input grid into the output grid by applying a color substitution\n    based on the provided example input/output grids.\n\n    Args:\n        input_grid (numpy.ndarray): The input grid.\n        example_inputs (list):  example input grids\n        example_outputs (list): example output grids\n\n    Returns:\n        numpy.ndarray: The transformed output grid.\n    \"\"\"\n    # Build color map\n    color_map = build_color_map(example_inputs, example_outputs)\n\n    # Initialize the output grid with the same dimensions as the input grid.\n    output_grid = np.zeros_like(input_grid)\n\n    # Iterate through each cell in the input grid.\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            # Get the color of the current cell.\n            input_color = input_grid[i, j]\n\n            # Apply the color substitution if mapping is known.\n            output_color = color_map.get(input_color, input_color) # Default: Keep original\n\n            # Place the new color in the corresponding cell of the output grid.\n            output_grid[i, j] = output_color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2939,
+    "candidates_token_count": 504,
+    "total_token_count": 3443,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.649809
+  },
+  "response_file": "016-response.json"
+}

@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies vertical azure (color 8) rectangles of size 2x1. It then adds a blue cell (color 1) based on the rectangle's position relative to other azure rectangles:\n\n1.  **Identify Azure Rectangles:** Locate all 2x1 vertical rectangles of color 8 (azure).\n2.  **Topmost Rectangle Rule:** For the topmost 2x1 azure rectangle, a blue cell is added to its top-right.\n3. **All the rest:** Add blue cell at bottom-left.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_rectangles(grid, color):\n    \"\"\"\n    Find and return the positions of all 2x1 vertical rectangles of the specified color.\n    \"\"\"\n    vertical_objects = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):  # Iterate up to the second-to-last row\n        for c in range(cols):\n            # Vertical 2x1 rectangle\n            if grid[r, c] == color and grid[r + 1, c] == color:\n                vertical_objects.append((r, c))\n    return vertical_objects\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    \n    # Find all 2x1 (vertical) rectangles of color 8 (azure)\n    vertical_azure_objects = find_vertical_rectangles(output_grid, 8)\n    \n    # Apply rules for vertical rectangles\n    for r, c in vertical_azure_objects:\n        # Check if it's the top part of a vertical azure rectangle\n        if r == 0 or output_grid[r - 1, c] != 8:  # Topmost part\n            # Insert at top-right corner if possible\n            if c + 1 < output_grid.shape[1]:\n                output_grid[r, c + 1] = 1\n        else:\n            if c>0:\n                output_grid[r+1,c-1]=1\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2656,
+    "candidates_token_count": 493,
+    "total_token_count": 3149,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.887519
+  },
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nMoves all non-zero single-cell objects to the last row of the grid,\nmaintaining their relative horizontal order.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving non-zero colored objects to the last row.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    # Initialize output_grid as a copy of the input grid\n    output_grid = np.copy(input_grid).tolist()\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Create an empty last row for the output grid\n    last_row = [0] * cols\n\n    # Find and move non-zero objects\n    for c in range(cols):\n        for r in range(rows):\n            if input_grid[r, c] != 0:\n                # Check to see if it isn't part of a larger object:\n                is_single = True\n                for i in range(-1,2):\n                    for j in range(-1,2):\n                        if 0 <= r+i < rows and 0 <= c+j < cols:\n                            if (i!=0 or j!=0) and input_grid[r+i,c+j] == input_grid[r,c]:\n                                is_single = False\n                                break\n                    if not is_single:\n                        break\n                #if the object is single, we can move it\n                if is_single:\n                    last_row[c] = input_grid[r, c]\n                    #clear initial position only if it's not in the last row already:\n                    if r != rows-1:\n                        output_grid[r][c] = 0\n\n\n    # Replace the last row of the output grid with the new last row\n    output_grid[rows - 1] = last_row\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1745,
+    "candidates_token_count": 461,
+    "total_token_count": 2206,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.682446
+  },
+  "response_file": "002-response.json"
+}

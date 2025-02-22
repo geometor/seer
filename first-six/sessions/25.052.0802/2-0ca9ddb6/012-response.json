@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies single-cell objects of color red (2) and blue (1). It then modifies the grid around these cells: red cells are surrounded by a diamond of yellow (4) cells, and blue cells are replaced by an orange (7) cell and surrounded by a plus sign (+) of orange cells. Other single-cell objects, such as magenta (6), are left unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rules for single-cell red and blue objects.\n    \"\"\"\n    output_grid = np.copy(input_grid)  # Initialize output_grid as a copy of input_grid\n\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            # Process red (2) cells\n            if input_grid[i, j] == 2:\n                # Add yellow (4) cells diagonally\n                if i > 0 and j > 0:\n                    output_grid[i - 1, j - 1] = 4\n                if i > 0 and j < input_grid.shape[1] - 1:\n                    output_grid[i - 1, j + 1] = 4\n                if i < input_grid.shape[0] - 1 and j > 0:\n                    output_grid[i + 1, j - 1] = 4\n                if i < input_grid.shape[0] - 1 and j < input_grid.shape[1] - 1:\n                    output_grid[i + 1, j + 1] = 4\n\n            # Process blue (1) cells\n            elif input_grid[i, j] == 1:\n                # Replace the blue cell with an orange (7) cell\n                output_grid[i, j] = 7\n                # Add orange (7) cells in a plus shape\n                if i > 0:\n                    output_grid[i - 1, j] = 7\n                if j > 0:\n                    output_grid[i, j - 1] = 7\n                if j < input_grid.shape[1] - 1:\n                    output_grid[i, j + 1] = 7\n                if i < input_grid.shape[0] - 1:\n                    output_grid[i + 1, j] = 7\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3009,
+    "candidates_token_count": 568,
+    "total_token_count": 3577,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.100614
+  },
+  "response_file": "012-response.json"
+}

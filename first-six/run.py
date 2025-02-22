@@ -11,8 +11,8 @@ def run():
     with open(config_file, "r") as f:
         config = yaml.safe_load(f)
 
-    #  tasks = Tasks("one")
-    tasks = Tasks("first-six")
+    tasks = Tasks("one")
+    #  tasks = Tasks("first-six")
     #  tasks = Tasks("44")
 
     seer = Seer(

@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Identify the vertical line of color 5 in the input grid.\n2. Create a 3x3 output grid filled with color 0s.\n3. Change the color of the topmost and bottommost cells of the identified vertical line from 5 to 2.\n4. Place the modified top cell at [1, 0] and the modified bottom cell at [2, 2] in the output grid.\n5. Ensure all other cells in the output grid remain color 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    # Find contiguous vertical lines of the specified color\n    rows, cols = grid.shape\n    for c in range(cols):\n        for r in range(rows - 1):\n            if grid[r, c] == color and grid[r+1, c] == color:\n                 if r + 2 < rows and grid[r+2,c] == color:\n                    return [(r,c), (r+1, c), (r+2, c)]  # Return all cells in vertical line.\n    return None\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    # Convert input grid to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the vertical line of color 5\n    line_cells = find_vertical_line(input_grid, 5)\n\n    # Initialize the output grid as a 3x3 array filled with 0s\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # If a vertical line of color 5 is found:\n    if line_cells:\n        # Place the modified top cell at [1, 0]\n        output_grid[1, 0] = 2\n        # Place the modified bottom cell at [2, 2]\n        output_grid[2, 2] = 2\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5330,
+    "candidates_token_count": 462,
+    "total_token_count": 5792,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.317656
+  },
+  "response_file": "010-response.json"
+}

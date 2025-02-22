@@ -6,15 +6,14 @@ from rich.markdown import Markdown
 from rich.table import Table
 from rich.console import Console
 
-
-def summarize_session(session_dir, log_error, display_response):
+def summarize_session(session):
     """
     Creates a session-level summary report by aggregating task summary reports.
     """
     session_summary = []
 
     # Iterate through each task directory, sorting them by name
-    for task_dir in sorted(session_dir.iterdir()):
+    for task_dir in sorted(session.session_dir.iterdir()):
         if not task_dir.is_dir():
             # TODO: handle situation
             continue
@@ -38,7 +37,7 @@ def summarize_session(session_dir, log_error, display_response):
                     task_total_tokens["candidates"] += response["token_usage"].get("candidates", 0)
                     task_total_tokens["total"] += response["token_usage"].get("total", 0)
                     task_total_tokens["cached"] += response["token_usage"].get("cached", 0)
-                    task_total_response_time += response["timing"]["response_time"]
+                    task_total_response_time += response["response_time"]
 
                 # --- Best Test Score ---
                 best_test_score = "N/A"  # Default if no tests
@@ -69,7 +68,7 @@ def summarize_session(session_dir, log_error, display_response):
             print(
                 f"Error reading or parsing {summary_report_json_path}: {e}"
             )
-            log_error(
+            session.log_error(
                 f"Error reading or parsing {summary_report_json_path}: {e}"
             )
 
@@ -82,7 +81,7 @@ def summarize_session(session_dir, log_error, display_response):
     session_summary_report_md = console.export_text()
     session_summary_report_md_file = "session_summary_report.md"
     _write_to_file_session(
-        session_dir, session_summary_report_md_file, session_summary_report_md
+        session.session_dir, session_summary_report_md_file, session_summary_report_md
     )
 
     # --- JSON report ---
@@ -91,7 +90,7 @@ def summarize_session(session_dir, log_error, display_response):
     }
     session_summary_report_json_file = "session_summary_report.json"
     _write_to_file_session(
-        session_dir,
+        session.session_dir,
         session_summary_report_json_file,
         json.dumps(session_summary_report, indent=2),
     )
@@ -181,7 +180,7 @@ def summarize_task(task_dir, log_error):
                 "total": data["usage_metadata"].get("total_token_count", 0),
                 "cached": data["usage_metadata"].get("cached_token_count", 0)
             },
-            "timing": data["timing"]
+            "response_time": data["response_time"]
         })
 
     test_report_json = {}
@@ -258,14 +257,14 @@ def _create_response_table(resplist):
             str(data["usage_metadata"].get("candidates_token_count", 0)),
             str(data["usage_metadata"].get("cached_token_count", 0)),
             str(data["usage_metadata"].get("total_token_count", 0)),
-            f"{data['timing']['response_time']:.4f}",
+            f"{data['response_time']:.4f}",
         )
 
         total_tokens["prompt"] += data["usage_metadata"].get("prompt_token_count", 0)
         total_tokens["candidates"] += data["usage_metadata"].get("candidates_token_count", 0)
         total_tokens["total"] += data["usage_metadata"].get("total_token_count", 0)
         total_tokens["cached"] += data["usage_metadata"].get("cached_token_count", 0)
-        total_response_time += data["timing"].get("response_time", 0) # handle missing
+        total_response_time += data.get("response_time", 0) # handle missing
 
     # Add a summary row
     table.add_row(

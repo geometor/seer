@@ -1,0 +1,74 @@
+
+## example 1
+*input:*
+```
+0 0 0 0 0 0 0
+0 8 0 0 0 0 0
+0 8 8 0 0 0 0
+0 0 0 0 8 8 0
+0 0 0 0 0 8 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+```
+*expected output:*
+```
+0 0 0 0 0 0 0
+0 8 1 0 0 0 0
+0 8 8 0 0 0 0
+0 0 0 0 8 8 0
+0 0 0 0 1 8 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+```
+*transformed output:*
+```
+0 0 0 0 0 0 0
+0 8 0 0 0 0 0
+0 8 1 0 0 0 0
+0 0 0 0 8 8 0
+0 0 0 0 0 1 0
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0
+```
+Size Correct: True
+Color Palette Correct: True
+Pixel Counts Correct: False
+Pixels Off: 4
+**FAILED!**
+
+## example 2
+*input:*
+```
+0 0 0 0 8 8 0
+0 0 0 0 0 8 0
+0 0 8 0 0 0 0
+0 0 8 8 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 8 0 0
+0 0 0 8 8 0 0
+```
+*expected output:*
+```
+0 0 0 0 8 8 0
+0 0 0 0 1 8 0
+0 0 8 1 0 0 0
+0 0 8 8 0 0 0
+0 0 0 0 0 0 0
+0 0 0 1 8 0 0
+0 0 0 8 8 0 0
+```
+*transformed output:*
+```
+0 0 0 0 8 8 0
+0 0 0 0 0 1 0
+0 0 8 0 0 0 0
+0 0 8 1 0 0 0
+0 0 0 0 0 0 0
+0 0 0 0 8 0 0
+0 0 0 1 8 0 0
+```
+Size Correct: True
+Color Palette Correct: True
+Pixel Counts Correct: False
+Pixels Off: 6
+**FAILED!**

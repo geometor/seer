@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies azure (8) \"L-shapes\" in the input grid and changes specific pixels within those shapes to blue (1).\nAn L-shape is a 2x2 block with one cell removed.\nThe pixel to change is determined by these rules:\n- If the rightmost pixel's row is less than the bottommost, change rightmost\n- Otherwise, change the bottom-most pixel\n\"\"\"\n\nimport numpy as np\n\ndef is_l_shape(grid, x, y, color):\n    \"\"\"\n    Checks if a pixel at (x, y) is part of an L-shape of the specified color.\n    An L-shape is defined as a 2x2 area with one missing block.\n    \"\"\"\n    if grid[x][y] != color:\n        return False\n\n    neighbors = 0\n    coords = []\n    for dx in [-1, 0, 1]:\n        for dy in [-1, 0, 1]:\n            if dx == 0 and dy == 0:\n                continue\n            nx, ny = x + dx, y + dy\n            if 0 <= nx < grid.shape[0] and 0 <= ny < grid.shape[1] and grid[nx][ny] == color:\n                neighbors += 1\n                coords.append((nx,ny))\n\n    if neighbors == 2:\n          coords.append((x,y))\n          return coords\n    else:\n        return False\n    \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rule.\"\"\"\n\n    output_grid = np.copy(input_grid)\n    l_shapes = []\n    \n    # Iterate through all pixels in the input grid.\n    for x in range(input_grid.shape[0]):\n        for y in range(input_grid.shape[1]):\n          # Check if the current pixel is the start of an L-shape.\n          result = is_l_shape(input_grid, x, y, 8)\n          if result:\n            l_shapes.append(result)\n\n    # iterate by l_shapes found\n    if len(l_shapes) > 0:\n        for shape in l_shapes:\n          # Find the right-most and bottom-most pixels in the L-shape.\n          rightmost_pixel = max(shape, key=lambda p: p[1])\n          bottommost_pixel = max(shape, key=lambda p: p[0])\n\n          # Determine which pixel to change based on the shape\n          if rightmost_pixel[0] < bottommost_pixel[0]: # check x coordinates to know the figure position\n              #if the rightmost is first, replace it\n              output_grid[rightmost_pixel] = 1\n          else:\n              #if bottom is first or at the same level, change it\n              output_grid[bottommost_pixel] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3532,
+    "candidates_token_count": 666,
+    "total_token_count": 4198,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.1242
+  },
+  "response_file": "008-response.json"
+}

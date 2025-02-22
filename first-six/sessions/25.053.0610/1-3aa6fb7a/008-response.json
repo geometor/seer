@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies all \"L\"-shaped azure objects in the input grid. \nFor each \"L\" shape, the inside corner pixel is changed to blue (value 1).\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds L-shaped objects of a specific color in the grid.\n    Returns a list of (corner_row, corner_col) tuples for each L-shape.\n    \"\"\"\n    l_shapes = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            if grid[r, c] == color:\n                # Check for L shape (2x2 block with one missing corner)\n                neighbors = [(r + 1, c), (r, c + 1), (r + 1, c + 1)]\n                color_count = sum(1 for nr, nc in neighbors if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color)\n                if color_count == 2:\n                    l_shapes.append((r, c))\n    return l_shapes\n\ndef get_inside_corner(grid, corner_row, corner_col):\n    \"\"\"\n    Determines the inside corner coordinates of an L-shape given its corner pixel.\n    \"\"\"\n    rows, cols = grid.shape\n\n    # Check orientation and determine inside corner\n    if corner_row == 0: # Top row\n        return corner_row + 1, corner_col\n    elif corner_col == 0: # Left column\n        return corner_row , corner_col + 1\n    else:  # other rows\n        return corner_row + 1, corner_col + 1\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    \n    # Find the L-shaped objects of color azure (8)\n    l_shapes = find_l_shapes(input_grid, 8)\n    \n    # Change inside corner of each L-shape to blue\n    for corner_row, corner_col in l_shapes:\n        inside_row, inside_col = get_inside_corner(input_grid, corner_row, corner_col)\n        output_grid[inside_row, inside_col] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2670,
+    "candidates_token_count": 562,
+    "total_token_count": 3232,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.002038,
+  "response_file": "008-response.json"
+}

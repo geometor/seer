@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies single-cell objects of colors red (2), blue (1), and magenta (6).  Red cells (2) are preserved, and yellow (4) cells are placed diagonally adjacent to them (NW, NE, SW, SE), forming an 'x' pattern. Blue cells (1) are transformed to orange(7), and orange (7) cells are placed orthogonally adjacent to them (up, down, left, right), forming a '+' pattern. Magenta cells (6) are preserved without modification. Grid boundaries are respected, preventing out-of-bounds placements.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Iterate through the input grid\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            # Check for the red cell (color 2)\n            if input_grid[i, j] == 2:\n                # Place yellow cells (color 4) diagonally\n                if i > 0 and j > 0:\n                    output_grid[i - 1, j - 1] = 4\n                if i > 0 and j < input_grid.shape[1] - 1:\n                    output_grid[i - 1, j + 1] = 4\n                if i < input_grid.shape[0] - 1 and j > 0:\n                    output_grid[i + 1, j - 1] = 4\n                if i < input_grid.shape[0] - 1 and j < input_grid.shape[1] - 1:\n                    output_grid[i + 1, j + 1] = 4\n\n            # Check for the blue cell (color 1)\n            elif input_grid[i, j] == 1:\n                # change the blue cell to orange\n                output_grid[i, j] = 7\n                # Place orange cells (color 7) orthogonally adjacent\n                if i > 0:\n                    output_grid[i - 1, j] = 7\n                if j > 0:\n                    output_grid[i, j - 1] = 7\n                if j < input_grid.shape[1] - 1:\n                    output_grid[i, j + 1] = 7\n                if i < input_grid.shape[0] - 1:\n                    output_grid[i + 1, j] = 7\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3174,
+    "candidates_token_count": 599,
+    "total_token_count": 3773,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.874532
+  },
+  "response_file": "008-response.json"
+}

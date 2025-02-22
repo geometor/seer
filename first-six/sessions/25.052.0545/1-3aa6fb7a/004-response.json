@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies azure (8) colored L-shaped objects and inserts a blue (1) pixel to complete a 2x2 square. The insertion point is determined by the orientation of the L-shape.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find contiguous regions of the specified color.\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n    for i in range(rows):\n        for j in range(cols):\n            if grid[i, j] == color and not visited[i, j]:\n                obj = []\n                stack = [(i, j)]\n                while stack:\n                    r, c = stack.pop()\n                    if 0 <= r < rows and 0 <= c < cols and grid[r, c] == color and not visited[r, c]:\n                        visited[r, c] = True\n                        obj.append((r, c))\n                        stack.extend([(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)])\n                objects.append(obj)\n    return objects\n\ndef is_l_shape(obj):\n    \"\"\"\n    Checks if a given object (list of coordinates) forms an L-shape.\n    \"\"\"\n    if len(obj) != 3:\n        return False\n\n    obj.sort()  # Sort to make checking easier\n    x, y = zip(*obj)\n\n    # Check all 4 possible L-shape orientations\n    if (x[0] == x[1] and x[1] + 1 == x[2] and y[0] + 1 == y[1] and y[1] == y[2]) or \\\n       (x[0] + 1 == x[1] and x[1] == x[2] and y[0] == y[1] and y[1] + 1 == y[2]) or \\\n       (x[0] == x[1] and x[1] + 1 == x[2] and y[0] == y[1] and y[1] - 1 == y[2]) or \\\n       (x[0] + 1 == x[1] and x[1] == x[2] and y[0] - 1 == y[1] and y[1] == y[2]):\n        return True\n\n    return False\n    \ndef find_insertion_point(obj):\n    \"\"\"\n    Finds the coordinates where the blue pixel should be inserted.\n    \"\"\"\n    obj.sort()  # Sort for consistent checking\n    x, y = zip(*obj)\n\n    # Check the four possible L shapes and their corresponding insertion points\n    if x[0] == x[1] and x[1] + 1 == x[2] and y[0] + 1 == y[1] and y[1] == y[2]:\n        return (x[0], y[0])  # top left\n    elif x[0] + 1 == x[1] and x[1] == x[2] and y[0] == y[1] and y[1] + 1 == y[2]:\n        return (x[0], y[2]) # top right\n    elif x[0] == x[1] and x[1] + 1 == x[2] and y[0] == y[1] and y[1] - 1 == y[2]:\n        return (x[0],y[0]) # bottom left\n    elif x[0] + 1 == x[1] and x[1] == x[2] and y[0] - 1 == y[1] and y[1] == y[2]:\n        return (x[2],y[2]) # bottom right\n\n    return None\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid.\n    output_grid = np.copy(input_grid)\n    \n    # Find all azure objects.\n    azure_objects = find_objects(input_grid, 8)\n    \n    # Iterate through each azure object.\n    for obj in azure_objects:\n        # Check if the object is an L-shape.\n        if is_l_shape(obj):\n            # Find the insertion point to complete the 2x2 square.\n            insertion_point = find_insertion_point(obj)\n            if insertion_point:\n                x, y = insertion_point\n                # Insert blue pixel if within grid bounds.\n                if 0 <= x < output_grid.shape[0] and 0 <= y < output_grid.shape[1]:\n                   output_grid[x, y] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4139,
+    "candidates_token_count": 1108,
+    "total_token_count": 5247,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 9.119158
+  },
+  "response_file": "004-response.json"
+}

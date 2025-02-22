@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is to identify L-shaped objects formed by three azure (color 8) cells in the input grid. For each L-shape, a blue (color 1) cell is added to fill its inner corner, effectively completing a 2x2 square. The output grid contains only the original L-shapes and the added blue cells; all other cells are blank (color 0). The orientation of the L-shape determines the position of the added blue cell.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    \"\"\"\n    Finds L-shaped objects of a specific color in the grid.\n    Returns a list of coordinates representing the corners of the L-shapes.\n    \"\"\"\n    l_shapes = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols - 1):\n            if grid[r, c] == color:\n                # Check for different orientations of L-shapes\n                if grid[r + 1, c] == color and grid[r, c + 1] == color:\n                    l_shapes.append(((r, c), (r + 1, c), (r, c + 1)))  # Bottom-Right\n                elif grid[r + 1, c] == color and grid[r + 1, c + 1] == color:\n                    l_shapes.append(((r, c), (r + 1, c), (r + 1, c + 1)))  # Bottom-Left\n                elif grid[r, c + 1] == color and grid[r + 1, c + 1] == color:\n                    l_shapes.append(((r, c), (r, c + 1), (r + 1, c + 1)))  # Top-Left\n                elif c>0 and grid[r+1,c] == color and grid[r+1,c-1] == color:\n                    l_shapes.append(((r, c), (r + 1, c), (r + 1, c - 1))) # Top-Right\n    return l_shapes\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    - Keeps the position and shape of L-shaped azure (8) objects.\n    - Adds one blue (1) cell to fill their inner empty corner.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)  # Initialize with all zeros\n    \n    # Find L-shapes of color 8 (azure)\n    l_shapes = find_l_shapes(input_grid, 8)\n    \n    # Fill the inner empty corner of each L-shape with color 1 (blue)\n    for l_shape in l_shapes:\n        (r1, c1), (r2, c2), (r3, c3) = l_shape\n        \n        #Copy L\n        output_grid[r1,c1] = 8\n        output_grid[r2,c2] = 8\n        output_grid[r3,c3] = 8\n\n\n        # Determine the corner and fill the inside\n        if r2 == r1 + 1 and c2 == c1:  # r1,c1 and r1+1, c1\n            if c3 == c1 + 1: # Bottom-Right L\n                output_grid[r1+1, c1 + 1] = 1\n            else: # Top-Right L\n                output_grid[r1+1,c1-1] = 1\n        elif r2 == r1 + 1 and c2 == c1+1:  # r1, c1 and r1+1, c1+1\n            output_grid[r1, c1 + 1] = 1 # Bottom-Left L\n        elif r2 == r1 and c2 == c1 + 1: #r1,c1 and r1, c1+1\n            output_grid[r1 + 1, c1 + 1] = 1  # Top-Left L\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4206,
+    "candidates_token_count": 951,
+    "total_token_count": 5157,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 8.613475
+  },
+  "response_file": "004-response.json"
+}

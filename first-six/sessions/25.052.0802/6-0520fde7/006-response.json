@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Identify the vertical line of color 5 in the input grid.\n2. Create a 3x3 output grid filled with color 0s.\n3. Transform the identified vertical line from color 5 to color 2.\n4. Place this transformed line into the output grid, maintaining its vertical orientation and relative position.\n5. Ensure all other cells in the output grid remain color 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    # Find contiguous vertical lines of the specified color\n    rows, cols = grid.shape\n    for c in range(cols):\n        for r in range(rows - 1):\n            if grid[r, c] == color and grid[r+1, c] == color:\n                if r + 2 < rows and grid[r+2,c] == color:\n                    return [(r,c), (r+1, c), (r+2, c)]  # Return all cells in vertical line.\n    return None\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    # Convert input grid to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the vertical line of color 5\n    line_cells = find_vertical_line(input_grid, 5)\n\n    # Initialize the output grid as a 3x3 array filled with 0s\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # If a vertical line of color 5 is found, change all cells in that line to 2\n    if line_cells:\n        # Calculate the relative column position within the 3x3 grid.  This places\n        # the vertical line in the output grid in the same relative x position\n        # as the input grid, but centered if the line wouldn't fit otherwise.\n        col_offset = max(0, min(line_cells[0][1] - (input_grid.shape[1] // 2) + 1, 2))\n\n        for i, cell in enumerate(line_cells):\n            output_grid[i, 1] = 2 # place output in center column\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3381,
+    "candidates_token_count": 521,
+    "total_token_count": 3902,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 5.553449
+  },
+  "response_file": "006-response.json"
+}

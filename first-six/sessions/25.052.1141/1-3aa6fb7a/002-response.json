@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nLocate each 2x1 vertical rectangle of azure color (8). Add a blue cell (1) to the immediate right of both cells that constitute the 2x1 azure object.\n\"\"\"\n\nimport numpy as np\n\ndef find_2x1_vertical_rectangles(grid, color):\n    \"\"\"\n    Finds the coordinates of 2x1 vertical rectangles of the specified color.\n    Returns a list of tuples, where each tuple contains the top and bottom coordinates of a rectangle.\n    \"\"\"\n    rectangles = []\n    rows, cols = grid.shape\n    for r in range(rows - 1):\n        for c in range(cols):\n            if grid[r, c] == color and grid[r + 1, c] == color:\n                rectangles.append(((r, c), (r + 1, c)))\n    return rectangles\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule:\n    Locate each 2x1 vertical rectangle of azure color (8).\n    Add a blue cell (1) to the immediate right of both cells of the 2x1 azure object.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_rectangles = find_2x1_vertical_rectangles(output_grid, 8)\n\n    for top_coord, bottom_coord in azure_rectangles:\n        # Add a blue cell to the right of the top cell, if within bounds\n        if top_coord[1] + 1 < output_grid.shape[1]:\n            output_grid[top_coord[0], top_coord[1] + 1] = 1\n        # Add a blue cell to the right of the bottom cell, if within bounds\n        if bottom_coord[1] + 1 < output_grid.shape[1]:\n            output_grid[bottom_coord[0], bottom_coord[1] + 1] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1736,
+    "candidates_token_count": 454,
+    "total_token_count": 2190,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.834091,
+  "response_file": "002-response.json"
+}

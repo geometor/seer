@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe gray shape (color 5) present in the input is recolored. The initial part of the 'path' defined by the gray shape is filled with color 2 (red), and the final or latter part of the path is filled by color 8 (azure). The white background is preserved.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    # Find coordinates of all cells with the given color.\n    coords = np.argwhere(grid == color)\n    return coords\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the gray object (color 5).\n    gray_coords = find_object(input_grid, 5)\n\n    # If no gray object is present, return the original grid.\n    if gray_coords.size == 0:\n      return output_grid\n\n    # Recolour the entire shape with color 8 initially.\n    output_grid[input_grid == 5] = 8\n\n    # Determine the \"start\" and \"end\" of the path.  This is the tricky part\n    # and relies on observation of the examples.  We are making an assumption\n    # about how the path is traced. We'll use a simple heuristic based on row-major\n    # order, then refine if necessary.  We convert the coordinates to a list of tuples.\n\n    gray_coords_list = [(y, x) for y, x in gray_coords]\n    gray_coords_list.sort() # Sorts primarily by row, then by column\n    \n    min_row = gray_coords_list[0][0]\n    min_col = gray_coords_list[0][1]\n\n    for r,c in gray_coords_list:\n        if r == min_row or c == min_col:\n            if input_grid[r,c] == 5:\n                output_grid[r,c] = 2\n        \n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3093,
+    "candidates_token_count": 466,
+    "total_token_count": 3559,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 4.013858
+  },
+  "response_file": "012-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThis transformation identifies azure objects and adds a blue pixel inside of them. The position is at the corner pixel of L shaped objects.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds all contiguous objects of a given color in the grid.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, current_object):\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_l_shape(object_pixels):\n    \"\"\"\n    Checks if a set of pixels forms an L-shape (size 3).\n    Returns the corner coordinates if it is, otherwise returns None.\n    \"\"\"\n    if len(object_pixels) != 3:\n        return None\n\n    # Convert list of tuples to numpy array for easier manipulation\n    pixels = np.array(object_pixels)\n    \n    #find min and max of rows and cols\n    min_row, min_col = np.min(pixels, axis=0)\n    max_row, max_col = np.max(pixels, axis=0)\n    \n    # Calculate differences in row and col coordinates\n    row_diffs = pixels[:, 0] - min_row\n    col_diffs = pixels[:, 1] - min_col\n\n    # Check for the three possible L-shape configurations:\n    if (np.array_equal(row_diffs, [0, 0, 1]) and np.array_equal(col_diffs, [0, 1, 0])) or \\\n       (np.array_equal(row_diffs, [0, 1, 1]) and np.array_equal(col_diffs, [0, 0, 1])) or \\\n       (np.array_equal(row_diffs, [0, 1, 0]) and np.array_equal(col_diffs, [0, 0, 1]))or \\\n       (np.array_equal(row_diffs, [0, 0, 1]) and np.array_equal(col_diffs, [0, 1, 1])):\n       \n       #find corner using min and max values\n       if (np.array_equal(row_diffs, [0, 0, 1]) and np.array_equal(col_diffs, [0, 1, 0])):\n          corner = (max_row,min_col)\n       elif (np.array_equal(row_diffs, [0, 1, 1]) and np.array_equal(col_diffs, [0, 0, 1])):\n          corner = (min_row,min_col)\n       elif (np.array_equal(row_diffs, [0, 1, 0]) and np.array_equal(col_diffs, [0, 0, 1])):\n          corner = (min_row, max_col)\n       else:\n          corner = (max_row,max_col)\n       return corner\n    else:\n        return None\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find azure objects\n    azure_objects = find_objects(input_grid, 8)  # 8 is for azure\n\n    # Iterate through each azure object\n    for obj in azure_objects:\n        # Check if it's an L-shape and get the corner\n        corner = is_l_shape(obj)\n        if corner:\n            # Determine insertion point based on L-shape orientation\n            row, col = corner\n            output_grid[row,col] = 1 #set the corner\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3516,
+    "candidates_token_count": 1081,
+    "total_token_count": 4597,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.694038,
+  "response_file": "008-response.json"
+}

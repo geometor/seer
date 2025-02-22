@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms the input grid by moving non-zero colored cells down within their columns\nto occupy the lowest available rows, and filling the rest with zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving non-zero colored cells down within their columns\n    to occupy the lowest available rows, and filling the rest with zeros.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    for j in range(cols):\n        # Collect non-zero elements from the column\n        non_zero_elements = [input_grid[i, j] for i in range(rows) if input_grid[i, j] != 0]\n\n        # Fill the column from the bottom up\n        for i, val in enumerate(non_zero_elements):\n            output_grid[rows - len(non_zero_elements) + i, j] = val\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3012,
+    "candidates_token_count": 243,
+    "total_token_count": 3255,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 2.677763
+  },
+  "response_file": "004-response.json"
+}

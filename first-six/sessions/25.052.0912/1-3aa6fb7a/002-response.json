@@ -1,0 +1,30 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCopies the input grid to the output grid, then finds two specific L-shaped azure objects.\nFor the first L-shape, it changes the right-most pixel to blue.\nFor the second L-shape, it changes the bottom-most pixel to blue.\n\"\"\"\n\nimport numpy as np\n\ndef find_l_shapes(grid, color):\n    # helper function for finding objects\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def is_valid(x, y):\n        return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]\n\n    def dfs(x, y, current_object):\n        if not is_valid(x, y) or visited[x, y] or grid[x, y] != color:\n            return\n\n        visited[x, y] = True\n        current_object.append((x, y))\n\n        dfs(x + 1, y, current_object)\n        dfs(x - 1, y, current_object)\n        dfs(x, y + 1, current_object)\n        dfs(x, y - 1, current_object)\n\n    for x in range(grid.shape[0]):\n        for y in range(grid.shape[1]):\n            if grid[x, y] == color and not visited[x, y]:\n                current_object = []\n                dfs(x, y, current_object)\n                # check for approximate shape and size (could be enhanced with other geometric checks)\n                if 3 <= len(current_object) <= 5:\n                    objects.append(current_object)\n\n    return objects\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rule.\"\"\"\n\n    output_grid = np.copy(input_grid)\n    l_shapes = find_l_shapes(output_grid, 8)\n\n    # assume that two L-shaped will be in this order\n    if len(l_shapes) >= 2:\n\n        # process first L-shape (top-left)\n        first_l_shape = l_shapes[0]\n        # find right-most pixel\n        rightmost_pixel = max(first_l_shape, key=lambda p: p[1])\n        output_grid[rightmost_pixel] = 1\n\n\n        # process second L-shape (bottom-right)\n        second_l_shape = l_shapes[1]\n        # Find the bottom-most pixel\n        bottommost_pixel = max(second_l_shape, key=lambda p: p[0])  # bottom-most\n        output_grid[bottommost_pixel] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1993,
+    "candidates_token_count": 625,
+    "total_token_count": 2618,
+    "cached_content_token_count": 0
+  },
+  "timing": {
+    "response_time": 6.435485
+  },
+  "response_file": "002-response.json"
+}
