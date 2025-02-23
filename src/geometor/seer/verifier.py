@@ -76,7 +76,10 @@ def test_code(code, task_dir, task_pairs):
                 continue
 
             # --- MODIFIED: Store the NumPy array ---
-            example_result["transformed_output_array"] = transformed_output
+            if isinstance(transformed_output, np.ndarray):
+                example_result["transformed_output_array"] = transformed_output.tolist()
+            else:
+                example_result["transformed_output_array"] = transformed_output
             example_result["transformed_output"] = Grid(
                 transformed_output, "", "", "", ""
             ).to_string()
