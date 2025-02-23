@@ -1,0 +1,37 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 3x7
+    elements: [0, 1, 5]
+  - type: grid
+    name: output_grid
+    dimensions: 3x3
+    elements: [0, 2]
+
+properties:
+  - object: input_grid
+    property: has_vertical_line
+    value: True
+    color: 5
+    location: center_column
+  - object: output_grid
+    property: center_pixel_color
+    value: 2
+
+actions:
+  - type: find_pattern
+    input: input_grid
+    output: output_grid
+    description: "Locates a specific feature within the input grid and represents it in the output grid"
+
+relationships:
+  - type: spatial
+    object1: input_grid
+    object2: output_grid
+    description: "The output grid's dimensions are smaller than the input, suggesting a focused extraction or abstraction"
+  - type: color_change
+    object1: input_grid
+    object2: output_grid.center
+    from: 5
+    to: 2
+    description: color change represents central object

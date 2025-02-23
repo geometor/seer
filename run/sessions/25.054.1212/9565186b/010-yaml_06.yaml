@@ -1,0 +1,48 @@
+observations:
+  - example_1:
+      input_objects:
+        - description: 2x2 block of mixed colors (1 and 8) in the bottom right.
+          colors: [1, 8]
+          shape: rectangle
+          size: 2x2
+      output_objects:
+        - description: 2x2 block of color 5.
+          colors: [5]
+          shape: rectangle
+          size: 2x2
+      transformation: Change the 2x2 block to all 5s.
+      relationship: bottom right 2x2
+
+  - example_2:
+      input_objects:
+        - description: A non-square region of different colors.
+          colors: [8, 1, 3, 2]
+          shape: irregular_column
+          size:
+      output_objects:
+        - description: 2x2 block of color 5, including some same pixels
+          colors: [5]
+          shape: irregular
+          size:
+      transformation: Change the non-white area to all 5s.
+      relationship: largest non-1 area
+
+  - example_3:
+    input_objects:
+        - description: two 8's down the first column
+          colors: [8]
+    output_objects:
+      - description: two 5's down the first column
+        colors: [5]
+    transformation: 8's become 5 in the first column.
+    relationship: left column
+
+  - example_4:
+      input_objects:
+        - description: 3x1 column of color 4 and 8
+          colors: [4,8]
+      output_objects:
+        - description: 3x1 column of color 5
+          colors: [5]
+      transformation: change colors 4 and 8 to 5 in left column.
+      relationship: left column

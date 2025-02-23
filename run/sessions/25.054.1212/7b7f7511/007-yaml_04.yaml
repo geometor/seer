@@ -1,0 +1,27 @@
+facts:
+  - type: grid
+    description: Input grid with dimensions 3x6 (rows x columns)
+    elements:
+      - row: 0
+        values: [4, 4, 4, 4, 4, 4]
+      - row: 1
+        values: [6, 4, 8, 6, 4, 8]
+      - row: 2
+        values: [6, 6, 8, 6, 6, 8]
+
+  - type: grid
+    description: Output grid with dimensions 3x3 (rows x columns)
+    elements:
+      - row: 0
+        values: [4, 4, 4]
+      - row: 1
+        values: [6, 4, 8]
+      - row: 2
+        values: [6, 6, 8]
+
+  - observation: The output grid's rows match the input grid's rows.
+  - observation: Columns are removed from the input grid to create output
+  - observation: "The first, third and fifth columns appear to be selected to
+    form the output"
+  - action: column_removal
+    parameters: [remove every other column, starting with the 2nd]

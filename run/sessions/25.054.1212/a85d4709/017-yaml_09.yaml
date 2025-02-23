@@ -1,0 +1,19 @@
+facts:
+  - observation: All input grids are 3x3.
+  - observation: All output grids are 3x3.
+  - observation: Input grids contain only colors 0 (white) and 5 (gray).
+  - observation: Output grids contain colors that depend on the row.
+  - observation: Output Example 1 contains color 3 (green) in the top row, color 4 (yellow) in the middle row, and color 2 (red) in the bottom row.
+  - observation: Output Example 2 contains all color 3 (green).
+  - observation: Output Example 3 contains color 2 (red) in the top and bottom row, and color 4 (yellow) in the middle row.
+  - observation: Output Example 4 contains color 4 (yellow) in the top and bottom row, and color 3 (green) in the middle row.
+  - object: input_grid
+    properties:
+      shape: 3x3
+      colors: [0, 5]
+  - object: output_grid
+    properties:
+      shape: 3x3
+      colors: dependent on row number
+  - action: transform_row
+    description: Each row of the input grid is transformed to a row of a single, specific output color.

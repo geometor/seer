@@ -1,0 +1,70 @@
+task_id: 016
+observations:
+  - example_1:
+      input_objects:
+        - object_1: { color: maroon, shape: scattered, count: 5 }
+        - object_2: { color: blue, shape: scattered, count: 3 }
+        - object_3: { color: white, shape: scattered, count: 10}
+      output_objects:
+        - object_1: { color: red, shape: column_segment, location: top_left, count: 2 }
+        - object_2: {color: white, count: 7}
+      input_grid_size: [6, 3]
+      output_grid_size: [3, 3]
+      color_palette: [maroon, blue, white, red]
+      spatial_relationship: "Input is divided into 2x1 subgrids vertically. Output grid is a compressed representation."
+      transformation_rule: "Presence of maroon or blue in a 2x1 input area triggers red in the corresponding output cell."
+      error_analysis: "Code fails to correctly map 2x1 input regions to output cells. Overgenerates red."
+
+  - example_2:
+      input_objects:
+        - object_1: { color: maroon, shape: scattered, count: 4 }
+        - object_2: { color: blue, shape: scattered, count: 3 }
+        - object_3: { color: white, shape: scattered, count: 11}
+      output_objects:
+        - object_1: {color: red, shape: column_segment, location: [0,1], [2,1], count: 2}
+        - object_2: {color: white, count: 7}
+      input_grid_size: [6, 3]
+      output_grid_size: [3, 3]
+      spatial_relationship: "Input is compressed vertically, some relationship."
+      transformation_rule: "Presence of maroon or blue."
+      error_analysis: "Incorrect subgrid mapping and transformation logic."
+  - example_3:
+      input_objects:
+        - object_1: { color: maroon, shape: scattered, count: 4 }
+        - object_2: { color: blue, shape: scattered, count: 2 }
+        - object_3: {color: white, shape: scattered, count: 12}
+      output_objects:
+        - object_1: {color: red, count: 3, location: 'diagonal from top left'}
+        - object_2: {color: white, count: 6}
+      input_grid_size: [6, 3]
+      output_grid_size: [3, 3]
+      spatial_relationship: "Diagonal relationship"
+      transformation_rule: "Presence of maroon or blue causes red."
+      error_analysis: "Subgrid logic fails; overgenerates red"
+  - example_4:
+      input_objects:
+          - object_1: {color: maroon, shape: scattered, count: 5}
+          - object_2: {color: blue, shape: scattered, count: 4}
+          - object_3: {color: white, count: 9}
+      output_objects:
+          - object_1: {color: red, count: 2, location: isolated}
+          - object_2: {color: white, count: 7}
+      input_grid_size: [6, 3]
+      output_grid_size: [3, 3]
+      spatial_relationship: 'input condensed'
+      transformation_rule: "Maroon and Blue result in Red in the correct location"
+      error_analysis: "subgrid and position are incorrect"
+
+  - example_5:
+    input_objects:
+      - object_1: {color: maroon, shape: scattered, count: 4}
+      - object_2: {color: blue, shape: scattered, count: 4}
+      - object_3: {color: white, count: 10}
+    output_objects:
+        - object_1: {color: red, location: [0,0], [0,2], count: 2}
+        - object_2: {color: white, count: 7}
+    input_grid_size: [6, 3]
+    output_grid_size: [3, 3]
+    spatial_relationship: "Input is condensed vertically into output"
+    transformation_rule: 'Presence of maroon or blue in a vertical column'
+    error_analysis: 'the 2x1 subgrid rule is incorrect'

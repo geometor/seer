@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Locate** the red pixel (value 2) in the input grid.\n2.  **Remove** the red pixel from the output grid.\n3.  **Conditional Azure/Orange Placement:**\n    *   If the red pixel is *not* in the last row:\n        *   Place an azure pixel (value 8) one row *below* and one column *to the left* of the red pixel's original position.\n        *   Place an orange pixel (value 7) one row *below* and one column *to the right* of the red pixel's original position.\n4.  **Conditional Green/Magenta Placement:**\n    *  If the red pixel is *not* in the first row AND *not* in the first column:\n        * Place a green pixel (value 3) one row *above* and one column *to the left* of the red pixel's original position.\n    *  If the red pixel is *not* in the first row AND *not* in the last column:\n       *   Place a magenta pixel (value 6) one row *above* and one column *to the right* of the red pixel's original position.\n5. **Output Grid**: maintain original grid size and all white pixels that were not replaced.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel_by_value(grid, value):\n    # Find the coordinates of a pixel with a specific value.\n    coords = np.where(grid == value)\n    if len(coords[0]) > 0:\n        return (coords[0][0], coords[1][0])  # Return the first occurrence\n    return None\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the red pixel (value 2).\n    red_pixel_coords = find_pixel_by_value(input_grid, 2)\n\n    if red_pixel_coords:\n        # Remove the red pixel.\n        output_grid[red_pixel_coords] = 0\n\n        # Conditional Azure/Orange Placement.\n        if red_pixel_coords[0] < output_grid.shape[0] - 1:\n            azure_coords = (red_pixel_coords[0] + 1, red_pixel_coords[1] - 1)\n            orange_coords = (red_pixel_coords[0] + 1, red_pixel_coords[1] + 1)\n\n            if 0 <= azure_coords[1] < output_grid.shape[1]:\n                output_grid[azure_coords] = 8\n            if 0 <= orange_coords[1] < output_grid.shape[1]:\n                output_grid[orange_coords] = 7\n\n        # Conditional Green/Magenta Placement\n        if red_pixel_coords[0] > 0:\n            if red_pixel_coords[1] > 0:\n                green_coords = (red_pixel_coords[0] - 1, red_pixel_coords[1] -1)\n                output_grid[green_coords] = 3\n            if red_pixel_coords[1] < input_grid.shape[1] - 1:\n                magenta_coords = (red_pixel_coords[0] - 1, red_pixel_coords[1] + 1)\n                output_grid[magenta_coords] = 6\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3549,
+    "candidates_token_count": 798,
+    "total_token_count": 4347,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.879908,
+  "response_file": "016-response.json"
+}

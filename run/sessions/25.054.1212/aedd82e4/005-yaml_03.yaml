@@ -1,0 +1,20 @@
+objects:
+  - name: red_group
+    description: A contiguous group of red pixels.
+    properties:
+      - size: The number of pixels in the group.
+      - shape: the layout of the pixels (e.g., horizontal, vertical, diagonal, other).
+      - bottom_rightmost: The pixel in the group with the largest row and column indices.
+      - bottom_most: The pixel in the group with the largest row.
+      - right_most: The pixel in the group with the largest column.
+actions:
+  - name: change_color
+    description: Change the color of a pixel.
+    parameters:
+      - from_color: The original color of the pixel (red).
+      - to_color: The new color of the pixel (blue).
+    conditions:
+      - "if red_group.size == 1: change the single pixel"
+      - "if red_group.size == 2: change the right_most pixel."
+      - "if red_group.size == 3: change the right_most pixel"
+      - "if red_group.shape == diagonal: change the right_most pixel and bottom_most pixel."

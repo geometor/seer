@@ -1,0 +1,25 @@
+observations:
+  - example_set: Training Examples
+    common_properties:
+      - grid_size: 3x3
+      - color_count: 2
+      - color_preservation: Input and output grids always contain the same two colors, and the counts of each color are consistent.
+      - transformation_type: Color replacement/shifting, not a simple rotation.
+
+  - object_identification:
+      - object_1:
+        color: "Varies (9, 6, or 2 in examples)"
+        role: "Likely the 'active' color, the one being moved or replaced."
+        initial_count: Varies
+        final_count: Varies, but matches input count
+      - object_2:
+        color: "Always 0 (white)"
+        role: "Likely the 'background' color, or the color being replaced."
+        initial_count: Varies
+        final_count: Varies, but matches input count
+
+  - transformation_rules:
+    - rule_1: "The 'active' color (non-zero) appears to fill some of the positions previously occupied by the 'background' color (0)."
+    - rule_2: "The change isn't a simple rotation; it's a more complex color swapping."
+    - rule_3:  "The top-left cell of the output is always the non-zero color."
+    - rule_4: "Looking along the diagonals, we see the color swapping/filling following the top-left to bottom-right direction."

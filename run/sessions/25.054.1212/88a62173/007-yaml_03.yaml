@@ -1,0 +1,35 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - dimensions: 5x5
+      - values: [0, 1]  # white, blue
+      - description: "Represents the initial state"
+
+  - name: output_grid
+    type: grid
+    properties:
+      - dimensions: 2x2
+      - values: [0, 1] # white, blue
+      - description: "Represents the transformed state"
+
+  - name: blue_pixel
+    type: pixel
+    properties:
+      - value: 1
+      - color: blue
+
+  - name: white_pixel
+    type: pixel
+    properties:
+      - value: 0
+      - color: white
+
+actions:
+    - type: condensation
+    - description: "The input grid is reduced in size to create the output grid."
+    - agent: "unknown rule"
+
+relationships:
+  - type: input_to_output
+  - description: "The output grid is derived from the input grid based on a specific rule, seemingly focusing on the blue pixels."

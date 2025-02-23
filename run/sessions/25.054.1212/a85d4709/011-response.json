@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIterate through each pixel of the input grid. If the input pixel is gray (5), \nthe output color depends on the column: column 0 -> red (2), column 1 -> yellow (4), \ncolumn 2 -> green (3).  If the input pixel is black (0), the output is a color \ndetermined by a gray (5) pixel. Return the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid with the same dimensions as the input_grid\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get the column mapping color for any gray pixel.\n    gray_column_colors = {}\n    for col in range(input_grid.shape[1]):\n        for row in range(input_grid.shape[0]):\n          if input_grid[row, col] == 5:\n              if col == 0:\n                  gray_column_colors[col] = 2\n              elif col == 1:\n                  gray_column_colors[col] = 4\n              elif col == 2:\n                  gray_column_colors[col] = 3\n    \n    # Determine a default color for black pixels.\n    default_color = list(gray_column_colors.values())[0] if gray_column_colors else 0  # Default to black if no gray pixels\n\n    # Iterate through each pixel of the input grid\n    for row in range(input_grid.shape[0]):\n        for col in range(input_grid.shape[1]):\n            # If the input pixel is gray (5)\n            if input_grid[row, col] == 5:\n                # Determine output color based on column\n                if col == 0:\n                    output_grid[row, col] = 2  # Red\n                elif col == 1:\n                    output_grid[row, col] = 4  # Yellow\n                elif col == 2:\n                    output_grid[row, col] = 3  # Green\n            # Else (input pixel is black/0)\n            else:\n                output_grid[row,col] = default_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3106,
+    "candidates_token_count": 507,
+    "total_token_count": 3613,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.178123,
+  "response_file": "011-response.json"
+}

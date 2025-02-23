@@ -1,0 +1,21 @@
+facts:
+  - object: gray_stripe
+    type: vertical_line
+    color: gray
+    value: 5
+    constant: true
+    position: consistent_column_index_3
+  - object: blue_pixels
+    color: blue
+    value: 1
+    relation: adjacent_to_gray_stripe
+  - object: red_pixels
+    color: red
+    value: 2
+    output: created_based_on_blue_adjacency
+  - transformation:
+    input_rows: variable
+    input_cols: variable
+    output_rows: 3
+    output_cols: 3
+    rule: "A red pixel appears in the output grid at a row index if a blue pixel is adjacent (left or right) to the gray stripe in *any* of the input grid rows."

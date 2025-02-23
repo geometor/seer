@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule appears to involve these steps:\n\n1.  **Identify the Dominant Non-Zero Color:** In each input grid, there's one non-black (non-zero) color that appears most frequently. Let's call this the \"dominant color.\"\n\n2.  **Top-Left Alignment:** The pixels of the dominant color are shifted (moved as a group) so that *one or more* of the dominant-colored pixels occupy the top-left most positions that are occupied by that color in the flattened input grid.\n\n3. **Preserve relative positions.** The internal arrangement of the dominant color's shape appears to be the same in input and output, only its absolute positioning is what changes.\n\n4. **Fill Remaining:** Fill in any newly vacated spots by shifting the background color (0) appropriately. The shape of color(0) might change, as needed to complete the grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_dominant_color(grid):\n    # Count the occurrences of each color\n    unique_colors, counts = np.unique(grid, return_counts=True)\n    \n    # Exclude black (color 0)\n    color_counts = {color: count for color, count in zip(unique_colors, counts) if color != 0}\n    \n    # If there is any other color than zero\n    if len(color_counts) > 0:    \n      # Find the color with the maximum count\n      dominant_color = max(color_counts, key=color_counts.get)\n    else:\n       dominant_color = 0\n\n    return dominant_color\n\ndef get_color_positions(grid, color):\n     # Get the indices where the grid matches the specified color\n    return np.array(np.where(grid == color)).T # Transpose for (row, col) pairs\n\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    \n    # 1. Identify the Dominant Non-Zero Color\n    dominant_color = get_dominant_color(input_grid)\n\n    if dominant_color==0:\n        return output_grid\n\n    # 2. Find positions of the dominant color\n    dominant_positions = get_color_positions(input_grid, dominant_color)\n    \n    # 3. Determine the top-left most position of the dominant color in input\n    if len(dominant_positions)>0:\n        top_left_most = dominant_positions[0]\n    \n        # 4. Calculate the shift needed\n        shift = top_left_most\n    \n    \n        # 5. Clear the original positions of dominant color in output, set to zero\n        for pos in dominant_positions:\n          output_grid[pos[0], pos[1]] = 0\n\n        # 6. Apply the shift to get new positions, set dominant color\n        for pos in dominant_positions:\n            new_pos = pos - shift\n            output_grid[new_pos[0], new_pos[1]] = dominant_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3495,
+    "candidates_token_count": 704,
+    "total_token_count": 4199,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.114612,
+  "response_file": "011-response.json"
+}

@@ -1,0 +1,30 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements: pixels
+    input_values: [0, 5]
+    output_values: [3, 4]
+
+observations:
+  - input_gray_pixels:
+      count: 3
+      positions: [(0, 1), (1, 2), (2, 1)]
+  - input_white_pixels:
+      count: 6
+      positions:  [(0, 0), (0, 2), (1, 0), (1, 1), (2, 0), (2, 2)]
+  - output_yellow_pixels :
+      count: 6
+      positions: [(0, 0), (0, 1), (0,2), (2,0), (2,1), (2,2)]
+  - output_green_pixels:
+    count: 3
+    positions: [(1,0), (1,1), (1,2)]
+
+actions:
+  - replace_value:
+      from: 0
+      to: 4
+      condition: "if the original value is 0"
+  - replace_value:
+      from: 5
+      to: 3
+      condition: "If the original value is 5"

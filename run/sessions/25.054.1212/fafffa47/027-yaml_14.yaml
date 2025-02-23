@@ -1,0 +1,35 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      colors: [0, 9, 1]  # All colors present in the input grids
+      maroon_positions: "Variable, see code output above"
+  - name: output_grid
+    type: grid
+    properties:
+      size: 3x3
+      colors: [0, 2] # All colors present in the output grids
+      red_positions: "Variable, see code output above"
+
+actions:
+  - name: extract_subgrid
+    input: input_grid
+    parameters:
+        rows: "top 3 rows from input"
+        columns: "all columns that have a red(2) in corresponding output position"
+    description: "Select a subgrid from input based on red pixel location in corresponding output"
+  - name: transform_color
+    input: subgrid
+    parameters:
+      from_color: 9
+      to_color: 2
+    description: "Change maroon pixels to red within the selected subgrid."
+  - name: create_output
+    parameters:
+      size: 3x3
+      default_color: 0
+    description: "Create output grid with a specific size and fill with a default color"
+  - name: place_subgrid
+      input: subgrid_transformed
+      output: output_grid
+      description: place transformed subgrid into output grid

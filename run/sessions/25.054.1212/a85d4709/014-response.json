@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a 3x3 input grid of gray (5) and white (0) pixels to an output grid of red (2) and yellow (4) pixels. \nGray pixels on the middle row become yellow, while gray pixels on the top/bottom rows and all white pixels become red.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rules.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)  # Initialize output grid\n\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            if input_grid[i, j] == 5:  # Gray pixel\n                if i == 1:  # Middle row\n                    output_grid[i, j] = 4  # Yellow\n                else:  # Top or bottom row\n                    output_grid[i, j] = 2  # Red\n            elif input_grid[i, j] == 0:  # White pixel\n                output_grid[i, j] = 2  # Red\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2244,
+    "candidates_token_count": 267,
+    "total_token_count": 2511,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.442973,
+  "response_file": "014-response.json"
+}

@@ -1,0 +1,31 @@
+observations:
+  - example_1:
+      input_shape: 3x3
+      output_shape: 3x3
+      transformations: |
+        Elements of the last row shifted within the row.
+        The '5's from the first column are used in the first row.
+
+  - example_2:
+      input_shape: 3x3
+      output_shape: 3x3
+      transformations: |
+        The bottom left `5`s are replaced with the values above them, and the last element of the middle row is replaced by a `5` from the row below.
+
+  - example_3:
+      input_shape: 3x3
+      output_shape: 3x3
+      transformations: |
+        The '5' at (1,0) is replaced by '9' at (0,0)
+
+  - example_4:
+      input_shape: 3x3
+      output_shape: 3x3
+      transformations: |
+        First row rotates by 1 to the left, last two row's first and last elements are switched.
+
+  - general:
+      grid_size: constant
+      colors: preserved, some relocated
+      rows: Elements in rows change based on relative positioning.
+      columns: No specific column operation is consistently applied, focus on row transformations

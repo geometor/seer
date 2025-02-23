@@ -1,0 +1,18 @@
+facts:
+  - object: grid
+    properties:
+      - dimensions: 3x3
+      - cell_values: [0, 5]  # Input grid contains only 0 and 5
+      - output_cell_values: [2, 4] # Output grid contains only 2 and 4
+  - object: pixel
+    properties:
+      - color:
+          input: [white, gray]
+          output: [red, yellow]
+      - row_position: [top, middle, bottom]
+    actions:
+      - change_color:
+          conditions:
+            - "if input pixel is gray (5) AND on the middle row, output is yellow (4)"
+            - "if input pixel is gray (5) AND on the top or bottom row, output is determined by the column."
+            - "if input pixel is white (0): the output color depends on position and input value"

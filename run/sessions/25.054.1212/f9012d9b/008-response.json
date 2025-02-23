@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFinds the most frequent non-zero color in the input grid and returns a 1x1 grid with that color.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by finding most frequent non-zero color.\n\n    Args:\n        input_grid (list of lists): input grid\n    Returns:\n        (list of lists): 1x1 grid with most freq color\n    \"\"\"\n    # Flatten the input grid to a 1D array.\n    flat_grid = np.array(input_grid).flatten()\n\n    # Count the occurrences of each color, excluding 0.\n    color_counts = Counter(color for color in flat_grid if color != 0)\n\n    # Find the most frequent color.\n    most_frequent_color = color_counts.most_common(1)[0][0]\n\n    # Create a 1x1 output grid with the most frequent color.\n    output_grid = [[most_frequent_color]]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1973,
+    "candidates_token_count": 243,
+    "total_token_count": 2216,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.643826,
+  "response_file": "008-response.json"
+}

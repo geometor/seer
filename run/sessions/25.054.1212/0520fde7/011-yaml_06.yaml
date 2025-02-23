@@ -1,0 +1,22 @@
+facts:
+  - task_id: "010"
+  - input_objects:
+      - description: Input grid of varying size, containing pixels of different colors.
+        properties:
+          - colors: [0, 1, 5]  # white, blue, grey
+          - shape: Variable, up to 30x30
+  - output_objects:
+      - description: Output grid of fixed size (3x3), containing only white and red pixels.
+        properties:
+          - colors: [0, 2]  # white, red
+          - shape: (3, 3)
+  - transformations:
+      - description: Grey pixels in the input are transformed to red pixels in the output; all others are changed to white.
+        details: >
+          The position of a red pixel in the output corresponds to the
+          position of the Nth grey pixel in the input, considering only the
+          first three grey pixels found, row by row. If a row contains gray,
+          a red pixel is placed at column index corresponding to the order
+          (first, second, third, from the left) that the grey pixel appeared
+          within that input.
+          All other pixels in output are white. The output size is always 3x3.

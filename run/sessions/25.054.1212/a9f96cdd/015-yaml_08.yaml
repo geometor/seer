@@ -1,0 +1,30 @@
+facts:
+  - object: red_pixel
+    color: red
+    initial_presence: true
+    final_presence: false
+    action: removed
+  - object: azure_pixel
+    color: azure
+    initial_presence: false
+    final_presence: true
+    condition: red_pixel_present_and_not_at_bottom_row
+    relative_position: one_row_below_and_one_column_left_of_red_pixel
+  - object: orange_pixel
+    color: orange
+    initial_presence: false
+    final_presence: true
+    condition: red_pixel_present_and_not_at_bottom_row
+    relative_position: one_row_below_and_one_column_right_of_red_pixel
+  - object: green_pixel
+    color: green
+    initial_presence: false
+    final_presence: true
+    condition: red_pixel_present_and_not_at_top_row_and_not_at_left_most_column
+    relative_position: one_row_above_and_one_column_left_of_red_pixel
+  - object: magenta_pixel
+    color: magenta
+    initial_presence: false
+    final_presence: true
+    condition: red_pixel_present_and_not_at_top_row_and_not_at_right_most_column
+    relative_position: one_row_above_and_one_column_right_of_red_pixel

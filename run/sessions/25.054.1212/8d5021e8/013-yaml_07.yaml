@@ -1,0 +1,31 @@
+facts:
+  - object: input_grid
+    properties:
+      type: 2D array
+      dimensions: 3x2 (rows x columns)
+      elements: [0, 5]  # white, grey
+      description: "The original smaller grid."
+
+  - object: output_grid
+    properties:
+      type: 2D array
+      dimensions: 9x4
+      elements: [0, 5]
+      description: "The expanded grid, a patterned transformation of the input."
+
+  - relation: input_to_output_size
+    properties:
+        type: expansion
+        details: "Output dimensions seem derived by multiplying with input dimension: rows x3, cols x2"
+  - relation: pattern_replication
+    type: tiling
+    details: "The output is created by repeating a modified version of a 2x2 sub-grid derived from the input grid."
+  - object: cell_values
+    properties:
+        type: color_values
+        details: "0 represents white, 5 represents gray"
+  - action: transformation
+    properties:
+        type: expansion_and_pattern_replication
+        details: >
+           Take a 2x2 sub-grid area from the input. Transform it. Tile to the output grid dimension.

@@ -1,0 +1,27 @@
+objects:
+  - id: square_1
+    type: square
+    color: azure
+    initial_position: (0,0)
+    size: 2x2
+  - id: square_2
+    type: square
+    color: red
+    final_position: (1,0)
+    size: 2x2
+  - id: background
+    type: grid
+    color: white
+    size: 5x5
+
+actions:
+  - type: color_change
+    subject: square_1
+    new_color: red
+  - type: move_down
+    subject: square_1
+    amount: 1
+
+relationships:
+   - square_1 is_replaced_by square_2
+   - background contains square_1 and square_2

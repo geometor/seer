@@ -1,0 +1,176 @@
+facts:
+  - example_1:
+      input:
+        objects:
+          - color: 2
+            shape: line
+            position: row 1
+          - color: 2
+            shape: single
+            position: (2,1)
+          - color: 1
+            shape: single
+            position: (2,2)
+          - color: 8
+            shape: single
+            position: (2,3)
+          - color: 2
+            shape: single
+            position: (3,1)
+          - color: 8
+            shape: pair
+            position: (3,2),(3,3)
+      output:
+        objects:
+          - color: 2
+            shape: line
+            position: row 1
+          - color: 2
+            shape: single
+            position: (2,1)
+          - color: 1 #note - should have expected a 5
+            shape: single
+            position: (2,2)
+          - color: 5
+            shape: single
+            position: (2,3)
+          - color: 2
+            shape: single
+            position: (3,1)
+          - color: 5
+            shape: pair
+            position: (3,2),(3,3)
+      transformation:
+        - action: replace
+          from: 8
+          to: 5
+        - action: changed 1,1 from 2->5  # incorrect
+  - example_2:
+      input:
+          objects:
+            - color: 1
+              shape: line
+              position: row 1
+            - color: 8
+              shape: single
+              position: (2,1)
+            - color: 1
+              shape: single
+              position: (2,2)
+            - color: 3
+              shape: single
+              position: (2,3)
+            - color: 8
+              shape: single
+              position: (3,1)
+            - color: 2
+              shape: single
+              position: (3,2)
+            - color: 2
+              shape: single
+              position: (3,3)
+      output:
+        objects:
+           - color: 1
+             shape: line
+             position: row 1
+           - color: 5
+             shape: single
+             position: (2,1)
+           - color: 1
+             shape: single
+             position: (2,2)
+           - color: 5
+             shape: single
+             position: (2,3)
+           - color: 5
+             shape: single
+             position: (3,1)
+           - color: 5 #incorrect - should be 2
+             shape: single
+             position: (3,2)
+           - color: 5 #incorrect - should be 2
+             shape: single
+             position: (3,3)
+      transformation:
+        - action: replace
+          from: 8
+          to: 5
+  - example_3:
+      input:
+          objects:
+            - color: 2
+              shape: row
+              position: 1
+            - color: 8
+              shape: block
+              position: (2,1),(2,2)
+            - color: 2
+              shape: single
+              position: (2,3)
+            - color: 2
+              shape: row
+              position: 3
+      output:
+        objects:
+          - color: 2
+            shape: row
+            position: 1
+          - color: 5
+            shape: block
+            position: (2,1),(2,2)
+          - color: 2
+            shape: single
+            position: (2,3)
+          - color: 2
+            shape: row
+            position: 3
+      transformation:
+        - action: replace
+          from: 8
+          to: 5
+  - example_4:
+      input:
+         objects:
+            - color: 3
+              shape: pair
+              position: (1,1),(1,2)
+            - color: 8
+              shape: single
+              position: (1,3)
+            - color: 4
+              shape: row
+              position: 2
+            - color: 8
+              shape: single
+              position: (3,1)
+            - color: 1
+              shape: pair
+              position: (3,2),(3,3)
+      output:
+          objects:
+            - color: 5
+              shape: pair
+              position: (1,1),(1,2) # note 3 replaced with 5
+            - color: 5
+              shape: single
+              position: (1,3)
+            - color: 4
+              shape: row
+              position: 2
+            - color: 5
+              shape: single
+              position: (3,1)
+            - color: 5 # note 1 replaced with 5
+              shape: pair
+              position: (3,2),(3,3)
+      transformation:
+        - action: replace
+          from: 8
+          to: 5
+        - action: replace  #added
+          from: 1   #added
+          to: 5  #added
+        - action: replace #added
+          from: 3  #added
+          to: 5 #added

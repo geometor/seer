@@ -1,0 +1,14 @@
+task: color_mapping_by_column
+description: Map input gray pixels to output colors based on their column, and map black pixels to the color corresponding to any gray pixel.
+objects:
+  - type: grid
+    properties:
+      - name: input_grid
+        values: [0, 5]  # Black and gray
+      - name: output_grid
+        values: [2, 3, 4]  # Red, Green, Yellow
+transformations:
+  - condition: "input pixel is gray (5)"
+    action: "output pixel color depends on column: 0 -> red (2), 1 -> yellow (4), 2 -> green (3)"
+  - condition: "input pixel is black (0)"
+    action: "output pixel takes the color determined by the column number of any of the gray pixels"

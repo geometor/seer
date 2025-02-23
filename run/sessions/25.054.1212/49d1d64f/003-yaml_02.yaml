@@ -1,0 +1,49 @@
+task: 002
+examples:
+  - example_id: 1
+    input_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [2, 2]
+        pixels: [[1, 2], [3, 8]]
+    output_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [4, 4]
+        pixels: [[0, 1, 2, 0], [1, 1, 2, 2], [3, 3, 8, 8], [0, 3, 8, 0]]
+    transformation:
+      type: replication_with_padding
+      padding_color: 0
+      replication_factor: 2
+
+  - example_id: 2
+    input_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [2, 3]
+        pixels: [[1, 8, 4], [8, 3, 8]]
+    output_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [4, 6]
+        pixels: [[0, 1, 8, 4, 0], [1, 1, 8, 8, 4, 4], [8, 8, 3, 3, 8, 8], [0, 8, 3, 8, 0]]
+    transformation:
+      type: replication_with_padding
+      padding_color: 0
+      replication_factor: 2
+
+  - example_id: 3
+    input_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [3, 3]
+        pixels: [[2, 1, 4], [8, 0, 2], [3, 2, 8]]
+    output_objects:
+      - object_id: 1
+        type: grid
+        dimensions: [6, 6]
+        pixels: [[0, 2, 1, 4, 0], [2, 2, 1, 1, 4, 4], [8, 8, 0, 0, 2, 2], [3, 3, 2, 2, 8, 8], [0, 3, 2, 8, 0]]
+    transformation:
+      type: replication_with_padding
+      padding_color: 0
+      replication_factor: 2

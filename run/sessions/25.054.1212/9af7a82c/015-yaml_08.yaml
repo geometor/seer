@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    properties:
+      rows: variable
+      cols: variable
+      cells: integers (0-9, representing colors)
+  - type: column
+    properties:
+      index: integer
+      values: list of integers (0-9)
+  - type: color_marker
+    properties:
+      color: integer (specifically 3, 8, 4, or 2)
+      location: (row_index, col_index)
+
+actions:
+  - name: identify_color_markers
+    description: Find the first occurrence of colors 3, 8, 4, and 2 in the grid's columns.
+  - name: preserve_and_stack
+    description: Maintain grid cells at and above the identified color markers.
+  - name: zero_out_below
+    description: Set grid cells below the identified color markers to 0 (white).
+  - name: reorder_columns
+    description: Columns associated with 3, 8, 4, and 2 are moved to the leftmost columns of the output in the correct order.

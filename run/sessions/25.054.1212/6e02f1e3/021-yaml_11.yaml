@@ -1,0 +1,23 @@
+facts:
+  - task_id: "020"
+  - objects:
+      - description: 3x3 grid
+        properties:
+          - dimensions: 3x3
+          - initial_state: variable colors based on input
+          - final_state: diagonal gray pixels on a white background
+
+      - description: diagonal line of gray
+        properties:
+            - color: gray (5)
+            - length: 3 pixels
+            - start: can be top-left OR top-right.
+            - orientation: top-left to bottom-right, OR top-right to bottom left.
+
+  - actions:
+      - name: create_diagonal
+        description: Create a diagonal line of gray pixels.
+        parameters:
+          - color: gray (5)
+        constraints:
+            - output_grid_size_matches_input_grid_size: True

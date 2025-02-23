@@ -1,0 +1,26 @@
+task: 002
+input_objects:
+  - object_1:
+    description: 6x3 grid of pixels
+    properties:
+      colors: [0, 9, 1] # White, Maroon, Blue
+      dimensions: [6, 3]
+output_objects:
+  - object_1:
+    description: 3x3 subgrid
+    properties:
+      colors: [0, 2] # White, Red
+      dimensions: [3, 3]
+transformation_rules:
+  - rule_1:
+    description: Extract top 3x3 subgrid from input.
+    details: The bottom 3 rows are discarded.
+  - rule_2:
+    description: Rotate sub-grid 90 degrees counter-clockwise
+    details: swap rows and columns
+  - rule_3:
+    description: Map colors in the top 3x3 subgrid.
+    details:
+      - Maroon (9) becomes Red (2).
+      - White (0) remains White (0).
+      - Other colors are discarded (become implicitly White (0) due to initialization).

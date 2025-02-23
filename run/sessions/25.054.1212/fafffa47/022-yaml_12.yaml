@@ -1,0 +1,72 @@
+examples:
+  - example_id: 1
+    input_objects:
+      - color: 9
+        shape: L-shape
+        positions: [(0, 1), (0, 2), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
+        bounding_box:
+          top_left: (0,0)
+          bottom_right: (2,2)
+    output_objects:
+      - color: 2
+        positions: [(0, 0), (1, 0)]
+        bounding_box:
+            top_left: (0,0)
+            bottom_right: (1,0)
+    transformation:
+        description: "Maroon object defines a region in top-left corner for red output"
+
+  - example_id: 2
+    input_objects:
+      - color: 9
+        shape: C-shape
+        positions: [(0, 0), (0, 2), (1, 1), (1, 2), (2, 2)]
+        bounding_box:
+          top_left: (0,0)
+          bottom_right: (2,2)
+    output_objects:
+      - color: 2
+        positions: [(0, 1), (2, 1)]
+    transformation:
+        description: "Maroon object in top defines a region in center columns for red output"
+
+  - example_id: 3
+    input_objects:
+      - color: 9
+        shape: two lines
+        positions:  [(0, 1), (1, 0), (1, 2), (2, 0)]
+        bounding_box:
+          top_left: (0,0)
+          bottom_right: (2,2)
+    output_objects:
+      - color: 2
+        positions: [(0, 0), (0, 2), (1, 1), (1, 2)]
+    transformation:
+        description: "Maroon object is separated, but centered"
+
+  - example_id: 4
+    input_objects:
+      - color: 9
+        shape: L-shape
+        positions: [(0, 2), (1, 0), (1, 1), (1, 2), (2, 1)]
+        bounding_box:
+          top_left: (0,0)
+          bottom_right: (2,2)
+    output_objects:
+      - color: 2
+        positions: [(0, 1), (2, 0)]
+    transformation:
+        description: "Maroon region defines output in top and row 2"
+  - example_id: 5
+    input_objects:
+      - color: 9
+        shape: L-shape
+        positions: [(0, 1), (1, 1), (1, 2), (2, 1), (2, 2)]
+        bounding_box:
+          top_left: (0,0)
+          bottom_right: (2,2)
+    output_objects:
+      - color: 2
+        positions: [(0, 0), (0, 2)]
+    transformation:
+        description: "Maroon in the top-left, red in top corners"

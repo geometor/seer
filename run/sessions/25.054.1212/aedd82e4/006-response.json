@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies groups of contiguous red pixels and changes the color of single pixels, the bottom-rightmost pixel in groups of two or three, or two pixels (bottom-most and right-most) in diagonal groups to blue.\n\"\"\"\n\nimport numpy as np\n\ndef find_red_groups(grid):\n    \"\"\"Finds groups of contiguous red pixels.\"\"\"\n    red_groups = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_group):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != 2:\n            return\n        visited[r, c] = True\n        current_group.append((r, c))\n        # Explore adjacent cells (up, down, left, right)\n        dfs(r + 1, c, current_group)\n        dfs(r - 1, c, current_group)\n        dfs(r, c + 1, current_group)\n        dfs(r, c - 1, current_group)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 2 and not visited[r, c]:\n                current_group = []\n                dfs(r, c, current_group)\n                red_groups.append(current_group)\n    return red_groups\n\ndef is_diagonal(group):\n    \"\"\"Checks if a group of pixels forms a diagonal line.\"\"\"\n    if len(group) < 2:\n        return False\n    \n    group.sort() #sort by row then column\n    for i in range(len(group) - 1):\n        dr = abs(group[i+1][0] - group[i][0])\n        dc = abs(group[i+1][1] - group[i][1])\n        if dr != 1 or dc != 1:\n           return False\n    return True\n    \n\ndef select_target_pixel(group):\n    \"\"\"Selects the target pixel(s) within a red group.\"\"\"\n    if len(group) == 0:\n       return []\n    \n    if len(group) == 1:\n       return [group[0]]\n\n    group.sort(key=lambda x: (x[0], x[1]))  # Sort by row, then column\n\n    targets = []\n    \n    if is_diagonal(group):\n        # Find bottom-most\n        bottom_most = group[0]\n        for pixel in group:\n            if pixel[0] > bottom_most[0]:\n                bottom_most = pixel\n\n        #Find right-most\n        right_most = group[0]\n        for pixel in group:\n            if pixel[1] > right_most[1]:\n                right_most = pixel\n        targets.append(bottom_most)\n        targets.append(right_most)\n\n    else:\n        targets.append(group[-1]) #right_most\n\n    return targets\n        \n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find groups of contiguous red pixels.\n    red_groups = find_red_groups(input_grid)\n\n    # Select and change the target pixel(s) in each group.\n    for group in red_groups:\n        target_pixels = select_target_pixel(group)\n        for target_pixel in target_pixels:\n          if target_pixel:\n            output_grid[target_pixel] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3748,
+    "candidates_token_count": 868,
+    "total_token_count": 4616,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.6617,
+  "response_file": "006-response.json"
+}

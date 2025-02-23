@@ -1,0 +1,103 @@
+    2 1 1
+    1 5 1
+    5 2 2
+    ```
+*   **Expected Output:**
+    ```
+    2 1 5
+    2 5 2
+    1 1 2
+    ```
+*   **Transformed Output:**
+    ```
+    1 1 1
+    1 5 1
+    5 5 5
+    ```
+*   **Metrics:**
+    *   `match`: False
+    *   `pixels_off`: 7
+    *   `size_correct`: True
+    *   `color_palette_correct`: True
+    *   `correct_pixel_counts`: False
+
+*   **Observations:** The replacement logic is clearly incorrect. Stable pixels are handled correctly, but the substitution of 2 and 6 is flawed.
+
+**Example 2:**
+
+*   **Input:**
+    ```
+    2 6 5
+    6 2 2
+    5 5 5
+    ```
+*   **Expected Output:**
+    ```
+    2 6 5
+    2 2 5
+    5 2 5
+    ```
+*  **Transformed output**
+    ```
+    ERROR: integer division or modulo by zero
+    ```
+*   **Metrics:**
+    *   `match`: ERROR: integer division or modulo by zero
+
+*   **Observations:** This highlights the critical error in handling rows containing only '2' and '6'.
+
+**Example 3:**
+
+*   **Input:**
+    ```
+    9 5 5
+    5 5 8
+    5 8 9
+    ```
+*   **Expected Output:**
+    ```
+    9 5 5
+    9 5 8
+    5 8 9
+    ```
+*   **Transformed Output:**
+    ```
+    9 5 5
+    5 5 8
+    5 8 9
+    ```
+*   **Metrics:**
+    *   `match`: False
+    *   `pixels_off`: 1
+    *   `size_correct`: True
+    *   `color_palette_correct`: True
+    *   `correct_pixel_counts`: False
+
+*   **Observations:** This shows that pixels which are *not* 2 or 6 are handled correctly.  Only a single pixel (the '9' in the second row) is incorrect.
+
+**Example 4:**
+
+*   **Input:**
+    ```
+    2 2 6
+    2 1 1
+    2 6 2
+    ```
+*   **Expected Output:**
+    ```
+    2 2 2
+    6 1 6
+    6 1 2
+    ```
+
+*   **Transformed output**
+    ```
+    ERROR: integer division or modulo by zero
+    ```
+
+*   **Metrics:**
+    *   `match`: ERROR: integer division or modulo by zero
+
+*   **Observations:** The "modulo by zero" error occurs again. The program must address empty set of colors.
+
+**YAML Facts (Revised):**

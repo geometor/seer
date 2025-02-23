@@ -1,0 +1,61 @@
+facts:
+  - task_id: d511f180
+  - example_1:
+      input_objects:
+        - object_1: { shape: rectangle, color: red, position: [0,1], dimensions: [2,2] }
+        - object_2: { shape: rectangle, color: black, position: [2,0], dimensions: [1,1] }
+        - object_3: { shape: rectangle, color: red, position: [2, 1], dimensions: [1, 1] }
+
+      output_objects:
+        - object_1: { shape: rectangle, color: red, position: [0,1], dimensions: [2,2] }
+        - object_2: { shape: rectangle, color: black, position: [2,0], dimensions: [1,1] }
+        - object_3: { shape: rectangle, color: blue, position: [2,0], dimensions: [1,1]}
+
+      transformations:
+        - action: change_color, object: object_3, from: red, to: blue, condition: "adjacent to black on the left"
+
+  - example_2:
+      input_objects:
+          - object_1: { shape: rectangle, color: red, position: [0,0], dimensions: [1,3]}
+          - object_2: { shape: rectangle, color: red, position: [1,1], dimensions: [1,1]}
+          - object_3: { shape: rectangle, color: red, position: [3,1], dimensions: [1,1]}
+          - object_4: { shape: rectangle, color: red, position: [2,3], dimensions: [1,1]}
+      output_objects:
+          - object_1: { shape: rectangle, color: red, position: [0,0], dimensions: [1,3]}
+          - object_2: { shape: rectangle, color: red, position: [1,1], dimensions: [1,1]}
+          - object_3: { shape: rectangle, color: red, position: [3,1], dimensions: [1,1]}
+          - object_4: { shape: rectangle, color: blue, position: [2,3], dimensions: [1,1]}
+
+      transformations:
+        - action: change_color, object: object_4, from: red, to: blue, condition: "adjacent to black on the left"
+
+  - example_3:
+      input_objects:
+        - object_1: { shape: rectangle, color: red, position: [0, 0], dimensions: [1, 2] }
+        - object_2: { shape: rectangle, color: red, position: [1, 1], dimensions: [1, 1] }
+        - object_3: { shape: rectangle, color: red, position: [2, 0], dimensions: [1, 2] }
+        - object_4: { shape: rectangle, color: red, position: [2, 3], dimensions: [1, 1] }
+        - object_5: { shape: rectangle, color: red, position: [4, 1], dimensions: [1, 3] }
+      output_objects:
+        - object_1: { shape: rectangle, color: red, position: [0, 0], dimensions: [1, 2] }
+        - object_2: { shape: rectangle, color: red, position: [1, 1], dimensions: [1, 1] }
+        - object_3: { shape: rectangle, color: red, position: [2, 0], dimensions: [1, 2] }
+        - object_4: { shape: rectangle, color: blue, position: [2, 3], dimensions: [1, 1] }
+        - object_5: { shape: rectangle, color: red, position: [4, 1], dimensions: [1, 3] }
+
+      transformations:
+        - action: change_color, object: object_4, from: red, to: blue, condition: "adjacent to black on the left"
+  - example_4:
+    input_objects:
+      - object_1: { shape: rectangle, color: red, position: [0, 0], dimensions: [1, 2] }
+      - object_2: { shape: rectangle, color: red, position: [1, 0], dimensions: [1, 1] }
+      - object_3: { shape: rectangle, color: red, position: [1, 2], dimensions: [1, 1] }
+      - object_4: { shape: rectangle, color: red, position: [2, 1], dimensions: [1, 1] }
+    output_objects:
+      - object_1: { shape: rectangle, color: red, position: [0, 0], dimensions: [1, 2] }
+      - object_2: { shape: rectangle, color: red, position: [1, 0], dimensions: [1, 1] }
+      - object_3: { shape: rectangle, color: blue, position: [1, 2], dimensions: [1, 1] }
+      - object_4: { shape: rectangle, color: blue, position: [2, 1], dimensions: [1, 1] }
+    transformations:
+        - action: change_color, object: object_3, from: red, to: blue, condition: "adjacent to black on the left"
+        - action: change_color, object: object_4, from: red, to: blue, condition: "adjacent to black on the left"

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Initialization:** Start with an input grid of dimensions 3x5.\n2.  **Locate:** Note the red pixel (value 2) in the top row at position (0,2).\n3.  **Transformation**: Create azure colored pixel with value 8 and orange colored pixel with value 7 in the second row of the output grid. Azure is one row down and one column to the left and orange is one row down and one column to the right, relative to the input red pixel.\n4. **Output:** maintain original grid size and all the white pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel_by_value(grid, value):\n    # Find the coordinates of a pixel with a specific value.\n    coords = np.where(grid == value)\n    if len(coords[0]) > 0:\n        return (coords[0][0], coords[1][0])  # Return the first occurrence\n    return None\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the observed rule.\"\"\"\n\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the red pixel (value 2).\n    red_pixel_coords = find_pixel_by_value(input_grid, 2)\n\n    if red_pixel_coords:\n        # Calculate coordinates for the azure and orange pixels.\n        azure_coords = (red_pixel_coords[0] + 1, red_pixel_coords[1] - 1)\n        orange_coords = (red_pixel_coords[0] + 1, red_pixel_coords[1] + 1)\n\n        # Set the azure and orange pixels in the output grid,\n        # checking bounds.\n        if 0 <= azure_coords[0] < output_grid.shape[0] and 0 <= azure_coords[1] < output_grid.shape[1]:\n            output_grid[azure_coords] = 8\n        if 0 <= orange_coords[0] < output_grid.shape[0] and 0 <= orange_coords[1] < output_grid.shape[1]:\n             output_grid[orange_coords] = 7\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2162,
+    "candidates_token_count": 518,
+    "total_token_count": 2680,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.375963,
+  "response_file": "014-response.json"
+}

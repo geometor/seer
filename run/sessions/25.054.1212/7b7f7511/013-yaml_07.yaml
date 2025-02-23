@@ -1,0 +1,30 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      rows: 6
+      columns: 2
+      colors: [2, 3, 4]
+  - name: output_grid
+    type: grid
+    properties:
+      rows: 3
+      columns: 2
+      colors: [2, 3, 4]
+
+actions:
+  - name: crop
+    agent: system
+    input: input_grid
+    parameters:
+        row_start: 0
+        row_end: 3 # input_grid.rows / 2
+        col_start: 0
+        col_end: 2
+
+relationships:
+   - subject: output_grid
+     relation: is_cropped_version_of
+     object: input_grid
+     properties:
+        crop_region: top_half

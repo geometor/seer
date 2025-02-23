@@ -1,0 +1,27 @@
+objects:
+  - input_grid:
+      type: 2D array
+      dimensions: 7x7
+      elements:
+        - color: red (2)
+        - color: gray (5)
+        - color: white (0)
+      regions:
+          - name: top_left_corner
+            bounds: [0:2, 0:2]
+            dominant_color: red
+          - name: third_row
+            bounds: [2:3, 0:7]
+            dominant_color: gray
+          - name: bottom_right
+            bounds: [5:7,5:7]
+            dominant_color: white
+  - output_grid:
+      type: 2D array
+      dimensions: 2x2
+      elements:
+        - color: gray (5)
+        - color: red (2)
+relationships:
+ - output_element_1: corresponds to input top left gray block
+ - output_element_2: corresponds to top left red

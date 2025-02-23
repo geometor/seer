@@ -1,0 +1,36 @@
+task_id: "010"
+input_objects:
+  - color: 9  # Maroon
+    shape: variable
+    positions: variable  # Positions within the top half of the grid
+  - color: 0  # White
+    shape: variable
+    positions: variable
+  - color: 1 # Blue
+    shape: variable
+    positions: variable
+
+output_objects:
+  - color: 2  # Red
+    shape: variable
+    positions: specific pattern  # Determined by a rule based on maroon positions
+  - color: 0  # White
+    shape: variable
+    positions: variable
+
+actions:
+  - map_color:
+      from: 9  # Maroon
+      to: 2  # Red
+  - map_color:
+      from: 0
+      to: 0
+  - determine_output_position:
+      input_object: maroon_pixels
+      rule: "A specific, yet-to-be-determined rule based on the distribution of maroon pixels in the *entire* top half of the input grid."
+  - ignore:
+      color: 1
+
+grid_size:
+    input: variable, always even number of rows.
+    output: 3x3

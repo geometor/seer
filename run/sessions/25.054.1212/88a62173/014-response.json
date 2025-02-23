@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation extracts a 2x2 representation of the larger, somewhat checkerboard-like input grid by taking top-left corner and using it's simplified 2x2 pattern.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid as 2x2 numpy array with zeros\n    output_grid = np.zeros((2, 2), dtype=int)\n\n    # Extract the top-left 2x2 subgrid from the input\n    subgrid = input_grid[:2, :2]\n\n    # check if top left 2 x 2 has alternating pattern, if yes, use it, if no, use general rule\n    if (subgrid[0,0] != subgrid[0,1]) and (subgrid[0,0] != subgrid[1,0]) and (subgrid[1,1] != subgrid[1,0]) and (subgrid[1,1] != subgrid[0,1]):\n      output_grid = subgrid\n    else:\n        # Apply the alternating pattern to the output\n        output_grid[0, 0] = input_grid[0, 0]\n        output_grid[0, 1] = input_grid[0, -1]\n        output_grid[1, 0] = input_grid[-1, 0]\n        output_grid[1, 1] = input_grid[-1, -1]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2101,
+    "candidates_token_count": 336,
+    "total_token_count": 2437,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.267313,
+  "response_file": "014-response.json"
+}

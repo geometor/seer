@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  Identify Red Pixels: Locate all pixels with the color red (value 2).\n2.  Check for Left Adjacency to Black: For each red pixel, determine if a black pixel (value 0) is directly to its left.\n3.  Change Color to Blue: If a red pixel has a black pixel directly to its left, change the red pixel's color to blue (value 1).\n4.  Leave other Pixels Unchanged: All other pixels that do not meet the above rule should not be modified.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms an input grid by changing red pixels to blue if they are directly to the right of a black pixel.\n    \"\"\"\n    output_grid = np.copy(input_grid)  # Create a copy to modify\n    rows, cols = input_grid.shape\n\n    # Iterate through each pixel of the grid\n    for r in range(rows):\n        for c in range(cols):\n            # Check if the current pixel is red\n            if input_grid[r, c] == 2:\n                # Check for left adjacency to black\n                if c > 0 and input_grid[r, c - 1] == 0:\n                    # Change the red pixel to blue\n                    output_grid[r, c] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4069,
+    "candidates_token_count": 313,
+    "total_token_count": 4382,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.504608,
+  "response_file": "023-response.json"
+}

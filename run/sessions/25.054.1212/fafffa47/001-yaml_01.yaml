@@ -1,0 +1,36 @@
+objects:
+  - id: input_grid
+    type: grid
+    dimensions: 6x3
+    elements: [0, 9, 1]
+    properties:
+      - divided_into: [top_subgrid, bottom_subgrid]
+
+  - id: top_subgrid
+    type: grid
+    dimensions: 3x3
+    elements: [0, 9]
+
+  - id: bottom_subgrid
+    type: grid
+    dimensions: 3x3
+    elements: [0, 1]
+
+  - id: output_grid
+    type: grid
+    dimensions: 3x3
+    elements: [2, 0]
+
+actions:
+  - type: map_color
+    input: top_subgrid
+    output: output_grid
+    mapping:
+        9: 2
+        0: 0
+        1: none
+
+relationships:
+  - type: spatial
+    relation: input_grid contains top_subgrid and bottom_subgrid
+    notes: "input grid vertically stacked"

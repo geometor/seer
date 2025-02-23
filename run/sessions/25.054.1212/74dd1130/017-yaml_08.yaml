@@ -1,0 +1,28 @@
+task_016:
+  objects:
+    - type: grid
+      properties:
+        rows: 3
+        columns: 3
+        elements: integers (0-9 representing colors)
+    - type: row #each row is an object
+      properties:
+        elements: integers (0-9 representing colors)
+        length: 3
+        index:  # 0, 1, or 2 within its parent grid
+
+  actions:
+    - description: "Each row of input can map to a row in the output"
+    - description: "The counts of each color may change from input to output"
+
+  observations:
+    - "The output grid always has the same dimensions as the input grid."
+    - "The colors used in output exist in the input"
+    - example_1:
+        row_mapping: "Row permutation, order changes"
+    - example_2:
+        row_mapping: "Row 1 is constant, other rows do not map consistently"
+    - example_3:
+        row_mapping: "Row 1 and 3 are constant, row 2 does not map"
+    - example_4:
+        row_mapping: "no consistent mapping"

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a 3x3 input grid into a 3x3 output grid. The transformation fills the top row and the main diagonal with gray (5). All other cells are set to white (0).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the top row and main diagonal rule.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through the grid\n    for i in range(rows):\n        for j in range(cols):\n            # Fill the top row with gray (5)\n            if i == 0:\n                output_grid[i, j] = 5\n            #Fill the main diagonal\n            elif i == j:\n                output_grid[i,j] = 5\n            # Fill other cells with white (0)\n            else:\n                output_grid[i, j] = 0\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3617,
+    "candidates_token_count": 232,
+    "total_token_count": 3849,
+    "cached_content_token_count": 0
+  },
+  "response_time": 2.718694,
+  "response_file": "006-response.json"
+}

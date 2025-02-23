@@ -1,0 +1,22 @@
+facts:
+  - observation: |
+      Each input grid is expanded in both dimensions.
+  - observation: |
+      The output grid's dimensions are related to the input grid's dimensions by constant factors, but not as we originally coded.
+  - observation: |
+      Each pixel in the input grid corresponds to a block of pixels in the output grid.
+  - observation: |
+      The color of the input pixel is replicated in its corresponding output block.
+  - object: input_grid
+    properties:
+      - dimensions: variable
+      - content: single-digit integers representing colors
+  - object: output_grid
+    properties:
+      - dimensions: derived from input_grid dimensions (3x height, 2x width)
+      - content: replication of input_grid pixel colors in a specific pattern
+  - action: replication
+    description: |
+      Each input pixel's color is replicated in a 3x2 or 2x3 block in the output grid.  Need to determine the exact block size and placement rule.  Initial code incorrectly assumed.
+  - error_analysis:
+      - consistent_error_pattern: The consistent 16 pixels off in all tested examples suggests that the row/column expansion factor is incorrect.

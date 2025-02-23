@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Count Non-Zero Elements:** Count the total number of non-zero elements across all columns of the input grid. This count determines the height of the output grid. The output width is the same as the input width.\n\n2.  **Column-wise Transformation:** For each column in the input grid:\n    a.  **Extract:** Extract all values from the current input column.\n    b.  **Filter:** Separate the non-zero values from the zero values.\n    c.  **Sort:** Sort the non-zero values in *descending* order.\n    d. **Assemble Column:** Create output column. Place the sorted non-zero values at the *top* of the output column.\n    e.  **Pad:** Fill the remaining cells of the output column (if any) with zeros (representing the color white).\n\n3.  **Assemble Output Grid:** Combine the transformed columns to form the final output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    \n    # Count non-zero elements to determine output height.\n    non_zero_count = np.count_nonzero(input_grid)\n    output_height = non_zero_count\n    output_width = input_grid.shape[1]\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # change output pixels \n    output_row_index = 0\n    for j in range(input_grid.shape[1]):\n        # Get the values from the input column\n        input_column_values = input_grid[:, j]\n\n        # Get non-zero values.\n        non_zero_values = input_column_values[input_column_values != 0]\n        \n        #sort in descending order\n        sorted_non_zero = np.sort(non_zero_values)[::-1]\n\n        # how many non-zeros in this col\n        num_non_zero_this_col = len(sorted_non_zero)\n        \n        # write to output\n        output_grid[output_row_index:output_row_index + num_non_zero_this_col, j] = sorted_non_zero\n        \n        # update the output_row_index so next col writes to next available row\n        output_row_index += num_non_zero_this_col\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3503,
+    "candidates_token_count": 562,
+    "total_token_count": 4065,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.269815,
+  "response_file": "006-response.json"
+}

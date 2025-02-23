@@ -1,0 +1,22 @@
+task: 004b8a7b
+summary: |
+  The input grid is transformed into an output grid where each column is repeated three times, and within that repeated block, there is also a vertical repetition of colors.
+objects:
+  input_grid:
+    type: grid
+    dimensions: 3x2
+    elements: integers (0-9) representing colors
+  output_grid:
+    type: grid
+    dimensions: 9x6
+    elements: integers (0-9) representing colors
+    transformation: |
+      Each column from the input grid expands to three columns in the output grid by repeating the values vertically.
+      Each column from the input grid expands into 2 columns.
+      The whole output grid expands to 3 times the height and two times the width of the input grid.
+
+actions:
+  - name: expand_columns
+    description: |
+       Each column is transformed into a new grid by repeating the sequence three times.
+       Each element of these sequences is duplicated in a new column to its right.

@@ -1,0 +1,24 @@
+facts:
+  - object: input_grid
+    properties:
+      type: 2D array
+      dimensions: 3x4
+      elements: integers (0-9 representing colors)
+    observations:
+      - "Contains distinct color blocks: green (3), blue (1), red (2), and yellow (4)."
+  - object: output_grid
+    properties:
+      type: 2D array
+      dimensions: 6x4
+      elements: integers (0-9 representing colors)
+    observations:
+      - "Larger than the input grid."
+      - "Mostly filled with white (0)."
+      - "Preserves some color relationships from the input, but mirrored."
+  - relationship: transformation
+    type: input_to_output
+    description: "The input grid is transformed into the output grid through a process involving mirroring, expansion, and color preservation, likely following an identifiable rule."
+    details:
+      - "Horizontal mirroring and expansion are apparent, yellow remains in the leftmost column"
+      - "The input grid appears in reverse order of columns from right to left"
+      - "Each row is expanded downward by copying the input row until the left most column is filled."

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Pixels:** Locate all pixels within the input grid that are colored azure (8) or blue (1).\n\n2.  **Determine Bounding Box:** Find the smallest rectangle that *completely encloses* all azure and blue pixels.  This rectangle is defined by the top-leftmost and bottom-rightmost occurrences of either azure or blue pixels.\n\n3.  **Fill Bounding Box:** Change the color of *all* pixels within the bounding box (including its edges) to gray (5).  This includes pixels that were *not* originally azure or blue.\n\n4.  **Preserve Other Pixels:** All pixels *outside* the bounding box retain their original colors.\n\"\"\"\n\nimport numpy as np\n\ndef find_bounding_box(grid, colors):\n    \"\"\"Finds the minimal bounding box containing specified colors.\"\"\"\n    rows, cols = grid.shape\n    min_row, min_col = rows, cols\n    max_row, max_col = -1, -1\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] in colors:\n                min_row = min(min_row, r)\n                min_col = min(min_col, c)\n                max_row = max(max_row, r)\n                max_col = max(max_col, c)\n\n    if max_row == -1: # No matching colors found\n        return None\n\n    return min_row, min_col, max_row, max_col\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by filling the bounding box of blue/azure pixels with gray.\"\"\"\n\n    # Initialize output_grid as a copy of the input.\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find the bounding box coordinates for blue (1) and azure (8) pixels.\n    bounding_box = find_bounding_box(input_grid, [1, 8])\n\n    # If no blue or azure pixels are found, return the original grid.\n    if bounding_box is None:\n        return output_grid\n\n    min_row, min_col, max_row, max_col = bounding_box\n\n    # Fill the bounding box with gray (5).\n    for r in range(min_row, max_row + 1):\n        for c in range(min_col, max_col + 1):\n            output_grid[r, c] = 5\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3825,
+    "candidates_token_count": 576,
+    "total_token_count": 4401,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.035802,
+  "response_file": "006-response.json"
+}

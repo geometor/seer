@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Find Valid Subgrid Size: Examine the input grid starting from the top-left corner. Determine the largest possible square subgrid (1x1, 2x2, 3x3, etc.) that meets either of the following criteria:\n    *   It contains only one color (any color).\n    *   It contains only gray (5) and one other color.\n\n2. Copy Subgrid: Once the largest valid subgrid size is found, copy that subgrid from the input to the output.\n\n3. Return Result\n\"\"\"\n\nimport numpy as np\n\ndef get_largest_valid_subgrid_size(grid):\n    \"\"\"\n    Finds the size of the largest square subgrid at the top-left corner\n    of the input grid that contains only one color or gray (5) and one other color.\n    \"\"\"\n    height, width = grid.shape\n    max_size = min(height, width)\n\n    for size in range(max_size, 0, -1):\n        subgrid = grid[0:size, 0:size]\n        unique_colors = np.unique(subgrid)\n\n        if len(unique_colors) == 1:\n            return size  # Single color case\n        elif len(unique_colors) == 2 and 5 in unique_colors:\n            return size  # Gray and one other color case\n        elif len(unique_colors) == 2:\n            continue # two colors, but not gray\n        elif len(unique_colors) > 2:\n            continue # skip and check the smaller sub-grid\n\n    return 0  # Should not happen in well-formed ARC tasks\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n\n    # Determine output size.\n    output_size = get_largest_valid_subgrid_size(input_grid)\n\n    # Initialize the output grid.\n    output_grid = np.zeros((output_size, output_size), dtype=int)\n\n    if output_size > 0:\n        # Copy the subgrid.\n        output_grid[:] = input_grid[0:output_size, 0:output_size]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3368,
+    "candidates_token_count": 500,
+    "total_token_count": 3868,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.984956,
+  "response_file": "018-response.json"
+}

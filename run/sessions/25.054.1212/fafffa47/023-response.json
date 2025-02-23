@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Maroon Pixels:** Locate all pixels in the input grid with a value of 9 (maroon).\n2.  **Bounding Box:** Determine a rectangle bounding box containing all the maroon pixels. The top left corner of this box is the origin, and the bottom right marks the bounds.\n3.  **Output Grid:** Create a new output grid. Initialize all cells as black (0). The dimensions are always 3x3.\n4. **Top Row corners**: In the output grid, examine the top row of the input's maroon bounding box. If a maroon pixel exists in the top row of the bounding box, then turn the corresponding top corner(s) of the output to red (2).\n5. **Vertical Mirror**: If a maroon pixel exists in input grid column `c` in the bottom half of the input (rows 3-5) then set the cell at `(2,c)` to red.\n\"\"\"\n\nimport numpy as np\n\ndef get_maroon_bounding_box(grid):\n    maroon_positions = np.argwhere(grid == 9)\n    if maroon_positions.size == 0:\n        return None  # No maroon pixels\n    min_row = maroon_positions[:, 0].min()\n    max_row = maroon_positions[:, 0].max()\n    min_col = maroon_positions[:, 1].min()\n    max_col = maroon_positions[:, 1].max()\n    return (min_row, min_col), (max_row, max_col)\n\ndef transform(input_grid):\n    # initialize output_grid as 3x3 array of all zeros\n    output_grid = np.zeros((3, 3), dtype=int)\n    input_grid = np.array(input_grid)\n\n    # Get bounding box of maroon pixels\n    bounding_box = get_maroon_bounding_box(input_grid)\n    if bounding_box is None:\n        return output_grid\n\n    (min_row, min_col), (max_row, max_col) = bounding_box\n\n    # Check top row of bounding box for corners\n    for c in range(min_col, max_col + 1):\n       if input_grid[min_row,c] == 9:\n           if c == min_col:\n                output_grid[0, 0] = 2  # Top-left\n           if c == max_col:\n                output_grid[0, 2] = 2  # Top-right\n           if min_col < c < max_col:\n               output_grid[0,1] = 2 # Top-middle\n\n    # Vertical Mirror for bottom half\n    for r in range(3,6):\n        for c in range(3):\n            if input_grid[r,c] == 9:\n                output_grid[2,c] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3903,
+    "candidates_token_count": 663,
+    "total_token_count": 4566,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.919833,
+  "response_file": "023-response.json"
+}

@@ -1,0 +1,38 @@
+examples:
+  - example_id: 1
+    input_grid: [[0, 0, 5], [0, 5, 0], [5, 0, 0]]
+    expected_output: [[2, 2, 2], [4, 4, 4], [2, 2, 2]]
+    previous_code_output: [[2, 2, 2], [2, 4, 2], [2, 2, 2]]
+    observations:
+      - "Gray (5) on the middle row becomes yellow (4)."
+      - "Gray (5) on top/bottom rows becomes red (2)."
+      - "White (0) incorrectly becomes red (2) instead of matching the row-based logic of the example"
+    errors:
+      - color_mapping_incorrect_for_white: "White should become red (2) on the top and middle, but does correctly output Red (2) on the last row."
+
+  - example_id: 2
+    input_grid: [[0, 0, 5], [0, 0, 5], [0, 0, 5]]
+    expected_output: [[2, 2, 2], [2, 2, 2], [2, 2, 2]]
+    previous_code_output: [[2, 2, 2], [2, 2, 4], [2, 2, 2]]
+    observations:
+      - "All pixels are Red, there appears to be a bug with the second row."
+    errors:
+      - all_rows_same: "Output should have been all red (2), but the code incorrectly makes the last column of middle row to yellow (4)"
+
+  - example_id: 3
+    input_grid: [[5, 0, 0], [0, 5, 0], [5, 0, 0]]
+    expected_output: [[2, 2, 2], [4, 4, 4], [2, 2, 2]]
+    previous_code_output: [[2, 2, 2], [2, 4, 2], [2, 2, 2]]
+    observations:
+      - "Same output as example 1 - correct."
+    errors:
+      - first_and_last_row: "Output should match example 1, but the code is not behaving the same."
+
+  - example_id: 4
+    input_grid: [[0, 5, 0], [0, 0, 5], [0, 5, 0]]
+    expected_output: [[4, 4, 4], [2, 2, 2], [4, 4, 4]]
+    previous_code_output: [[2, 2, 2], [2, 2, 4], [2, 2, 2]]
+    observations:
+      - "Gray (5) pixels on the top and bottom rows should become yellow (4). The center should be red (2)."
+    errors:
+        - all_rows_same: "the rows should be the opposite of example 3, but this isn't happening."

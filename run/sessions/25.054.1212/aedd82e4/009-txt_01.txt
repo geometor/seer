@@ -1,0 +1,27 @@
+# Example Usage:
+
+# Example Grids (replace with actual data from ARC)
+example_inputs = [
+    np.array([[0, 2, 2], [0, 2, 2], [2, 0, 0]]),
+    np.array([[2, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 2], [0, 2, 0, 0]]),
+    np.array([[2, 2, 0, 0], [0, 2, 0, 0], [2, 2, 0, 2], [0, 0, 0, 0], [0, 2, 2, 2]]),
+    np.array([[2, 2, 0], [2, 0, 2], [0, 2, 0]]),
+]
+example_expected_outputs = [
+    np.array([[0, 2, 2], [0, 2, 2], [1, 0, 0]]),
+    np.array([[2, 2, 2, 0], [0, 2, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0]]),
+    np.array([[2, 2, 0, 0], [0, 2, 0, 0], [2, 2, 0, 1], [0, 0, 0, 0], [0, 2, 2, 2]]),
+    np.array([[2, 2, 0], [2, 0, 1], [0, 1, 0]]),
+]
+example_transformed_outputs = [
+    np.array([[0, 2, 2], [0, 2, 2], [2, 0, 1]]),
+    np.array([[2, 2, 2, 0], [0, 2, 1, 1], [0, 0, 1, 2], [0, 2, 0, 0]]),
+    np.array([[2, 2, 0, 0], [0, 2, 1, 0], [2, 2, 1, 2], [0, 1, 1, 0], [0, 2, 2, 2]]),
+    np.array([[2, 2, 0], [2, 1, 2], [0, 2, 0]]),
+]
+# Analyze each example
+for i, (inp, exp, trans) in enumerate(zip(example_inputs, example_expected_outputs, example_transformed_outputs)):
+    analysis = analyze_transformation(inp, exp, trans)
+    print(f"Example {i+1}:")
+    for key, value in analysis.items():
+        print(f"  {key}: {value}")

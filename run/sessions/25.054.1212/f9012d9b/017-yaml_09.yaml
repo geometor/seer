@@ -1,0 +1,50 @@
+facts:
+  - task_id: 016
+  - example_1:
+      input_objects:
+        - object_1:
+          type: grid
+          dimensions: 5x5
+          colors: [2, 1, 0]
+          top_left_subgrid:
+            size: 1x1 # largest where colors are uniform OR uniform other than 5.
+            colors: [2]
+      output_objects:
+        - object_1:
+          type: grid
+          dimensions: 2x2
+          colors: [2,1]
+          notes: "The top-left 2x2 subgrid of the input, contains the colors [2,1,5]. 5 is present, along with 2 and 1, so this matches our criteria."
+      transformation: copy_largest_valid_top_left_subgrid
+  - example_2:
+      input_objects:
+        - object_1:
+            type: grid
+            dimensions: 4x4
+            colors: [8, 6, 0]
+            top_left_subgrid:
+              size: 1x1
+              colors: [8]
+      output_objects:
+         - object_1:
+            type: grid
+            dimensions: 1x1
+            colors: [8]
+            notes: "The top-left 1x1 subgrid of the input, contains the colors [8]. This matches our criteria."
+      transformation: copy_largest_valid_top_left_subgrid
+  - example_3:
+      input_objects:
+        - object_1:
+          type: grid
+          dimensions: 7x7
+          colors: [2, 5, 0]
+          top_left_subgrid:
+            size: 2x2 #largest uniform block at top left, accounting for the presence of 5.
+            colors: [2,5]
+      output_objects:
+        - object_1:
+          type: grid
+          dimensions: 2x2
+          colors: [2,5]
+          notes: "The top-left 2x2 subgrid of the input contains [2,5]. 5 is present, along with 2, so this matches our criteria."
+      transformation: copy_largest_valid_top_left_subgrid

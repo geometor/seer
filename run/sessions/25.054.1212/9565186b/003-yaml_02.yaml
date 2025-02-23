@@ -1,0 +1,105 @@
+facts:
+  example_1:
+    input:
+      objects:
+        - type: pixel
+          color: red
+          positions: [[0,0], [0,1], [0,2], [1,0], [2,0]]
+        - type: pixel
+          color: blue
+          positions: [[1,1]]
+        - type: pixel
+          color: azure
+          positions: [[1,2], [2,1], [2,2]]
+      grid_size: [3, 3]
+    output:
+      objects:
+        - type: pixel
+          color: red
+          positions:  [[0,0], [0,1], [0,2], [1,0], [2,0]]
+        - type: pixel
+          color: gray
+          positions: [[1,1], [1,2], [2,1], [2,2]]
+      grid_size: [3, 3]
+    transformation:
+      description: "The minimal bounding box of the blue and azure pixels is changed to gray."
+
+  example_2:
+    input:
+      objects:
+        - type: pixel
+          color: blue
+          positions:  [[0,0], [0,1], [0,2], [1,1]]
+        - type: pixel
+          color: azure
+          positions:  [[1,0], [2,0]]
+        - type: pixel
+          color: green
+          positions:  [[1,2]]
+        - type: pixel
+          color: red
+          positions:  [[2,1], [2,2]]
+      grid_size: [3, 3]
+    output:
+       objects:
+        - type: pixel
+          color: gray
+          positions:  [[0,0], [0,1], [0,2], [1,0], [1,1], [2,0], [2,1]]
+        - type: pixel
+          color: green
+          positions:  [[1,2]]
+        - type: pixel
+          color: red
+          positions: [[2,2]]
+       grid_size: [3, 3]
+    transformation:
+      description: "The minimal bounding box containing the blue and azure is changed to gray"
+
+  example_3:
+    input:
+      objects:
+        - type: pixel
+          color: red
+          positions: [[0,0], [0,1], [0,2], [1,2], [2,0], [2,1], [2,2]]
+        - type: pixel
+          color: azure
+          positions: [[1,0], [1,1]]
+      grid_size: [3, 3]
+    output:
+      objects:
+        - type: pixel
+          color: red
+          positions: [[0,0], [0,1], [0,2], [1,2], [2,0], [2,1], [2,2]]
+        - type: pixel
+          color: gray
+          positions: [[1,0], [1,1]]
+      grid_size: [3, 3]
+    transformation:
+      description: "The minimum bounding box containing the azure is gray"
+  example_4:
+    input:
+      objects:
+        - type: pixel
+          color: green
+          positions: [[0,0], [0,1]]
+        - type: pixel
+          color: yellow
+          positions: [[1,0], [1,1], [1,2]]
+        - type: pixel
+          color: azure
+          positions: [[0,2], [2,0]]
+        - type: pixel
+          color: blue
+          positions: [[2,1], [2,2]]
+      grid_size: [3, 3]
+    output:
+      objects:
+        - type: pixel
+          color: gray
+          positions: [[0,0], [0,1],[0,2], [2,0], [2,1], [2,2]]
+        - type: pixel
+          color: yellow
+          positions: [[1,0], [1,1], [1,2]]
+      grid_size: [3, 3]
+    transformation:
+      description: "The minimal bounding box containing the blue and azure is gray"

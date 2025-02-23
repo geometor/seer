@@ -1,0 +1,27 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 5x5
+    elements: pixels
+    properties:
+      - color:
+        values: [0, 8]  # white, azure
+  - type: grid
+    name: output_grid
+    dimensions: 2x2
+    elements: pixels
+    properties:
+      - color:
+        values: [0, 8] # white, azure
+
+actions:
+  - type: transformation
+    input: input_grid
+    output: output_grid
+    description: Simplification of grid while preserving a general alternating pattern
+
+relationships:
+ - type: spatial
+   description: Input grid contains a roughly checkerboard pattern.
+ - type: correspondence
+   description: output grid seems to capture top-left 2 x 2 corner with alternating pattern

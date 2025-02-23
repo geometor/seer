@@ -1,0 +1,38 @@
+facts:
+  - task: color_row_transformation
+  - objects:
+      - name: grid
+        type: 2D array
+        properties:
+          - colors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] # All possible colors
+          - rows: integer  # Number of rows
+          - cols: integer  # Number of columns
+  - observations:
+      - example_1:
+        input_rows:
+            0: 0  # Number of complete rows with color 0
+            5: 0  # Number of complete rows with color 5
+        expected_rows:
+            2: 1
+            3: 1
+            4: 1
+      - example_2:
+        input_rows:
+            0: 0
+            5: 3
+        expected_rows:
+            3: 3
+      - example_3:
+        input_rows:
+            0: 0
+            5: 0
+        expected_rows:
+            2: 2
+            4: 1
+      - example_4:
+        input_rows:
+            0: 0
+            5: 0
+        expected_rows:
+           3: 1
+           4: 2

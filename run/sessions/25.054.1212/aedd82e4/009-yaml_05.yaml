@@ -1,0 +1,27 @@
+task: 00d62c1b
+objects:
+  - color: red
+    shape: irregular
+    role: source
+  - color: white
+    shape: irregular
+    role: target
+  - color: blue
+    shape: irregular
+    role: result
+
+actions:
+  - find_all:
+    input: red
+    description: Identify all pixels of color red.
+  - find_adjacent:
+    input: white
+    condition: diagonally adjacent (down and right) to red pixels
+    description: Identify all pixels that are adjacent to the source pixels in a specific direction
+  - change_color:
+      input: adjacent white pixels
+      new_color: blue
+      description: Change the color of selected white pixels to blue.
+  - preserve_color:
+      input: all other pixels.
+      description: all other pixels remain the same.

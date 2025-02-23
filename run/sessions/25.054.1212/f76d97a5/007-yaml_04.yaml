@@ -1,0 +1,30 @@
+task_elements:
+  - type: grid
+    description: 2D array of pixels
+    properties:
+      - width: 5
+      - height: 5
+      - colors: [gray, magenta, white]
+
+  - type: pixel
+    properties:
+      - color: integer (0-9)
+      - position: (row, column)
+
+transformation_rules:
+- replace all pixels color gray to white
+- replace some pixels color magenta to white
+
+objects:
+  - input_grid:
+      type: grid
+      colors: [5, 6]
+  - output_grid:
+      type: grid
+      colors: [6, 0]
+
+relationships:
+    - type: spatial
+      description: The relative positions of pixels influence the color changes.
+    - type: color_change
+      description: Gray (5) always changes to white (0). Magenta (6) changes to white (0) based on its neighbors

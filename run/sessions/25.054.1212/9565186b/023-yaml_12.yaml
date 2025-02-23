@@ -1,0 +1,76 @@
+examples:
+  - id: 1
+    objects:
+      - color: 2
+        shape: vertical_line
+        position: left_column
+        preserved: true
+      - color: 1
+        shape: single_pixel
+        position: middle_row_middle_column
+        preserved: false
+      - color: 8
+        shape: L_shape
+        position: right_column, bottom_right_corner
+        preserved: false
+    middle_row_colors: [2, 1, 8]
+    transformation: "Preserve colors in the middle row only if they are part of a vertically contiguous block extending upwards and/or downwards."
+
+  - id: 2
+    objects:
+      - color: 1
+        shape: vertical_line
+        position: middle_column
+        preserved: true
+      - color: 8
+        shape: vertical_line
+        position: left_column
+        preserved: false
+      - color: 3
+        shape: single_pixel
+        position: middle_row_right_column
+        preserved: false
+       - color: 2
+        shape: vertical_line
+        position: right_column
+        preserved: false       
+    middle_row_colors: [8, 1, 3]
+    transformation: "Preserve colors present in middle row, only if they are part of a contiguous line"
+
+  - id: 3
+    objects:
+      - color: 2
+        shape: vertical_line_with_gap, two_parts
+        position: right_column, and top_left_corner
+        preserved: true
+      - color: 8
+        shape: horizontal_line
+        position: middle_row_left_and_middle
+        preserved: false
+    middle_row_colors: [8, 8, 2]
+    transformation: "Preserve colors in middle row and contiguously extend."
+
+  - id: 4
+    objects:
+      - color: 3
+        shape: horizontal line
+        position: top_row_left_and_middle
+        preserved: false
+      - color: 8
+        shape: single_pixel
+        position: top_right_corner
+        preserved: false
+      - color: 4
+        shape: horizontal_line
+        position: middle_row
+        preserved: true
+      - color: 8
+        shape: single_pixel
+        position: bottom_left
+        preserved: false
+      - color: 1
+        shape: vertical line
+        position: bottom_right_corner
+        preserved: false
+    middle_row_colors: [4, 4, 4]
+    transformation: "Preserve colors extending vertically and in the middle row"

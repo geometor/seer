@@ -1,0 +1,21 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: 4x3 (height x width)
+      - values: integers (representing colors)
+      - columns: 3
+      - rows: 4
+  - object: output_grid
+    type: grid
+    properties:
+      - dimensions: 6x6
+      - values: integers (representing colors)
+      - columns: 3
+      - rows: 6
+  - observation: color_mapping
+    details: Input colors are mostly maintained in their relative column positions, with a change in the last column replacing color '1' with '0', except on the first and second row.
+  - observation: spatial_transformation
+    details: The output grid is larger than the input grid. The columns of the input appear reordered and repeated or changed in the output.
+  - observation: row_addition
+      details: Two new rows are added filled with color '1' in column 1 and '0' in the rest.

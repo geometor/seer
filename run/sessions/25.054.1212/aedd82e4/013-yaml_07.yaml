@@ -1,0 +1,46 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 5x4 (rows x columns)
+      elements: pixels
+      colors: [red, white, blue]
+      color_codes:
+        red: 2
+        white: 0
+        blue: 1
+
+  - type: pixel
+    properties:
+       color:
+         - red
+         - white
+         - blue
+       position: (row, column)
+
+actions:
+  - name: change_color
+    agent: unknown
+    target: pixel
+    precondition:
+      color: red
+      position_context: "part of a 2x2 red square"
+    postcondition:
+       color: blue
+       position_same: True
+    specifics:
+        - old_color: 2
+          new_color: 1
+          location: "lower right pixel of a 2x2 square of red pixels"
+
+relationships:
+   - type: spatial
+     description: pixels are arranged in a 2D grid.
+     elements:
+        - pixel
+   - type: adjacency
+     elements:
+       - pixel
+       - pixel
+     description: pixels can be adjacent horizontally, vertically, or diagonally.
+   - type: pattern
+     description: four red pixels create a 2x2 block

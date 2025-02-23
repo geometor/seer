@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Initialization:** Start with an input grid of size 5x5.\n2.  **Gray Replacement:** Iterate through every pixel in the input grid. If a pixel is gray (5), change it to white (0).\n3.  **Magenta Replacement (Conditional):** Iterate through the grid again.\n    *   Examine the color magenta (6)\n    *   For each pixel that has the color magenta (6) replace with white (0) if the pixel meets *any* of the following conditions:\n        *   The pixel is located in either the top-left, top-right, bottom-left, or bottom-right corner.\n        *   If the pixel directly to its left *and* the pixel directly above it have a magenta (6) color.\n        *    If the pixel directly to its right *and* the pixel directly above it have a magenta (6) color.\n        *   If the pixel directly to its left *and* the pixel directly below it have a magenta (6) color.\n        *    If the pixel directly to its right *and* the pixel directly below it have a magenta (6) color.\n\n4.  **Output:** The resulting grid is the output.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Gray Replacement\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 5:\n                output_grid[r, c] = 0\n\n    # Magenta Replacement\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 6:\n                # Corner Cases\n                if (r == 0 and c == 0) or \\\n                   (r == 0 and c == cols - 1) or \\\n                   (r == rows - 1 and c == 0) or \\\n                   (r == rows - 1 and c == cols - 1):\n                    output_grid[r, c] = 0\n                # L-shape Cases\n                else:\n                    if r > 0 and c > 0 and output_grid[r-1, c] == 6 and output_grid[r, c-1] == 6:\n                        output_grid[r, c] = 0\n                    elif r > 0 and c < cols - 1 and output_grid[r-1, c] == 6 and output_grid[r, c+1] == 6:\n                        output_grid[r,c] = 0\n                    elif r < rows - 1 and c > 0 and output_grid[r+1, c] == 6 and output_grid[r, c-1] == 6:\n                        output_grid[r,c] = 0\n                    elif r < rows - 1 and c < cols -1 and output_grid[r+1, c] == 6 and output_grid[r, c+1] == 6:\n                        output_grid[r,c] = 0\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2356,
+    "candidates_token_count": 724,
+    "total_token_count": 3080,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.701717,
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,25 @@
+task_id: "016"
+objects:
+  - description: Input grid
+    properties:
+      shape: 3x2 (all examples)
+      elements: Single-digit integers (0-9, representing colors)
+  - description: Output grid
+    properties:
+      shape: 9x4 (all examples)
+      elements: Single-digit integers (0-9)
+  - description: 2x2 subgrid
+    properties:
+      location: Top-right corner of the input grid
+      elements: Copied from the corresponding input grid cells
+  - description: rotated_subgrid
+    properties:
+     rotation: 90 degrees clockwise relative to the extracted subgrid
+
+actions:
+  - description: Extract subgrid
+    details: Select the 2x2 region at the top-right of the input grid.
+  - description: rotate subgrid
+    details: Rotate the subgrid by 90 degrees, clockwise
+  - description: construct output grid
+    details: Create output grid by tiling the *rotated* subgrid, replicating across rows and columns

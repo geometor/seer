@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtract the top-left 2x2 block of red color and the single bottom-right red pixel.\n\"\"\"\n\nimport numpy as np\n\ndef find_top_left_red_square(grid):\n    # Find the top-left red square\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 2:\n                if r + 1 < rows and c + 1 < cols:\n                  if grid[r+1,c] == 2 and grid[r, c+1] == 2 and grid[r+1,c+1] == 2:\n                      return (r,c)\n                else:\n                    return None\n    return None\n\ndef find_bottom_right_white(grid):\n  rows, cols = grid.shape\n  for r in range(rows):\n    for c in range(cols):\n      if grid[r,c] == 2:\n        if r+1 < rows and c+1 < cols:\n          if (grid[r,c] == 2 and grid[r+1, c] == 2 and\n              grid[r,c+1] == 2 and grid[r+1,c+1] == 0 ):\n            return (r+1, c+1)\n          elif (grid[r,c] == 2 and grid[r+1, c] == 0 and\n              grid[r,c+1] == 2 and grid[r+1,c+1] == 2 ):\n            return (r+1, c)\n          elif (grid[r,c] == 2 and grid[r+1, c] == 2 and\n              grid[r,c+1] == 0 and grid[r+1,c+1] == 2 ):\n            return (r, c+1)\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros((2, 2), dtype=int)\n\n    # find top left 2x2 red square\n    top_left_coords = find_top_left_red_square(input_grid)\n    if top_left_coords:\n      r, c = top_left_coords\n      output_grid[0,0] = 2\n      output_grid[0,1] = 2\n      output_grid[1,0] = 2\n\n    # find the single white cell\n    white_coords = find_bottom_right_white(input_grid)\n    if white_coords:\n      output_grid[1,1] = 0\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2187,
+    "candidates_token_count": 635,
+    "total_token_count": 2822,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.305202,
+  "response_file": "002-response.json"
+}

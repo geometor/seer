@@ -1,0 +1,23 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements:
+      - value: 5
+        color: gray
+        positions: [(0,0), (0,2), (2,0), (2,2), (1,1)]
+      - value: 0
+        color: white
+        positions: [(0,1), (1,0), (1,2), (2,1)]
+  - type: scalar
+    value: 2
+    color: red
+
+relationships:
+  - type: count
+    object1: grid
+    property: number of distinct objects of 'white'
+
+actions:
+  - type: count_distinct
+    input: grid
+    output: scalar

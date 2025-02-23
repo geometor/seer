@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Identify the middle row:** Find the row with index `height // 2`.\n2. **Identify color blocks:** Find contiguous regions of the same color within the entire grid.\n3. **Check Middle Row:** For each color in the middle row:\n    *   If that color exists in contiguous blocks of the same color extending upwards or downwards, preserve that block.\n4. **Replace other colors:** All cells not part of the preserved color block are changed to gray (5).\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef find_color_blocks(grid):\n    \"\"\"\n    Finds contiguous regions (blocks) of the same color in the grid.\n    \"\"\"\n    visited = set()\n    blocks = []\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def bfs(start_r, start_c):\n        color = grid[start_r, start_c]\n        queue = deque([(start_r, start_c)])\n        visited.add((start_r, start_c))\n        block = []\n\n        while queue:\n            r, c = queue.popleft()\n            block.append((r, c))\n\n            for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                nr, nc = r + dr, c + dc\n                if is_valid(nr, nc) and grid[nr, nc] == color and (nr, nc) not in visited:\n                    visited.add((nr, nc))\n                    queue.append((nr, nc))\n        return block, color\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if (r, c) not in visited:\n                block, color = bfs(r, c)\n                blocks.append((block, color))\n    return blocks\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule:\n    Colors in the middle row that extend contiguously upwards or downwards are preserved.\n    All other cells are changed to gray (5).\n    \"\"\"\n    # Initialize output_grid with gray\n    output_grid = np.full_like(input_grid, 5)\n    height = input_grid.shape[0]\n    middle_row_index = height // 2\n\n    # Find all color blocks\n    color_blocks = find_color_blocks(input_grid)\n\n    # Check middle row and preserve extending colors.\n    for block, color in color_blocks:\n        for r, c in block:\n            if r == middle_row_index:\n                # Preserve the entire block\n                for br, bc in block:\n                    output_grid[br, bc] = color\n                break  # Move to the next block\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2867,
+    "candidates_token_count": 669,
+    "total_token_count": 3536,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.496816,
+  "response_file": "022-response.json"
+}

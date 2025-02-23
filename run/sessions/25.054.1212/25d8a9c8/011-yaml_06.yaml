@@ -1,0 +1,33 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      rows: integer
+      columns: integer
+      cells: integer (0-9)
+
+  - name: output_grid
+    type: grid
+    properties:
+      rows: integer (same as input_grid)
+      columns: integer (same as input_grid)
+      cells: integer (0 or 5)
+
+  - name: middle_row
+    type: index
+    properties:
+      value: integer (rows // 2)
+
+actions:
+  - name: determine_output_dimensions
+    description: The output grid has the same dimensions as the input grid.
+  - name: check_row_parity
+    description: Determine if the number of rows in the input grid is odd.
+  - name: determine_first_row
+    description: inspect the value of the expected output's first row.
+  - name: color_output_grid
+    description: >
+      If the number of rows is odd, and if the expected first row is white,
+      then set the output grid cells at and below the middle row to gray (5), otherwise to white (0);
+      if the expected first row is grey, then set the output grid cells above and including the middle row to grey, otherwise white.
+      If the number of rows is even, all cells are white(0). This case is undefined in the examples, but the behavior is implemented.

@@ -1,0 +1,61 @@
+task: 6b8b0e7d
+description: |
+  The task involves rearranging the non-black (color 0) pixels in a specific pattern, while maintaining relative positions of other color blocks. The black color serves as a background.
+
+observations:
+  - example_1:
+      input:  "900999999" #original grid flattened
+      output: "099099999" #original grid flattened
+      objects:
+        - color_9:
+            original_positions: [0, 3, 4, 5, 6, 7, 8] #indices flattened
+            new_positions:      [1, 2, 4, 5, 6, 7, 8]
+        - color_0:
+          original_positions: [1, 2]
+          new_positions: [0, 3]
+      transformations:
+        - type: "shift"
+          color: 9
+          shift_amount: [0,0]
+        - type: "shift_and_wrap"
+          color: 0
+          shift_amount: [0,0]
+
+  - example_2:
+      input: "066600660"
+      output: "600606606"
+      objects:
+        - color_6:
+          original_positions: [1, 2, 3, 6, 7]
+          new_positions: [0, 3, 6, 7, 8]
+        - color_0:
+            original_positions: [0, 4, 5, 8]
+            new_positions: [1, 2, 4]
+      transformations:
+        - type: "shift"
+          color: [6]
+
+  - example_3:
+      input: "009009999"
+      output: "999009009"
+      objects:
+        - color_9:
+          original_positions: [2, 5, 6, 7, 8]
+          new_positions: [0, 1, 2, 5, 8]
+        - color_0:
+            original_positions: [0, 1, 3, 4]
+            new_positions: [3, 4, 6, 7]
+      transformations:
+        - type: "shift"
+          color: [9]
+
+  - example_4:
+    input: "202002022"
+    output: "222002200"
+    objects:
+        - color_2:
+          original_positions: [0, 2, 5, 7, 8]
+          new_positions: [0, 1, 2, 5, 8]
+        - color_0:
+            original_positions: [1, 3, 4, 6]
+            new_positions: [3, 4, 6, 7]

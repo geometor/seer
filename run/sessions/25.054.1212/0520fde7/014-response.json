@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the vertical gray stripe:** Find the complete vertical stripe in the input grid which contains only the color gray (value 5).\n2. **Identify horizontal runs of blue adjacent to gray:** Find locations to either the left, or the right of this stripe where there are 1 or more blue pixels. Consider only the rows which have the vertical gray stripe.\n3.  **Create the output grid:** Create an output grid with dimensions of 3x3, and fill it all with white (0) pixels.\n4.  **Transform Blue Runs to Red:** For each segment, or a group of blue pixels, transform one white pixel in the output to red (value 2), at the equivalent row index. In case of multiple blue pixel segments on different sides of gray, consider each segment separately, putting a red pixel on the left column if blue is to the left of the gray segment, and a red pixel on the right if blue is to the right of the gray column.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_stripe(grid, color):\n    # Find the complete vertical stripe of a specific color.\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i, j] == color for i in range(rows)):\n            return j\n    return -1\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros((3, 3), dtype=int)\n    rows, cols = input_grid.shape\n\n    # Find the vertical gray stripe (color 5).\n    gray_stripe_col = find_vertical_stripe(input_grid, 5)\n\n    if gray_stripe_col == -1:\n        return output_grid  # No gray stripe found.\n\n    # Identify horizontal runs of blue (color 1) adjacent to the gray stripe.\n    for i in range(rows):\n        if gray_stripe_col > 0 and input_grid[i, gray_stripe_col - 1] == 1:\n           output_grid[i,0] = 2\n        if gray_stripe_col < cols - 1 and input_grid[i, gray_stripe_col + 1] == 1:\n           output_grid[i,2] = 2\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2371,
+    "candidates_token_count": 523,
+    "total_token_count": 2894,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.945114,
+  "response_file": "014-response.json"
+}

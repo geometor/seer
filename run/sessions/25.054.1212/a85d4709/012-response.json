@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is transformed into an output grid of the same dimensions. The color of each row in the output grid is determined by the row index, cycling through the colors green (3), yellow (4), and red (2). Specifically:\n\n1. The first row of the output grid is always green (3).\n2. The second row of the output grid is always yellow (4).\n3. The third row of the output grid is always red (2).\n4. The process repeats if there are more than three rows, so row 4 would be green again, row 5 yellow, etc.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid based on row index to assign colors.\n\n    Args:\n        input_grid: A 2D numpy array representing the input grid.\n\n    Returns:\n        A 2D numpy array representing the output grid.\n    \"\"\"\n    # Initialize the output grid with the same dimensions as the input grid.\n    output_grid = np.zeros_like(input_grid)\n    height = output_grid.shape[0]\n\n    # Iterate over each row and set the color according to the row index.\n    for i in range(height):\n        if i % 3 == 0:\n            output_grid[i, :] = 3  # Green\n        elif i % 3 == 1:\n            output_grid[i, :] = 4  # Yellow\n        else:\n            output_grid[i, :] = 2  # Red\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3311,
+    "candidates_token_count": 354,
+    "total_token_count": 3665,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.902532,
+  "response_file": "012-response.json"
+}

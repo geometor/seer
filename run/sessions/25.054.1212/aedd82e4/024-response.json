@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify White and Red Pixels: Locate all pixels colored white (0) and red (2).\n2. Check for Adjacency: For each white pixel, determine if it is directly adjacent (horizontally or vertically, not diagonally) to a red pixel.\n3. Check Row Constraint: If a white pixel is adjacent to a red pixel, check if it is in the bottom 2 rows.\n4. Conditional Replacement: If a white pixel is adjacent to at least one red pixel AND is on the bottom or second-to-bottom row, replace it with a blue pixel (1).\n5. Leave Other Pixels Unchanged: All other pixels retain their original colors.\n\"\"\"\n\nimport numpy as np\n\ndef get_adjacent_pixels(grid, row, col):\n    \"\"\"\n    Gets the coordinates of horizontally and vertically adjacent pixels.\n    \"\"\"\n    rows, cols = grid.shape\n    adjacent_pixels = []\n    if row > 0:\n        adjacent_pixels.append((row - 1, col))  # Up\n    if row < rows - 1:\n        adjacent_pixels.append((row + 1, col))  # Down\n    if col > 0:\n        adjacent_pixels.append((row, col - 1))  # Left\n    if col < cols - 1:\n        adjacent_pixels.append((row, col + 1))  # Right\n    return adjacent_pixels\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each pixel in the grid\n    for i in range(rows):\n        for j in range(cols):\n            # Check if the pixel is white (0)\n            if output_grid[i, j] == 0:\n                # Check for adjacency to red (2) pixels\n                is_adjacent_to_red = False\n                for r, c in get_adjacent_pixels(output_grid, i, j):\n                    if output_grid[r, c] == 2:\n                        is_adjacent_to_red = True\n                        break\n\n                # Check row constraint (bottom two rows) and adjacency\n                if is_adjacent_to_red and i >= rows - 2:\n                    # Change the color to blue (1)\n                    output_grid[i, j] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4475,
+    "candidates_token_count": 555,
+    "total_token_count": 5030,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.046979,
+  "response_file": "024-response.json"
+}

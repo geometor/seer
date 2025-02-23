@@ -1,0 +1,19 @@
+observations:
+  - object: grid
+    properties:
+      - dimensions: variable (rows x columns)
+      - cells: contain integer values representing colors
+    actions:
+      - transformed: based on a rule involving the diagonal and possibly other input pixel values
+
+  - object: diagonal
+    properties:
+      - definition: cells where row index equals column index
+    actions:
+      - set_color: color is dependent on input
+
+  - object: other_cells
+    properties:
+      - definition: cells not on the diagonal
+    actions:
+      - preserve_color: color does not appear to be dependent on input

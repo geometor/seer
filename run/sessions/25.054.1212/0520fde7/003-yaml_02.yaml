@@ -1,0 +1,38 @@
+observations:
+  - task: 002
+    example_set: train
+    objects:
+      - name: input_grid
+        type: grid
+        properties:
+          - attribute: central_column
+            description: The middle column of the grid.
+            value: Varies per example.
+      - name: gray_pixels
+        type: pixels
+        properties:
+          - attribute: color
+            value: gray (5)
+          - attribute: location
+            description: Indices within the central column.
+            value: Varies, but always in central column.
+      - name: output_grid
+        type: grid
+        size: 3x3
+        properties:
+          - attribute: content
+            description: Represents the presence of gray pixels in the input's central column using red pixels. All other pixels are white
+            value: dynamic
+      - name: red_pixels
+        type: pixels
+        properties:
+          - attribute: color
+            value: red (2)
+          - attribute: location
+            description:  Row indices in the output grid corresponding to the row indices of gray pixels in the input grid's central column. Columns are not 1:1, but a mapping to a single, centered, column.
+            value: Varies per example
+    actions:
+      - description: Identify the central column of the input grid.
+      - description: Find the indices of gray (5) pixels within the central column.
+      - description: Create a 3x3 output grid filled with white pixels (0).
+      - description: For each gray pixel found in the input's central column, set the corresponding row index in the output grid's central column to red (2), all other output is white (0)

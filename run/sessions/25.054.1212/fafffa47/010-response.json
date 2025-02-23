@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms the top half of the input grid to a 3x3 output grid, mapping maroon (9) to red (2) and keeping white (0) as white (0), preserving relative positions within the top half.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize a 3x3 output grid filled with zeros.\n    output_grid = np.zeros((3, 3), dtype=int)\n    input_height = input_grid.shape[0]\n    input_width = input_grid.shape[1]\n\n    # Consider only the top half of the input grid.\n    for i in range(min(3, input_height // 2 )): # Iterate through top half, up to 3 rows.\n        for j in range(min(3,input_width)):  #Iterate through the columns\n            # Map colors and positions.\n            if input_grid[i][j] == 9:\n                output_grid[i][j] = 2\n            elif input_grid[i][j] == 0:\n                output_grid[i][j] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3153,
+    "candidates_token_count": 266,
+    "total_token_count": 3419,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.62982,
+  "response_file": "010-response.json"
+}

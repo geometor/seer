@@ -1,0 +1,27 @@
+facts:
+  - description: "The output grid is always 3x3."
+    type: "size"
+    value: [3, 3]
+
+  - description: "The input grid's top half (rows 0 to height/2 - 1) is represented in the output."
+    type: "region"
+    input_rows: "0:(height/2 - 1)"
+    output_rows: "0:2"
+
+  - description: "Maroon (9) in the input becomes red (2) in the output."
+    type: "color_mapping"
+    input_color: 9
+    output_color: 2
+
+  - description: "White (0) in the input remains white (0) in the output."
+    type: "color_mapping"
+    input_color: 0
+    output_color: 0
+
+  - description: "The output grid is a compressed representation of the input's upper half, not just a color replacement."
+    type: "transformation_type"
+    value: "positional compression and color mapping"
+
+  - description: "The bottom half of input is always 1 or 0"
+    type: "pattern"
+    value: "true"

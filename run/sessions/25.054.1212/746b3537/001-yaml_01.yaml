@@ -1,0 +1,28 @@
+objects:
+  - name: input_grid
+    type: 2D_grid
+    dimensions: 3x3
+    elements: pixels
+    properties:
+      - color: [blue, red]
+      - value: [1, 2]
+
+  - name: output_grid
+    type: 1D_grid
+    dimensions: 3x1
+    elements: pixels
+    properties:
+      - color: [blue, red]
+      - value: [1, 2]
+
+actions:
+  - name: reduce_dimension
+    input: input_grid
+    output: output_grid
+    description: "Transforms a 2D grid into a 1D grid by extracting the first column."
+
+relationships:
+  - type: transformation
+    from: input_grid
+    to: output_grid
+    via: reduce_dimension

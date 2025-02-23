@@ -1,0 +1,21 @@
+facts:
+  - task: "Map values in the row containing grey (5) to a 3x3 output grid."
+  - input_objects:
+    - description: "Input grid with varying dimensions, containing digits 0-9."
+      properties:
+        - colors: "Represents colors based on digit values (0-9)."
+        - key_color: "Grey (5) acts as a marker."
+  - output_objects:
+    - description: "A 3x3 output grid."
+      properties:
+        - size: "Always 3x3."
+        - colors: "Contains only white (0) and red (2)."
+  - transformations:
+    - description: "Row-wise mapping based on the input."
+      rules:
+        - "If a row contains the number 5, transform and include in the output"
+        - "If a row in input has 5, set to 2 in output at the same x coordinate"
+        - "All other input pixels on that row transform to 0"
+  - constraints:
+      - "output is always 3x3"
+      - "only map rows with a 5"

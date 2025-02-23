@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    description: input grid
+    properties:
+      - dimensions: 2x2
+      - elements: single-digit integers (1, 2, 3, 8) representing colors
+      - role: source data
+  - type: grid
+    description: output grid
+    properties:
+      - dimensions: 4x4
+      - elements: single-digit integers, including '0'
+      - role: transformed data
+  - type: pixel
+    description: individual cell in the grid
+    properties:
+      - value: integer representing a color
+      - location: row and column index
+actions:
+  - name: replication
+    description: Each pixel in the input grid is duplicated to form a 2x2 block in the output grid.
+  - name: padding
+    description:  '0' (white) pixels are added as padding.
+relationships:
+  - type: spatial
+    description: The output grid is a spatially expanded version of the input grid, with added padding.
+  - type: element-wise
+    description: Each input pixel corresponds to a 2x2 block of the same color in the output grid.

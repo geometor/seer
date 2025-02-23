@@ -1,0 +1,26 @@
+observations:
+  - object: red_pixel
+    color: red (2)
+    initial_location: varies
+    action: move_and_recolor
+    new_color: green (3)
+    new_location: one_up_one_left_from_initial
+  - object: green_pixel
+    color: green (3)
+    location: conditional_on_red_pixel
+    condition: in_bounds_after_move
+    action: trigger_additional_pixels
+  - object: gray_pixel
+    color: gray (6)
+    location: one_up_from_green
+    condition: green_pixel_placed
+  - object: azure_pixel
+    color: azure (8)
+    location: one_down_from_green_OR_one_left_from_red
+    condition: always_placed
+  - object: orange_pixel
+    color: orange (7)
+    location: one_down_one_right_from_green_OR_one_right_from_red
+    condition: always_placed
+  - grid:
+      background: black (0)

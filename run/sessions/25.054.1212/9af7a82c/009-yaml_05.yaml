@@ -1,0 +1,48 @@
+examples:
+  - example_1:
+      input_shape: [3, 3]
+      output_shape: [5, 3]
+      column_reversal: true
+      row_expansion_factor: input_height * 2 - 1      
+      zero_filling: "fills remaining cells after expansion"
+      objects:
+          - object1: "columns of input grid"
+            action: "reversed and placed in output"
+          - object2: "cells with value 0"
+            action: "fill remaining cells in the output grid"
+      
+  - example_2:
+      input_shape: [3, 4]
+      output_shape: [6, 4]
+      column_reversal: true
+      row_expansion_factor:  input_height * 2 - 1
+      zero_filling: "fills remaining cells after expansion"
+      objects:
+          - object1: "columns of input grid"
+            action: "reversed and placed in output"
+          - object2: "cells with value 0"
+            action: "fill remaining cells in the output grid"
+
+  - example_3:
+      input_shape: [4, 3]
+      output_shape: [5, 4]
+      column_reversal: true
+      row_expansion_factor: input_height * 2 - 3 #note difference!
+      zero_filling: "fills remaining cells after expansion"
+      objects:
+        - object1: "columns of input grid"
+          action: "reversed and placed in output, skipping every other row"
+        - object2: "cells with value 0"
+          action: "fill remaining cells in the output grid"
+
+  - example_4:
+      input_shape: [4, 3]
+      output_shape: [6, 3]
+      column_reversal: true
+      row_expansion_factor: input_height * 2 - 2 #note difference
+      zero_filling: "fills remaining cells after expansion"
+      objects:
+        - object1: "columns of input grid"
+          action: "reversed and placed in output grid"
+        - object2: "cells with value 0"
+          action: "fill remaining cells in the output grid"

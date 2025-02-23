@@ -1,0 +1,20 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [rows, columns]
+      cells: [color_values]
+  - type: color
+    properties:
+      value: [integer, 0-9]
+      name: [white, blue, red, green, yellow, gray, magenta, orange, azure, maroon]
+
+actions:
+  - type: reorder_columns
+    description: Rearrange the order of columns based on an unknown rule.
+  - type: replace_column
+    description:  Replace entire columns with a specific color, potentially zero (white).
+
+relationships:
+  - input_grid: Contains original arrangement of colored pixels.
+  - output_grid: Contains transformed arrangement of colored pixels.
+  - color_mapping: Defines the integer-to-color relationship.

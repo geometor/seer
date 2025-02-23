@@ -1,0 +1,13 @@
+facts:
+  - task: 008_task
+  - input_grid_size: variable
+  - output_grid_size: 2x2
+  - quadrant_division:
+      description: Input grid is divided into four quadrants (top-left, top-right, bottom-left, bottom-right).
+      method: Integer division of rows and columns by 2.
+  - color_check:
+      description: Each quadrant is checked for the presence of any non-zero color.
+      logic: if any pixel value in quadrant != 0
+  - output_value:
+      description: The output cell corresponding to a quadrant takes the value of the non-zero pixel.  If there are no non-zero colors, it takes a zero value.
+      logic: output_pixel = input_quadrant.first_non_zero_pixel #Conceptual

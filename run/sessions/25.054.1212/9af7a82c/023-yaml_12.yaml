@@ -1,0 +1,26 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    properties:
+      rows: variable
+      columns: variable
+      values: integers (0-9 representing colors)
+
+  - object: output_grid
+    type: 2D array
+    properties:
+      rows: derived from input_grid.rows
+      columns: same as input_grid.columns
+      values: integers (0-9 representing colors)
+
+  - action: reverse_columns
+    description: Reorders the columns of the input grid.
+    details: The last column of the input becomes the first of the output, the second-to-last becomes the second, and so on.
+
+  - action: stack_rows
+    description: The output grid begins by duplicating the first n-1 rows, with 0 replacing the final element.
+    details: n = rows of input_grid.
+
+  - action: zero_fill_rows
+    description: Fill remainig rows, starting with value of first column, all others are 0.
+    details:  The number of rows added is (input_rows -1 ).

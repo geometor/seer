@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Gray Stripe:** Find the vertical gray stripe (all pixels in a column have a value of 5).\n2.  **Check for Adjacent Blues:** For each *row* in the *output* grid (going from 0 to 2), determine if there's *at least one* row in the input grid where a blue pixel (value 1) is directly to the left *or* right of the gray stripe.\n3.  **Place Red Pixel:** If, for a given output row, the condition in step 2 is true, place a red pixel (value 2) in the corresponding row of the output grid. The red pixel will be placed in the middle column (column index 1).\n4. All other output pixels are 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_gray_stripe(grid):\n    \"\"\"Finds the column index of the vertical gray stripe.\"\"\"\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i, j] == 5 for i in range(rows)):\n            return j\n    return -1  # Should not happen in valid cases, based on problem definition\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rule.\"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros((3, 3), dtype=int)\n    gray_stripe_col = find_gray_stripe(input_grid)\n\n    # Check for adjacent blues for each output row\n    for output_row in range(3):\n        has_adjacent_blue = False\n        for input_row in range(input_grid.shape[0]):\n            if (0 <= gray_stripe_col - 1 < input_grid.shape[1] and\n                input_grid[input_row, gray_stripe_col - 1] == 1) or \\\n               (0 <= gray_stripe_col + 1 < input_grid.shape[1] and\n                input_grid[input_row, gray_stripe_col + 1] == 1):\n                has_adjacent_blue = True\n                break  # Found a blue pixel, no need to check other input rows\n\n        # Place red pixel if adjacent blue was found\n        if has_adjacent_blue:\n            output_grid[output_row, 1] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3365,
+    "candidates_token_count": 548,
+    "total_token_count": 3913,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.575897,
+  "response_file": "017-response.json"
+}

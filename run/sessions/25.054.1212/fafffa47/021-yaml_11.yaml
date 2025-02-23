@@ -1,0 +1,27 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      height: 6
+      width: 3
+      elements: integers (0-9)
+      maroon_positions: variable # Positions of maroon (9) pixels
+
+  - name: output_grid
+    type: grid
+    properties:
+      height: 3
+      width: 3
+      elements: integers (0-9)
+      red_positions: variable # Positions of red (2) pixels
+
+actions:
+  - name: map_maroon_to_red
+    input: input_grid
+    output: output_grid
+    description:  Maps maroon pixels in specific input rows to red pixels in the output grid based on a diagonal relationship.
+
+  - name: halve_height
+    input: input_grid
+    output: output_grid
+    description: The output grid's height is half of the input grid's height.

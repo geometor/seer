@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCounts the number of times the most frequent non-white color appears in the\ninput grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Calculates the count of the most frequent non-white color and\n    returns it as a 1x1 grid.\n    \"\"\"\n    input_array = np.array(input_grid)\n\n    # Find all non-white colors.\n    non_white_colors = input_array[input_array != 0]\n\n    # If there are no non-white colors, return 0.\n    if non_white_colors.size == 0:\n        return np.array([[0]])\n\n    # Count the occurrences of each non-white color.\n    unique, counts = np.unique(non_white_colors, return_counts=True)\n    \n    # Find maximum count\n    max_count = np.max(counts)\n\n    # Create a 1x1 output grid with the maximum count.\n    output_grid = np.array([[max_count]])\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5109,
+    "candidates_token_count": 247,
+    "total_token_count": 5356,
+    "cached_content_token_count": 0
+  },
+  "response_time": 2.800561,
+  "response_file": "006-response.json"
+}

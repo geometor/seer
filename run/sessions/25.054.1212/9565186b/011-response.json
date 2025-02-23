@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify a Region of Interest (ROI):** In each input grid, find the largest contiguous region of non-white and non-background (2) color(s) forming either a 2x2 square, or largest area, or a column.\n2. **Identify the Target Color:** The target color within the output grid is consistently '5' (gray).\n3.  **Transformation Rule:** Within the ROI, change all pixels to color '5'. Other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef find_roi(grid):\n    \"\"\"Finds the region of interest (ROI) in the grid.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    max_region = []\n    max_region_size = 0\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_region):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] == 0 or grid[r,c] == 2:\n            return\n        visited[r, c] = True\n        current_region.append((r, c))\n\n        dfs(r + 1, c, current_region)\n        dfs(r - 1, c, current_region)\n        dfs(r, c + 1, current_region)\n        dfs(r, c - 1, current_region)\n\n    for r in range(rows):\n        for c in range(cols):\n            if not visited[r, c] and grid[r, c] != 0 and grid[r, c] != 2:\n                current_region = []\n                dfs(r, c, current_region)\n                if len(current_region) > max_region_size:\n                    max_region_size = len(current_region)\n                    max_region = current_region\n    return max_region\n    \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the identified rule.\"\"\"\n    \n    # Convert to numpy array for easier manipulation\n    grid = np.array(input_grid)\n    output_grid = np.copy(grid)  # Initialize output as a copy\n\n    # Find the Region of Interest\n    roi = find_roi(grid)\n\n    # Apply transformation: change ROI pixels to 5\n    for r, c in roi:\n        output_grid[r, c] = 5\n\n    return output_grid.tolist()  # Convert back to list\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3691,
+    "candidates_token_count": 600,
+    "total_token_count": 4291,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.396103,
+  "response_file": "011-response.json"
+}

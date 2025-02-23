@@ -1,0 +1,15 @@
+facts:
+  - observation: |
+      The transformation involves changing gray (5) pixels to either white (0) or the color of another pixel in the input.
+  - observation: |
+      Gray (5) pixels in the corners of the input grid always become white (0).
+  - observation: |
+      Gray (5) pixels that are not in the corner take on another color from the input grid.
+  - observation: |
+      After replacing gray (5) pixels, pixels of another color directly adjacent to the new white (0) become white (0).
+  - object: grid
+    properties:
+      - dimensions: variable (MxN)
+      - cell_values: integers representing colors
+    actions:
+      - replace_color: Changes specific colors based on location and adjacency.

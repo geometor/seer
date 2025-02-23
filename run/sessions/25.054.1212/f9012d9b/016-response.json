@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Determine Output Size: Identify the size of the largest square subgrid, at the top left corner of the input grid, that is made up of all the same color/number, excluding 5 (gray). This defines the dimension of the output grid.\n2. Copy the Subgrid: Copy this subgrid to the output.\n\"\"\"\n\nimport numpy as np\n\ndef get_largest_uniform_top_left_subgrid_size(grid):\n    \"\"\"\n    Finds the size of the largest square subgrid at the top-left corner\n    of the input grid that contains only one color (excluding gray, 5).\n    \"\"\"\n    height, width = grid.shape\n    max_size = min(height, width)\n\n    for size in range(max_size, 0, -1):\n        subgrid = grid[0:size, 0:size]\n        unique_colors = np.unique(subgrid)\n        if len(unique_colors) == 1 and unique_colors[0] != 5:\n            return size\n        elif len(unique_colors) == 2 and 5 in unique_colors:\n            if unique_colors[0] == 5:\n               if unique_colors[1] != 5:\n                   return size\n            elif unique_colors[1] == 5:\n               if unique_colors[0] != 5:\n                   return size\n\n    return 0  # Should not happen in well-formed ARC tasks, but included for safety\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n\n    # Determine output size.\n    output_size = get_largest_uniform_top_left_subgrid_size(input_grid)\n\n    # Initialize the output grid.\n    output_grid = np.zeros((output_size, output_size), dtype=int)\n    \n    if output_size > 0:\n        # Copy the subgrid.\n        output_grid[:] = input_grid[0:output_size, 0:output_size]\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2894,
+    "candidates_token_count": 472,
+    "total_token_count": 3366,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.678693,
+  "response_file": "016-response.json"
+}

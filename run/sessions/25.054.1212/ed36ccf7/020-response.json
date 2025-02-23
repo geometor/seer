@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is a 90-degree clockwise rotation of the grid, followed by swapping the color of the cells in the rotated grid, such that any cell that *was* red in the original grid and *is* red after rotation will remain red after the swap.\n\n1.  **Identify Red Pixels:** Locate all pixels in the input grid with the value '2' (red).\n2.  **Rotate:** Rotate the whole grid by 90-degree clockwise\n3.  **Swap Colors:** Swap colors on all rotated cells, except where the rotated grid and original grid both had red.\n\"\"\"\n\nimport numpy as np\n\ndef rotate_grid_90_clockwise(grid):\n    return np.rot90(grid, k=-1)\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n\n    # Identify red pixels\n    red_pixels = (input_grid == 2)\n\n    # Rotate\n    rotated_grid = rotate_grid_90_clockwise(input_grid)\n    \n    rotated_red_pixels = (rotated_grid == 2)\n\n    # perform the color swap based on overlap of original red pixels, and rotated red pixels.\n    output_grid = np.where(red_pixels & rotated_red_pixels, 2, rotated_grid)\n    output_grid = np.where(output_grid == 2, 0, output_grid) # swap remaining 2s with 0\n    output_grid = np.where(output_grid != 0, 2, output_grid) # make every other cell 2\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2020,
+    "candidates_token_count": 393,
+    "total_token_count": 2413,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.072917,
+  "response_file": "020-response.json"
+}

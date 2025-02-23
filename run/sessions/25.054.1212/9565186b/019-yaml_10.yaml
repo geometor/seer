@@ -1,0 +1,30 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements: pixels
+    properties:
+      - color: represented by integers (0-9)
+
+observations:
+  - input_grid:
+      row_1: [3, 3, 8]
+      row_2: [4, 4, 4]
+      row_3: [8, 1, 1]
+  - output_grid:
+      row_1: [5, 5, 5]
+      row_2: [4, 4, 4]
+      row_3: [5, 5, 5]
+
+transformations:
+  - description: "The middle row is preserved."
+    before: [4, 4, 4]
+    after:  [4, 4, 4]
+  - description: "All other cells changed color."
+    before: [[3, 3, 8], [8, 1, 1]]
+    after: [[5, 5, 5], [5, 5, 5]]
+
+relationships:
+ - type: spatial
+   description: "Pixels are arranged in a 2D grid."
+ - type: transformation
+   description: "Input grid pixels map to output grid pixels based on their original color and position."

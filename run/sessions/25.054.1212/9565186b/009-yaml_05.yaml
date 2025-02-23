@@ -1,0 +1,38 @@
+objects:
+  - name: grid
+    type: 2D array
+    size: 3x3
+    elements: pixels
+    properties:
+      - name: color
+        type: integer
+        values: [0-9]  # Represents colors
+
+  - name: pixel
+    properties:
+      - name: row
+        type: integer
+      - name: column
+        type: integer
+      - name: color
+        type: integer
+        values: [0-9]
+      - name: adjacent_pixels
+        type: list
+        elements:
+          type: tuple (row, column)
+
+actions:
+  - name: change_color
+    preconditions:
+      - adjacent_to_azure: True #check pixels adjacent to azure ones
+      - not_top_row: True  # should not be top row
+      - not_azure: True
+    postconditions:
+      - color_becomes: 5
+
+  - name: preserve_top_row
+    preconditions:
+        - top_row: True
+    postconditions:
+        - color_unchanged: True

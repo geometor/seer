@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    cells:
+      - properties:
+          value: integer (0-9)
+          color: mapped from value
+          location: row, column coordinates
+
+observations:
+  - input_bottom_row:
+      values: [1, 1, 1]
+      color: blue
+  - output_bottom_row:
+    values: [5,5,5]
+    color: grey
+  - input_other_rows:
+    values_row_1: [2,2,4]
+    values_row_2: [2,2,4]
+    colors: [red, red, yellow]
+
+actions:
+    - bottom_row_change_to_grey: all values in the bottom row are replaced by 5 (gray) if they are all the same color and value
+    - other_rows_change_to_white: all values in other row are replaced by 0 (white)
+
+relationships:
+  - bottom_row_input_output: The change in the bottom row's color appears to relate to bottom row of the input and is a different color from input.
+  - other_row_input_output: the change from red/yellow to all white appears to be a consistent operation.

@@ -1,0 +1,18 @@
+facts:
+  - description: "The input grid is divided into four quadrants."
+    type: "grid_division"
+  - description: "The output grid is always 2x2."
+    type: "output_size"
+  - description: "Each quadrant of the input corresponds to a specific pixel in the output."
+    type: "quadrant_mapping"
+    mapping:
+      - "Input Quadrant 0 (Top-Left) -> Output Pixel (0, 0)"
+      - "Input Quadrant 1 (Top-Right) -> Output Pixel (0, 1)"
+      - "Input Quadrant 2 (Bottom-Left) -> Output Pixel (1, 0)"
+      - "Input Quadrant 3 (Bottom-Right) -> Output Pixel (1, 1)"
+  - description: "The color of each output pixel is determined by the most frequent color within its corresponding input quadrant."
+    type: "color_determination"
+  - description: "There are ties in frequency in example 1 Quadrant 0, Example 1 Quadrant 3, and Example 3 Quadrant 3."
+    type: "tie_exists"
+  - description: "When a tie exists, the correct behavior is not determined - the overall dominant color does not break the tie."
+    type: "tie_behavior"
