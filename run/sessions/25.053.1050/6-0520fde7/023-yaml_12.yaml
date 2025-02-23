@@ -1,0 +1,14 @@
+observations:
+  - object: grid
+    properties:
+      - dimensions: variable in input, 3x3 in output
+      - cell_values: integers representing colors (0-9)
+      - fourth_column: contains only the value 5 (gray) in all the examples
+    actions:
+      - remove_column: The fourth column is consistently removed.
+      - condense: Input grid collapses to a 3x3 output grid.
+      - color_conversion_selective_blue:
+          description: Blue pixels change to red under specific conditions.
+          conditions:
+            - column_based: The first and third columns often trigger blue-to-red conversion, BUT NOT ALWAYS.
+            - neighbors: Neighboring colors and row positions *may* influence the conversion, but no consistent pattern is apparent with current examples.

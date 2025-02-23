@@ -1,0 +1,31 @@
+        pixels_off: 0
+        size_correct: True
+        color_palette_correct: True
+        correct_pixel_counts: True
+        ```
+
+*   **Example 2:**
+    *   Input: Two main objects: one red, one becomes green.
+    *   Output: The green object and some of the nearby white. The original red is removed.
+    *   Result: `match: False` (Failure). The code incorrectly focused on the red object.
+    *   metrics:
+        ```
+        pixels_off: None
+        size_correct: False
+        color_palette_correct: False
+        correct_pixel_counts: False
+        ```
+
+*   **Example 3:**
+    *   Input: Multiple objects of various colors, including a yellow region in lower-left.
+    *   Output: Cropped region with yellow and a small amount of white and black pixels.
+    *   Result: `match: ERROR` (Failure). No red object exists, causing an error in the `min()` function within `crop_grid`, operating on an empty `coords` list.
+    *   metrics:
+        ```
+        pixels_off: None
+        size_correct: None
+        color_palette_correct: None
+        correct_pixel_counts: None
+        ```
+
+**YAML Fact Block:**

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Objects:** Find all contiguous regions (objects) of azure (color 8) pixels in the input grid.\n2.  **Find Rightmost Pixels:** For each azure object, determine the pixel(s) with the largest column index (the rightmost pixel of that object).\n3.  **Insert Blue Pixels:** For each rightmost azure pixel, insert a blue (color 1) pixel immediately to its right in the output grid.  Do not insert if this would place a pixel outside of the grid boundaries.\n4.  **Copy Other Pixels** Copy all pixels from input to output, except where blue pixels are inserted.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid, color):\n    \"\"\"\n    Find contiguous regions of the specified color.\n    Returns a list of coordinates.\n    \"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n\n        # Explore adjacent cells\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef find_rightmost_pixels(object_coords):\n    \"\"\"\n    Finds the rightmost pixel(s) of an object.  Handles cases where multiple pixels\n    share the maximum column index.\n    \"\"\"\n    if not object_coords:\n        return []\n    max_col = max(c for r, c in object_coords)\n    return [(r, c) for r, c in object_coords if c == max_col]\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Identify Azure Objects\n    azure_objects = get_objects(input_grid, 8)\n\n    # 2. Find Rightmost Pixels\n    for obj in azure_objects:\n        rightmost_pixels = find_rightmost_pixels(obj)\n\n        # 3. Insert Blue Pixels\n        for r, c in rightmost_pixels:\n            if c + 1 < cols:  # Check boundary\n                output_grid[r, c + 1] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3277,
+    "candidates_token_count": 712,
+    "total_token_count": 3989,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.394538,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Copy Azure Pixel:**  Copy the azure pixel from the input to the same position in the output grid.\n2.  **Locate Red Pixels:** Find all red pixels (value 2) in the input grid.\n3.  **Create Yellow Pixels (for each red pixel):**\n    *   Two yellow pixels are created, one row *above* the red pixel and one column to either side.\n    *   Two yellow pixels are created, one row *below* the red pixel and one column to either side.\n4.  **Locate Blue Pixels:** Find all blue pixels (value 1) in the input grid.\n5.  **Create Orange Pixels (for each blue pixel):**\n    *   One orange pixel is placed one row above the blue pixel at the blue pixel's column.\n    *   One orange pixel is placed one row below the blue pixel at the blue pixel's column.\n    *   Two orange pixels are created in the same row as the blue pixel, one column to the left and right.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixels_by_color(grid, color):\n    # Find the coordinates of all pixels of the specified color.\n    indices = np.where(grid == color)\n    return list(zip(indices[0], indices[1]))\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the red and blue pixels.\n    red_pixels = find_pixels_by_color(input_grid, 2)\n    blue_pixels = find_pixels_by_color(input_grid, 1)\n\n    # Create yellow pixels around each red pixel.\n    for red_pos in red_pixels:\n        row, col = red_pos\n        if row > 0: #check if the row above is valid\n          if col > 0:\n            output_grid[row - 1, col - 1] = 4  # One row above, one column left\n          if col < output_grid.shape[1] - 1:\n            output_grid[row - 1, col + 1] = 4  # One row above, one column right\n        if row < output_grid.shape[0] -1: #check for row below\n          if col > 0:\n            output_grid[row + 1, col - 1] = 4  # One row below, one column left\n          if col < output_grid.shape[1] - 1:\n            output_grid[row + 1, col + 1] = 4  # One row below, one column right\n\n    # Create orange pixels around each blue pixel.\n    for blue_pos in blue_pixels:\n        row, col = blue_pos\n        if row > 0:  #check if the row above is valid\n          output_grid[row - 1, col] = 7  # One row above, same column\n        if row < output_grid.shape[0] - 1:\n          output_grid[row + 1, col] = 7 #one row below, same column\n        if col > 0:\n          output_grid[row, col - 1] = 7  # Same row, one column left\n        if col < output_grid.shape[1] - 1:\n          output_grid[row, col + 1] = 7  # Same row, one column right\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12011,
+    "candidates_token_count": 807,
+    "total_token_count": 12818,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.872503,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Pixels:** Examine the input grid and locate all pixels with the value '3' (green).\n2.  **Check for Adjacency:** For each identified '3' pixel, check if it has any adjacent pixels (horizontally or vertically, but not diagonally) that also have the value '3'.\n3.  **Modify Central Pixels :** If a '3' pixel *has one neighbor*, keep original '3' value.\n4.  **Modify Connected Pixels:** If a '3' pixel has more than one horizontal/vertical adjacent pixels with value '3', change its value to '4' (yellow).\n5.  **Output:** Create the output grid with the modified pixel values, leaving all other pixels unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_adjacent_pixels(grid, row, col):\n    \"\"\"\n    Gets the values of adjacent pixels (up, down, left, right).\n    \"\"\"\n    rows, cols = grid.shape\n    adjacent = []\n    if row > 0:\n        adjacent.append(grid[row-1, col])  # Up\n    if row < rows - 1:\n        adjacent.append(grid[row+1, col])  # Down\n    if col > 0:\n        adjacent.append(grid[row, col-1])  # Left\n    if col < cols - 1:\n        adjacent.append(grid[row, col+1])  # Right\n    return adjacent\n\ndef transform(input_grid):\n    # initialize output_grid with a copy of the input grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # iterate through each pixel in the input grid\n    for row in range(rows):\n        for col in range(cols):\n            # identify target pixels (value '3')\n            if input_grid[row, col] == 3:\n                # check for adjacency\n                adjacent_pixels = get_adjacent_pixels(input_grid, row, col)\n                count_of_3_neighbors = adjacent_pixels.count(3)\n\n                # modify connected pixels based on the number of adjacent '3' pixels\n                if count_of_3_neighbors > 1:\n                    output_grid[row, col] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2198,
+    "candidates_token_count": 530,
+    "total_token_count": 2728,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.14542,
+  "response_file": "002-response.json"
+}

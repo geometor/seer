@@ -1,0 +1,16 @@
+objects:
+  - name: 2x2_subgrid
+    description: A 2x2 section of the input grid.
+    properties:
+      - diagonal_pair: [pixel_value, pixel_value] # Describes the values on the diagonals.
+
+actions:
+  - name: check_diagonal
+    description: Checks if a diagonal pair of pixels within a 2x2 subgrid are both azure (8).
+    input: 2x2_subgrid
+    output: boolean  # True if the diagonal condition is met, False otherwise.
+
+  - name: transform_pixel
+    description: Changes the value of a specific pixel in the output grid to blue (1).
+    input: [grid, row_index, col_index]
+    output: modified_grid

@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    dimensions:
+      input: 9x9
+      output: 1x5
+    elements: pixels
+    element_types:
+      - color: white
+        value: 0
+      - color: blue
+        value: 1
+      - color: red
+        value: 2
+  - type: count_summary # added the type to specify the objects in the output
+    elements: digits
+
+actions:
+    - type: count
+      target: objects of specific color
+      condition: by row or by whole board
+
+relationships:
+    - input_grid: contains multiple colored objects
+    - output_grid: represents a summarized form of count for the input

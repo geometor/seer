@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Double Rows:** Duplicate each row of the input grid. This transforms a 3x4 grid into a 6x4 grid.\n2.  **Double, and shift Columns:** For the 6x4 grid, duplicate each column. However, in the duplicated column, shift any non-zero values to the position of value to it's right in the input. If there is no value to its right, the values are not placed.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows * 2, cols * 2), dtype=int)\n\n    # Double Rows\n    for i in range(rows):\n        output_grid[i*2, 0:cols] = input_grid[i, :]\n        output_grid[i*2+1, 0:cols] = input_grid[i, :]\n    \n    # Double, and shift Columns:\n    for j in range(cols):\n      for i in range(rows * 2):\n        output_grid[i,j*2] = output_grid[i,j]\n        if j+1 < cols and input_grid[i//2,j] != 0:\n            output_grid[i,j*2+1] = input_grid[i//2,j]\n        else:\n            output_grid[i, j*2 + 1] = 0\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2182,
+    "candidates_token_count": 368,
+    "total_token_count": 2550,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.399492,
+  "response_file": "002-response.json"
+}

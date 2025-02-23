@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIterates through each pixel in the input grid.\nIdentifies green (3) pixels.\nFor each green pixel, checks if it's the center of a \"+\" shaped structure formed by green pixels, with horizontal and vertical line segments of at least three contiguous green pixels.\nIf the condition is met, changes the pixel's color to yellow (4) in the output grid.\nPixels that are not green remain unchanged.\nReturns the modified grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_line_length(grid, row, col, direction):\n    \"\"\"\n    Calculates the length of a contiguous line of green pixels starting from a given position.\n\n    Args:\n        grid: The input grid.\n        row: Starting row index.\n        col: Starting column index.\n        direction: A tuple (row_change, col_change) indicating the direction to check.\n                   (0, 1) for horizontal (right), (0, -1) for horizontal (left),\n                   (1, 0) for vertical (down), (-1, 0) for vertical (up).\n\n    Returns:\n        The length of the contiguous line of green pixels in the specified direction.\n    \"\"\"\n    rows, cols = grid.shape\n    length = 0\n    r, c = row, col\n    dr, dc = direction\n\n    while 0 <= r < rows and 0 <= c < cols and grid[r, c] == 3:\n        length += 1\n        r += dr\n        c += dc\n    return length\n\ndef is_center_pixel(grid, row, col):\n    \"\"\"\n    Checks if a green pixel is a \"center\" pixel, meaning it has green neighbors\n    directly above, below, to the left, and to the right.\n\n    Args:\n        grid: The input grid.\n        row: Row index of the pixel.\n        col: Column index of the pixel.\n\n    Returns:\n        True if the pixel is a center pixel, False otherwise.\n    \"\"\"\n    rows, cols = grid.shape\n    if grid[row, col] != 3:\n        return False\n\n    # Check for neighbors in all four directions\n    has_left   = col > 0 and grid[row, col - 1] == 3\n    has_right  = col < cols - 1 and grid[row, col + 1] == 3\n    has_above  = row > 0 and grid[row - 1, col] == 3\n    has_below  = row < rows - 1 and grid[row + 1, col] == 3\n\n    return has_left and has_right and has_above and has_below\n\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each pixel\n    for row in range(rows):\n        for col in range(cols):\n            # Check if the pixel is green\n            if output_grid[row, col] == 3:\n                # Check for horizontal line segment of length >= 3\n                left_length = get_line_length(output_grid, row, col - 1, (0, -1))\n                right_length = get_line_length(output_grid, row, col + 1, (0, 1))\n                horizontal_length = left_length + 1 + right_length  # Include the current pixel\n\n                # Check for vertical line segment of length >= 3\n                up_length = get_line_length(output_grid, row - 1, col, (-1, 0))\n                down_length = get_line_length(output_grid, row + 1, col, (1, 0))\n                vertical_length = up_length + 1 + down_length  # Include the current pixel\n\n                # Check if it's a center pixel\n                center_pixel = is_center_pixel(output_grid, row, col)\n\n                # Change color to yellow if it's a center pixel and part of a line segment of length >= 3\n                if center_pixel and horizontal_length >= 3 and vertical_length >= 3:\n                    output_grid[row, col] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7320,
+    "candidates_token_count": 982,
+    "total_token_count": 8302,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.816404,
+  "response_file": "006-response.json"
+}

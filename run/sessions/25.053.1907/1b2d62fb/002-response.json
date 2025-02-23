@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Region of Interest:** Locate the vertical line of '1's (blue pixels) in the input grid.\n2.  **Define Subgrid:** Define bounds of the output grid. The height is the same as the number of rows of 1s in the input grid. The width appears to be fixed to 3 columns centered on the original line.\n3.  **Extract Subgrid:** Extract the subgrid defined by the bounds in the previous step.\n4.  **Replace Values:**\n    *   Replace all '1' values within the subgrid with '8' (azure).\n    *   Replace all other values in the subgrid with '0' (white).\n5.   Return extracted and transformed subgrid.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, value):\n    \"\"\"Finds the longest vertical line of a specific value in a grid.\"\"\"\n    rows, cols = grid.shape\n    max_len = 0\n    start_row = -1\n    col_index = -1\n\n    for j in range(cols):\n        current_len = 0\n        current_start_row = -1\n        for i in range(rows):\n            if grid[i, j] == value:\n                if current_len == 0:\n                    current_start_row = i\n                current_len += 1\n            else:\n                if current_len > max_len:\n                    max_len = current_len\n                    start_row = current_start_row\n                    col_index = j\n                current_len = 0\n                current_start_row = -1\n        # Check for line at the end of the column\n        if current_len > max_len:\n            max_len = current_len\n            start_row = current_start_row\n            col_index = j\n\n    return start_row, col_index, max_len\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n    \n    # Find the vertical line of '1's\n    start_row, col_index, length = find_vertical_line(input_grid, 1)\n\n    # Define subgrid bounds\n    top = start_row\n    bottom = start_row + length\n    left = max(0, col_index - 1)  # Ensure within bounds\n    right = min(input_grid.shape[1], col_index + 2) # Ensure within bounds and includes the column\n\n    # Initialize output grid with zeros, size 3 x length\n    output_grid = np.zeros((length, 3), dtype=int)\n\n    # Extract relevant section and map to the output grid\n    for i in range(top,bottom):\n        for j in range(left, right):\n          row_in_output = i - top\n          col_in_output = j - left\n          if input_grid[i,j] == 1:\n              output_grid[row_in_output, col_in_output] = 8\n          else:\n              output_grid[row_in_output, col_in_output] = 0\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2315,
+    "candidates_token_count": 734,
+    "total_token_count": 3049,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.424416,
+  "response_file": "002-response.json"
+}

@@ -1,0 +1,22 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      rows: variable
+      columns: variable
+      colors: [0-9]
+  - object: output_grid
+    type: grid
+    properties:
+      rows: same as input_grid.rows
+      columns: input_grid.columns // 2
+      colors: derived from input_grid
+  - action: select_columns
+    description: Select every other column from the input_grid, starting with column 0.
+    input: input_grid
+    output: intermediate_grid #temporary, not the final output
+
+  - action: create_output_grid
+    description: Creates a new grid with the selected columns to the expected size of the output.
+    input: intermediate_grid
+    output: output_grid

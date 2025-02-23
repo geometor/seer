@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [24, 8] # Height x Width
+      colors: [0, 1, 4]
+      rows:
+        - row_index: 7
+          color: 4 #yellow
+          elements: [4, 0, 0, 0, 0, 0, 0, 0]
+        - row_index: 11
+          color: 1 # blue
+          elements: [1, 0, 0, 0, 0, 0, 0, 0]
+
+actions:
+  - type: replication
+    description: Rows with non-zero colors are replicated.
+  - type: stacking
+    description: Replicated rows are stacked, potentially repeating the pattern.
+
+relationships:
+  - type: spatial
+    description: The spatial relationship between the original colored rows and the replicated rows is important. The single yellow row becomes three sets of yellow rows, and single blue row becomes two sets of blue rows in the output.

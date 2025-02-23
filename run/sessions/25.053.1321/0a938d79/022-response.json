@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Seed Rows:** Find all rows in the input grid that contain at least one non-white pixel. These are the \"seed rows.\"\n\n2.  **Iterate Through Seed Rows (Top to Bottom):**\n    * Record the row index of the seed row.\n\n3.  **Process Each Seed Pixel:** For each seed row, iterate through each non-white pixel in the row from left to right:\n    *   Record the color and column index of the seed pixel.\n    *   Fill the cell at the current row and column with the seed pixel's color.\n    *   The colors of each of the seed pixels in the seed rows will fill every\n        row of the grid, alternating between each of the colors in order.\n\n4. **Combine Colors**: The output grid will consist of the combined color\n   patterns, stacked.\n\"\"\"\n\nimport numpy as np\n\ndef get_seed_rows(grid):\n    \"\"\"Identifies rows with at least one non-white pixel and extracts seed pixel information.\"\"\"\n    seed_rows = []\n    for row_index, row in enumerate(grid):\n        non_white_pixels = []\n        for col_index, pixel_value in enumerate(row):\n            if pixel_value != 0:\n                non_white_pixels.append({\"col\": col_index, \"color\": pixel_value})\n        if non_white_pixels:\n            seed_rows.append({\"row_index\": row_index, \"seed_pixels\": non_white_pixels})\n    return seed_rows\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the observed rule.\"\"\"\n    output_grid = np.zeros_like(input_grid)\n    rows = len(output_grid)\n    cols = len(output_grid[0])\n\n    # Find seed rows.\n    seed_rows = get_seed_rows(input_grid)\n\n    # Collect all seed pixels from all seed rows\n    all_seed_pixels = []\n    for seed_row in seed_rows:\n        all_seed_pixels.extend([\n            (seed_row[\"row_index\"], pixel_info[\"col\"], pixel_info[\"color\"])\n            for pixel_info in seed_row[\"seed_pixels\"]\n        ])\n    \n    # Iterate through all rows of the output grid\n    for row_index in range(rows):\n        # Use the modulo operator to alternate between colors\n        pixel_index = row_index % len(all_seed_pixels)\n        \n        if all_seed_pixels:  # Handle the case where there are no seed pixels\n            _, col, color = all_seed_pixels[pixel_index]\n            output_grid[row_index, :] = color\n            #  Fill based on original column position\n            #  The prior code caused an index out of bounds so doing it\n            #  this way now\n            for i in range(cols):\n              if i == col:\n                output_grid[row_index,i] = color\n              elif i < col:\n                output_grid[row_index,i] = 0 #color\n              else:\n                output_grid[row_index,i] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7841,
+    "candidates_token_count": 726,
+    "total_token_count": 8567,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.39388,
+  "response_file": "022-response.json"
+}

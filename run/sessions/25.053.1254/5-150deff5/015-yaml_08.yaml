@@ -1,0 +1,20 @@
+task: 014
+objects:
+  - id: shape_1
+    type: contiguous_shape
+    color: gray (5)
+    properties:
+      - can_be_filled: true
+      - has_edges: true
+actions:
+  - action: identify
+    target: shape_1
+    description: Find all contiguous shapes of gray pixels.
+  - action: determine_edge
+    target: shape_1
+    description: Identify edge pixels within the shape. Edge pixels neighbor empty(0) pixels or image edge, non-edge pixels are 'interior'.
+  - action: transform
+    target: shape_1
+    description: >
+        Color edge pixels red (2).
+        Color interior pixels azure (8).

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Rows:** Scan the input grid row by row. Identify rows that contain *exactly one* non-zero pixel. Note the color of that pixel and the row index.\n\n2.  **Replicate and Insert:** For each identified row:\n    *   Create multiple copies of a new row, where *all* pixels in the new row are of the color found in the original, key, row.\n    *   The number of replicated rows should match the height of the original image.\n    *  Insert the new replicated rows in blocks maintaining the order they were found in the original input.\n\n3. **Assemble output:** The result of inserting the replicated rows is the final output grid.\n\"\"\"\n\nimport numpy as np\n\ndef _find_key_rows(grid):\n    \"\"\"Finds rows with exactly one non-zero pixel and returns their indices and colors.\"\"\"\n    key_rows = []\n    for i, row in enumerate(grid):\n        non_zero_pixels = [x for x in row if x != 0]\n        if len(non_zero_pixels) == 1:\n            key_rows.append((i, non_zero_pixels[0]))\n    return key_rows\n\ndef _replicate_row(color, width, count):\n    \"\"\"Creates multiple ('count') copies of a row filled with the given color.\"\"\"\n    return [[color] * width for _ in range(count)]\n    \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n\n    input_grid = np.array(input_grid)\n    height, width = input_grid.shape\n    output_grid = []\n\n    # Find key rows (rows with exactly one non-zero pixel).\n    key_rows = _find_key_rows(input_grid)\n\n    # For each key row, replicate and insert.\n    for _, color in key_rows:\n        replicated_rows = _replicate_row(color, width, height)\n        output_grid.extend(replicated_rows)\n    \n    return np.array(output_grid)\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2842,
+    "candidates_token_count": 473,
+    "total_token_count": 3315,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.390364,
+  "response_file": "026-response.json"
+}

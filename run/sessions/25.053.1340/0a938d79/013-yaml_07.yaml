@@ -1,0 +1,77 @@
+observations:
+  - task: 3618c87e
+    examples:
+      - example_id: 1
+        input_objects:
+          - object_id: 1
+            type: row
+            color_sequence: [2]  #Red row
+            row_index: 0
+            first_color_row: True
+          - object_id: 2
+            type: row
+            color_sequence: [8]   #Azure Row
+            row_index: 9
+            first_color_row: True
+        output_objects:
+          - object_id: 1
+            type: patterned_rows
+            pattern_rows: [0, 9] # The index of colored row in input
+            repeat: True
+
+      - example_id: 2
+        input_objects:
+          - object_id: 1
+            type: row
+            color_sequence: [1]  #Blue
+            row_index: 0
+            first_color_row: True
+          - object_id: 2
+            type: row
+            color_sequence: [3]  #Green
+            row_index: 6
+            first_color_row: True
+        output_objects:
+          - object_id: 1
+            type: patterned_rows
+            pattern_rows: [0, 6] # The index of colored row in input
+            repeat: True
+      - example_id: 3
+        input_objects:
+          - object_id: 1
+            type: row
+            color_sequence: [2]  #Red
+            row_index: 5
+            first_color_row: True
+          - object_id: 2
+            type: row
+            color_sequence: [3]  #Green
+            row_index: 7
+            first_color_row: True
+        output_objects:
+          - object_id: 1
+            type: patterned_rows
+            pattern_rows: [5, 7] # The index of colored row in input
+            repeat: True
+      - example_id: 4
+        input_objects:
+          - object_id: 1
+            type: row
+            color_sequence: [4]
+            row_index: 7
+            first_color_row: True
+          - object_id: 2
+            type: row
+            color_sequence: [1]
+            row_index: 11
+            first_color_row: True
+        output_objects:
+            - object_id: 1
+              type: patterned_rows
+              pattern_rows: [7, 11]
+              repeat: True
+
+    general_rule: |
+      Identify the rows in the input grid where each distinct, non-zero color first appears.  
+      Copy these *entire* rows. 
+      Create an output grid where the pattern is a repeating sequence of these identified rows. The sequence restarts from the beginning after the last identified row is placed.

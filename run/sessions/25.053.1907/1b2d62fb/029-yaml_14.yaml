@@ -1,0 +1,25 @@
+task: 028
+objects:
+  - id: blue_stripe
+    type: vertical_stripe
+    color: blue
+    properties:
+      length: variable
+  - id: subgrid
+    type: rectangle
+    dimensions: 5x3
+    relative_position: right_of_blue_stripe
+    transformation:
+      - type: color_change
+        mapping:
+          white: azure
+          other: black
+actions:
+  - name: locate_stripe
+    description: Find the vertical blue stripe.
+  - name: extract_subgrid
+    description: Extract a 5x3 subgrid to the right of the stripe, aligning the top edge with the top of the blue stripe.
+  - name: transform_subgrid
+    description: Apply color transformation within the subgrid.
+  - name: output_subgrid
+    description: Use the transformed subgrid as the output.

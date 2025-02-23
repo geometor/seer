@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the central column:** Find the vertical line of pixels with the color blue (value 1) in the input grid.\n2.  **Resize:** The width is changed from the original to a new smaller width\n3.  **Translate:** Create the output grid, copying the height of the input\n4. **Recolor** Change the color of the vertical line from blue (1) to azure (8).\n5. **Fill Surrounding:** Change the remaining of the output grid to white (0).\n\"\"\"\n\nimport numpy as np\n\ndef find_central_blue_line(grid):\n    # Find the column index where all rows have the value 1 (blue).\n    rows, cols = grid.shape\n    for j in range(cols):\n        if np.all(grid[:, j] == 1):\n            return j\n    return -1  # Return -1 if no such column is found\n\ndef transform(input_grid):\n    # Find the central blue line's column index.\n    blue_line_col = find_central_blue_line(input_grid)\n\n    # Initialize the output grid with the same height as the input and width 3, filled with white (0).\n    rows, _ = input_grid.shape\n    output_grid = np.zeros((rows, 3), dtype=int)\n\n    # If a blue line was found, replace the corresponding pixels in the output grid with azure (8).\n    if blue_line_col != -1:\n        for i in range(rows):\n            output_grid[i, 0] = 0  # white\n            output_grid[i, 1] = 8  # azure\n            output_grid[i, 2] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2078,
+    "candidates_token_count": 401,
+    "total_token_count": 2479,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.77127,
+  "response_file": "020-response.json"
+}

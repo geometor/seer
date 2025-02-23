@@ -1,0 +1,25 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      colors: [blue, white, gray]
+      dimensions: [3, 7]  # Height, Width
+  - object: output_grid
+    type: grid
+    properties:
+      colors: [white, red]
+      dimensions: [3, 3]
+  - object: gray_stripe
+    type: object
+    properties:
+        color: gray
+        location: vertical center
+        role: reference
+  - action: extract_center
+    input: input_grid
+    parameters: [3,3] # size of center region
+    output: intermediate_grid
+  - action: determine_center_color
+    input: intermediate_grid
+    logic: "if the sum of the blue pixels in input is greater than 2, then output is red in center, else output is white."
+    output: output_grid

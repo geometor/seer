@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Target Shape:** Locate all pixels within the input grid that have a color value of '3' (green). Consider these pixels as forming a single, potentially irregular, shape.\n\n2.  **Find Adjacent Pixels:** For each pixel that is part of the identified shape, determine its immediate neighbors. Neighbors are defined as pixels directly above, below, to the left, or to the right (not diagonal).\n\n3.  **Conditional Color Change:**\n    *   Check the neighbors of the shape identified in step one.\n    *   If a neighboring pixel does *not* have the value '3' (green), and it exists within grid bounds, is now part of the identified shape.\n    *   Change any pixels that have become part of the shape to color value '4' (yellow).\n\n4.  **Output:** Produce the modified grid, where the identified shape's interior adjacent pixels have been changed to yellow, while all other pixels retain their original color.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighbors of a cell in the grid.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # North\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # South\n    if col > 0:\n        neighbors.append((row, col - 1))  # West\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # East\n    return neighbors\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of the input\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Identify the target shape (green pixels)\n    green_pixels = []\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 3:\n                green_pixels.append((r, c))\n\n    # Find pixels inside the shape\n    shape_pixels = set() # use a set for quick lookups and additions\n    shape_pixels.update(green_pixels)\n\n    new_pixels_added = True\n    while new_pixels_added:\n        new_pixels_added = False # assume done, unless we add some\n        \n        next_shape_pixels = set() # store new found pixels before adding to shape_pixels\n        next_shape_pixels.update(shape_pixels) # prime it with existing\n        \n        for r, c in shape_pixels:  # Check neighbors of all current shape_pixels\n            for neighbor_row, neighbor_col in get_neighbors(input_grid, r, c):\n                if (neighbor_row, neighbor_col) not in shape_pixels: # if neighbor isnt already added\n                        next_shape_pixels.add((neighbor_row,neighbor_col)) # add it\n                        new_pixels_added = True\n\n        shape_pixels.update(next_shape_pixels) # commit all the newly discovered shape pixels\n\n\n    #change pixels inside the shape to color 4\n    for r,c in shape_pixels:\n        if (r,c) not in green_pixels:\n            output_grid[r,c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2562,
+    "candidates_token_count": 768,
+    "total_token_count": 3330,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.457858,
+  "response_file": "014-response.json"
+}

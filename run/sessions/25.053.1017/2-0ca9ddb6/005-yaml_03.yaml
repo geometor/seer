@@ -1,0 +1,29 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - width: 9
+      - height: 9
+      - cells: pixels (integers 0-9)
+
+  - name: pixel
+    type: cell
+    properties:
+      - color: integer (0-9)
+      - position: (row, column)
+
+actions:
+  - name: add_border
+    description: Adds pixels of a specific color around existing non-zero pixels.
+    parameters:
+      - color_map: mapping of input pixel color to border pixel color and position
+
+relationships:
+  - adjacency: Pixels can be adjacent horizontally, vertically, or diagonally.
+  - border: Added pixels form a border around original non-zero pixels.
+
+color_mapping:
+    input_output:
+        '1': ['7',[(1,0),(0,1),(-1,0),(0,-1)]] # relative positions
+        '2': ['4',[(1,0),(-1,0)]]
+        '6': ['7',[(-1,0)]]

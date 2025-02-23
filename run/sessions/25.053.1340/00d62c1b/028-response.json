@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies connected regions of green pixels and recolors the internal pixels of enclosed regions to yellow.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col, color, diagonal=False):\n    \"\"\"Gets the neighbors of a specific color around a given pixel.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    \n    # Orthogonal neighbors\n    possible_neighbors = [\n        (row - 1, col), (row + 1, col),\n        (row, col - 1), (row, col + 1)\n    ]\n    \n    if diagonal:\n        possible_neighbors.extend([\n            (row - 1, col - 1), (row - 1, col + 1),\n            (row + 1, col - 1), (row + 1, col + 1)\n        ])\n    \n    for r, c in possible_neighbors:\n        if 0 <= r < rows and 0 <= c < cols and grid[r, c] == color:\n            neighbors.append((r, c))\n\n    return neighbors\n\ndef is_enclosed(grid, region):\n    \"\"\"Checks if a region is fully enclosed (not touching the edge and surrounded by non-green).\"\"\"\n    rows, cols = grid.shape\n    for r, c in region:\n        # Check if the pixel is on the edge\n        if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:\n            return False  # Touches edge, so not enclosed\n\n        #check if the pixel has a non-green, non-edge neighbor\n        neighbors = get_neighbors(grid, r, c, 3, True) #check all neighbors\n        if len(neighbors) == 8:\n            continue #it's an internal pixel, check next pixel\n        else:\n            return False\n\n    return True\n    \ndef get_connected_region(grid, start_row, start_col, color):\n    \"\"\"Finds a connected region of a given color starting from a given pixel.\"\"\"\n    rows, cols = grid.shape\n    region = set()\n    queue = [(start_row, start_col)]\n\n    while queue:\n        row, col = queue.pop(0)\n        if (row, col) in region:\n            continue\n        if not (0 <= row < rows and 0 <= col < cols):\n            continue\n        if grid[row, col] == color:\n            region.add((row, col))\n            neighbors = get_neighbors(grid, row, col, color)\n            for neighbor in neighbors:\n                if neighbor not in region:\n                    queue.append(neighbor)\n\n    return region\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n    visited = set()\n\n    # Iterate to find all green regions\n    for row in range(rows):\n        for col in range(cols):\n            if input_grid[row, col] == 3 and (row, col) not in visited:\n                region = get_connected_region(input_grid, row, col, 3)\n                visited.update(region)\n\n                # Check if the region is enclosed\n                if is_enclosed(input_grid, region):\n                    # Recolor all pixels in the enclosed region to yellow\n                    for r, c in region:\n                        output_grid[r, c] = 4\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7323,
+    "candidates_token_count": 815,
+    "total_token_count": 8138,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.337623,
+  "response_file": "028-response.json"
+}

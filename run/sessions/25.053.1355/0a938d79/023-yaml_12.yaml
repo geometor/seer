@@ -1,0 +1,20 @@
+objects:
+  - type: grid
+    properties:
+      shape: variable
+      elements: integers (0-9 representing colors)
+
+  - type: seed_row
+    properties:
+      color: integer (0-9, non-zero)
+      column: integer (index of the first non-zero pixel)
+
+actions:
+  - name: identify_seed_rows
+    description: Locate rows with at least one non-white pixel.
+
+  - name: create_horizontal_stripes
+    description: Fill each row of the output grid with a single color, creating full-width stripes.
+
+  - name: alternate_colors
+    description:  Cycle through the seed row colors, assigning each to a successive output row.

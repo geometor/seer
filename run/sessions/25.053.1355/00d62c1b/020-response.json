@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Largest Object:** Find the largest contiguous block of green (3) pixels in the input grid. This is the target object.\n\n2.  **Determine Interior Pixels:** Accurately identify the *interior* pixels of the target object. A pixel is considered inside if it's part of the largest green object and is completely surrounded by other green pixels of that *same* object, such that it cannot be reached from the background without crossing a green pixel of the target object. A simple neighbor check is insufficient; a flood-fill or similar approach from the outside edge of the grid is needed to ensure accurate identification of enclosed regions.\n\n3.  **Change Interior Color:** Change the color of all identified *interior* pixels of the target object from green (3) to yellow (4).\n\n4. **Preserve Other Pixels:** All other pixels in the grid that are not part of the target object's interior remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_largest_object(grid, color):\n    visited = np.zeros_like(grid, dtype=bool)\n    max_size = 0\n    largest_object_coords = []\n\n    def dfs(row, col, current_object_coords):\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return 0\n\n        visited[row, col] = True\n        current_object_coords.append((row, col))\n        size = 1\n        size += dfs(row + 1, col, current_object_coords)\n        size += dfs(row - 1, col, current_object_coords)\n        size += dfs(row, col + 1, current_object_coords)\n        size += dfs(row, col - 1, current_object_coords)\n        return size\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object_coords = []\n                current_size = dfs(row, col, current_object_coords)\n                if current_size > max_size:\n                    max_size = current_size\n                    largest_object_coords = current_object_coords\n\n    return largest_object_coords\n\ndef flood_fill(grid, row, col, target_color, replacement_color):\n    \"\"\"\n    Performs a flood fill on the grid, starting from (row, col).\n    Only fills pixels that are equal to target_color.\n    \"\"\"\n    if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n            grid[row, col] != target_color):\n        return\n    grid[row, col] = replacement_color\n    flood_fill(grid, row + 1, col, target_color, replacement_color)\n    flood_fill(grid, row - 1, col, target_color, replacement_color)\n    flood_fill(grid, row, col + 1, target_color, replacement_color)\n    flood_fill(grid, row, col - 1, target_color, replacement_color)\n\ndef find_interior_pixels(grid, object_coords, object_color):\n    \"\"\"\n    Identifies the interior pixels of an object using a flood-fill approach.\n    \"\"\"\n    # Create a copy of the grid to work with\n    temp_grid = np.copy(grid)\n\n    # Replace the object with a temporary color\n    temp_object_color = -1  # Use a color that doesn't exist in the original grid\n    for row, col in object_coords:\n        temp_grid[row, col] = temp_object_color\n\n    # Find background color (assuming the top-left corner is background)\n    background_color = temp_grid[0, 0]\n\n\n    # Flood fill the background from the edges with a different temporary color\n    temp_background_color = -2\n    if background_color != temp_object_color:\n        flood_fill(temp_grid, 0, 0, background_color, temp_background_color)\n\n    # Identify interior pixels: they are the remaining temp_object_color pixels\n    interior_pixels = []\n    for row, col in object_coords:\n        if temp_grid[row, col] == temp_object_color:\n            interior_pixels.append((row, col))\n\n    return interior_pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # find largest green object\n    green_object_coords = find_largest_object(input_grid, 3)\n\n    # find interior pixels of the largest green object\n    interior_pixels = find_interior_pixels(input_grid, green_object_coords, 3)\n\n    # change interior object pixels to yellow\n    for row, col in interior_pixels:\n        output_grid[row, col] = 4\n        \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 2546,
+            "end_index": 2815,
+            "uri": "https://github.com/ShehanIshanka/advent-of-code",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7510,
+    "candidates_token_count": 1197,
+    "total_token_count": 8707,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.291557,
+  "response_file": "020-response.json"
+}

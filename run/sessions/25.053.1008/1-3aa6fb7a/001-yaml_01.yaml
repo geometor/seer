@@ -1,0 +1,13 @@
+facts:
+  - observation: |
+      The input and output grids are the same size (7x7).
+  - object: |
+      'azure' pixels (value 8) are present in both input and output.
+  - object: |
+      'blue' pixels (value 1) are present in the output, but not in the input.
+  - action: |
+     Some 'azure' pixels (8) are replaced by 'blue' pixels (1).
+  - relationship: |
+      The 'blue' pixels in the output seem to appear where the 'azure' color connected, but not the pixel is at the edge of connected 'azure' blocks.
+  - rule: |
+      change an azure pixel to blue if and only if it is an azure pixel, it's on at an edge and it's neighbor on that edge is not azure

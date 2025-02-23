@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the background:** The background is the grid itself, and all pixels with a value of 0 (white) remain unchanged.\n2.  **Identify the shape:** Find the contiguous block of pixels with a value of 5 (gray). This is the primary shape.\n3. **Segment Identification**: Find the segments of the contiguous block, defining segments as only single pixel width horizontal or vertical lines of pixels\n4.  **Horizontal Segment Replacement:** Replace each horizontal line segment of the gray shape with pixels of value 8 (azure).\n5.  **Vertical Segment Replacement:** Replace each vertical line segment of the gray shape with pixels of value 2 (red).\n6.  **Output:** The output grid consists of the unchanged background, and the transformed shape with azure and red segments.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_block(grid, color):\n    # Find the contiguous block of pixels with a specific color.\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    block = []\n\n    def dfs(r, c):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        block.append((r, c))\n        dfs(r + 1, c)\n        dfs(r - 1, c)\n        dfs(r, c + 1)\n        dfs(r, c - 1)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                dfs(r, c)\n                return block  # Return after finding the first block\n    return block\n\ndef is_horizontal(grid, r, c):\n    # Check if the pixel at (r, c) is part of a horizontal segment.\n    if grid[r][c] == 0:\n        return False\n\n    rows, cols = grid.shape\n    #check left and right - if at least one neighbor matches, return true\n    if (c > 0 and grid[r, c - 1] == grid[r,c]) or (c < cols - 1 and grid[r, c + 1] == grid[r,c]):\n        return True\n    return False\n    \n\ndef is_vertical(grid, r, c):\n    # Check if the pixel at (r, c) is part of a vertical segment.\n    if grid[r][c] == 0:\n        return False\n    \n    rows, cols = grid.shape\n    #check above and below - if at least one neighbor matches return true\n    if (r > 0 and grid[r - 1, c] == grid[r,c]) or (r < rows - 1 and grid[r + 1, c] == grid[r,c]):\n          return True\n\n    return False\n    \n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find the gray shape\n    gray_shape = find_contiguous_block(input_grid, 5)\n\n    #change output pixels\n    for r, c in gray_shape:\n      if is_horizontal(input_grid, r, c):\n        output_grid[r,c] = 8\n      elif is_vertical(input_grid, r, c):\n        output_grid[r,c] = 2\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2508,
+    "candidates_token_count": 831,
+    "total_token_count": 3339,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.75379,
+  "response_file": "004-response.json"
+}

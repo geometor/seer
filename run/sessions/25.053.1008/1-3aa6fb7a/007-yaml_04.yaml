@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 7x7
+      elements: pixels
+      pixel_values: [0, 8, 1]
+  - type: pixel
+    properties:
+      color:
+        white: 0
+        azure: 8
+        blue: 1
+      position: [row, column]
+
+actions:
+  - type: modification
+    description: Change pixel color from white (0) to blue (1).
+    condition: specific positions related to azure(8) pixels
+
+relationships:
+  - type: spatial
+    description: Blue (1) pixels appear adjacent to azure (8) pixels. Specifically, one space to the left or above.

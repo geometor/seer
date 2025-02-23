@@ -1,0 +1,67 @@
+observations:
+  - example: 1
+    input_objects:
+      - color: 3
+        shape: dispersed
+        contiguous: false
+        notes: "Single green pixels and lines, not considered a cohesive object for transformation."
+    output_objects:
+      - color: 3
+        shape: dispersed
+      - color: 4 # single value
+        shape: point
+        contiguous: false
+    transformation: "Isolated green pixels remain unchanged. A single green pixel can change to yellow."
+
+  - example: 2
+    input_objects:
+      - color: 3
+        shape: lines
+        contiguous: false
+        notes: "Linear arrangements of green pixels."
+    output_objects:
+     - color: 3
+       shape: line
+       contiguous: false
+    transformation: "Linear green structures remain unchanged."
+
+  - example: 3
+    input_objects:
+      - color: 3
+        shape: mixed
+        contiguous: true
+        notes: "Contains both isolated pixels, lines, and 2x2 blocks"
+    output_objects:
+      - color: 3
+        shape: mixed
+      - color: 4
+        shape: 2x2 block
+        contiguous: True
+    transformation: "2x2 green blocks are converted to yellow."
+
+  - example: 4
+    input_objects:
+        - color: 3
+          shape: complex
+          contiguous: true
+          notes: large contiguous object
+    output_objects:
+        - color: 3
+          shape: edges, complex
+        - color: 4
+          shape: interior, complex
+    transformation: "interior green pixels that have four neighbors of the
+                      same color are changed to yellow"
+
+  - example: 5
+    input_objects:
+      - color: 3
+        shape: complex
+        contiguous: true,
+        notes: Very large and complex objects
+    output_objects:
+      - color: 3
+        shape: complex, edges
+      - color: 4
+        shape: complex, interior
+    transformation: "interior green pixels of larger objects are changed to yellow"

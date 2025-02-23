@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: 9x9
+      - cells: pixels
+      - colors: [white, blue, red, azure, orange, yellow]
+  - type: pixel
+    properties:
+      - color: integer (0-9)
+      - position: (row, column)
+
+actions:
+  - name: expand_color
+    description: Existing colors influence the color of adjacent white pixels.
+  - name: introduce_color
+    description: New colors, orange and yellow, are introduced based on some interaction between existing colors.
+
+relationships:
+  - type: adjacency
+    description:  Pixels are considered adjacent horizontally and vertically (not diagonally).
+  - type: color_interaction
+    description: The colors of existing pixels determine the colors of new or modified pixels.

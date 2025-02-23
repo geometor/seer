@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-Zero Pixels:** Find all pixels in the input grid that have a non-zero color.\n2.  **Extract Unique Colors:** Create a list of unique colors present in the input grid.\n3. **Determine Axis**: If all detected pixels are in one row use columns, otherwise use rows.\n4.  **Establish Replication Pattern:** The replication pattern is composed by the ordered list of unique colors.\n5. **Replicate Pattern**:\n    *  If the axis is `rows`, extend the found pattern by replicating it on each row of the grid. The pattern should be replicated in an alternating sequence that covers all rows.\n    *  If the axis is `columns`, extend the found pattern by replicating it on each column of the grid. The pattern should be replicated in an alternating sequence that covers all columns.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"Finds all unique non-zero colored pixels and their positions.\"\"\"\n    objects = []\n    for i in range(grid.shape[0]):\n        for j in range(grid.shape[1]):\n            if grid[i, j] != 0:\n                objects.append((grid[i, j], (i, j)))\n    # remove duplicate color entries\n    unique_objects = []\n    seen_colors = set()\n    for color, pos in objects:\n        if color not in seen_colors:\n            unique_objects.append((color, pos))\n            seen_colors.add(color)\n\n    return unique_objects\n\ndef determine_axis(objects):\n    \"\"\"Determines the axis of replication (row or column).\"\"\"\n    if not objects:\n        return \"row\"  # Default to row if no objects\n\n    rows = set()\n    cols = set()\n    for _, (row, col) in objects:\n        rows.add(row)\n        cols.add(col)\n\n    if len(rows) == 1:\n      return \"column\"\n    else:\n      return \"row\"\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # Find all non-zero colored pixels (objects)\n    objects = find_objects(input_grid)\n    \n    if not objects:\n        return output_grid\n\n    # Determine the axis of replication\n    axis = determine_axis(objects)\n\n    # Sort objects by color value\n    objects.sort()\n\n    # Get the pattern of colors\n    pattern = [color for color, _ in objects]\n\n    # Replicate by rows\n    if axis == \"row\":\n        for i in range(output_grid.shape[0]):\n          row_index = i % len(pattern)\n          output_grid[i, :] = pattern[row_index]\n    # Replicate by columns\n    elif axis == \"column\":\n        for j in range(output_grid.shape[1]):\n          col_index = j % len(pattern)\n          output_grid[:, j] = pattern[col_index]\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7995,
+    "candidates_token_count": 699,
+    "total_token_count": 8694,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.636797,
+  "response_file": "014-response.json"
+}

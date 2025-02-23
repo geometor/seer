@@ -1,0 +1,61 @@
+    0 0 8 0
+    0 8 0 8
+    0 0 8 0
+    ```
+*   **Expected Output:**
+    ```
+    0 0 8 8 0 0 0 0
+    0 0 8 8 0 0 0 0
+    0 0 0 0 8 8 0 0
+    0 0 0 0 8 8 0 0
+    0 0 8 8 0 0 0 0
+    0 0 8 8 0 0 0 0
+    0 0 0 0 8 8 0 0
+    0 0 0 0 8 8 0 0
+    ```
+
+* **Problem**: Only expands and handles azure pixels, it does correctly expand but not in the correct location. It seems to understand the 2x2 expansion, but misapplies the row logic.
+
+**Example 2:**
+
+*   **Input:**
+    ```
+    0 0 3 3
+    0 3 0 3
+    3 3 3 0
+    ```
+*   **Expected Output:**
+    ```
+    0 0 0 0 3 3 3 3
+    0 0 0 0 3 3 3 3
+    0 0 3 3 0 0 3 3
+    0 0 3 3 0 0 3 3
+    3 3 3 3 3 3 0 0
+    3 3 3 3 3 3 0 0
+    3 3 3 3 0 0 3 3
+    3 3 3 3 0 0 3 3
+    ```
+* **Problem**: The code does not replicate the green color. The output shows how the replication works.
+
+**Example 3:**
+
+*   **Input:**
+    ```
+    3 3 3 3
+    3 0 0 0
+    3 0 0 0
+    ```
+*   **Expected Output:**
+    ```
+    3 3 3 3 3 3 3 3
+    3 3 3 3 3 3 3 3
+    3 3 0 0 0 0 0 0
+    3 3 0 0 0 0 0 0
+    3 3 0 0 0 0 0 0
+    3 3 0 0 0 0 0 0
+    3 3 0 0 0 0 0 0
+    3 3 0 0 0 0 0 0
+    ```
+* **Problem**: Again the replication is missing, and only the azure color is moved.
+
+**YAML Facts:**

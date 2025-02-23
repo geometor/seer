@@ -1,0 +1,33 @@
+task_description: |
+  The input grid is duplicated vertically.  In the duplicated rows, all colors are cyclically shifted one position to the right.
+
+objects:
+  - name: input_grid
+    type: 2D array
+    description: The original grid of colors.
+  - name: output_grid
+    type: 2D array
+    description: The transformed grid, double the height of the input.
+  - name: row
+    type: 1D array
+    description: a single row in a grid
+  - name: shifted_row
+      type: 1D array
+      description: copy of original with all elements shifted to the right by one, wrapping
+
+actions:
+  - name: duplicate
+    description: The input grid is copied directly below itself.
+    input: input_grid
+    output: output_grid (partial)
+
+  - name: shift_right
+    description: >
+      Every other row in the output grid has its colors shifted one position to the right.
+    input: row
+    output: shifted_row
+
+  - name: combine_rows
+    description: place shifted_row in correct location in output_grid.
+    input: shifted_row
+    output: output_grid

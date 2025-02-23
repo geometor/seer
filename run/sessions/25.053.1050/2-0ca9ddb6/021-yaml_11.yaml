@@ -1,0 +1,72 @@
+task_id: "020"
+example_1:
+  input_shape: [9, 9]
+  output_shape: [9, 9]
+  match: False
+  pixels_off: 6
+  key_objects:
+    - color: 1 # Blue
+      actions: ["create_l_shape"]
+    - color: 2  # Red
+      actions: ["mirror_with_yellow"]
+    - color: 6  # Magenta
+      actions: ["preserve"]
+  l_shape_details:
+    color: 7 #orange
+    relative_positions:
+      - [-1, 0] # error in code, not always true. should not happen at all.
+      - [1, 0] # relative to each blue
+      - [0, 1] # relative to each blue
+      - [1,-1] # relative to each blue
+  mirror_details:
+      color: 4 # yellow
+      mirror_axis: "diagonal_top_left_to_bottom_right" # reflection along (x,y) = (-row, -col) from origin.
+
+example_2:
+  input_shape: [9, 9]
+  output_shape: [9, 9]
+  match: False
+  pixels_off: 12
+  key_objects:
+    - color: 1 # Blue
+      actions: ["create_l_shape"]
+    - color: 2  # Red
+      actions: ["mirror_with_yellow"]
+    - color: 6  # Magenta
+      actions: ["preserve"]
+      - color: 8 # azure
+        actions: ["preserve"]
+
+  l_shape_details:
+    color: 7 #orange
+    relative_positions:
+      - [0, -1]
+      - [1, 0] # relative to each blue
+      - [0, 1] # relative to each blue
+      - [1,-1] # relative to each blue
+  mirror_details:
+      color: 4 # yellow
+      mirror_axis: "diagonal_top_left_to_bottom_right"
+
+example_3:
+  input_shape: [9, 9]
+  output_shape: [9, 9]
+  match: False
+  pixels_off: 6
+  key_objects:
+    - color: 1 # Blue
+      actions: ["create_l_shape"]
+    - color: 2  # Red
+      actions: ["mirror_with_yellow"]
+    - color: 6  # Magenta
+      actions: ["preserve"]
+  l_shape_details:
+    color: 7 #orange
+    relative_positions:
+      - [0,-1]
+      - [1, 0] # relative to each blue
+      - [0, 1] # relative to each blue
+      - [1,-1] # relative to each blue
+  mirror_details:
+      color: 4 # yellow
+      mirror_axis: "diagonal_top_left_to_bottom_right"

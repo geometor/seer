@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** the white (0) background and preserve its position in the output grid.\n2.  **Identify** the contiguous gray (5) object in the input grid.\n3.  **Segment** the gray object into distinct vertical segments. A segment is defined as a contiguous set of gray pixels in one or more adjacent columns. There may or may not be a single white pixel separating the object into segments.\n4.  **Alternate Colors:** Starting with the leftmost segment, color it red (2). Color the next segment azure (8). Continue alternating red and azure for all segments of the gray object.\n5. **Place** the colored segments to the output grid in place of the gray object.\n\"\"\"\n\nimport numpy as np\n\ndef get_vertical_segments(grid, color):\n    \"\"\"\n    Identifies distinct vertical segments of a specified color within the grid.\n    Returns a list of lists, where each inner list contains the coordinates\n    of a segment.\n    \"\"\"\n    rows, cols = grid.shape\n    segments = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_segment):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_segment.append((r, c))\n        # Explore vertically\n        dfs(r + 1, c, current_segment)\n        dfs(r - 1, c, current_segment)\n        \n\n    for c in range(cols):\n        for r in range(rows):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_segment = []\n                dfs(r, c, current_segment)\n                # Check adjacent columns to see if this continues a previous segment\n                if current_segment:\n                    \n                    segments.append(current_segment)\n\n    return segments\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # get the gray object segments\n    gray_segments = get_vertical_segments(input_grid, 5)\n\n    # if no gray object exists, return a copy of the original\n    if not gray_segments:\n      return output_grid\n\n    # set all the gray pixels to white\n    for segment in gray_segments:\n      for r,c in segment:\n        output_grid[r,c] = 0\n\n    # alternate coloring of segments\n    color_index = 0\n    colors = [2, 8]  # Red and Azure\n    for segment in gray_segments:\n        current_color = colors[color_index % 2]\n        for r, c in segment:\n            output_grid[r, c] = current_color\n        color_index += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4454,
+    "candidates_token_count": 693,
+    "total_token_count": 5147,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.861171,
+  "response_file": "022-response.json"
+}

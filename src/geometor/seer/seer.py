@@ -11,6 +11,8 @@ import json
 import numpy as np
 import os
 import re
+import contextlib
+import traceback
 
 from geometor.seer.tasks import Tasks, Task, Grid
 
@@ -46,6 +48,7 @@ class Seer:
 
         self.max_iterations = config["max_iterations"]
         self.current_iteration = 0
+        self.use_images = config.get("use_images", False)
 
         self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
@@ -78,7 +81,10 @@ class Seer:
 
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
-        self._investigate(task)
+        try:
+            self._investigate(task)
+        except Exception as e:
+            self.session.log_error(e, stack_trace)
 
         summarize_task(session.task_dir, session.log_error)
 
@@ -86,16 +92,20 @@ class Seer:
         """
         investigate all training pairs
         """
-        history = [""]
         self.task_solved = False  # Reset at the start of each task
 
         for i, pair in enumerate(task.train, 1):
+            # reset history for each pair
+            history = [""]
+            self.current_iteration = 0
+
             input_grid_str = pair.input.to_string()
             output_grid_str = pair.output.to_string()
 
             # dreamer prompt
             prompt = [
-                "\n**input**\n```\n",
+                f"\n## Example {i}\n",
+                "\n**input:**\n```\n",
                 input_grid_str,
                 "\n```\n\n",
             ]
@@ -103,16 +113,18 @@ class Seer:
                 input_image_filename = self.session.log_prompt_image(
                     pair.input, self.prompt_count + 1, f"example_{i}_input"
                 )
-                prompt.append(f"![Image]({input_image_filename})\n")
+                #  prompt.append(f"![Image]({input_image_filename})\n")
+                prompt.append(pair.input.to_image())
                 prompt.append("\n")
-            prompt.append("\n**output**\n```\n")
+            prompt.append("\n**output:**\n```\n")
             prompt.append(output_grid_str)
             prompt.append("\n```\n\n")
             if include_images:
                 output_image_filename = self.session.log_prompt_image(
                     pair.output, self.prompt_count + 1, f"example_{i}_output"
                 )
-                prompt.append(f"![Image]({output_image_filename})\n")
+                #  prompt.append(f"![Image]({output_image_filename})\n")
+                prompt.append(pair.output.to_image())
                 prompt.append("\n")
 
             instructions = [self.instructions["investigate_dreamer"]]
@@ -126,7 +138,7 @@ class Seer:
                 prompt,
                 instructions,
                 tools="code_execution",
-                description=f"example_{i} - NLP",
+                description=f"example_{i} • investigate_dreamer",
             )
             history.extend(prompt)
             history.extend(response_parts)
@@ -136,12 +148,7 @@ class Seer:
                 break  # Exit the loop if solved
 
             # coder prompt
-            instructions = [
-                self.instructions["investigate_coder"].format(
-                    input_grid_rows=pair.input.to_python_string(),
-                    expected_output_grid_rows=pair.output.to_python_string(),
-                )
-            ]
+            instructions = [ self.instructions["investigate_coder"]]
             prompt = [""]
             (
                 response,
@@ -153,7 +160,7 @@ class Seer:
                 prompt,
                 instructions,
                 #  tools="code_execution",
-                description=f"example_{i} - CODE",
+                description=f"example_{i} • investigate_coder",
             )
             history.extend(prompt)
             history.extend(response_parts)
@@ -183,7 +190,7 @@ class Seer:
                 train_results.extend(current_train_results)
 
                 all_train_passed = all(
-                    result.get("status") is True for result in train_results
+                    result.get("match") is True for result in train_results
                 )
                 if all_train_passed:
                     current_test_results = verifier.test_code(
@@ -199,13 +206,14 @@ class Seer:
                     test_results.extend(current_test_results)
 
                     all_test_passed = all(
-                        result.get("status") is True for result in test_results
+                        result.get("match") is True for result in test_results
                     )
                     if all_test_passed:
                         self.task_solved = True  # Set the flag
                         break  # Exit the loop *after* setting the flag
                 else:
                     if self.current_iteration <= self.max_iterations:
+                        #  if not self.task_solved:
                         self.refine(
                             task, train_results, test_results, code, base_filename
                         )
@@ -307,40 +315,49 @@ class Seer:
 
         # Construct the dreamer prompt
         dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
+        
         dreamer_prompt.append("\nTrain Set Results:\n")
-
         for i, result in enumerate(train_results):
-            dreamer_prompt.append(f"\n**Example {i+1}:**\n")
-            dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
+            dreamer_prompt.append(f"\n## Example {i+1}:\n")
+            dreamer_prompt.append(f"\nInput:\n```\n{result.get('input')}\n```\n")
             dreamer_prompt.append(
-                f"Expected Output:\n```\n{result['expected_output']}\n```\n"
+                f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
             )
             if "transformed_output" in result:
                 dreamer_prompt.append(
-                    f"Transformed Output:\n```\n{result['transformed_output']}\n```\n"
+                    f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
                 )
                 # Add images
                 image_filename = f"{base_filename}-train-example_{i+1}.png"
                 dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
 
-            dreamer_prompt.append(f"Status: {result['status']}\n")
+            dreamer_prompt.append(f"match: {result.get('match')}\n")
+            dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
+            dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
+            dreamer_prompt.append(f"color_palette_correct: {result.get('color_palette_correct')}\n")
+            dreamer_prompt.append(f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n")
+
 
         if test_results:  # Only include if there are test results
             dreamer_prompt.append("\nTest Set Results (if applicable):\n")
             for i, result in enumerate(test_results):
-                dreamer_prompt.append(f"\n**Test Example {i+1}:**\n")
-                dreamer_prompt.append(f"Input:\n```\n{result['input']}\n```\n")
+                dreamer_prompt.append(f"\n**Test {i+1}:**\n")
+                dreamer_prompt.append(f"Input:\n```\n{result.get('input')}\n```\n")
                 dreamer_prompt.append(
-                    f"Expected Output:\n```\n{result['expected_output']}\n```\n"
+                    f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
                 )
                 if "transformed_output" in result:
                     dreamer_prompt.append(
-                        f"Transformed Output:\n```\n{result['transformed_output']}\n```\n"
+                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
                     )
                     # Add images
                     image_filename = f"{base_filename}-test-example_{i+1}.png"
-                    dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
-                dreamer_prompt.append(f"Status: {result['status']}\n")
+                    dreamer_prompt.append(f"!.get(Transformed Image)({image_filename})\n")
+                dreamer_prompt.append(f"match: {result.get('match')}\n")
+                dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
+                dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
+                dreamer_prompt.append(f"color_palette_correct: {result.get('color_palette_correct')}\n")
+                dreamer_prompt.append(f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n")
 
         instructions = [self.instructions["refine_dreamer"]]
         (
@@ -352,11 +369,12 @@ class Seer:
             history,
             dreamer_prompt,
             instructions,
-            description=f"refine_code - NLP",
+            description=f"refine_dreamer",
         )
         history.extend(dreamer_prompt)
         history.extend(response_parts)
 
+        # there should not generally be code from dreamer but just in case
         self._test_extracted_codelist(extracted_code_list, task)
 
         # Construct the coder prompt
@@ -372,7 +390,7 @@ class Seer:
             history,
             coder_prompt,
             instructions,
-            description=f"refine_code - CODE",
+            description=f"refine_coder",
         )
         history.extend(coder_prompt)
         history.extend(response_parts)

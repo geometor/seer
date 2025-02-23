@@ -1,0 +1,12 @@
+task: 008
+objects:
+  - color: azure (8)
+    shape: contiguous regions
+    property: can be internal or external
+  - color: blue (1)
+    shape: derived from internal azure pixels
+actions:
+  - identify: find all contiguous regions of azure
+  - identify: find all *internal* azure pixels within each region, defined as part of 2x2 azure block
+  - transform: change color of identified internal azure pixels to blue
+  - preserve: keep all other pixels unchanged

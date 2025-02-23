@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Objects: Find all distinct, contiguous regions (objects) of non-zero color in the input grid.  These regions can be any shape, including single pixels.\n2. Order Objects: Sort the identified objects from left to right based on the horizontal position of their leftmost pixel.\n3. Combine Objects: Create a new grid. Place the identified and sorted objects horizontally, side-by-side, in the new grid.\n4. Vertical Placement and Height:\n   - Determine output row based on consistent positioning.  Specifically, if input is 10 rows, output on row 5. If input grid is 5 rows, place on row 2. Maintain original height of elements.\n5. Output Grid: The output grid might not have the same dimensions as the input grid. It should be large enough to fit all objects.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds all contiguous regions of non-zero color (objects) in the grid.\n    Returns a list of dictionaries, each representing an object.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n\n    for r in range(rows):\n        for c in range(cols):\n            if not visited[r, c] and grid[r, c] != 0:\n                color = grid[r, c]\n                # Start BFS to find the extent of the object\n                queue = [(r, c)]\n                visited[r, c] = True\n                min_row, max_row = r, r\n                min_col, max_col = c, c\n\n                while queue:\n                    curr_row, curr_col = queue.pop(0)\n                    min_row = min(min_row, curr_row)\n                    max_row = max(max_row, curr_row)\n                    min_col = min(min_col, curr_col)\n                    max_col = max(max_col, curr_col)\n\n                    # Check neighbors (including diagonals)\n                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:\n                        new_row, new_col = curr_row + dr, curr_col + dc\n                        if 0 <= new_row < rows and 0 <= new_col < cols and \\\n                           not visited[new_row, new_col] and grid[new_row, new_col] == color:\n                            queue.append((new_row, new_col))\n                            visited[new_row, new_col] = True\n\n                objects.append({\n                    'color': color,\n                    'top_left': (min_row, min_col),\n                    'bottom_right': (max_row, max_col)\n                })\n\n    return objects\n\ndef transform(input_grid):\n    # Identify objects in the input grid\n    objects = find_objects(input_grid)\n\n    # Order objects by their leftmost column\n    objects.sort(key=lambda obj: obj['top_left'][1])\n\n    # Calculate total width needed and max height of objects\n    total_width = 0\n    max_height = 0\n    for obj in objects:\n        obj_height = obj['bottom_right'][0] - obj['top_left'][0] + 1\n        obj_width = obj['bottom_right'][1] - obj['top_left'][1] + 1\n        total_width += obj_width\n        max_height = max(max_height, obj_height)\n\n    # Determine output grid size and target row\n    input_height = input_grid.shape[0]\n    if input_height >= 10:\n        output_height = input_height\n        target_row = 5\n    elif input_height == 5:\n        output_height = 5\n        target_row = 2\n    else: # default\n        output_height = input_height\n        target_row = input_height // 2\n\n\n    output_grid = np.zeros((output_height, total_width), dtype=int)\n\n    # Combine objects horizontally\n    current_col = 0\n    for obj in objects:\n      obj_height = obj['bottom_right'][0] - obj['top_left'][0] + 1\n      obj_width =  obj['bottom_right'][1] - obj['top_left'][1] + 1\n\n      for r in range(obj_height):\n          row_to_place = target_row\n          # use input row if it is not part of specified rows\n          if input_height != 5 and input_height != 10:\n            row_to_place = obj['top_left'][0]\n\n          for c in range(obj_width):\n              output_grid[row_to_place, current_col + c] = obj['color']\n\n          # if 5 or 10, copy same object to next row\n          if input_height == 5 or input_height == 10:\n            row_to_place += 1\n            for c in range(obj_width):\n              output_grid[row_to_place, current_col + c] = obj['color']\n      current_col += obj_width\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6735,
+    "candidates_token_count": 1239,
+    "total_token_count": 7974,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.955055,
+  "response_file": "012-response.json"
+}

@@ -1,0 +1,51 @@
+observations:
+  - example: 1
+    input_grid_size: [4, 4]
+    output_grid_size: [4, 4]
+    input_non_zero_count: 5
+    output_non_zero_count: 5
+    actions:
+      - collect_non_zero:
+          description: "All non-zero pixels are identified in the input."
+          from: input_grid
+          to: temporary_collection
+      - arrange_last_row:
+         description: "Non-zero pixels are arranged on the last row. If there are more non-zero elements than columns, excess elements 'overflow' into rows above, right-aligned."
+         from: temporary_collection
+         to: output_grid
+    objects:
+       non_zero_pixels: "Pixels with values other than 0"
+
+  - example: 2
+    input_grid_size: [6, 6]
+    output_grid_size: [6, 6]
+    input_non_zero_count: 8
+    output_non_zero_count: 8
+    actions:
+      - collect_non_zero:
+          description: "All non-zero pixels are identified in the input."
+          from: input_grid
+          to: temporary_collection
+      - arrange_last_row:
+         description: "Non-zero pixels are arranged on the last row. If there are more non-zero elements than columns, excess elements 'overflow' into rows above, right-aligned."
+         from: temporary_collection
+         to: output_grid
+    objects:
+       non_zero_pixels: "Pixels with values other than 0"
+
+  - example: 3
+    input_grid_size: [5, 5]
+    output_grid_size: [5, 5]
+    input_non_zero_count: 7
+    output_non_zero_count: 7
+    actions:
+      - collect_non_zero:
+          description: "All non-zero pixels are identified in the input."
+          from: input_grid
+          to: temporary_collection
+      - arrange_last_row:
+         description: "Non-zero pixels are arranged on the last row. If there are more non-zero elements than columns, excess elements 'overflow' into rows above, right-aligned."
+         from: temporary_collection
+         to: output_grid
+    objects:
+       non_zero_pixels: "Pixels with values other than 0"

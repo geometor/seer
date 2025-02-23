@@ -1,0 +1,21 @@
+facts:
+  - type: grid
+    description: Input and output are 2D grids of digits.
+    dimensions: 11x9
+  - type: object
+    description: A contiguous region of non-zero pixels.
+    input_color: 5 (gray)
+    output_color: 8 (azure)
+  - type: object
+    description: outline of the gray region.
+    input_color: 5 (gray)
+    output_color: 2 (red)
+  - type: background
+    description: The surrounding pixels.
+    color: 0 (white)
+    change: unchanged
+  - type: transformation
+    description: Color replacement based on object identification.
+    rule: |
+          Inner region of color 5 changes to color 8.
+          Bordering region of object are changed to color 2

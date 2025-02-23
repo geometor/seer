@@ -1,0 +1,20 @@
+task: 022
+objects:
+  - id: background
+    color: white (0)
+    role: static
+    description: Fills the entire grid initially, and remains unchanged in areas not occupied by the main object.
+  - id: gray_object
+    color: gray (5)
+    role: dynamic
+    description: The main object that undergoes transformation. It's a contiguous block of gray pixels in the input.
+transformations:
+  - action: segment
+    input: gray_object
+    description: The gray object is divided into contiguous vertical segments. A segment is defined by its connectivity – adjacent gray pixels, both vertically and horizontally, belong to the same segment.
+  - action: color_alternation
+    input: segments
+    description:  Segments are colored alternately with red (2) and azure (8), starting with red for the leftmost segment.
+  - action: place
+    input: colored segments, background
+    description: Colored segments occupy cells that are gray in the input grid

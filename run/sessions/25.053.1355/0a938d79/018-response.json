@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Colored Pixels:** Locate all non-white (non-zero) pixels in the input grid.\n2.  **Horizontal Replication:** For each colored pixel:\n    *   Replace all white pixels in the same row with the color of the identified pixel.\n3. **Pattern Replication:**\n   *  Starting with each original colored pixel row.\n   *  alternating below, fill the rows with the same color as the original pixel row.\n\"\"\"\n\nimport numpy as np\n\ndef get_colored_pixels(grid):\n    \"\"\"Finds the coordinates and colors of non-white pixels.\"\"\"\n    colored_pixels = []\n    for row_idx, row in enumerate(grid):\n        for col_idx, pixel in enumerate(row):\n            if pixel != 0:\n                colored_pixels.append(((row_idx, col_idx), pixel))\n    return colored_pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    \n    # Find colored pixels\n    colored_pixels = get_colored_pixels(input_grid)\n\n    # Horizontal Replication and pattern creation\n    for (row, col), color in colored_pixels:\n        # Fill the original row\n        output_grid[row, :] = color\n\n        # alternate the filled rows\n        offset = 1\n        while row + offset < output_grid.shape[0]:\n          output_grid[row+offset,:] = color\n          offset += 2\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2799,
+    "candidates_token_count": 352,
+    "total_token_count": 3151,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.141695,
+  "response_file": "018-response.json"
+}

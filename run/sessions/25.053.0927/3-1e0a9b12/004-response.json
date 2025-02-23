@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  Identify all non-zero pixels (colored objects).\n2.  Locate the maroon pixel (color 9). Move this pixel to the last row of the grid, while maintaining its original column.\n3.  Locate the azure pixel (color 8) that is not part of a contiguous vertical object of size=2, move it to the last row, keep the original column if unoccupied, if occupied by an object, move object to the next available row.\n4.  All other objects remain in their original positions.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color, exclude_positions=None):\n    # Find the position of a specific colored pixel.\n    if exclude_positions is None:\n        exclude_positions = []\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in exclude_positions:\n                return (r, c)\n    return None\n\ndef get_contiguous_vertical_objects(grid):\n    # Find objects that are vertically contiguous with size\n    objects = []\n\n    for c in range(grid.shape[1]):\n      for r in range(grid.shape[0]):\n        color = grid[r,c]\n        if(color != 0):\n            count = 0\n            for r2 in range(r, grid.shape[0]):\n                if grid[r2,c] == color:\n                    count = count + 1\n                else:\n                    break;\n            if count > 0:\n                obj = {'color': color, 'position':(r,c), 'size': count}\n                objects.append(obj)\n\n    return objects\n\ndef is_cell_occupied(grid, row, col):\n    # Check if a cell is occupied by a non-zero value.\n    return grid[row, col] != 0\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Move the maroon pixel (color 9)\n    maroon_pos = find_object(input_grid, 9)\n    if maroon_pos:\n        output_grid[maroon_pos[0], maroon_pos[1]] = 0  # Remove from original position\n        output_grid[output_grid.shape[0] - 1, maroon_pos[1]] = 9  # Place in new position\n\n    # move azure pixel (color 8)\n    contiguous_vertical = get_contiguous_vertical_objects(input_grid)\n    exclude_positions = []\n    for obj in contiguous_vertical:\n      if obj['size'] > 1:\n        for i in range(0,obj['size']):\n          exclude_positions.append( (obj['position'][0] + i, obj['position'][1]) )\n\n    azure_pos = find_object(input_grid, 8, exclude_positions)\n\n    if azure_pos:\n        output_grid[azure_pos[0], azure_pos[1]] = 0\n\n        target_row = output_grid.shape[0] - 1\n        target_col = azure_pos[1]\n        \n        if not is_cell_occupied(output_grid, target_row, target_col):\n          output_grid[target_row, target_col] = 8\n        else:\n          #find next available row\n          \n          for r in range(target_row -1, -1, -1):\n            if not is_cell_occupied(output_grid, r, target_col):\n              output_grid[r, target_col] = 8\n              break\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3408,
+    "candidates_token_count": 856,
+    "total_token_count": 4264,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.248176,
+  "response_file": "004-response.json"
+}

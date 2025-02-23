@@ -1,0 +1,31 @@
+objects:
+  - description: input grid
+    type: grid
+    properties:
+      elements: integers from 0 to 9
+
+  - description: output grid
+    type: grid
+    properties:
+      elements: integers from 0 to 9
+
+actions:
+  - name: increment_modulo
+    input: input grid
+    output: intermediate grid
+    description: Each element in the input grid is incremented by 1, then modulo 10 is applied.
+  - name: value_replacement
+    input: intermediate grid
+    output: output grid
+    description: specific mapping derived from examples
+    mapping:
+        0: 4
+        1: 5
+        2: 6
+        3: 4
+        4: 3
+        5: 1
+        6: 2
+        7: 0
+        8: 9
+        9: 8

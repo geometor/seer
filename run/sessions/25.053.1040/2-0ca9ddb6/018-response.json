@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify original objects**: Find all contiguous non-white pixels in the input grid. These are the original colored objects.\n2.  **Determine expansion colors**:\n    *   If an original object is red (2), add adjacent pixels colored yellow (4).\n    *   If an original object is blue (1), add adjacent pixels colored orange (7).\n    *   If an original object is magenta (6) add adjacent pixels, but they will have yellow and orange nearby, so they will not be extended\n3.  **Expand objects**: For each original colored object:\n    *   For each pixel in the original object, check its four immediate neighbors (up, down, left, right).\n    *   If a neighbor is white (0), change it to the designated expansion color based on the original pixel's color. Do *not* extend diagonally.\n4. output the final grid\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighbors of a cell (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # Up\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # Down\n    if col > 0:\n        neighbors.append((row, col - 1))  # Left\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # Right\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the expansion rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each cell in the input grid\n    for row in range(rows):\n        for col in range(cols):\n            pixel_color = input_grid[row, col]\n\n            # Determine expansion color based on original pixel color\n            expansion_color = 0  # Default to white (no expansion)\n            if pixel_color == 2:  # Red\n                expansion_color = 4  # Yellow\n            elif pixel_color == 1:  # Blue\n                expansion_color = 7  # Orange\n            #elif pixel_color == 6: #Magenta, no expansion color specified\n\n            # If there's an expansion color, check neighbors\n            if expansion_color != 0:\n                neighbors = get_neighbors(input_grid, row, col)\n                for n_row, n_col in neighbors:\n                    if output_grid[n_row, n_col] == 0:  # If neighbor is white\n                        output_grid[n_row, n_col] = expansion_color  # Expand\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 983,
+            "end_index": 1275,
+            "uri": "https://github.com/Kaeltherol/Minesweeper",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2471,
+    "candidates_token_count": 643,
+    "total_token_count": 3114,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.628359,
+  "response_file": "018-response.json"
+}

@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    dimensions: 4x4
+    elements: integers (0-9)
+    element_type: pixel
+
+properties:
+  - property: color
+    values: represented by integers 0-9
+  - property: position
+    values: row and column indices
+
+actions:
+  - name: move
+    description: Non-zero elements are moved.
+    precondition: element is non-zero
+    postcondition: element is in the bottom row
+
+relationships:
+  - type: spatial
+    description: Elements maintain their relative horizontal order.
+  - type: source-destination
+    description: non zero input elements map to bottom row of the output
+  

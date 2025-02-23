@@ -1,0 +1,22 @@
+observations:
+  - object: grid
+    properties:
+      size: [rows, cols] # Variable, depends on the specific example.
+      elements: pixels
+      pixel_values: [0-9]  # Representing colors.
+
+  - object: pixel
+    properties:
+      color: [0-9] # color
+      position: [row, col] # location in the grid
+    interactions:
+      - action: expand
+        conditions:
+          - if color is 8:
+            changes_adjacent_white_pixels: true
+            adjacent_pixels_color: 7  #orange
+          - if color is 1 or 2: # blue or red
+            changes_L1_2_white: true # this needs work
+            L1_2_pixels_color: 4  # yellow
+          - if color is 6:  #magenta - should not change surrounding
+            changes_surrounding_white: false

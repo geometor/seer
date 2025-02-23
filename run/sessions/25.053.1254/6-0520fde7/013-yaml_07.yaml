@@ -1,0 +1,36 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - colors: [0, 1, 5]  # List of colors present in the input grids
+      - height: variable
+      - width: variable
+  - name: gray_line
+    type: vertical_line
+    properties:
+      - color: 5
+      - x_coordinate: variable # Dynamically determined
+  - name: output_grid
+    type: 2D array
+    properties:
+      - colors: [0, 2]  # Limited color palette in the output.
+      - height: same as input_grid
+      - width: 3
+  - name: left_pixel
+    type: pixel
+    properties:
+      - relative_position: left of gray_line
+  - name: right_pixel
+    type: pixel
+    properties:
+      - relative_position: right of gray_line
+
+actions:
+  - name: locate_gray_line
+    description: Find the x-coordinate of the vertical gray line.
+  - name: extract_adjacent_pixels
+    description: Get the pixels immediately to the left and right of the gray line for each row.
+  - name: create_output
+    description: build a 3xN grid, where N is the height of the input
+  - name: translate_colors
+    description:  Map input colors to output colors based on specific rules. Specifically, input blue becomes output red, and all other non-zero colors become zero. The center column is always zero.

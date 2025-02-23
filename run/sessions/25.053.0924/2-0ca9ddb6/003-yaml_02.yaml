@@ -1,0 +1,72 @@
+facts:
+  - task_type: "grid transformation"
+  - input_grid_shape: [9, 9]
+  - output_grid_shape: [9, 9]
+  - input_colors:
+    - 8:  # Azure
+        instances: 1
+    - 2:  # Red
+        instances: 2
+    - 1:  # Blue
+        instances: 2
+  - output_colors:
+    - 8:  # Azure
+        instances: 1
+    - 2:  # Red
+        instances: 2
+    - 1:  # Blue
+        instances: 2
+    - 4: # Yellow
+        instances: 6
+    - 7: # Orange
+        instances: 7
+
+objects:
+  - name: "Azure Pixel"
+    input_location: (0, 3)
+    output_location: (0, 3)
+    properties:
+      color: 8  # Azure
+      change: "None"
+
+  - name: "Red Pixel 1"
+    input_location: (2, 6)
+    output_location: (2, 6)
+    properties:
+      color: 2  # Red
+      change: "None"
+
+  - name: "Red Pixel 2"
+    input_location: (7, 1)
+    output_location: (7, 1)
+    properties:
+        color: 2 # Red
+        change: "None"
+
+  - name: "Blue Pixel 1"
+    input_location: (3, 2)
+    output_location: (3, 2)
+    properties:
+      color: 1  # Blue
+      change: "Mirrored with Orange(7), Yellow(4) appears"
+
+  - name: "Blue Pixel 2"
+    input_location: (6, 6)
+    output_location: (6, 6)
+    properties:
+        color: 1 # Blue
+        change: "Mirrored with Orange(7), Yellow(4) appears"
+
+actions:
+  - name: "Mirror Blue"
+    description: >
+      Blue pixels are the center of a mirroring operation.
+      An orange pixel is placed on either side of the original
+      blue pixel in the row and column dimensions, but only if the
+      mirrored position is within the bounds of the grid and is currently
+      a black pixel.
+  - name: "Create Yellow"
+      description: >
+        A yellow object is created around blue pixel by mirroring the action of a blue pixel.
+        Two positions on the opposite side of red pixels in the same row.
+        Two position on the opposite side of red pixels in the same column.

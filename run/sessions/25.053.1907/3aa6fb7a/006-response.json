@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIf two azure pixels are diagonally adjacent, change one of the pixel to blue.\nPrioritize changing the top-left pixel in a diagonally adjacent pair.\nIf not top-left, change the bottom-right pixel.\n\"\"\"\n\nimport numpy as np\n\ndef get_azure_pixels(grid):\n    # find coordinates of all azure pixels\n    return np.argwhere(grid == 8)\n\ndef are_diagonally_adjacent(coord1, coord2):\n    # check if two coordinates are diagonally adjacent\n    return abs(coord1[0] - coord2[0]) == 1 and abs(coord1[1] - coord2[1]) == 1\n\ndef get_top_left(coord1, coord2):\n    # Return the coordinate that is more top-left.\n    if coord1[0] < coord2[0] or (coord1[0] == coord2[0] and coord1[1] < coord2[1]):\n        return coord1\n    else:\n        return coord2\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule: If two azure pixels are\n    diagonally adjacent, change the top-left one of the pair to blue.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    azure_pixels = get_azure_pixels(output_grid)\n    changed_pixels = set()  # Keep track of changed pixels\n\n    # Iterate through all pairs of azure pixels\n    for i in range(len(azure_pixels)):\n        for j in range(i + 1, len(azure_pixels)):\n            coord1 = tuple(azure_pixels[i])\n            coord2 = tuple(azure_pixels[j])\n\n            if coord1 in changed_pixels or coord2 in changed_pixels:\n                continue # skip if one has been changed already in a prior compare\n\n            if are_diagonally_adjacent(coord1, coord2):\n                # Determine top-left pixel in the pair\n                top_left = get_top_left(coord1, coord2)\n\n                # Change the top-left pixel in the pair to blue\n                output_grid[top_left] = 1\n                changed_pixels.add(top_left) # add to set to prevent re-checking\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3447,
+    "candidates_token_count": 526,
+    "total_token_count": 3973,
+    "cached_content_token_count": 0
+  },
+  "response_time": 29.535867,
+  "response_file": "006-response.json"
+}

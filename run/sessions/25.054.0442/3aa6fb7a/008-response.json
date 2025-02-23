@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nLocates azure (8) clusters in the input grid. Identifies adjacent white (0) pixels\nand changes them to blue (1) in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_azure_clusters(grid):\n    # Find all azure pixels\n    azure_pixels = np.argwhere(grid == 8)\n    clusters = []\n    visited = set()\n\n    # helper function to perform Depth First Search\n    def dfs(row, col, current_cluster):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != 8:\n            return\n\n        visited.add((row, col))\n        current_cluster.append((row, col))\n\n        # Explore adjacent cells\n        dfs(row + 1, col, current_cluster)\n        dfs(row - 1, col, current_cluster)\n        dfs(row, col + 1, current_cluster)\n        dfs(row, col - 1, current_cluster)\n\n\n    for r, c in azure_pixels:\n        if (r, c) not in visited:\n            current_cluster = []\n            dfs(r, c, current_cluster)\n            clusters.append(current_cluster)\n\n    return clusters\n\ndef find_adjacent_whites(grid, cluster):\n    adjacent_whites = []\n    for r, c in cluster:\n        # Check neighbors\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1] and grid[nr, nc] == 0:\n                if (nr, nc) not in adjacent_whites: #avoid duplicates\n                    adjacent_whites.append((nr, nc))\n    return adjacent_whites\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of input\n    output_grid = np.copy(input_grid)\n    \n    # Find azure clusters\n    clusters = find_azure_clusters(input_grid)\n    \n    #introduce blue adjacent to clusters\n    for cluster in clusters:\n      adjacent_whites = find_adjacent_whites(input_grid, cluster)\n      if adjacent_whites:\n          #only put one blue next to the cluster\n          row,col = adjacent_whites[0]\n          output_grid[row,col]=1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2158,
+    "candidates_token_count": 594,
+    "total_token_count": 2752,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.469447,
+  "response_file": "008-response.json"
+}

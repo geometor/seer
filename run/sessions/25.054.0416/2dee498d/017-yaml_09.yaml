@@ -1,0 +1,24 @@
+task_016:
+  example_1:
+    input_shape: (3, 9)
+    output_shape: (3, 3)
+    rule: "Keep columns 0, 4, and 8."
+    success: True
+  example_2:
+    input_shape: (4, 12)
+    output_shape: (4, 4)
+    rule: "Keep columns 0, 4, 8, and 11."
+    success: False
+  example_3:
+    input_shape: (2, 6)
+    output_shape: (2, 2)
+    rule: "Keep columns 0 and 3"
+    success: False
+  overall_rule: "Keep every 4th column, starting with the first, and includes the LAST column, regardless of interval."
+  objects:
+    - grid:
+        properties:
+          - dimensions: rows x columns
+          - values: integers (0-9) representing colors
+        actions:
+          - column_selection: Select specific columns based on a calculated interval and include the final column.

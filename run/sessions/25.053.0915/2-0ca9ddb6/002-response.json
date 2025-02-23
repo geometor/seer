@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Red Pixel Expansion:** The red pixel (color 2) expands horizontally by one pixel in both directions, creating new yellow pixels (color 4). This expansion is mirrored across the original red pixel's vertical axis.\n\n2.  **Blue Pixel Expansion:** The blue pixel (color 1) expands by one pixel in all orthogonal directions (up, down, left, and right), creating new orange pixels (color 7).\n\"\"\"\n\nimport numpy as np\n\ndef get_pixel_positions(grid, color):\n    return np.argwhere(grid == color).tolist()\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # Find red pixel\n    red_pixel_positions = get_pixel_positions(input_grid, 2)\n    if red_pixel_positions:\n      red_pixel = red_pixel_positions[0]\n    \n      # Horizontal expansion for red pixel\n      for i in [-1, 1]:\n        new_x = red_pixel[1] + i\n        if 0 <= new_x < output_grid.shape[1]:\n          output_grid[red_pixel[0], new_x] = 4\n          \n\n    # Find blue pixel\n    blue_pixel_positions = get_pixel_positions(input_grid, 1)\n    if blue_pixel_positions:\n      blue_pixel = blue_pixel_positions[0]\n    \n      # Orthogonal expansion for blue pixel\n      for dx, dy in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n          new_x = blue_pixel[1] + dx\n          new_y = blue_pixel[0] + dy\n          if 0 <= new_x < output_grid.shape[1] and 0 <= new_y < output_grid.shape[0]:\n            output_grid[new_y, new_x] = 7\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4248,
+    "candidates_token_count": 464,
+    "total_token_count": 4712,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.310673,
+  "response_file": "002-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIterates through each pixel in the input grid.\nIdentifies green (3) pixels.\nFor each green pixel, checks for adjacency with other green pixels:\n    Checks if there is a green pixel directly above AND directly below.\n    Checks if there is a green pixel directly to the left AND directly to the right.\nIf either of the adjacency conditions is true, changes the pixel's color to yellow (4).\nReturns the modified grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_adjacent_pixels(grid, row, col):\n    \"\"\"Gets the values of adjacent pixels (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    adjacent = {}\n    if row > 0:\n        adjacent['up'] = grid[row - 1, col]\n    if row < rows - 1:\n        adjacent['down'] = grid[row + 1, col]\n    if col > 0:\n        adjacent['left'] = grid[row, col - 1]\n    if col < cols - 1:\n        adjacent['right'] = grid[row, col + 1]\n    return adjacent\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rule.\"\"\"\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each pixel in the grid\n    for row in range(rows):\n        for col in range(cols):\n            # Check if the current pixel is green (3)\n            if output_grid[row, col] == 3:\n                # Get adjacent pixel values\n                adjacent = get_adjacent_pixels(output_grid, row, col)\n\n                # Check adjacency conditions and change color to yellow (4) if met\n                if adjacent.get('up') == 3 and adjacent.get('down') == 3:\n                    output_grid[row, col] = 4\n                elif adjacent.get('left') == 3 and adjacent.get('right') == 3:\n                    output_grid[row, col] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2236,
+    "candidates_token_count": 493,
+    "total_token_count": 2729,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.439908,
+  "response_file": "002-response.json"
+}

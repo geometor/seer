@@ -1,0 +1,14 @@
+task_id: 016
+observations:
+  - type: object_identification
+    description: Identify vertically connected components of the same color.
+    details: Each group of vertically adjacent pixels of the same color forms a distinct object.
+  - type: vertical_merging
+    description: Merge vertically connected components into single rows.
+    details: Adjacent pixels in the same column with the same color are merged.
+  - type: shifting
+    description: After merging, shift merged groups down.
+    details: All resulting components are combined into a single row each and moved down.
+  - type: row_preservation
+    description: shift all components, inserting blank rows at the top to preserve row count
+    details: The final output grid should have the same number of rows as the input grid.

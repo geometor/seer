@@ -1,0 +1,25 @@
+observations:
+  - task_id: '004-ARC'
+    example_set: train
+    objects:
+      - name: green_connected_components
+        description: Groups of green (3) pixels connected orthogonally (up, down, left, right).
+        properties:
+          - property: shape
+            values: [cross, line, blob]
+          - property: interior_pixels
+            description: Green pixels within a component considered "inside" based on surrounding green neighbors.
+            values: [list of (row, col) coordinates]
+    actions:
+      - name: transform_color
+        description: Change the color of interior green pixels to yellow (4).
+        preconditions:
+          - object: green_pixel
+            property: interior
+            state: true
+        postconditions:
+          - object: green_pixel
+            property: color
+            new_state: 4
+    rules:
+      - description: "Interior pixels of green connected components are transformed to yellow."

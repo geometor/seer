@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Shapes:** Find all distinct, contiguous regions of gray (5) pixels in the input grid.  Each of these regions is considered a separate \"shape.\"\n2.  **Outline Each Shape:** For each identified shape:\n    *   Iterate through all pixels within the shape.\n    *   A gray pixel is part of the *outline* if it is directly adjacent (up, down, left, or right) to a pixel that is *not* part of the *same* gray shape (either a different color or out of bounds).\n    *   Replace all outline pixels of the shape with azure (8).\n3.  **Fill Each Shape:** For each outlined shape:\n    * fill the interior by flood filling from the edges inward, changing all gray pixels to red (2) until the azure outline is met.\n4.  **Preserve Background:** Ensure all white (0) pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef find_shapes(grid, shape_color):\n    \"\"\"Finds all contiguous regions of the specified color.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    shapes = []\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_shape):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != shape_color:\n            return\n        visited[r, c] = True\n        current_shape.append((r, c))\n        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n            dfs(r + dr, c + dc, current_shape)\n\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row, col] == shape_color and not visited[row, col]:\n                current_shape = []\n                dfs(row, col, current_shape)\n                shapes.append(current_shape)\n    return shapes\n\ndef outline_shape(grid, shape, outline_color):\n    \"\"\"Outlines a single shape with the specified color.\"\"\"\n    outlined_grid = np.copy(grid)\n    for r, c in shape:\n        is_outline = False\n        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n            nr, nc = r + dr, c + dc\n            if not (0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1]) or (nr, nc) not in shape:\n                is_outline = True\n                break\n        if is_outline:\n            outlined_grid[r, c] = outline_color\n    return outlined_grid\n\ndef flood_fill(grid, start_r, start_c, fill_color, outline_color, shape_color):\n    \"\"\"\n    Flood fills the interior of a shape. Starts from multiple boundary points\n    of the shape and moves inwards.\n    \"\"\"\n    rows, cols = grid.shape\n    q = deque()\n    \n    # Add shape pixels adjacent to non-shape pixels (or boundaries) to the queue\n    visited = set()\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r,c] == shape_color:\n               for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n                   nr, nc = r + dr, c + dc\n                   if not (0 <= nr < rows and 0 <= nc < cols and grid[nr,nc] == shape_color):\n                       q.append((r,c))\n                       visited.add((r,c))\n                       break\n    \n\n    while q:\n        r, c = q.popleft()\n\n        if grid[r, c] == shape_color:\n            grid[r, c] = fill_color\n\n            for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n                nr, nc = r + dr, c + dc\n                if (0 <= nr < rows and 0 <= nc < cols and\n                        grid[nr, nc] == shape_color and (nr, nc) not in visited ):\n                    q.append((nr, nc))\n                    visited.add((nr,nc))\n\ndef transform(input_grid):\n    # Initialize output_grid with the same dimensions and background as input_grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n    shape_color = 5\n    outline_color = 8\n    fill_color = 2\n\n    # Find all distinct shapes.\n    shapes = find_shapes(input_grid, shape_color)\n    \n    # Outline and then fill each shape\n    for shape in shapes:\n        output_grid = outline_shape(output_grid, shape, outline_color)\n    \n    for shape in shapes:\n        flood_fill(output_grid, shape[0][0], shape[0][1], fill_color, outline_color, shape_color)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4595,
+    "candidates_token_count": 1224,
+    "total_token_count": 5819,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.511985,
+  "response_file": "006-response.json"
+}

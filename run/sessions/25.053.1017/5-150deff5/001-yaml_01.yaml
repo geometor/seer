@@ -1,0 +1,28 @@
+objects:
+  - name: shape
+    type: contiguous_pixels
+    initial_color: gray (5)
+    properties:
+      - connected: true
+      - bounded: true
+  - name: background
+    type: pixels
+    color: white (0)
+    properties:
+      - static: true
+
+actions:
+  - name: color_transform
+    target: shape
+    type: substitution
+    parameters:
+      - from: gray (5)
+        to:
+          - azure (8)
+          - red (2)
+    rule: alternating_fill
+
+relationships:
+   - subject: shape
+     relation: contained_within
+     object: background

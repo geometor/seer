@@ -69,17 +69,21 @@ def test_code(code, task_dir, task_pairs):
                 continue  # Skip to the next iteration
 
             try:
-                transformed_output = np.array(transformed_output)  # Convert to NumPy array
+                transformed_output = np.array(
+                    transformed_output
+                )  # Convert to NumPy array
             except Exception as e:
-                example_result["match"] = f"ERROR: Could not convert output to NumPy array: {e}"
+                example_result[
+                    "match"
+                ] = f"ERROR: Could not convert output to NumPy array: {e}"
                 test_results_json.append(example_result)
                 continue
 
-            # --- MODIFIED: Store the NumPy array ---
-            if isinstance(transformed_output, np.ndarray):
-                example_result["transformed_output_array"] = transformed_output.tolist()
-            else:
-                example_result["transformed_output_array"] = transformed_output
+            #  if isinstance(transformed_output, np.ndarray):
+                #  example_result["transformed_output_array"] = transformed_output.tolist()
+            #  else:
+                #  example_result["transformed_output_array"] = transformed_output
+
             example_result["transformed_output"] = Grid(
                 transformed_output, "", "", "", ""
             ).to_string()
@@ -104,7 +108,7 @@ def test_code(code, task_dir, task_pairs):
                 pixels_off = int(np.sum(transformed_output != expected_output))
                 example_result["pixels_off"] = pixels_off
                 example_result["percent_correct"] = 100 * (
-                    ( expected_output.size - pixels_off ) / expected_output.size
+                    (expected_output.size - pixels_off) / expected_output.size
                 )
 
             if not np.array_equal(transformed_output, expected_output):
@@ -115,6 +119,34 @@ def test_code(code, task_dir, task_pairs):
             test_results_json.append(example_result)
 
     return test_results_json
+
+
+def string_to_grid(grid_string, row_delimiter="\n", cell_delimiter=" "):
+    """
+    Converts a grid string back to a list of lists for Grid
+    """
+    try:
+        rows = grid_string.strip().split(row_delimiter)
+        grid_list = []
+        for row in rows:
+            cells = row.strip().split(cell_delimiter)
+            # Convert each cell to an integer.  Handle potential errors.
+            int_cells = [int(cell) for cell in cells]
+            grid_list.append(int_cells)
+
+        return Grid(
+            grid_list,
+            "",
+            "",
+            "",
+            "",
+        )
+    except ValueError:
+        # Handle cases where conversion to int fails
+        return None
+    except Exception:
+        # Catch any other unexpected errors
+        return None
 
 
 def write_test_results(test_results_json, task_dir, base_filename):
@@ -136,18 +168,9 @@ def write_test_results(test_results_json, task_dir, base_filename):
 
                 # Generate and save image of transformed output
                 try:
-                    # --- MODIFIED SECTION ---
-                    # Directly use the NumPy array from the test results.
-                    transformed_output = result['transformed_output_array'] # NEW KEY
-                    transformed_grid = Grid(
-                        transformed_output,  # Pass the NumPy array directly
-                        "",  # These arguments are not used by to_image()
-                        "",
-                        "",
-                        "",
-                    )
+                    transformed_output_str = result["transformed_output"]  # NEW KEY
+                    transformed_grid = string_to_grid(transformed_output_str)
                     transformed_image = transformed_grid.to_image()
-                    # --- END MODIFIED SECTION ---
                     image_filename = f"{base_filename}-example_{result['example']}.png"
                     image_path = task_dir / image_filename
                     transformed_image.save(image_path)
@@ -155,7 +178,7 @@ def write_test_results(test_results_json, task_dir, base_filename):
                 except ValueError as e:
                     test_results_str += f"**ERROR**: Could not create grid from transformed output: {e}\n"
                     continue  # Skip image creation and go to the next result
-                except Exception as e: # Catch the PIL error
+                except Exception as e:  # Catch the PIL error
                     test_results_str += f"**ERROR**: Could not save image: {e}\n"
                     continue
 

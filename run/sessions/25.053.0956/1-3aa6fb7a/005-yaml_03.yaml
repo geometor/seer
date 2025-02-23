@@ -1,0 +1,29 @@
+observations:
+  - task_id: 004
+  - objects:
+      - type: vertical_line
+        color: azure
+        properties:
+          - contiguous: true
+          - variable_length: true
+      - type: pixel
+        properties:
+          - top:
+              color_change: blue #only when part of an azure object
+          - bottom:
+              color_change: blue #only when part of an azure object
+  - actions:
+      - identify: vertical_lines  # Find all distinct vertical lines of azure pixels.
+      - transform:               # Change the color of the top and bottom pixels.
+          target: top_pixel
+          new_color: blue
+      - transform:
+          target: bottom_pixel
+          new_color: blue
+  - rules:
+      - condition: "pixel is part of a vertical_line AND is the top-most pixel of that line"
+        action: "change color to blue"
+      - condition: "pixel is part of a vertical_line AND is the bottom-most pixel of that line"
+        action: "change color to blue"
+      - condition: otherwise
+        action: "pixel remains the same color"

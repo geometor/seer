@@ -1,0 +1,19 @@
+facts:
+  - observation: Input grid is 7x3, output grid is 3x3.
+  - observation: Input grid colors are white (0), blue (1), and gray (5).
+  - observation: Output grid colors are white (0) and red (2).
+  - object: Input grid
+    properties:
+      dimensions: 7x3
+      colors: [0, 1, 5]
+  - object: Output grid
+    properties:
+      dimensions: 3x3
+      colors: [0, 2]
+  - action: Transformation
+    description: Converts input grid to output grid.
+    details:
+      - Removes the fourth column, which is gray (5).
+      - Changes blue (1) in specific position to red (2).
+  - relationship: Spatial arrangement changes.
+  - hypothesis: "1" changes to "2" when bordered by at least two "0" of opposite type, i.e. horizontal or vertical

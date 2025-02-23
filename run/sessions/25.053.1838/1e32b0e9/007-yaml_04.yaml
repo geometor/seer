@@ -1,0 +1,30 @@
+facts:
+  - object: grid
+    description: 2D array of pixels
+    properties:
+      - width: 17
+      - height: 17
+      - cells: pixels with color values 0-9
+
+  - object: red_cross
+    description: Cross-shaped structure
+    properties:
+      - color: red (2)
+      - composition: contiguous red pixels
+      - surrounds: blue and white pixels
+
+  - object: blue_pixels
+    description: Blue pixels inside arms of red cross
+    properties:
+        - color: blue(1)
+        - location: within the red cross structure
+
+  - object: background
+    description: set of all white pixels
+    properties:
+        - color: white(0)
+
+  - action: fill
+    description: Change color of selected white pixels to red.
+    parameters:
+      - condition:  white pixels that form 3x3 squares with other white pixels and share an edge or corner with blue pixels inside the red cross.

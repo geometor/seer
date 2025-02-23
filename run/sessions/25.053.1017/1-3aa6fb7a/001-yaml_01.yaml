@@ -1,0 +1,23 @@
+facts:
+  - type: grid
+    description: 2D array of pixels
+    elements:
+      - value: 0
+        color: white
+        role: background
+      - value: 8
+        color: azure
+        role: object
+      - value: 1
+        color: blue
+        role: marker
+  - objects:
+    description: Contiguous blocks of azure (8) pixels
+    properties:
+      - shape: irregular
+      - size: variable
+  - transformation:
+    description: change in color
+    action: A single azure (8) pixel within an object is changed to blue (1).
+    location:
+      description: The changed pixel seems to be interior, not on the edge. It's always on the second row or second to last row of the shape

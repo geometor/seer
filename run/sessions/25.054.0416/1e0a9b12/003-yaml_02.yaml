@@ -1,0 +1,30 @@
+task_id: 63613498
+summary: |
+  Non-zero elements are extracted and placed in order on the last row of the output grid. Other rows are shifted upwards.
+objects:
+  - id: grid
+    description: A 2D array of integers representing colored pixels.
+    properties:
+      - width: Variable, between 1 and 30.
+      - height: Variable, between 1 and 30.
+      - elements: Integers from 0 to 9, representing colors.
+  - id: non_zero_elements
+    description: The elements within the grid that have a value other than 0.
+    properties:
+      - count: Variable, determined by the input grid.
+      - order: Preserved from the input grid (reading left-to-right, top-to-bottom).
+actions:
+  - id: extract
+    description: Identify and collect all non-zero elements from the input grid.
+  - id: shift_up
+    description: shift the rows upward
+    details: |
+      Rows are shifted upwards, the number of rows equal to the number of input
+      rows containing at least one nonzero value
+  - id: place
+    description: Place the extracted non-zero elements on the last row of the output grid.
+    details: |
+      The elements are placed in their original order.  Any remaining cells on
+      the last row are set to zero.
+  - id: create_output_grid
+    description: Create output grid same size as input grid

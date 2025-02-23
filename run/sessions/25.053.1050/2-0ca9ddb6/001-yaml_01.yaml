@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 9x9
+      elements: integers (0-9)
+
+  - type: pixel
+    properties:
+      color:
+        mapping:
+          0: white
+          1: blue
+          2: red
+          4: yellow
+          7: orange
+      position: (row, column)
+
+actions:
+  - name: expand
+    description: Create new pixels around existing pixels of a specific color.
+    parameters:
+      source_color: The color of the pixel to expand from.
+      target_color: The color of the new pixels to create.
+      shape: the relative coordinates to place the new color
+
+relationships:
+  - type: adjacency
+    description: Pixels are considered adjacent if they share a side (not diagonally).

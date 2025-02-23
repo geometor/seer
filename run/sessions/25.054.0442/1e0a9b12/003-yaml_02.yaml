@@ -1,0 +1,10 @@
+observations:
+  - type: object_identification
+    description: Non-zero pixels in the input grid are treated as individual objects.
+    details: Each non-zero pixel retains its original color value.
+  - type: transformation_rule
+    description: Non-zero objects are moved to the last row(s) of the output grid, but they *maintain their original horizontal order within each row AND their relative vertical order*.
+  - type: spatial_relationship
+    description: The output grid has the same dimensions as the input grid. The target cells are filled from left-to-right, wrapping to the next row if there's not space in the final row.
+  - type: fill_operation
+    description: Empty cells in the output grid, those not occupied by the moved non-zero objects, are filled with zeros (white).

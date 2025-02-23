@@ -1,0 +1,25 @@
+task: 018
+objects:
+  - id: grid
+    type: 2D array
+    description: Contains pixels of different colors.
+  - id: green_regions
+    type: list
+    description: List of contiguous regions of green pixels. Each region is a list of (row, col) coordinates.
+  - id: inner_region
+    type: list
+    description: Subset of green_region, representing pixels to be changed to yellow.
+
+actions:
+  - name: find_contiguous_regions
+    input: grid, color
+    output: green_regions
+    description: Identifies all contiguous regions of the specified color.
+  - name: determine_inner_region
+    input: grid, green_region
+    output: inner_region
+    description: Determines which pixels within a green region are considered "inner" and should be transformed. The current implementation is flawed.
+  - name: transform_color
+    input: grid, inner_region, old_color, new_color
+    output: modified_grid
+    description: Changes the color of pixels in the inner_region from old_color to new_color.

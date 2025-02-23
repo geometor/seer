@@ -1,0 +1,33 @@
+facts:
+  - type: grid
+    description: input grid
+    properties:
+      - colors: [white, blue, gray]
+      - dimensions: 3x7
+      - pattern: vertical stripe of gray in the center, blue and white elsewhere.
+  - type: grid
+    description: output grid
+    properties:
+      - colors: [white, red]
+      - dimensions: 3x3
+      - pattern: central red pixel, surrounded by white.
+  - type: object
+    description: central column
+    properties:
+       - color: gray
+       - location: input grid, column 4 (index 3)
+  - type: transformation
+    description: color change
+    properties:
+      - from: gray
+      - to: red
+    location: center of the input grid
+  - type: transformation
+    description: size reduction
+    properties:
+       - from: 3 x 7
+       - to:  3 x 3
+  - type: relationship
+    description: spatial
+    properties:
+      - input_center: maps to output center

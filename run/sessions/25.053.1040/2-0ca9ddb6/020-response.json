@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Original Colored Pixels:** Iterate through each cell of the input grid. Note the color and position of any non-white pixels.\n2.  **Preserve Original Colors:** The output grid starts as a copy of the input grid.  This ensures all original non-white pixels are maintained.\n3.  **Conditional Expansion:** For each *white* (0) pixel in the output grid:\n    *   Check its immediate neighbors (up, down, left, and right, but *not* diagonally).\n    *   If a neighbor is red (2), change the white pixel to yellow (4).\n    *   If a neighbor is blue (1), change the white pixel to orange (7).\n    *   If a neighbor is magenta(6) do nothing.\n4. Output the final grid\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighbors of a cell (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # Up\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # Down\n    if col > 0:\n        neighbors.append((row, col - 1))  # Left\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # Right\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the expansion rules.\"\"\"\n    output_grid = np.copy(input_grid)  # Start with a copy to preserve original colors\n    rows, cols = input_grid.shape\n\n    # Iterate through each cell in the *output* grid\n    for row in range(rows):\n        for col in range(cols):\n            # Only consider white pixels for expansion\n            if output_grid[row, col] == 0:\n                neighbors = get_neighbors(input_grid, row, col)\n                for n_row, n_col in neighbors:\n                    neighbor_color = input_grid[n_row, n_col]\n                    # Conditional expansion based on neighbor's color\n                    if neighbor_color == 2:  # Red neighbor\n                        output_grid[row, col] = 4  # Change to yellow\n                        break  # Stop after the first expansion color is applied\n                    elif neighbor_color == 1:  # Blue neighbor\n                        output_grid[row, col] = 7  # Change to orange\n                        break  # Stop after the first expansion color is applied\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 847,
+            "end_index": 1139,
+            "uri": "https://github.com/Kaeltherol/Minesweeper",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5045,
+    "candidates_token_count": 604,
+    "total_token_count": 5649,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.471693,
+  "response_file": "020-response.json"
+}

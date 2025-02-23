@@ -1,0 +1,256 @@
+{
+  "response_report": [
+    {
+      "response_file": "001-response.json",
+      "token_usage": {
+        "prompt": 1319,
+        "candidates": 815,
+        "total": 2134,
+        "cached": 0
+      },
+      "response_time": 10.113348
+    },
+    {
+      "response_file": "002-response.json",
+      "token_usage": {
+        "prompt": 1968,
+        "candidates": 591,
+        "total": 2559,
+        "cached": 0
+      },
+      "response_time": 7.028094
+    },
+    {
+      "response_file": "003-response.json",
+      "token_usage": {
+        "prompt": 2926,
+        "candidates": 1436,
+        "total": 4362,
+        "cached": 0
+      },
+      "response_time": 14.743369
+    },
+    {
+      "response_file": "004-response.json",
+      "token_usage": {
+        "prompt": 4198,
+        "candidates": 364,
+        "total": 4562,
+        "cached": 0
+      },
+      "response_time": 3.804024
+    },
+    {
+      "response_file": "005-response.json",
+      "token_usage": {
+        "prompt": 4884,
+        "candidates": 1265,
+        "total": 6149,
+        "cached": 0
+      },
+      "response_time": 19.481566
+    },
+    {
+      "response_file": "006-response.json",
+      "token_usage": {
+        "prompt": 5987,
+        "candidates": 329,
+        "total": 6316,
+        "cached": 0
+      },
+      "response_time": 3.579708
+    }
+  ],
+  "test_report": {
+    "002-py_01-train": [
+      {
+        "example": 1,
+        "input": "0 4 0 9\n0 0 0 0\n0 4 6 0\n1 0 0 0",
+        "expected_output": "0 0 0 0\n0 0 0 0\n0 4 0 0\n1 4 6 9",
+        "transformed_output": "",
+        "match": "ERROR: index 4 is out of bounds for axis 1 with size 4",
+        "size_correct": "N/A",
+        "color_palette_correct": "N/A",
+        "correct_pixel_counts": "N/A",
+        "pixels_off": "N/A",
+        "percent_correct": "N/A"
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 9\n0 0 0 8 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 0 0 0",
+        "expected_output": "0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 8 0 9",
+        "transformed_output": "",
+        "match": "ERROR: index 6 is out of bounds for axis 1 with size 6",
+        "size_correct": "N/A",
+        "color_palette_correct": "N/A",
+        "correct_pixel_counts": "N/A",
+        "pixels_off": "N/A",
+        "percent_correct": "N/A"
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 1 0\n0 3 0 0 0\n0 3 0 1 2\n6 0 0 0 0\n0 3 0 0 0",
+        "expected_output": "0 0 0 0 0\n0 0 0 0 0\n0 3 0 0 0\n0 3 0 1 0\n6 3 0 1 2",
+        "transformed_output": "",
+        "match": "ERROR: index 5 is out of bounds for axis 1 with size 5",
+        "size_correct": "N/A",
+        "color_palette_correct": "N/A",
+        "correct_pixel_counts": "N/A",
+        "pixels_off": "N/A",
+        "percent_correct": "N/A"
+      }
+    ],
+    "003-py_02-train": [
+      {
+        "example": 1,
+        "input": "0 4 0 9\n0 0 0 0\n0 4 6 0\n1 0 0 0",
+        "expected_output": "0 0 0 0\n0 0 0 0\n0 4 0 0\n1 4 6 9",
+        "transformed_output": "1 4 6 9\n0 4 0 0\n0 0 0 0\n0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 10,
+        "percent_correct": 0.625
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 9\n0 0 0 8 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 0 0 0",
+        "expected_output": "0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 8 0 9",
+        "transformed_output": "4 0 7 8 0 9\n4 0 7 8 0 0\n4 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 16,
+        "percent_correct": 0.4444444444444444
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 1 0\n0 3 0 0 0\n0 3 0 1 2\n6 0 0 0 0\n0 3 0 0 0",
+        "expected_output": "0 0 0 0 0\n0 0 0 0 0\n0 3 0 0 0\n0 3 0 1 0\n6 3 0 1 2",
+        "transformed_output": "6 3 0 1 2\n0 3 0 1 0\n0 3 0 0 0\n0 0 0 0 0\n0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 12,
+        "percent_correct": 0.48
+      }
+    ],
+    "004-py_03-train": [
+      {
+        "example": 1,
+        "input": "0 4 0 9\n0 0 0 0\n0 4 6 0\n1 0 0 0",
+        "expected_output": "0 0 0 0\n0 0 0 0\n0 4 0 0\n1 4 6 9",
+        "transformed_output": "1 4 6 9\n0 4 0 0\n0 0 0 0\n0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 10,
+        "percent_correct": 0.625
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 9\n0 0 0 8 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 0 0 0",
+        "expected_output": "0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 8 0 9",
+        "transformed_output": "4 0 7 8 0 9\n4 0 7 8 0 0\n4 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 16,
+        "percent_correct": 0.4444444444444444
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 1 0\n0 3 0 0 0\n0 3 0 1 2\n6 0 0 0 0\n0 3 0 0 0",
+        "expected_output": "0 0 0 0 0\n0 0 0 0 0\n0 3 0 0 0\n0 3 0 1 0\n6 3 0 1 2",
+        "transformed_output": "6 3 0 1 2\n0 3 0 1 0\n0 3 0 0 0\n0 0 0 0 0\n0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 12,
+        "percent_correct": 0.48
+      }
+    ],
+    "005-py_04-train": [
+      {
+        "example": 1,
+        "input": "0 4 0 9\n0 0 0 0\n0 4 6 0\n1 0 0 0",
+        "expected_output": "0 0 0 0\n0 0 0 0\n0 4 0 0\n1 4 6 9",
+        "transformed_output": "1 4 6 9\n0 4 0 0\n0 0 0 0\n0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 10,
+        "percent_correct": 0.625
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 9\n0 0 0 8 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 0 0 0",
+        "expected_output": "0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 8 0 9",
+        "transformed_output": "4 0 7 8 0 9\n4 0 7 8 0 0\n4 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 16,
+        "percent_correct": 0.4444444444444444
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 1 0\n0 3 0 0 0\n0 3 0 1 2\n6 0 0 0 0\n0 3 0 0 0",
+        "expected_output": "0 0 0 0 0\n0 0 0 0 0\n0 3 0 0 0\n0 3 0 1 0\n6 3 0 1 2",
+        "transformed_output": "6 3 0 1 2\n0 3 0 1 0\n0 3 0 0 0\n0 0 0 0 0\n0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 12,
+        "percent_correct": 0.48
+      }
+    ],
+    "006-py_05-train": [
+      {
+        "example": 1,
+        "input": "0 4 0 9\n0 0 0 0\n0 4 6 0\n1 0 0 0",
+        "expected_output": "0 0 0 0\n0 0 0 0\n0 4 0 0\n1 4 6 9",
+        "transformed_output": "1 4 6 9\n0 4 0 0\n0 0 0 0\n0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 10,
+        "percent_correct": 0.625
+      },
+      {
+        "example": 2,
+        "input": "0 0 0 0 0 9\n0 0 0 8 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 0 0 0",
+        "expected_output": "0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n4 0 0 0 0 0\n4 0 7 8 0 0\n4 0 7 8 0 9",
+        "transformed_output": "4 0 7 8 0 9\n4 0 7 8 0 0\n4 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0\n0 0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 16,
+        "percent_correct": 0.4444444444444444
+      },
+      {
+        "example": 3,
+        "input": "0 0 0 1 0\n0 3 0 0 0\n0 3 0 1 2\n6 0 0 0 0\n0 3 0 0 0",
+        "expected_output": "0 0 0 0 0\n0 0 0 0 0\n0 3 0 0 0\n0 3 0 1 0\n6 3 0 1 2",
+        "transformed_output": "6 3 0 1 2\n0 3 0 1 0\n0 3 0 0 0\n0 0 0 0 0\n0 0 0 0 0",
+        "match": false,
+        "size_correct": true,
+        "color_palette_correct": true,
+        "correct_pixel_counts": true,
+        "pixels_off": 12,
+        "percent_correct": 0.48
+      }
+    ]
+  }
+}

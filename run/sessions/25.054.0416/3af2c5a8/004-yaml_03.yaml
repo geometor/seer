@@ -1,0 +1,33 @@
+examples:
+  - example_id: 1
+    input_shape: [3, 4]
+    output_shape: [6, 8]
+    transformation: "Duplicate and interleave input, creating a mirrored pattern."
+    objects:
+      - name: "Input Block"
+        type: "rectangle"
+        properties:
+          colors: [0, 8] # white, azure
+    actions: [duplicate, interleave, mirror]
+  - example_id: 2
+    input_shape: [3, 4]
+    output_shape: [6, 8]
+    transformation: "Duplicate and interleave, with color preservation."
+    objects:
+      - name: "Input Block"
+        type: "rectangle"
+        properties:
+          colors: [0, 3] # white, green
+    actions: [duplicate, interleave]
+  - example_id: 3
+    input_shape: [3, 4]
+    output_shape: [6, 8]
+    transformation: "Duplicate rows and columns, maintaining color positions."
+    objects:
+     - name: "Input Block"
+       type: "rectangle"
+       properties:
+         colors: [3, 0] #green, white
+    actions: [duplicate, expand]
+
+general_rule: "The input grid's rows and columns are duplicated to double the size of the output grid. The original input appears in the top-left quadrant of the output, mirrored horizontally and vertically and also in diagonal."

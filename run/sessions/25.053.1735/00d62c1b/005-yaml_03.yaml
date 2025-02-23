@@ -1,0 +1,25 @@
+observations:
+  - task_id: 045e1274
+  - objects:
+      - description: Contiguous green regions.
+        properties:
+          - color: green (3)
+          - shape: variable (lines, blocks, diagonals)
+          - edges: Defined by adjacent non-green pixels or grid boundaries.
+      - description: Transformed edge pixels
+        properties:
+          - original_color: green (3)
+          - new_color: yellow (4)
+          - location: Rightmost or bottommost pixel of a horizontal or vertical green segment.
+  - actions:
+      - name: Identify contiguous green regions.
+        details: Find all connected green pixels.
+      - name: Determine edge pixels.
+        details: Within each region, identify green pixels that are on the bottom or right edge of horizontal or vertical lines.
+      - name: Change color.
+        details: Change the color of identified edge pixels from green to yellow.
+  - rules:
+      - condition: A green pixel is part of a contiguous region, and it's the rightmost pixel in a horizontal green segment, or it is the bottomost in a vertical green line.
+        action: Change the pixel's color to yellow.
+      - condition: a pixel that is on the right or bottom of a contiguous region.
+        action: change the pixel's color to yellow

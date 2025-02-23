@@ -1,0 +1,25 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      dimensions: 3x4
+      elements: [9, 9, 5, 9, 5, 5, 9, 9, 9, 5, 9, 9]
+      colors: [maroon, maroon, gray, maroon, gray, gray, maroon, maroon, maroon, gray, maroon, maroon]
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      dimensions: 6x4
+      elements: [9, 5, 9, 9, 5, 5, 9, 9, 9, 9, 5, 9, 9, 9, 5, 9, 5, 5, 9, 9, 9, 5, 9, 9]
+      colors: [maroon, gray, maroon, maroon, gray, gray, maroon, maroon, maroon, maroon, gray, maroon, maroon, maroon, gray, maroon, gray, gray, maroon, maroon, maroon, gray, maroon, maroon]
+
+actions:
+  - name: vertical_elongation
+    description: The input grid is expanded vertically.
+  - name: pattern_rearrangement
+    description: The arrangement of colors (maroon and gray) changes during elongation.
+
+relationships:
+    - input_grid is transformed into output_grid.
+    - output_grid height is twice the input_grid height.
+    - output_grid width is the same as input_grid width.

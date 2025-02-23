@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify**: Locate all non-zero pixels within the input grid.\n2.  **Collect**: Gather these non-zero pixels, preserving their original values.\n3.  **Sort**: Sort the collected pixels based on original column, then original row, in ascending order.\n4.  **Place**: Position the sorted pixels along the bottom row of the output grid, filling cells from left to right.\n5.  **Fill**: All other cells in output grid default to value of 0.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by moving all non-zero elements to the bottom row,\n    preserving their order from left to right and top to bottom.\n    \"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # 1. Identify and Collect non-zero pixels with their coordinates\n    non_zero_pixels = []\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                non_zero_pixels.append(((r, c), input_grid[r, c]))\n\n    # 2. Sort non-zero pixels by column, then by row\n    non_zero_pixels.sort(key=lambda x: (x[0][1], x[0][0]))\n\n    # 3. Place sorted pixels in the last row of the output grid\n    last_row_index = 0\n    for _, value in non_zero_pixels:\n        output_grid[rows - 1, last_row_index] = value\n        last_row_index += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2013,
+    "candidates_token_count": 391,
+    "total_token_count": 2404,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.167912,
+  "response_file": "002-response.json"
+}

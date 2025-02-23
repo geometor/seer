@@ -1,0 +1,29 @@
+objects:
+  - type: grid
+    description: 2D array of pixels
+    properties:
+      - height: 9
+      - width: 9
+      - cells: integer values (0-9) representing colors
+
+  - type: pixel
+    description: Individual cell in the grid
+    properties:
+      - color: integer value (0-9)
+      - position: (row, column) coordinates
+
+  - type: colored_object
+    description: A contiguous block of one or more non-white pixels.
+    properties:
+      - color: the color of the contiguous object
+
+actions:
+  - name: expand
+    description: Add new pixels of specified colors adjacent to existing colored pixels.
+    parameters:
+      - original_color: The color of the object being expanded
+      - new_color: The color of the new adjacent pixel
+
+relationships:
+  - adjacency: Pixels are considered adjacent if they share a side (up, down, left, or right).
+  - expansion: original colored pixels connect to added color, forming new extended objects

@@ -1,0 +1,24 @@
+observations:
+  - object: input_grid
+    properties:
+      type: 2D array
+      values: integers (0-9) representing colors
+      delimiters: gray (5) pixels often separate regions
+  - object: output_grid
+    properties:
+      type: 2D array
+      size: 3x3
+      values: integers, primarily 0 (white) and 2 (red)
+  - object: blue_pixels
+    properties:
+      color: 1 (blue)
+      location: variable within input_grid
+      role: trigger transformation to red
+  - object: red_pixels
+    properties:
+      color: 2 (red)
+      location: determined by blue pixel location, relative to gray delimiters
+      role: result of transformation
+  - action: spatial_mapping
+    description: Maps blue pixels in input to red pixels in output based on a quadrant/region rule.
+    details: The precise mapping rule needs further refinement, but grey pixels define regions.

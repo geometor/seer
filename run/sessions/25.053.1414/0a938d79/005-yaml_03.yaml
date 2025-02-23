@@ -1,0 +1,26 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - name: rows
+        type: list
+        properties:
+          - name: pixels
+            type: integer (0-9)
+            description: Represents colors.
+  - name: source_row
+    type: row
+    properties:
+      - name: has_non_zero_pixel
+        type: boolean
+        description: Indicates if the row contains at least one non-zero pixel.
+
+actions:
+  - name: replicate_horizontally
+    input: source_row
+    output: modified_row
+    description:  Copies the non-zero value of any cell to all cells to the right, until it reaches another non-zero pixel.
+  - name: stack_rows
+    input: list of modified rows
+    output: output_grid
+    description: Stacks modified rows to form the output grid, repeating rows as needed

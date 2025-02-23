@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Locate the red (2) and blue (1) pixels in the input grid.\n2.  **Red Pixel Transformation:** For the red pixel, add two yellow (4) pixels: one directly above and one directly below its original position.\n3.  **Blue Pixel Transformation:** For the blue pixel, add three orange (7) pixels: one directly above, one to it's right, and one more to the right of that.\n4.  **Preserve Originals:** Keep the original red and blue pixels in their original positions.\n5. **Output:** output is created by adding these pixels to the input.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel_by_color(grid, color):\n    \"\"\"Finds the coordinates of a pixel of the specified color.\"\"\"\n    for r, row in enumerate(grid):\n        for c, pixel in enumerate(row):\n            if pixel == color:\n                return (r, c)  # row, col\n    return None\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find red and blue pixels\n    red_pos = find_pixel_by_color(input_grid, 2)\n    blue_pos = find_pixel_by_color(input_grid, 1)\n\n    # Add yellow pixels around red pixel\n    if red_pos:\n        r, c = red_pos\n        if r > 0:\n            output_grid[r - 1, c] = 4  # Above\n        if r < rows - 1:\n            output_grid[r + 1, c] = 4  # Below\n\n    # Add orange pixels around blue pixel\n    if blue_pos:\n        r, c = blue_pos\n        if r > 0:\n          output_grid[r-1,c] = 7 # Above\n        if c < cols - 1:\n            output_grid[r, c + 1] = 7     # Right 1\n        if c < cols - 2:\n            output_grid[r, c + 2] = 7  # Right 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2484,
+    "candidates_token_count": 517,
+    "total_token_count": 3001,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.773333,
+  "response_file": "002-response.json"
+}

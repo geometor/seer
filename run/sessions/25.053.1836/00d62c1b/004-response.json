@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nA green (3) pixel changes to yellow (4) if and only if it is part of a connected component of green pixels that includes *more than two* pixels. If a green pixel is isolated (no adjacent green pixels) or is part of a connected component of *only* two pixels, it remains green. The connected component must be connected either horizontally or vertically.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms an input grid according to the specified rule.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    output_grid = [row[:] for row in input_grid]\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n\n    def get_connected_component(r, c, visited):\n        \"\"\"\n        Performs a Depth-First Search (DFS) to find all pixels in a connected component.\n        \"\"\"\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                input_grid[r][c] != 3 or (r, c) in visited):\n            return []\n\n        visited.add((r, c))\n        component = [(r, c)]\n\n        component.extend(get_connected_component(r + 1, c, visited))\n        component.extend(get_connected_component(r - 1, c, visited))\n        component.extend(get_connected_component(r, c + 1, visited))\n        component.extend(get_connected_component(r, c - 1, visited))\n\n        return component\n\n    # Iterate through each pixel\n    for r in range(rows):\n        for c in range(cols):\n            # Check if the current pixel is green\n            if input_grid[r][c] == 3:\n                visited = set()\n                connected_component = get_connected_component(r, c, visited)\n                #change connected components greater than 2 to yellow\n                if len(connected_component) > 2:\n                    for row, col in connected_component:\n                        output_grid[row][col] = 4\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7337,
+    "candidates_token_count": 513,
+    "total_token_count": 7850,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.21421,
+  "response_file": "004-response.json"
+}

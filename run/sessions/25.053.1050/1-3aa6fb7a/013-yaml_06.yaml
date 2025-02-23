@@ -1,0 +1,20 @@
+task: 012
+objects:
+  - color: white
+    role: target
+    properties:
+      changeable: True
+  - color: azure
+    role: trigger
+    properties:
+      adjacency_check: same_row
+  - color: blue
+    role: result
+    properties:
+      replacement_color: white
+
+actions:
+  - type: color_change
+    condition: "white pixel has azure pixels to its left AND right on the same row"
+    from_color: white
+    to_color: blue

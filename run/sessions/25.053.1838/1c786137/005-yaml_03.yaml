@@ -1,0 +1,39 @@
+examples:
+  - example_id: 1
+    input_objects:
+      - object_id: 1
+        type: bordered_region
+        border_color: black # 0
+        interior_colors: [varied]
+        shape: rectangle # Assumption, needs to be confirmed
+        action: extract_interior
+    expected_output:
+      - object_id: 2 # interior of object 1
+        type: region
+        shape: rectangle
+
+  - example_id: 2
+    input_objects:
+      - object_id: 1
+        type: bordered_region
+        border_color: black # 0
+        interior_colors: [ varied ]
+        shape: rectangle # Assumption
+        action: extract_interior
+    expected_output:
+       - object_id: 2 # interior
+         type: region
+         shape: rectangle
+
+  - example_id: 3
+    input_objects:
+      - object_id: 1
+        type: bordered_region
+        border_color: black # 0
+        interior_colors: [varied]
+        shape: rectangle # Assumption
+        action: extract_interior
+    expected_output:
+      - object_id: 2
+        type: region
+        shape: rectangle

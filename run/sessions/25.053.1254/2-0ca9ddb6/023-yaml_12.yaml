@@ -1,0 +1,18 @@
+task: 022
+objects:
+  - type: pixel
+    properties:
+      colors: [0, 1, 2, 4, 6, 7, 8]  # Colors present in inputs/outputs
+      seed_colors: [1, 2, 6, 8]   # Colors that initiate a transformation
+      expansion_colors: {1: 7, 2: 4}  # Mapping of seed color to expansion color
+      expansion_directions:
+        1: [down, left, right]  # Blue expands to Orange in these directions
+        2: [up, left, right]    # Red expands to Yellow in these directions
+        6: []  # stays
+        8: []  # Stays
+      constraints: [expands_onto_white_only] #pixel can only expand where an existing white(0) pixel exists.
+actions:
+  - name: expand_seed_pixels
+    description: Seed pixels initiate color expansions based on their color.
+  - name: iterative_expansion
+    description: Newly added expansion colors continue to expand, one layer at a time, but ONLY onto white(0).

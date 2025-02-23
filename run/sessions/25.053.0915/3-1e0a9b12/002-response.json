@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nMoves all non-zero pixels in the input grid to the last row of the output grid,\npreserving their original column order.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input grid, but filled with zeros.\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get the last row index.\n    last_row_index = output_grid.shape[0] - 1\n\n    # Create a list to hold (column, value) pairs for sorting.\n    non_zero_pixels = []\n\n    # Iterate through the input grid to find non-zero pixels.\n    for row_index, row in enumerate(input_grid):\n        for col_index, value in enumerate(row):\n            if value != 0:\n                non_zero_pixels.append((col_index, value))\n\n    # Sort the non-zero pixels by their column index.\n    non_zero_pixels.sort()\n\n    # Place the sorted non-zero pixels in the last row.\n    for col_index, value in non_zero_pixels:\n        output_grid[last_row_index, col_index] = value\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2923,
+    "candidates_token_count": 287,
+    "total_token_count": 3210,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.845262,
+  "response_file": "002-response.json"
+}

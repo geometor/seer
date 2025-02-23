@@ -1,0 +1,73 @@
+examples:
+  - example_1:
+      input_objects:
+        - object_1:
+            type: grid
+            dimensions: 3x3
+            elements: [3, 1, 2, 3, 1, 2, 3, 1, 2]
+            properties:
+              - all rows are identical
+      output_objects:
+        - object_1:
+            type: grid
+            dimensions: 3x3
+            elements:  [4, 5, 6, 4, 5, 6, 4, 5, 6]
+            properties:
+              - all rows are identical
+      transformation:
+        - action: direct substitution
+        - mapping: {3: 4, 1: 5, 2: 6}
+  - example_2:
+      input_objects:
+        - object_1:
+            type: grid
+            dimensions: 3x3
+            elements: [2, 3, 8, 2, 3, 8, 2, 3, 8]
+            properties:
+              - all rows are identical
+      output_objects:
+        - object_1:
+            type: grid
+            dimensions: 3x3
+            elements: [ 6, 4, 9, 6, 4, 9, 6, 4, 9]
+            properties:
+              - all rows are identical
+      transformation:
+        - action: direct substitution
+        - mapping: {2: 6, 3: 4, 8: 9}
+  - example_3:
+      input_objects:
+        - object_1:
+            type: grid
+            dimensions: 3x3
+            elements: [5, 8, 6, 5, 8, 6, 5, 8, 6]
+            properties:
+               - all rows are identical
+      output_objects:
+        - object_1:
+          type: grid
+          dimensions: 3x3
+          elements: [1, 9, 2, 1, 9, 2, 1, 9, 2]
+          properties:
+            - all rows are identical
+      transformation:
+        - action: direct substitution
+        - mapping: {5: 1, 8: 9, 6: 2}
+  - example_4:
+       input_objects:
+         - object_1:
+             type: grid
+             dimensions: 3x3
+             elements: [9, 4, 2, 9, 4, 2, 9, 4, 2]
+             properties:
+               - all rows are identical
+       output_objects:
+          - object_1:
+             type: grid
+             dimensions: 3x3
+             elements: [8, 3, 6, 8, 3, 6, 8, 3, 6]
+             properties:
+                - all rows are identical
+       transformation:
+          - action: direct substitution
+          - mapping: {9: 8, 4: 3, 2: 6}

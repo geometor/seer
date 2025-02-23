@@ -1,0 +1,20 @@
+task_id: 012
+objects:
+  - id: shape_1
+    type: contiguous_block
+    color: green
+    initial_state:  # Description of the green shape in the input
+      - "Varies in shape and size across examples."
+    transformed_state: # Description of the shape in the output
+      - "Perimeter remains green; interior pixels change to yellow."
+actions:
+  - name: identify_perimeter
+    description: "Find the set of pixels on the outer edge of the green shape, considering only up, down, left, and right neighbors."
+    input: shape_1
+    output: perimeter_pixels
+  - name: change_interior_color
+    description: "Change the color of all green pixels within the shape that are NOT part of the perimeter to yellow."
+    input:
+      - shape_1
+      - perimeter_pixels
+    output: shape_1.transformed_state

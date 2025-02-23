@@ -1,0 +1,22 @@
+task_id: "012"
+objects:
+  - id: shape_1
+    type: contiguous_region
+    color: gray (5)
+    properties:
+      outline:
+        color: azure (8)
+        definition: "pixels adjacent to non-gray pixels"
+      inside:
+        color: red (2)
+        definition: "pixels enclosed by the outline"
+actions:
+  - type: recolor
+    target: shape_1.outline
+    new_color: azure (8)
+  - type: recolor
+    target: shape_1.inside
+    new_color: red (2)
+  - type: preserve
+    target: background
+    description: keep all background pixels unchanged.

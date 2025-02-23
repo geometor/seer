@@ -1,0 +1,29 @@
+objects:
+  - name: azure_pixel
+    color: azure
+    value: 8
+    properties:
+      potential_square_starter: true
+
+  - name: blue_pixel
+    color: blue
+    value: 1
+    properties:
+      square_filler: true
+
+  - name: empty_pixel
+    color: white
+    value: 0
+    properties:
+      can_be_replaced: true
+      
+actions:
+  - name: form_2x2_square
+    preconditions:
+      - "An azure pixel exists."
+      - "Three adjacent pixels to the azure pixel are either blue or azure."
+      - "The diagonally opposite pixel location is either empty or blue or azure"
+      - "A complete 2x2 square with the azure pixel and the diagonally opposite location can be formed."
+    postconditions:
+      - "A blue pixel is placed diagonally opposite the azure pixel, completing a 2x2 azure and blue square."
+      - "Only one blue pixel may be placed per azure pixel."

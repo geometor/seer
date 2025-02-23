@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies contiguous regions of green (3) pixels within the input grid. Within each region,\nit changes the color of \"interior\" green pixels to yellow (4). An interior pixel is a green\npixel that is part of a green object and is not on the \"edge\" of that object, where edge is\ndetermined via a neighbor count.\nAll other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_contiguous_regions(grid, color):\n    \"\"\"\n    Finds all contiguous regions of a given color in the grid.\n    Uses a depth-first search (DFS) approach.\n    \"\"\"\n    rows, cols = len(grid), len(grid[0])\n    visited = set()\n    regions = []\n\n    def dfs(r, c, current_region):\n        if (r, c) in visited or not (0 <= r < rows and 0 <= c < cols) or grid[r][c] != color:\n            return\n        visited.add((r, c))\n        current_region.append((r, c))\n        # Explore all 8 neighbors\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                dfs(r + dr, c + dc, current_region)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == color and (r, c) not in visited:\n                current_region = []\n                dfs(r, c, current_region)\n                regions.append(current_region)\n    return regions\n\ndef is_interior(grid, r, c, color):\n    \"\"\"\n    Checks if a pixel at (r, c) is an interior pixel of a given color.\n    This version uses a neighbor count threshold.\n    \"\"\"\n    rows, cols = len(grid), len(grid[0])\n    neighbor_count = 0\n    # Check all 8 neighbors\n    for dr in [-1, 0, 1]:\n        for dc in [-1, 0, 1]:\n            if dr == 0 and dc == 0:\n                continue\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == color:\n                neighbor_count += 1\n\n    return neighbor_count > 4 # Experiment with different thresholds.\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    rows, cols = len(output_grid), len(output_grid[0])\n\n    # Identify green regions\n    green_regions = get_contiguous_regions(output_grid, 3)\n\n    # Find interior pixels and change their color\n    for region in green_regions:\n        for r, c in region:\n            if is_interior(output_grid, r, c, 3):\n                output_grid[r][c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7377,
+    "candidates_token_count": 715,
+    "total_token_count": 8092,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.295688,
+  "response_file": "014-response.json"
+}

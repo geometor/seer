@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 5x7
+    elements: [0, 1, 9]
+  - type: grid
+    name: output_grid
+    dimensions: 5x3
+    elements: [0, 8]
+  - type: column
+    name: central_column
+    color: blue (1)
+    position: input_grid column 4
+  - type: column
+    name: output_column
+    color: azure(8)
+
+actions:
+  - type: extraction
+    description: Extract a subgrid from the input grid.
+  - type: replacement
+    description: Replace the central column of blue(1) with azure(8).
+  - type: remove
+    description: remove the surronding columns of the extracted subgrid.
+
+relationships:
+  - relationship: "central_column in input_grid corresponds to output_column in output_grid"
+  - relationship: "output_grid is a subset of the input_grid, focused around the central_column"

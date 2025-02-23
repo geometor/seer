@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts the top-left subgrid from the input grid, stopping at the first major discontinuity in color.\n\"\"\"\n\nimport numpy as np\n\ndef find_discontinuity(grid):\n    \"\"\"\n    Finds the point of first discontinuity in the grid, starting from the top-left.\n    Discontinuity is defined as a change in color that breaks a perceived pattern.\n\n    Args:\n        grid (numpy.ndarray): The input grid.\n\n    Returns:\n        tuple: (row_end, col_end), the indices (exclusive) up to which the subgrid is continuous.\n    \"\"\"\n    rows, cols = grid.shape\n    row_end = rows\n    col_end = cols\n\n    # Check for vertical discontinuity\n    for r in range(1, rows):\n        if not np.all(grid[r, :min(col_end, grid.shape[1])] == grid[0, :min(col_end, grid.shape[1])]):\n            row_end = r\n            break\n            \n    # Check for horizontal discontinuity.\n    for c in range(1, cols):\n        if not np.all(grid[:min(row_end,grid.shape[0]), c] == grid[:min(row_end, grid.shape[0]), 0]):\n            col_end = c\n            break\n\n    return row_end, col_end\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the top-left subgrid of the input grid, stopping at the first discontinuity.\n\n    Args:\n        input_grid (numpy.ndarray): The input grid.\n\n    Returns:\n        numpy.ndarray: The extracted subgrid.\n    \"\"\"\n    # Find the point of discontinuity.\n    row_end, col_end = find_discontinuity(input_grid)\n\n    # Extract the subgrid.\n    output_grid = input_grid[:row_end, :col_end]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2798,
+    "candidates_token_count": 442,
+    "total_token_count": 3240,
+    "cached_content_token_count": 0
+  },
+  "response_time": 19.813401,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe task is to identify connected regions of azure pixels (color 8).  For each such region:\n\n1.  Find all azure pixels within the region that satisfy *both* of these conditions:\n    *   The pixel is *immediately to the right* of another azure pixel in the same region (i.e., has an azure pixel to its left).\n    *   The pixel is adjacent (horizontally, vertically, or diagonally) to at least one white pixel (color 0).\n2.  If there are any pixels satisfying both conditions in a region, choose *one* of them and change its color to blue (color 1). If multiple pixels satisfy the condition, the choice of which one to change doesn't seem to be specified by this single example, but for now, let's assume we just pick the first one we find. If no pixel satisfies both conditions in a region, do not change any pixels in that region.\n\nApply this process to each connected azure region in the input grid to produce the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Get the neighbors of a pixel, including diagonals.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for i in range(max(0, row - 1), min(rows, row + 2)):\n        for j in range(max(0, col - 1), min(cols, col + 2)):\n            if (i, j) != (row, col):\n                neighbors.append((i, j))\n    return neighbors\n\ndef find_azure_regions(grid):\n    \"\"\"Find connected regions of azure (8) pixels.\"\"\"\n    rows, cols = grid.shape\n    visited = set()\n    regions = []\n\n    def dfs(row, col, current_region):\n        \"\"\"Depth-first search to find connected components.\"\"\"\n        if (row, col) in visited or grid[row, col] != 8:\n            return\n        visited.add((row, col))\n        current_region.append((row, col))\n\n        for r, c in get_neighbors(grid, row, col):\n          dfs(r,c, current_region)\n\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row, col] == 8 and (row, col) not in visited:\n                current_region = []\n                dfs(row, col, current_region)\n                regions.append(current_region)\n    return regions\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    azure_regions = find_azure_regions(input_grid)\n\n    for region in azure_regions:\n        target_pixel = None\n        for row, col in region:\n            # Check if the pixel is to the right of another azure pixel\n            if (row, col - 1) in region:\n                # Check if the pixel is adjacent to a white pixel\n                neighbors = get_neighbors(input_grid, row, col)\n                for r, c in neighbors:\n                    if input_grid[r, c] == 0:\n                        target_pixel = (row, col)\n                        break  # Stop after finding the first suitable pixel\n            if target_pixel:\n                break  # Stop after finding a suitable pixel in the region\n\n        if target_pixel:\n            output_grid[target_pixel] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3199,
+    "candidates_token_count": 792,
+    "total_token_count": 3991,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.98571,
+  "response_file": "002-response.json"
+}

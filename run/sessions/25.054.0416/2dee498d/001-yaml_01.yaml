@@ -1,0 +1,19 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: variable (input: 3x9, output: 3x3)
+      - elements: colored pixels
+      - colors:
+        - 1: blue
+        - 4: yellow
+        - 5: gray
+    actions:
+      - reduction:  The grid is reduced in size.
+    relationships:
+      - spatial_preservation: The relative positions of colors are maintained during reduction.
+  - type: pixel
+    properties:
+      - color: integer value (1, 4, or 5)
+      - position: (row, column) within the grid
+    actions:
+        - selection: specific pixels from input are chosen for output

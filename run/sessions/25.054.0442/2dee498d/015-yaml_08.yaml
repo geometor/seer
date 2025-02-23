@@ -1,0 +1,45 @@
+example_1:
+  input:
+    objects:
+      - type: grid
+        dimensions: [3, 9]
+        elements: [4, 5, 1, 1, 5, 4, 4, 5, 1, 5, 5, 5, 5, 5, 5, 5, 5, 5, 1, 5, 4, 4, 5, 1, 1, 5, 4]
+        properties:
+          repeating_unit: [4, 5, 1]
+          interruption: [5,4]
+  output:
+      - type: grid
+        dimensions: [3,3]
+        elements: [4, 5, 1, 5, 5, 5, 1, 5, 4]
+  transformation:
+    type: horizontal_pattern_extraction
+
+example_2:
+  input:
+    objects:
+      - type: grid
+        dimensions: [4, 12]
+        elements: [ 2, 0, 0, 1, 2, 0, 0, 1, 2, 0, 0, 1, 4, 2, 1, 4, 4, 2, 1, 4, 4, 2, 1, 4, 4, 1, 2, 4, 4, 1, 2, 4, 1, 0, 0, 2, 1, 0, 0, 2, 1, 0, 0, 2]
+        properties:
+          repeating_unit: [2, 0, 0, 1]
+  output:
+     - type: grid
+       dimensions: [4, 4]
+       elements: [2, 0, 0, 1, 4, 2, 1, 4, 4, 1, 2, 4, 1, 0, 0, 2]
+  transformation:
+    type: horizontal_pattern_extraction
+
+example_3:
+  input:
+    objects:
+      - type: grid
+        dimensions: [2, 6]
+        elements: [2, 1, 2, 1, 2, 1, 2, 3, 2, 3, 2, 3]
+        properties:
+          repeating_unit: [2, 1]
+  output:
+    - type: grid
+      dimensions: [2, 2]
+      elements: [2, 1, 2, 3]
+  transformation:
+    type: horizontal_pattern_extraction

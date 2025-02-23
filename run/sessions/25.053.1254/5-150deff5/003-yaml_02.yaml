@@ -1,0 +1,20 @@
+task_id: 002-py_01
+facts:
+  - observation: "The input grids contain a single object composed of gray (5) pixels on a black (0) background."
+  - object: "Gray object"
+    properties:
+      color: "gray (5)"
+      shape: "Irregular, contiguous block of pixels"
+  - action: "Segmentation"
+    description: "The gray object is divided into two regions based on spatial properties."
+    criteria: "The average x-coordinate of gray pixels of each row."
+    result:
+      - region_1:
+          pixels: "Gray pixels to the left of average x-coordinate of the row."
+          color: "azure (8)"
+      - region_2:
+          pixels: "Gray pixels to the right of average x-coordinate of the row."
+          color: "red (2)"
+  - background:
+      color: "black (0)"
+      action: "Preserved, remains unchanged in the output."

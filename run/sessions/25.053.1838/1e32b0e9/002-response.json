@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Existing Blue Lines:** Locate the horizontal and vertical blue (8) lines that form a cross shape in the input grid.\n2.  **Extend Blue Lines:** Extend the blue lines by adding a blue pixel directly to the open ends of the existing blue segments. In other words, wherever a blue line has blank space on either side, it is extended, but if blue meets another blue pixel, then it isn't expanded on that side.\n3.  **Fill Bounded Areas:** Fill the areas that are boundaried by original blue lines and extended parts of the lines (from Step 2) with blue color.\n\"\"\"\n\nimport numpy as np\n\ndef get_blue_lines(grid):\n    blue_pixels = np.where(grid == 8)\n    blue_lines = []\n\n    # Check for horizontal lines\n    for row in np.unique(blue_pixels[0]):\n        cols = blue_pixels[1][blue_pixels[0] == row]\n        if len(cols) > 1:  # At least two points needed for a line\n            blue_lines.append(list(zip([row] * len(cols), cols)))\n\n    # Check for vertical lines\n    for col in np.unique(blue_pixels[1]):\n        rows = blue_pixels[0][blue_pixels[1] == col]\n        if len(rows) > 1:\n            blue_lines.append(list(zip(rows, [col] * len(rows))))\n    return blue_lines\n\ndef extend_lines(grid, blue_lines):\n    extended_grid = grid.copy()\n    for line in blue_lines:\n        for r, c in line:\n\n            #extend above\n            if r > 0 and extended_grid[r-1,c] == 0:\n                extended_grid[r-1,c] = 8\n            #extend below\n            if r < grid.shape[0]-1 and extended_grid[r+1, c] == 0:\n                extended_grid[r+1,c] = 8\n            #extend left\n            if c > 0 and extended_grid[r,c-1] == 0:\n                extended_grid[r,c-1] = 8\n            #extend right\n            if c < grid.shape[1]-1 and extended_grid[r, c+1] == 0:\n                extended_grid[r,c+1] = 8\n    return extended_grid\n\ndef flood_fill(grid, r, c, target_color, replace_color):\n    \"\"\"Performs a flood fill operation.\"\"\"\n    if (\n        r < 0\n        or r >= grid.shape[0]\n        or c < 0\n        or c >= grid.shape[1]\n        or grid[r, c] != target_color\n    ):\n        return\n    grid[r, c] = replace_color\n    flood_fill(grid, r + 1, c, target_color, replace_color)\n    flood_fill(grid, r - 1, c, target_color, replace_color)\n    flood_fill(grid, r, c + 1, target_color, replace_color)\n    flood_fill(grid, r, c - 1, target_color, replace_color)\n\ndef fill_bounded_areas(grid):\n    filled_grid = grid.copy()\n    for r in range(filled_grid.shape[0]):\n        for c in range(filled_grid.shape[1]):\n            if filled_grid[r,c] == 0:\n                flood_fill(filled_grid,r,c,0,8)\n    return filled_grid\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Identify Existing Blue Lines\n    blue_lines = get_blue_lines(output_grid)\n\n    # Extend the lines\n    output_grid = extend_lines(output_grid, blue_lines)\n    \n    #Fill bounded areas\n    output_grid = fill_bounded_areas(output_grid)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3226,
+    "candidates_token_count": 952,
+    "total_token_count": 4178,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.620464,
+  "response_file": "002-response.json"
+}

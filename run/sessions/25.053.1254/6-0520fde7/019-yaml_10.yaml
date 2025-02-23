@@ -1,0 +1,22 @@
+facts:
+  - task_id: "a79310a0"
+  - input_objects:
+    - description: "grid of pixels with varying colors"
+      properties:
+        - colors: [blue, white, gray, others]
+        - shapes: [grid]
+  - output_objects:
+    - description: "grid of pixels with red and white colors only"
+      properties:
+        - colors: [red, white]
+        - shapes: [grid]
+        - dimensions: [3x3] #Consistant across all examples
+  - transformations:
+    - description: "Blue pixels in input trigger red pixels at a calculated position in the output grid. Column positions are condensed but row positions are maintained, even if it goes out of bounds."
+      rules:
+        - input_color: blue
+          output_color: red
+        - row_mapping: "Input row `i` corresponds to output row `i // 2`"
+        - column_mapping: "Input column `j` corresponds to output column `j // 2`"
+        - output_size: "The output is always size of 3x3"
+        - other_colors: "Pixels that are not blue are ignored, background becomes white (0)."

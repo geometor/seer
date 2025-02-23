@@ -1,0 +1,111 @@
+import numpy as np
+
+def analyze_example(input_grid, expected_output, actual_output):
+    """Analyzes a single example and gathers metrics."""
+
+    input_grid = np.array(input_grid)
+    expected_output = np.array(expected_output)
+    actual_output = np.array(actual_output)
+
+    # Find blue line column in input
+    blue_col = -1
+    for j in range(input_grid.shape[1]):
+        if np.all(input_grid[:, j] == 1):
+            blue_col = j
+            break
+
+    # azure pattern
+    azure_cols_expected = []
+    
+    for j in range(expected_output.shape[1]):
+        if np.any(expected_output[:,j] == 8):
+            azure_cols_expected.append(j)
+
+    metrics = {
+        "input_size": input_grid.shape,
+        "expected_output_size": expected_output.shape,
+        "actual_output_size": actual_output.shape,
+        "blue_line_col": blue_col,
+        "expected_azure_cols": azure_cols_expected
+    }
+    return metrics
+
+# Example data (replace with actual example data from the task)
+examples = [
+    (
+        [[0, 9, 9, 1, 9, 9, 9],
+         [0, 0, 9, 1, 9, 9, 0],
+         [9, 0, 9, 1, 9, 9, 0],
+         [0, 0, 0, 1, 9, 0, 0],
+         [0, 9, 9, 1, 9, 9, 9]],
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 8, 8],
+         [0, 0, 0]],
+         []
+    ),
+     (
+        [[0, 0, 0, 1, 9, 0, 0],
+         [9, 0, 9, 1, 9, 9, 9],
+         [0, 9, 9, 1, 9, 9, 9],
+         [0, 0, 0, 1, 9, 9, 9],
+         [0, 9, 9, 1, 9, 9, 9]],
+        [[0, 8, 8],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]],
+         []
+    ),
+     (
+        [[9, 0, 0, 1, 9, 0, 9],
+         [9, 0, 0, 1, 0, 9, 0],
+         [9, 0, 0, 1, 9, 0, 0],
+         [0, 9, 9, 1, 0, 9, 9],
+         [0, 0, 9, 1, 0, 9, 0]],
+        [[0, 8, 0],
+         [0, 0, 8],
+         [0, 8, 8],
+         [8, 0, 0],
+         [8, 0, 0]],
+         []
+    ),
+    (
+        [[0, 9, 9, 1, 9, 0, 9],
+         [9, 0, 0, 1, 9, 0, 0],
+         [9, 9, 9, 1, 9, 9, 9],
+         [0, 9, 0, 1, 0, 0, 0],
+         [9, 0, 0, 1, 9, 0, 0]],
+        [[0, 0, 0],
+         [0, 8, 8],
+         [0, 0, 0],
+         [8, 0, 8],
+         [0, 8, 8]],
+         []
+    ),
+     (
+        [[0, 9, 9, 1, 9, 0, 9],
+         [9, 0, 9, 1, 9, 9, 9],
+         [9, 9, 9, 1, 0, 0, 9],
+         [9, 0, 0, 1, 9, 0, 0],
+         [9, 9, 9, 1, 0, 0, 9]],
+        [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0],
+         [0, 8, 8],
+         [0, 0, 0]],
+         []
+    ),
+
+]
+
+all_metrics = []
+for i, (input_grid, expected_output, actual_output) in enumerate(examples):
+    metrics = analyze_example(input_grid, expected_output, actual_output)
+    all_metrics.append(metrics)
+    print(f"Example {i+1}:")
+    print(metrics)
+    print("-" * 20)
+
+print(all_metrics)

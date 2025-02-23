@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation extracts the smallest rectangular subgrid that contains all non-zero pixels from the input grid.  It effectively \"crops\" the input grid, removing all surrounding rows and columns that contain *only* black (0) pixels. The colors and relative positions of the non-zero pixels are preserved.\n\n1.  **Identify Non-Zero Pixels:** Locate all pixels within the input grid that have a value other than 0.\n2.  **Find Bounding Box:** Determine the minimum and maximum row indices, and the minimum and maximum column indices, that encompass all non-zero pixels.  This defines a rectangular region.\n3.  **Extract Subgrid:** Create a new grid consisting only of the rows and columns within the bounding box identified in step 2. Copy the pixel values from the corresponding locations in the input grid to the new grid.\n4. Return the extracted subgrid\n\"\"\"\n\nimport numpy as np\nfrom typing import List, Tuple\n\ndef _find_bounding_box(grid: np.ndarray) -> Tuple[int, int, int, int]:\n    \"\"\"Finds the bounding box of non-zero pixels.\"\"\"\n    rows, cols = grid.shape\n    min_row, min_col = rows, cols\n    max_row, max_col = -1, -1\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                min_row = min(min_row, r)\n                min_col = min(min_col, c)\n                max_row = max(max_row, r)\n                max_col = max(max_col, c)\n\n    if max_row == -1:  # Handle the case where the grid is all zeros\n      return 0,0,-1,-1\n    return min_row, min_col, max_row + 1, max_col + 1\n\ndef transform(input_grid: List[List[int]]) -> List[List[int]]:\n    \"\"\"Extracts the smallest subgrid containing all non-zero pixels.\"\"\"\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the bounding box\n    top, left, bottom, right = _find_bounding_box(input_grid)\n\n    # Extract the subgrid.\n    if bottom == -1:\n        output_grid = []\n    else:\n        output_grid = input_grid[top:bottom, left:right].tolist()\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4526,
+    "candidates_token_count": 566,
+    "total_token_count": 5092,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.730168,
+  "response_file": "011-response.json"
+}

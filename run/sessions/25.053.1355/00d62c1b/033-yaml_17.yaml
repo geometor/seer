@@ -1,0 +1,23 @@
+objects:
+  - name: green_shape
+    type: contiguous_region
+    color: 3  # green
+    properties:
+      - irregular_shape: True
+      - enclosed: True #Appears to be fully enclosed by white pixels.
+  - name: yellow_shape
+    type: contiguous_region
+    color: 4
+    properties:
+      - relation_to_green: adjacent, interior #Yellow fills in the green shape.
+
+actions:
+  - name: identify_green_shape
+    description: Detect the contiguous region of green pixels.
+  - name: fill_interior
+    description: Change the colour of the green pixels adjacent to the background to yellow.
+
+relationships:
+  - object1: green_shape
+    object2: yellow_shape
+    relation: yellow fills inside green

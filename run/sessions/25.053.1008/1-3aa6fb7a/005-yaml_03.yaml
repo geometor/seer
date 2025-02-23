@@ -1,0 +1,31 @@
+facts:
+  - task_id: 004-py_02
+  - objects:
+    - color: azure (8)
+      shape: contiguous regions
+      properties:
+        - can_be_edge: true
+        - can_change_color: true
+    - color: blue (1)
+      shape: single pixels, formerly azure
+      properties:
+        - replaces_azure: true
+    - color: other (0)
+      shape: background
+      properties:
+        - static: true
+  - actions:
+    - type: color_change
+      agent: edge_detection_rule
+      from_color: azure (8)
+      to_color: blue (1)
+      conditions:
+        - "azure pixel is adjacent to a non-azure pixel on its top or left"
+  - observations:
+      example_1: |
+        Azure objects have varied shapes.
+        Blue pixels replace azure pixels adjacent at the top or left.
+
+      example_2: |
+        Azure objects have varied shapes.
+        Blue pixels replace azure pixels adjacent at the top or left.

@@ -1,0 +1,20 @@
+facts:
+  - object: input_grid
+    type: grid
+    dimensions: 2x6
+    elements: colored_pixels
+    colors: [red, blue, green]
+    pattern: repeating_sequence
+    sequence: [2, 1, 2, 1, 2, 1], [2, 3, 2, 3, 2, 3]
+
+  - object: output_grid
+    type: grid
+    dimensions: 2x2
+    elements: colored_pixels
+    colors: [red, blue, green]
+    pattern: subsequence_of_input
+    sequence: [2, 1], [2, 3]
+
+  - relationship: input_to_output
+    type: transformation
+    description: Extracts the fundamental repeating unit from the input grid.

@@ -1,0 +1,23 @@
+facts:
+  - object: grid
+    properties:
+      - dimensions: [rows, columns]
+      - elements: pixels
+      - values: [0, 3] # white and green
+  - observation: input_grid
+    properties:
+      - dimensions: [3, 4]
+  - observation: output_grid
+    properties:
+      - dimensions: [6, 8]
+  - action: expansion
+    description: The input grid is expanded to create the output grid.
+  - relationship:
+      - subject: input_grid
+      - relation: becomes
+      - object: output_grid
+      - details:
+          - rows: doubled
+          - columns: doubled
+  - action: mirroring
+    description: potential mirroring is observed along row and/or column

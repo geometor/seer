@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies contiguous shapes of gray (5) pixels in the input grid and replaces these pixels with azure (8) and red (2) in the output grid. Red pixels form the outer \"edge\" of the shape, and azure pixels fill the interior.\n\"\"\"\n\nimport numpy as np\n\ndef get_contiguous_shape(grid, color):\n    \"\"\"\n    Finds a contiguous shape of a given color in a grid.\n    \"\"\"\n    coords = np.argwhere(grid == color)\n    if len(coords) == 0:\n        return []\n\n    shape = [tuple(coords[0])]\n    remaining_coords = set(map(tuple, coords[1:]))\n\n    i = 0\n    while i < len(shape):\n        current_coord = shape[i]\n        neighbors_to_add = []\n        for neighbor in remaining_coords:\n            diff = np.abs(np.array(current_coord) - np.array(neighbor))\n            if np.sum(diff) == 1:  # Check for adjacency (Manhattan distance of 1)\n                neighbors_to_add.append(neighbor)\n\n        for neighbor in neighbors_to_add:\n            shape.append(neighbor)\n            remaining_coords.remove(neighbor)\n        i += 1\n\n    return shape\n\ndef is_edge_pixel(grid, coord, shape_coords):\n    \"\"\"\n    Checks if a pixel is an edge pixel within a contiguous shape.  A pixel\n    is an edge if at least one of its N, S, E, or W neighbors is *not*\n    part of the shape.\n    \"\"\"\n    r, c = coord\n    neighbors = [\n        (r - 1, c),  # North\n        (r + 1, c),  # South\n        (r, c - 1),  # West\n        (r, c + 1),  # East\n    ]\n\n    for nr, nc in neighbors:\n        if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1]:\n            if (nr, nc) not in shape_coords:\n                return True  # Found a neighbor outside the shape\n        else:\n            return True # Found a neighbor outside the image\n\n    return False  # All valid neighbors are within the shape\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by replacing gray shapes with red and azure.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = input_grid.copy()\n    shape_color = 5  # Gray\n    shape_coords = get_contiguous_shape(input_grid, shape_color)\n    shape_coords_set = set(shape_coords) #for faster lookup in is_edge_pixel\n\n    if not shape_coords:\n        return output_grid.tolist()\n\n    # Iterate through the shape and apply the transformation.\n    for r, c in shape_coords:\n        if is_edge_pixel(input_grid, (r, c), shape_coords_set):\n            output_grid[r, c] = 2  # Red\n        else:\n            output_grid[r, c] = 8  # Azure\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5064,
+    "candidates_token_count": 744,
+    "total_token_count": 5808,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.019659,
+  "response_file": "012-response.json"
+}

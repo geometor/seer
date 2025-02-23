@@ -1,0 +1,49 @@
+observations:
+  - example: 1
+    input_objects:
+      - color: red
+        initial_row: 0
+        initial_col: 5
+      - color: azure
+        initial_row: 9
+        initial_col: 7
+
+    output_objects:
+        description: "Alternating rows of red/azure mix and blank rows."
+
+  - example: 2
+    input_objects:
+      - color: blue
+        initial_row: 0
+        initial_col: 5
+      - color: green
+        initial_row: 6
+        initial_col: 8
+
+    output_objects:
+        description: "Alternating rows of blue/green mix and blank rows."
+
+  - example: 3
+    input_objects:
+      - color: red
+        initial_row: 5
+        initial_col: 0
+      - color: green
+        initial_row: 7
+        initial_col: 8
+
+    output_objects:
+        description: "Alternating rows of red, blank, green, and blank."
+
+  - example: 4
+    input_objects:
+      - color: yellow
+        initial_row: 7
+        initial_col: 0
+      - color: blue
+        initial_row: 11
+        initial_col: 0
+    output_objects:
+      description: "Alternating rows of yellow, blank, blue, and blank."
+
+general_rule: "Identify rows with colored pixels in the input.  Extend those colored pixels horizontally across their respective rows.  In the output, alternate these extended color rows with blank (all-zero) rows."

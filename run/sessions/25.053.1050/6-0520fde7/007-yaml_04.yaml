@@ -1,0 +1,25 @@
+facts:
+  - task: 006
+  - objects:
+    - input_grid:
+        description: A 2D array of varying dimensions.
+        properties:
+          - Contains integers 0-9, representing colors.
+          - Width can vary.
+          - Height can vary.
+    - output_grid:
+      description: A 2D array with dimensions 3x3.
+      properties:
+        - Contains only integers 0 and 2, representing white and red.
+  - actions:
+    - Find_center: locate the middle of input
+    - map_pixels:
+      description: Create output grid based on input
+      details:
+        - positions of red pixels (2) in the output grid depend on a specific relationship to the positions of black pixels (0) in the input grid and also on their position in the input row, relative to a point 3 to the left of the right hand edge of the input.
+  - observations:
+      - "The output grid is always 3x3."
+      - "The output grid contains only white (0) and red (2) pixels."
+      - "Red pixels (value 2) are place in the output based on the position of
+        white pixels (value 0) in the input."
+      - "The position of input white pixels relative to the right side of input grid impacts placement"

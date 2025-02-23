@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Regions:** Locate all contiguous regions of green (3) pixels in the input grid.  \"Contiguous\" means connected horizontally or vertically.\n\n2.  **Selective Color Change:** Within *some* of the identified green regions, change the color of a subset of the green pixels to yellow (4). The rule for selecting *which* green pixels to change is not entirely clear from this single example, but it's not *all* green pixels. It appears that green regions maintain their general shape when adjacent to white regions.\n\n3.  **Preserve Other Pixels:** All pixels that are not green in the input grid remain unchanged in the output grid.\n\n4. **Output:** The resulting grid, with the selected green pixels changed to yellow, is the output.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_regions(grid, color):\n    \"\"\"Finds contiguous regions of a given color in the grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    def is_valid(x, y):\n        \"\"\"Checks if a coordinate is within the grid bounds.\"\"\"\n        return 0 <= x < grid.shape[0] and 0 <= y < grid.shape[1]\n\n    def dfs(x, y, current_region):\n        \"\"\"Performs Depth-First Search to find contiguous pixels.\"\"\"\n        if not is_valid(x, y) or visited[x, y] or grid[x, y] != color:\n            return\n\n        visited[x, y] = True\n        current_region.append((x, y))\n\n        # Explore adjacent pixels (up, down, left, right)\n        dfs(x + 1, y, current_region)\n        dfs(x - 1, y, current_region)\n        dfs(x, y + 1, current_region)\n        dfs(x, y - 1, current_region)\n\n    for x in range(grid.shape[0]):\n        for y in range(grid.shape[1]):\n            if grid[x, y] == color and not visited[x, y]:\n                current_region = []\n                dfs(x, y, current_region)\n                regions.append(current_region)\n    return regions\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = input_grid.copy()\n    # change output pixels\n\n    green_regions = find_contiguous_regions(input_grid, 3)\n\n    for region in green_regions:\n      # currently changes interior to yellow, preserving one layer of green\n      for x,y in region:\n        neighbors = 0\n        if input_grid[x+1, y] == 3 if x+1 < input_grid.shape[0] else False:\n            neighbors += 1\n        if input_grid[x-1, y] == 3 if x-1 >= 0 else False:\n            neighbors += 1\n        if input_grid[x, y+1] == 3 if y+1 < input_grid.shape[1] else False:\n          neighbors += 1\n        if input_grid[x, y-1] == 3 if y-1 >= 0 else False:\n          neighbors += 1\n        if neighbors == 4:\n          output_grid[x,y] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3813,
+    "candidates_token_count": 768,
+    "total_token_count": 4581,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.351922,
+  "response_file": "034-response.json"
+}

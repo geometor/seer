@@ -1,0 +1,32 @@
+facts:
+  - subject: input_grid
+    description: A 2D array of integers.
+    properties:
+      rows: 3
+      columns: 4
+      elements: [9, 4]
+    relations:
+      - to: output_grid
+        type: transformed_to
+        details: "vertical mirroring and expansion"
+
+  - subject: output_grid
+    description: A 2D array of integers.
+    properties:
+      rows: 6
+      columns: 4
+      elements: [9, 4]
+    relations:
+       - from: input_grid
+         type: transformed_from
+         details: output is double input height, with vertical reflection
+
+  - subject: transformation
+    description: The process of changing input to output.
+    properties:
+      type: geometric
+      actions:
+       - name: vertical_reflection
+         details: mirror image along horizontal centerline
+       - name: vertical_expansion
+         details: original grid stacked on top of reflection

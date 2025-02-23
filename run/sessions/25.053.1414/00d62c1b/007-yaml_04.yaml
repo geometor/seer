@@ -1,0 +1,40 @@
+objects:
+  - name: grid
+    type: 2D array
+    elements: pixels
+    properties:
+      - width: 10
+      - height: 10
+      - color_values: [0, 3, 4]
+
+  - name: pixel
+    type: element
+    properties:
+      - color:
+          type: integer
+          values: [0, 3, 4]  # white, green, yellow
+      - position:
+          type: coordinate (row, column)
+
+  - name: green_cluster
+    type: object
+    definition: contiguous block of green (3) pixels
+    properties:
+       - shape: [ L-shape ]
+
+actions:
+  - name: change_color
+    agent: system
+    target: single green pixel
+    precondition: pixel is part of a green cluster
+    postcondition: pixel color changes to yellow (4)
+    constraints:
+      - location : pixel is chosen based on green cluster shape and appears to follow a consistent rule.  Specifically, the green pixel that has a green pixel diagonally down and to the left, and a green pixel below it is changed.
+
+relationships:
+  - type: adjacency
+    description: Pixels are considered adjacent if they share a side or a corner.
+  - type: containment
+    description: The grid contains pixels.
+  - type: part_of
+    description: A green pixel can be part of a green cluster.

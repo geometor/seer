@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies a contiguous shape of gray (5) pixels in the input grid and replaces these pixels with azure (8) and red (2) in the output grid, based on their position within the shape. Azure is used for leftmost, top and center, while red is on the right.\n\"\"\"\n\nimport numpy as np\n\ndef get_contiguous_shape(grid, color):\n    # Find the coordinates of all pixels matching the specified color.\n    coords = np.argwhere(grid == color)\n    if len(coords) == 0:\n      return []\n\n    # Start with the first coordinate as the seed.\n    shape = [tuple(coords[0])]\n    \n    # Use a set for faster lookup\n    remaining_coords = set(map(tuple, coords[1:]))\n\n    # Iteratively expand the shape by adding adjacent coordinates.\n    i = 0\n    while i < len(shape):\n      current_coord = shape[i]\n      \n      neighbors_to_add = []\n      for neighbor in remaining_coords:\n        diff = np.abs(np.array(current_coord) - np.array(neighbor))\n        if np.sum(diff) == 1:  # Check for adjacency (Manhattan distance of 1)\n          neighbors_to_add.append(neighbor)\n      \n      for neighbor in neighbors_to_add:\n        shape.append(neighbor)\n        remaining_coords.remove(neighbor)\n      \n      i += 1\n    \n    return shape\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    output_grid = input_grid.copy()\n    shape_color = 5\n    shape_coords = get_contiguous_shape(input_grid, shape_color)\n\n    if not shape_coords:\n        return output_grid\n\n    #find rightmost x\n    x_coords = [x[1] for x in shape_coords]\n    rightmost_x = max(x_coords)\n    \n    for r, c in shape_coords:\n        if c == rightmost_x:\n            output_grid[r, c] = 2\n        else:\n            output_grid[r,c] = 8\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2500,
+    "candidates_token_count": 518,
+    "total_token_count": 3018,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.890563,
+  "response_file": "010-response.json"
+}

@@ -1,0 +1,30 @@
+task_id: "020"
+observations:
+  - object: blue_stripe
+    properties:
+      color: blue (1)
+      shape: vertical_line
+      input_location: variable column
+    behavior:
+      transformation: color change to azure (8)
+      output_location: appears to follow a diagonal, alternating pattern within a 3-column grid.
+
+  - object: output_grid
+    properties:
+      width: 3
+      height: same as input
+      background_color: white (0)
+    behavior:
+      pixel_placement: azure pixels are placed based on a rule related to the blue stripe's location in the input.
+
+  - overall_transformation: |
+      The input grid's blue vertical stripe is extracted.  The blue color is
+      mapped to azure. A 3-column wide output grid is created, with height
+      equal to the input. The azure pixels are placed in the output grid
+      based on a diagonal, alternating pattern, starting at the top-left
+      output, stepping down and to the right, wrapping around the 3 width
+      output. All other output pixels are white.
+
+inconsistencies:
+  - The current code always places the azure stripe in the center column, which is incorrect.
+  - The current code only sets the color to azure (8).

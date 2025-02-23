@@ -1,0 +1,19 @@
+facts:
+  - task_id: "030"
+  - objects:
+      - description: "Input and output grids of identical dimensions."
+        properties:
+          - dimensions: "3x3"
+          - cell_values: "Integers representing colors (0-9)."
+  - transformations:
+      - description: "Color of each cell is transformed based on its column and initial color."
+        details:
+          - "Column 0: 3 -> 4, 2 -> 6, 5 -> 1, 8 -> 8"
+          - "Column 1: 1 -> 5, 3 -> 4 (inconsistent, should be 3 -> 3), 8 -> 9"
+          - "Column 2: 2 -> 6 (inconsistent, depends on example, should be 6), 8 -> 9"
+  - observations:
+      - description: "The transformation rule is column-specific and involves color mapping."
+      - note: "Current color mappings are not fully accurate and require refinement."
+  - inconsistencies:
+      - example_1: "Last column mapping of 2->2, should have mapped 2->6"
+      - example_4: "Second column mapping of 3 -> 4 and third column 2->2, needs review."

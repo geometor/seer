@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** all *horizontal sequences* of one or more contiguous azure pixels (value `8`) in the input grid.\n2.  **Preserve** all azure pixels in these sequences in their original positions in the output grid.\n3.  **Introduce** a *single* blue pixel (value `1`) immediately to the right of the *end* of each azure pixel sequence, if there is available space within the grid boundaries.\n4.  **Introduce** a *single* blue pixel (value `1`) immediately to the left of the *start* of each azure pixel sequence, if there is available space within the grid boundaries.\n5.  **Fill** all other positions in the output grid with `0` (white).\n\"\"\"\n\nimport numpy as np\n\ndef get_horizontal_sequences(grid, value):\n    sequences = []\n    for row in range(grid.shape[0]):\n        in_sequence = False\n        start = -1\n        for col in range(grid.shape[1]):\n            if grid[row, col] == value:\n                if not in_sequence:\n                    in_sequence = True\n                    start = col\n            elif in_sequence:\n                in_sequence = False\n                sequences.append(((row, start), (row, col - 1)))\n                start = -1\n        if in_sequence:\n            sequences.append(((row, start), (row, grid.shape[1] - 1)))\n    return sequences\n\ndef transform(input_grid):\n    # Initialize output_grid with zeros (white)\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get horizontal sequences of azure pixels (value 8)\n    azure_sequences = get_horizontal_sequences(input_grid, 8)\n    \n    # Preserve azure pixels in the output grid\n    for start, end in azure_sequences:\n        for col in range(start[1], end[1] + 1):\n            output_grid[start[0], col] = 8\n\n    # Introduce blue pixels (value 1) at the boundaries of azure sequences\n    for start, end in azure_sequences:\n        # To the left of the start\n        if start[1] - 1 >= 0:\n            output_grid[start[0], start[1] - 1] = 1\n        # To the right of the end\n        if end[1] + 1 < output_grid.shape[1]:\n            output_grid[end[0], end[1] + 1] = 1\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2989,
+    "candidates_token_count": 589,
+    "total_token_count": 3578,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.780613,
+  "response_file": "004-response.json"
+}

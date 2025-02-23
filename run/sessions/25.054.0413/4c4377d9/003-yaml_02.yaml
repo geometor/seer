@@ -1,0 +1,20 @@
+observations:
+  - task: 002
+    objects:
+      - type: row
+        properties:
+          original_index: int  # 0 to N-1, where N is the number of rows
+          colors: list[int]   # List of color values in the row
+        actions:
+          - reorder:
+              description: Rows are reordered before duplication.
+              mapping:  # Mapping of original row index to new row index (before duplication)
+                0: 2
+                1: 1
+                2: 0
+          - duplicate:
+              description: Each row, after reordering, is duplicated.
+    general:
+      - note: "The output grid is twice the height of the input grid."
+      - note: "The color palette and the pixel counts are preserved in the transformation."
+      - note: "rows are reversed"

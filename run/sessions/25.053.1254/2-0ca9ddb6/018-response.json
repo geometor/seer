@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Locate all pixels in the input grid that have a non-zero value (i.e., are not white/0). Consider each of these colored pixels as an individual object.\n\n2.  **Conditional Extension:**\n    *   If an object is blue (1), add orange (7) pixels to its immediate left, right, and below, if those positions are currently white (0).\n    *   If an object is red (2), add yellow (4) pixels to its immediate top, and to the left and the right if those positions are currently white (0).\n    *   If the object is magenta(6), do nothing\n\n3.  The rest of the white(0) cells stay white(0)\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"Finds all non-zero pixels and returns their coordinates and values.\"\"\"\n    objects = []\n    for r, row in enumerate(grid):\n        for c, value in enumerate(row):\n            if value != 0:\n                objects.append(((r, c), value))\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    objects = get_objects(input_grid)\n\n    # Iterate through identified objects\n    for (row, col), value in objects:\n      # Conditional Extension\n      if value == 1: # Blue\n          #add orange(7) on the left, right and below,\n          if col > 0 and output_grid[row, col - 1] == 0:\n              output_grid[row, col - 1] = 7\n          if col < output_grid.shape[1] - 1 and output_grid[row, col + 1] == 0:\n              output_grid[row, col + 1] = 7\n          if row < output_grid.shape[0] - 1 and output_grid[row + 1, col] == 0:\n            output_grid[row+1,col] = 7\n      elif value == 2:  # Red\n            # Add yellow (4) above and below.\n            if row > 0 and output_grid[row - 1, col] == 0:\n                output_grid[row - 1, col] = 4\n            if col > 0 and output_grid[row, col-1] == 0:\n              output_grid[row,col-1] = 4\n            if col < output_grid.shape[1] -1 and output_grid[row, col+1] == 0:\n              output_grid[row, col+1] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2364,
+    "candidates_token_count": 631,
+    "total_token_count": 2995,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.818275,
+  "response_file": "018-response.json"
+}

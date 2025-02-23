@@ -1,0 +1,11 @@
+objects:
+  - color: azure (8)
+    description: Contiguous blocks of azure pixels.
+    actions:
+      - identify_top_bottom: Find the minimum and maximum row indices.
+      - identify_target_rows:
+        - row_below_top: The row immediately below the top row, only if it exist and contains azure pixels.
+        - row_above_bottom: The row immediately above the bottom row, only if it exist and contains azure pixels.
+      - modify_pixels:
+        - row_below_top: Change the rightmost azure pixel to blue (1).
+        - row_above_bottom: Change the rightmost azure pixel to blue (1).

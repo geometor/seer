@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation counts the number of horizontally separated blue regions in the input grid and creates a single-row output grid where each cell corresponds to one of these regions. The presence of any blue region creates a blue pixel; otherwise, the result will be a white pixel.\n\"\"\"\n\nimport numpy as np\n\ndef count_horizontal_blue_regions(grid):\n    \"\"\"Counts distinct blue regions separated horizontally.\"\"\"\n    count = 0\n    in_blue_region = False\n    for row in grid:\n        for cell in row:\n            if cell == 1:  # Blue\n                if not in_blue_region:\n                    count += 1\n                    in_blue_region = True\n            else:\n                in_blue_region = False\n        in_blue_region = False #reset at end of row\n    return count\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid to output grid\"\"\"\n    # Convert to numpy array for easier manipulation.\n    grid = np.array(input_grid)\n\n    # Count distinct blue regions horizontally.\n    blue_region_count = count_horizontal_blue_regions(grid)\n    \n    # Create output grid.\n    if blue_region_count > 0:\n        output_grid = np.ones((1, blue_region_count), dtype=int)\n    else:\n      output_grid = np.zeros((1,1),dtype=int)\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2350,
+    "candidates_token_count": 329,
+    "total_token_count": 2679,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.5471,
+  "response_file": "014-response.json"
+}

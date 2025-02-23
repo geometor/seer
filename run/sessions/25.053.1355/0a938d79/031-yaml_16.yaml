@@ -1,0 +1,39 @@
+observations:
+  - example_1:
+      input_objects:
+        - row_1: [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        - row_10: [0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      output_objects:
+        - all_rows: [alternating sequence of 2 and 8, repeating vertically]
+      transformations:
+        - fill_alternating: [Rows with 0 and other color values fill with the sequence of non-zero color values, repeating]
+        - repeat_vertically: [Filled rows repeat vertically]
+  - example_2:
+      input_objects:
+        - row_1: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        - row_7: [0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      output_objects:
+         - all_rows: [alternating sequence of 1 and 3, repeating vertically]
+      transformations:
+        - fill_alternating: [Rows with 0 and other color values fill with the sequence of non-zero color values, repeating]
+        - repeat_vertically: [Filled rows repeat vertically]
+  - example_3:
+      input_objects:
+        - row_6: [2, 0, 0, 0, 0, 0, 0, 0, 0]
+        - row_8: [0, 0, 0, 0, 0, 0, 0, 0, 3]
+      output_objects:
+         - row_6,9,13,17,21: [2, 2, 2, 2, 2, 2, 2, 2, 2]
+         - row_8,11,15,19,23: [3, 3, 3, 3, 3, 3, 3, 3, 3]
+      transformations:
+        - fill_rows: [Rows with 0 and other colors, fill entire row with the non-zero color]
+        - alternate_rows: [Filled rows with different values alternate through the whole output grid]
+  - example_4:
+      input_objects:
+        - row_8: [4, 0, 0, 0, 0, 0, 0, 0]
+        - row_12: [1, 0, 0, 0, 0, 0, 0, 0]
+      output_objects:
+        - row_8,15,23: [4, 4, 4, 4, 4, 4, 4, 4]
+        - row_12, 19: [1, 1, 1, 1, 1, 1, 1, 1]
+      transformations:
+       - fill_rows: [Rows with 0 and a single other color fill the entire row with that color]
+       - alternate_rows: [Filled rows alternate through the whole output grid]

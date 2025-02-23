@@ -1,0 +1,36 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      colors: [0, 1, 5]
+      shape: varies (e.g., 3x7)
+  - name: output_grid
+    type: 2D array
+    properties:
+      colors: [0, 2]
+      shape: 3x3
+  - name: central_column
+    type: column
+    properties:
+      color: 5
+      location: middle of input_grid
+  - name: blue_pixels
+    type: pixels
+    properties:
+      color: 1
+      location: left or right of central_column
+  - name: red_pixels
+    type: pixels
+    properties:
+      color: 2
+      location: output_grid, derived from blue_pixels
+actions:
+  - name: separate_regions
+    description: Divide the input grid into left and right regions based on the central column.
+  - name: map_blue_pixels
+    description:  Map the blue pixels to the output grid.
+    details: >
+      The mapping is based on distance.
+      The mapping appears to only consider blue pixels at a distance of one from the dividing line.
+  - name: transform_color
+    description: Change the color of mapped pixels from blue (1) to red (2).

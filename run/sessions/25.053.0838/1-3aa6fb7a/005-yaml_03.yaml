@@ -1,0 +1,26 @@
+facts:
+  - task: 9a7dd655
+  - objects:
+      - color: azure (8)
+        type: contiguous_group
+        description: Objects composed of one or more azure pixels.
+      - color: blue (1)
+        type: single_pixel
+        description:  A single pixel that results from application of a rule
+      - color: white (0)
+        type: other
+        description:  Background, adjacent pixels considered in the transformation.
+  - actions:
+      - name: color_pixel
+        parameters:
+          - color: blue (1)
+        conditions:
+          - subject: white_pixel
+          - relationship: adjacent_to_azure_object
+          - logic: |
+              Determine relative positioning of each azure object
+              Locate white pixel above, below, left, or right of entire object
+              Color white cell blue
+  - observations:
+    - there appears to be a one-to-one mapping between azure colored objects and resulting blue pixel.
+    - The position where a new blue pixel is created is based on the position of azure object in the grid

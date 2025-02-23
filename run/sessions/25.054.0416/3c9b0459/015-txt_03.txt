@@ -1,0 +1,92 @@
+    2 2 1
+    2 1 2
+    2 8 1
+    ```
+*   **Expected Output:**
+    ```
+    1 8 2
+    2 1 2
+    1 2 2
+    ```
+*   **Transformed Output (Incorrect):**
+    ```
+    1 2 1
+    2 1 8
+    2 2 2
+    ```
+*   **Analysis:** The expected output's first row is the reverse of the input's last row. The second row is the same. The third row is the reverse of the first row. This suggests a vertical flip (mirroring along the horizontal axis) followed by reversing each row (which is equivalent to performing a horizontal flip after vertical). The combination of operations is a 180 degree rotation, but importantly, we must find the operations *in the correct order.*
+
+**Example 2:**
+
+*   **Input:**
+    ```
+    9 2 4
+    2 4 4
+    2 9 2
+    ```
+*   **Expected Output:**
+    ```
+    2 9 2
+    4 4 2
+    4 2 9
+    ```
+* **Transformed Output (Incorrect):**
+
+    ```
+    4 4 2
+    2 4 9
+    9 2 2
+    ```
+*   **Analysis:** The expected output's first row is the input's last row reversed. The second row is the input's second row reversed. The third row is the input's first row reversed. This is a horizontal flip (mirror along the vertical axis).
+
+**Example 3:**
+
+*   **Input:**
+    ```
+    8 8 8
+    5 5 8
+    8 5 5
+    ```
+*   **Expected Output:**
+    ```
+    5 5 8
+    8 5 5
+    8 8 8
+    ```
+*   **Transformed Output (Incorrect):**
+    ```
+    8 8 5
+    8 5 5
+    8 5 8
+    ```
+*   **Analysis:**  The expected output's first row is the input's second row. The second row is the input's third row. The third row is the input's first row. This indicates a cyclical shift of rows downwards.
+
+**Example 4:**
+
+*   **Input:**
+
+    ```
+    3 2 9
+    9 9 9
+    2 3 3
+    ```
+
+*   **Expected Output:**
+
+    ```
+    3 3 2
+    9 9 9
+    9 2 3
+    ```
+
+*   **Transformed Output (Incorrect):**
+
+    ```
+    9 9 3
+    2 9 3
+    3 9 2
+    ```
+
+* **Analysis:** The first row is the last row, reversed. Row two stays the same, Row 3 is row 1 reversed.
+
+**YAML Block (Facts):**

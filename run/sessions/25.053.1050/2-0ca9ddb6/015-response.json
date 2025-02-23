@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Copy Existing Pixels:** All pixels that are not black (color 0) in the input grid are copied to the same position in the output grid.\n2.  **Add Yellow Pixels:** For every non-black pixel in the input grid, add two yellow pixels in the output grid. The yellow pixels' positions depend on the position of original color pixels. One of these is placed two rows above, in the same column. The second is two rows above, and two columns to the right. If those spaces don't exist(out of grid bounds, or occupied), skip adding those yellow pixels.\n3. **Add Orange Pixels around Blue:** Add orange pixels around any blue pixel that existed in the *input* grid, but only in the direct adjacent positions(up, down, left and right). If any of these positions are occupied or out of grid bound, skip addition.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"\n    Returns the valid neighbor coordinates (up, down, left, right) of a cell.\n    \"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # Up\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # Down\n    if col > 0:\n        neighbors.append((row, col - 1))  # Left\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # Right\n    return neighbors\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    rows, cols = input_grid.shape\n\n    # change output pixels\n    # 1. Copy Existing Pixels\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                output_grid[r, c] = input_grid[r, c]\n\n    # 2. Add Yellow Pixels\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                # Position 1: Two rows above, same column\n                new_r1 = r - 2\n                new_c1 = c\n                if 0 <= new_r1 < rows and output_grid[new_r1, new_c1] == 0:\n                    output_grid[new_r1, new_c1] = 4  # Yellow\n\n                # Position 2: Two rows above, two columns right\n                new_r2 = r - 2\n                new_c2 = c + 2\n                if 0 <= new_r2 < rows and 0 <= new_c2 < cols and output_grid[new_r2, new_c2] == 0:\n                    output_grid[new_r2, new_c2] = 4  # Yellow\n\n    # 3. Add Orange Pixels around Blue\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 1:  # Blue\n                for nr, nc in get_neighbors(input_grid, r, c):\n                    if output_grid[nr, nc] == 0:\n                        output_grid[nr, nc] = 7  # Orange\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 1003,
+            "end_index": 1295,
+            "uri": "https://github.com/Kaeltherol/Minesweeper",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7021,
+    "candidates_token_count": 813,
+    "total_token_count": 7834,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.644098,
+  "response_file": "015-response.json"
+}

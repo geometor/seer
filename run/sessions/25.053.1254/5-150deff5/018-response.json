@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies a shape formed by the color gray (value 5) in the input grid and replaces the leftmost part of the shape with red (value 2) and the rightmost part with azure (value 8). The background (white, value 0) remains unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_shape(grid, shape_value):\n    \"\"\"Finds the coordinates of all pixels belonging to the shape.\"\"\"\n    coords = []\n    for r_idx, row in enumerate(grid):\n        for c_idx, value in enumerate(row):\n            if value == shape_value:\n                coords.append((r_idx, c_idx))\n    return coords\n\ndef find_leftmost_segment(coords):\n    \"\"\"Finds the leftmost vertical segment of the shape.\"\"\"\n    min_col = min(c for _, c in coords)\n    leftmost_segment_coords = []\n    \n    # get the range of the first vertical segment\n    for r, c in coords:\n      if c == min_col:\n        leftmost_segment_coords.append((r,c))\n\n    return leftmost_segment_coords\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    \n    shape_coords = find_shape(input_grid, 5)\n    if not shape_coords:\n        return output_grid\n\n    leftmost_segment = find_leftmost_segment(shape_coords)\n    \n    # Color Substitution - Left\n    for r, c in leftmost_segment:\n      output_grid[r,c] = 2\n\n    # Color Substitution - Right\n    for r, c in shape_coords:\n      if (r,c) not in leftmost_segment:\n        output_grid[r, c] = 8\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2413,
+    "candidates_token_count": 446,
+    "total_token_count": 2859,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.125182,
+  "response_file": "018-response.json"
+}

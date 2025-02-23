@@ -1,0 +1,38 @@
+facts:
+  - description: "Non-white pixels are considered objects."
+    objects:
+      - type: "pixel"
+        properties:
+          - color: "not white (0)"
+          - coordinates: "(row, column)"
+    relationships:
+      - type: "Manhattan distance"
+        condition: "equal to 3"
+        action:
+            - "create two yellow pixels adjacent to the pair"
+            - "create orange filling in a 3x3 area including original pair"
+
+  - description: "Yellow pixels are placed horizontally, vertically, *or diagonally* adjacent to pairs."
+    objects:
+       - type: pixel
+         properties:
+           - color: yellow(4)
+           - coordinates: "adjacent to the original pair based on their relationship"
+    actions:
+        - place: "one cell to the left or right, *or diagonally*"
+        - place: "one cell above or below, *or diagonally*"
+
+  - description: "Orange filling covers a 3x3 area."
+    objects:
+      - type: "area"
+        properties:
+          - color: "orange (7)"
+          - size: "3x3"
+        location: "centered around each of original pixel pair"
+
+  - description: "Unrelated non-white pixels are preserved."
+    objects:
+        - type: "pixel"
+          properties:
+            - color: "not white (0)"
+            - coordinates: "unchanged if not part of a distance-3 pair"

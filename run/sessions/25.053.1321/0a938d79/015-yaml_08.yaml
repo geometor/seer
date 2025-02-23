@@ -1,0 +1,18 @@
+facts:
+  - description: "Each input grid contains 'seed rows'."
+    properties:
+      seed_row: "A row with exactly one non-zero pixel."
+      seed_color: "The color (non-zero value) of the single pixel in a seed row."
+      seed_column: "The column index of the single pixel in a seed row."
+
+  - description: "The output grid is constructed based on the seed rows."
+    properties:
+      output_dimensions: "Same as the input grid."
+      row_filling:
+        - type: "seed_row_extension"
+          description: "For each seed row, the seed color extends from its initial column to the end of the row."
+        - type: "alternating_pattern"
+          description: "Empty rows are filled with an alternating pattern of the seed colors from all seed rows."
+          details: "The pattern starts from column 0, repeats colors in the same order as the seed rows, and wraps around as needed. This fills spaces to the left of a seed pixel, and between any 'seed_row_extension' rows"
+        - type: "empty_row_preservation"
+          description: "Rows that are completely empty (all zeros) in the input remain empty (all zeros) in the output."

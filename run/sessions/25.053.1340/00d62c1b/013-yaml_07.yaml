@@ -1,0 +1,18 @@
+task: 012
+objects:
+  - id: green_regions
+    color: green
+    description: Contiguous areas of green pixels
+    properties:
+      - interior_pixels:
+          definition: Pixels within a green region that should be colored yellow.
+          current_rule: All 8 neighbors must be green.  (INCORRECT)
+          proposed_rule:  Pixels on the edge are not interior. Pixels completely surrounded by green are. (NEEDS REFINEMENT)
+actions:
+  - name: change_color
+    subject: interior_pixels
+    from_color: green
+    to_color: yellow
+    conditions:
+      - subject must be part of a green_region
+      - subject must satisfy interior_pixels rule

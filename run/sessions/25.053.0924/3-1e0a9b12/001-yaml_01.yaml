@@ -1,0 +1,19 @@
+facts:
+  - object: grid
+    properties:
+      dimensions: 4x4
+      datatype: integer
+      elements: "0-9 (representing colors)"
+
+  - observation: non_zero_elements
+    description: "Non-zero elements are re-arranged"
+    input_values: [4, 9, 4, 6, 1]
+    output_values: [4, 1, 4, 6, 9]
+    
+  - transformation: row_shift
+    description: "Elements appear to be shifted downwards."
+    details: "The non-zero elements from the input grid are moved to the last row of the output grid, maintaining their relative order within the set of non-zero elements"
+
+  - transformation: zero_fill
+    description: "All elements, other than the shifted non-zero elements, are set to zero."
+    details: "Rows 0 and 1 of the output grid are filled with zeros. Some elements in row 2 and 3 are also zeroed if they don't hold a value from the original non-zero set"

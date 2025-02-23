@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Contiguous Green Blocks:** Find all contiguous blocks of green (3) pixels in the input grid. A contiguous block is defined as a group of green pixels where each pixel is directly adjacent (up, down, left, or right, but not diagonally) to at least one other green pixel in the same block.\n\n2.  **Identify Exterior and Interior Pixels:** Within each identified green block, classify each pixel as either exterior or interior.\n    *   **Exterior Pixel:** A green pixel that is part of the block, and is adjacent to at least one pixel that is *not* part of the *same* green block (either a different color, or the boundary of the input grid). Adjacency is defined as up, down, left, or right.\n    *   **Interior Pixel:** A green pixel where *all* its directly adjacent pixels (up, down, left, and right) are *also* part of the *same* green block.\n\n3.  **Transform Interior Pixels:** Change the color of all identified *interior* green pixels to yellow (4).\n\n4.  **Preserve Other Pixels:** All other pixels in the grid (non-green pixels, and exterior green pixels) remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_contiguous_blocks(grid, color):\n    \"\"\"Finds contiguous blocks of a given color in the grid.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    blocks = []\n\n    def dfs(r, c, current_block):\n        \"\"\"Depth-first search to find contiguous pixels.\"\"\"\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_block.append((r, c))\n        dfs(r + 1, c, current_block)\n        dfs(r - 1, c, current_block)\n        dfs(r, c + 1, current_block)\n        dfs(r, c - 1, current_block)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                current_block = []\n                dfs(r, c, current_block)\n                blocks.append(current_block)\n    return blocks\n\ndef is_exterior(grid, r, c, block):\n    \"\"\"Checks if a pixel is an exterior pixel of its block.\"\"\"\n    rows, cols = grid.shape\n    neighbors = [(r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)]\n    for nr, nc in neighbors:\n        if not (0 <= nr < rows and 0 <= nc < cols) or (nr, nc) not in block:\n            return True  # Exterior if any neighbor is outside or not in the block\n    return False\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Identify contiguous blocks of green pixels.\n    green_blocks = get_contiguous_blocks(input_grid, 3)\n\n    # 2. & 3. Iterate, classify, and change interior pixels to yellow.\n    for block in green_blocks:\n        for r, c in block:\n            # Check if pixel is exterior. If not, it's interior.\n            if not is_exterior(input_grid, r, c, block):\n                output_grid[r, c] = 4  # Change interior pixels to yellow\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7431,
+    "candidates_token_count": 863,
+    "total_token_count": 8294,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.905607,
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,28 @@
+observations:
+  - object: blue_pixels
+    description: Pixels with color code 1. These are the primary targets of the transformation.
+    properties:
+      color: 1 (blue)
+      shape: individual pixels
+      arrangement: Can be in a contiguous vertical line or staggered vertically.
+    actions:
+      - name: change_color
+        to_color: 8 (azure)
+
+  - object: cropped_region
+    description: A section of the original grid, centered around the blue pixels.
+    properties:
+      width: 3 columns
+      height: Same as the original grid.
+      x_offset: Dynamically determined based on the position of blue pixels. Calculated as one column to the left of the *leftmost* blue pixel and extending to two columns to the right of the *leftmost* blue pixel.
+    actions:
+      - name: crop
+        from: original_grid
+
+  - object: other_pixels
+    description: all other pixels that are not blue in the input
+    properties:
+       color: not 1
+    actions:
+      - name: set_color
+        to_color: 0 (black)

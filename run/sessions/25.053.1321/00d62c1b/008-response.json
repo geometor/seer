@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies green (3) pixels in the input grid.\nFor each green pixel, determines if it is the center of a \"+\" shaped object formed by green pixels.\nA pixel is the center of a \"+\" if the continuous lines of green pixels extending horizontally and vertically are at least 3 pixels long (including the center).\nChanges the color of the center pixel of valid \"+\" shaped objects to yellow (4).\nAll other pixels remain unchanged.\nReturns the modified grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_line_length(grid, row, col, direction):\n    \"\"\"\n    Calculates the length of a contiguous line of green pixels starting from a given position.\n\n    Args:\n        grid: The input grid.\n        row: Starting row index.\n        col: Starting column index.\n        direction: A tuple (row_change, col_change) indicating the direction to check.\n                   (0, 1) for horizontal (right), (0, -1) for horizontal (left),\n                   (1, 0) for vertical (down), (-1, 0) for vertical (up).\n\n    Returns:\n        The length of the contiguous line of green pixels in the specified direction.\n    \"\"\"\n    rows, cols = grid.shape\n    length = 0\n    r, c = row, col\n    dr, dc = direction\n\n    while 0 <= r < rows and 0 <= c < cols and grid[r, c] == 3:\n        length += 1\n        r += dr\n        c += dc\n    return length\n\ndef is_plus_center(grid, row, col):\n    \"\"\"\n    Checks if a green pixel is the center of a '+' shape with arms of length >= 3.\n\n    Args:\n        grid: The input grid.\n        row: Row index of the pixel.\n        col: Column index of the pixel.\n\n    Returns:\n        True if the pixel is a valid '+' center, False otherwise.\n    \"\"\"\n    if grid[row, col] != 3:\n        return False\n\n    # Calculate lengths in all four directions\n    left_length = get_line_length(grid, row, col - 1, (0, -1))\n    right_length = get_line_length(grid, row, col + 1, (0, 1))\n    up_length = get_line_length(grid, row - 1, col, (-1, 0))\n    down_length = get_line_length(grid, row + 1, col, (1, 0))\n\n    # Check if horizontal and vertical lengths are >= 3 (including the center pixel)\n    horizontal_length = left_length + 1 + right_length\n    vertical_length = up_length + 1 + down_length\n\n    return horizontal_length >= 3 and vertical_length >= 3\n\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each pixel\n    for row in range(rows):\n        for col in range(cols):\n            # Check if the pixel is green and a '+' center\n            if is_plus_center(output_grid, row, col):\n                # Change the color to yellow\n                output_grid[row, col] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7672,
+    "candidates_token_count": 771,
+    "total_token_count": 8443,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.500482,
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all non-white pixels in the input grid.\n2.  **Pairwise Check:** Iterate through all unique pairs of these non-white pixels.\n3.  **Distance Condition:** For each pair, calculate the Manhattan distance. If the distance is exactly 3:\n    *   **Yellow Pixel Placement:**\n        *   If the pair is horizontally aligned, place one yellow pixel one cell to the left of the leftmost pixel and one yellow pixel one cell to the right of the rightmost pixel.\n        *   If the pair is vertically aligned, place one yellow pixel one cell above the topmost pixel and one yellow pixel one cell below the bottommost pixel.\n        *   If the pair is diagonally aligned, place yellow pixel one cell diagonally adjacent to *both* pixels, maintaining relative positions.\n    *   **Orange Filling:** Create a 3x3 square of orange pixels centered on the *two original pixels*. Ensure this filling occurs for every pair that meets the distance condition, regardless of their relative orientation (horizontal, vertical, or diagonal). The 3x3 fill region should always include both original pixels.\n4.  **Preservation:** Copy any non-white pixels from the input grid that were *not* part of any pair with a Manhattan distance of 3 directly to the output grid at their original locations.\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_pixels(grid):\n    \"\"\"Finds coordinates of non-white pixels.\"\"\"\n    rows, cols = np.where(grid != 0)\n    return list(zip(rows, cols))\n\ndef manhattan_distance(p1, p2):\n    \"\"\"Calculates Manhattan distance between two points.\"\"\"\n    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    non_white_pixels = get_non_white_pixels(input_grid)\n\n    # iterate pairs of non-white pixels\n    processed_pixels = set()\n    for i in range(len(non_white_pixels)):\n      for j in range(i + 1, len(non_white_pixels)):\n        p1 = non_white_pixels[i]\n        p2 = non_white_pixels[j]\n\n        if manhattan_distance(p1,p2) == 3:\n            #Yellow Pixel Placement.\n            \n            #horizontal\n            if (p1[0] == p2[0]):\n              output_grid[p1[0], min(p1[1],p2[1])-1] = 4\n              output_grid[p1[0], max(p1[1],p2[1])+1] = 4\n            #vertical\n            if (p1[1] == p2[1]):\n              output_grid[min(p1[0],p2[0])-1, p1[1]] = 4\n              output_grid[max(p1[0],p2[0])+1, p1[1]] = 4\n\n            # diagonal\n            row_diff = p2[0] - p1[0]\n            col_diff = p2[1] - p1[1]\n\n            if abs(row_diff) + abs(col_diff) == 3 and row_diff !=0 and col_diff != 0: #confirm the diagonal\n                output_grid[p1[0] + (1 if row_diff > 0 else -1), p1[1] + (1 if col_diff > 0 else -1)] = 4\n                output_grid[p2[0] + (-1 if row_diff > 0 else 1), p2[1] + (-1 if col_diff > 0 else 1)] = 4\n\n            \n            # fill a 3x3 box with orange around the two pixels\n            min_row = min(p1[0], p2[0])\n            max_row = max(p1[0], p2[0])\n            min_col = min(p1[1], p2[1])\n            max_col = max(p1[1], p2[1])\n\n            for row in range(min_row -1, max_row + 2):\n              for col in range(min_col - 1, max_col + 2):\n                if 0 <= row < output_grid.shape[0] and 0<= col < output_grid.shape[1]:\n                    output_grid[row,col] = 7\n            \n            processed_pixels.add(p1)\n            processed_pixels.add(p2)\n\n\n    # preservation of other non-white pixels\n    for p in non_white_pixels:\n        if p not in processed_pixels:\n            output_grid[p] = input_grid[p]\n            \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4802,
+    "candidates_token_count": 1129,
+    "total_token_count": 5931,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.571371,
+  "response_file": "012-response.json"
+}

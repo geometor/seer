@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Objects:** Locate all distinct, contiguous groups of azure (8) pixels. Each group is considered an \"azure object.\"\n\n2.  **Determine Blue Pixel Placement:** For *each* azure object, find the adjacent (up, down, left or right - *not* diagonal) empty/white (0) cell. If there's only one such position, color this white cell blue (1).\n\n3.  **Output:** The final grid will contain the original azure objects and single blue pixels at positions determined during processing each azure object.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid, color):\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(r, c, current_object):\n        if (r < 0 or r >= grid.shape[0] or c < 0 or c >= grid.shape[1] or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef get_adjacent_white_pixels(grid, object_pixels):\n    adjacent_white = []\n    for r, c in object_pixels:\n        neighbors = [\n            (r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)\n        ]\n        for nr, nc in neighbors:\n            if (0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1] and\n                    grid[nr, nc] == 0):\n                adjacent_white.append((nr, nc))\n    return list(set(adjacent_white))  # Remove duplicates\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Identify azure objects\n    azure_objects = get_objects(input_grid, 8)\n\n    # Determine and apply blue pixel placement for each azure object\n    for azure_object in azure_objects:\n       adjacent_whites = get_adjacent_white_pixels(output_grid, azure_object)\n       if len(adjacent_whites) > 0:\n            output_grid[adjacent_whites[0]] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3688,
+    "candidates_token_count": 672,
+    "total_token_count": 4360,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.986675,
+  "response_file": "006-response.json"
+}

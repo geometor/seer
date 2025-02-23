@@ -1,0 +1,36 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - rows: list of rows
+      - columns: list of columns
+      - height: number of rows
+      - width: number of columns
+      - elements: integers (0-9 representing colors)
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      - rows: list of rows
+      - columns: list of columns
+      - height: double the height of input_grid
+      - width: same as the width of input_grid
+      - elements: integers (0-9 representing colors)
+
+  - name: row
+    type: 1D array
+    properties:
+      - elements: integers (0-9)
+
+actions:
+  - name: duplicate_grid
+    input: input_grid
+    output: intermediate_grid (height doubled)
+    description: Creates a new grid with twice the number of rows as the input, initially empty or zero-filled.
+
+  - name: map_rows
+    input: input_grid, intermediate_grid
+    output: output_grid
+    description: Copies rows from the input_grid to specific rows in the intermediate_grid based on the row mapping.
+      - Row Mapping: The relationship of an input row to it's index(s) in
+        the output.

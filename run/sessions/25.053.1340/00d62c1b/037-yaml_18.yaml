@@ -1,0 +1,17 @@
+task: 036
+objects:
+  - id: green_regions
+    type: contiguous_region
+    color: green
+    properties:
+      boundary: pixels adjacent to non-green pixels (including diagonals)
+      inner: pixels not on the boundary
+actions:
+  - name: change_color
+    input: green_regions.inner
+    properties:
+      from_color: green
+      to_color: yellow
+  - name: identify_boundary_pixels
+    input: green_regions
+    output: green_regions.boundary

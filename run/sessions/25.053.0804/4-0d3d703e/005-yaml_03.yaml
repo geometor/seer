@@ -1,0 +1,14 @@
+input:
+  shape: 3x3
+  values: [5, 8, 6] # gray, azure, magenta
+  pattern: horizontal repetition
+output:
+  shape: 3x3
+  values: [1, 9, 2] # blue, maroon, red
+  pattern: horizontal repetition
+transformation:
+  type: element-wise modulo subtraction
+  details:
+      - input value 5 maps to 1: subtract 4  (or 5 - 1 = 4)
+      - input value 8 maps to 9: subtract -1 (or add 1), but its also subtract 9 (8-9 = -1 or 9 mod 10)
+      - input value 6 maps to 2: subtract 4 (or 6 - 2 = 4)

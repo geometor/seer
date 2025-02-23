@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid based on the location of red and blue pixels.\n\n1.  **Red Pixel Rule:** For every red pixel in the input, maintain its position and color in the output.  Introduce yellow pixels to its immediate, non-diagonal neighbors (above, below, left, and right) if these neighboring positions exist within the grid boundaries and are occupied by white pixels in the input grid.\n\n2.  **Blue Pixel Rule:** For every blue pixel in the input, maintain its position and color in the output. Change the color of its immediate, non-diagonal neighbors (above, below, left, and right) to orange if these neighboring positions exist within the grid boundaries and are occupied by white pixels in the input grid.\n\n3.  **Other Colors:** Pixels of any color other than red or blue remain unchanged in their position and color from the input to the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_pixel(grid, r, c):\n    if 0 <= r < len(grid) and 0 <= c < len(grid[0]):\n        return grid[r][c]\n    else:\n        return None\n    \ndef set_pixel(grid, r, c, value):\n   if 0 <= r < len(grid) and 0 <= c < len(grid[0]):\n        grid[r][c] = value\n   \ndef transform(input_grid):\n    # initialize output_grid as a copy of the input\n    output_grid = np.copy(input_grid)\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n\n    # Iterate through each cell of the input_grid\n    for r in range(rows):\n        for c in range(cols):\n            # Red pixel rule\n            if input_grid[r][c] == 2:  # Red pixel found\n                #output_grid[r][c] = 2 # keep the red pixel (this is redundant as output is copy)\n                # Add yellow above and below if within bounds\n                if r > 0 and input_grid[r-1][c] == 0 :\n                    output_grid[r - 1][c] = 4  # Yellow\n                if r < rows - 1 and input_grid[r+1][c] == 0:\n                    output_grid[r + 1][c] = 4  # Yellow\n                if c > 0 and input_grid[r][c-1] == 0:\n                    output_grid[r][c-1] = 4\n                if c < cols -1 and input_grid[r][c+1] == 0:\n                    output_grid[r][c+1] = 4\n\n            # Blue pixel rule\n            elif input_grid[r][c] == 1:  # Blue pixel found\n                # output_grid[r][c] = 1 # keep the blue pixel (this is redundant as output is copy)\n                # Change adjacent cells to orange if within bounds\n                if r > 0 and input_grid[r-1][c] == 0:\n                    output_grid[r - 1][c] = 7  # Orange\n                if r < rows - 1 and input_grid[r+1][c] == 0:\n                    output_grid[r + 1][c] = 7  # Orange\n                if c > 0 and input_grid[r][c-1] == 0:\n                    output_grid[r][c - 1] = 7  # Orange\n                if c < cols - 1 and input_grid[r][c+1] == 0:\n                    output_grid[r][c + 1] = 7  # Orange\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8027,
+    "candidates_token_count": 853,
+    "total_token_count": 8880,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.318996,
+  "response_file": "006-response.json"
+}

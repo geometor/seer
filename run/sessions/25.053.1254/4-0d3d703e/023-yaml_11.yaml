@@ -1,0 +1,32 @@
+objects:
+  - description: 3x3 grid
+    properties:
+      rows: 3
+      columns: 3
+      elements: integers (0-9 representing colors)
+
+transformations:
+  - description: Conditional color mapping based on the last column's value.
+    details: |
+      The first two columns of each row are transformed based on a mapping
+      conditioned by the value in the third column of that row.
+      The third column is also transformed based on its initial value.
+  - specific_mappings:
+      column_3_value_2:
+        input_output_pairs_col1:
+          '3': '4'
+          '1': '5'
+          '5': '1'
+          '8': '8'
+        input_output_pairs_col2:
+            '1': '5'
+            '8': '8'
+            '3': '4'
+        column_3_transform: '6'
+      column_3_value_8:
+        input_output_pairs_col1:
+            '2': '6'
+            '3':'4'
+        input_output_pairs_col2:
+            '3': '4'
+        column_3_transform: '9'

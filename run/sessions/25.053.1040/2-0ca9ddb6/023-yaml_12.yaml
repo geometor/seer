@@ -1,0 +1,31 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Contains pixels of different colors.
+  - name: pixel
+    type: cell
+    description: Represents a single color value in the grid.
+    properties:
+      - color: integer (0-9)
+
+actions:
+  - name: expand
+    description: Changes the color of a white pixel based on neighboring colors.
+    conditions:
+      - trigger: Neighboring pixel is red (2) or blue (1).
+      - blocking: Expansion is halted by pixels that aren't 0, 1, or 2.
+    results:
+      - red_neighbor: White pixel becomes yellow (4).
+      - blue_neighbor: White pixel becomes orange (7).
+
+colors:
+    0: white
+    1: blue
+    2: red
+    3: green
+    4: yellow
+    5: gray
+    6: magenta
+    7: orange
+    8: azure
+    9: maroon

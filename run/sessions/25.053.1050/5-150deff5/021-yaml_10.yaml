@@ -1,0 +1,20 @@
+facts:
+  - task_id: 020
+  - objects:
+      - name: gray_object
+        color: gray (5)
+        properties:
+          - contiguous: True
+          - segments: Multiple vertical segments
+      - name: red_object
+        color: red (2)
+        properties:
+          - source: gray_object segments, every other one, starting with first
+      - name: azure_object
+        color: azure (8)
+        properties:
+          - source: gray_object segments, every other one, starting with second
+  - actions:
+      - description: Identify contiguous vertical segments within the gray_object.
+      - description: Color alternating segments as red and azure, starting with red.
+      - description: Maintain the position of the white background.

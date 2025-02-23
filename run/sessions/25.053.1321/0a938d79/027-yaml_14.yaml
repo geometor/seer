@@ -1,0 +1,28 @@
+observations:
+  - task: 026
+  - example_set: training
+  - general_rule: |
+      The output grid replicates a pattern constructed from rows with a single,
+      non-zero color expanded to fill the entire row. The input grid is
+      analyzed to identify any rows where all the values are zero except for
+      a single, non-zero value. The identified rows are duplicated and
+      interleaved with a row of all zeroes to build the output grid.
+  - objects:
+      - type: row
+        property: significant
+        description: Contains only one non-zero color.
+        actions:
+          - expand: Fill the entire row with the single color.
+          - duplicate: Create a copy of the row.
+          - interleave: place the expanded significant rows in alternating
+            order in the output, and interleave single rows of all zeros
+            between them.
+  - pattern:
+      - type: alternating_rows
+        description: The output grid is constructed by repeating the pattern from top
+          to bottom.
+  - dimensions:
+      - input_height: Varies per example
+        input_width: Varies per example
+        output_height: Same as input height.
+        output_width: Same as input width.

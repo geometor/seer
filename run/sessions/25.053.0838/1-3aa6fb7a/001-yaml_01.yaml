@@ -1,0 +1,19 @@
+facts:
+  input_grid_dimensions: 7x7
+  output_grid_dimensions: 7x7
+  objects:
+    - color: 8  # azure
+      instances_input: 2
+      instance_1_pixels: [(1, 1), (2, 1), (2, 2)]
+      instance_2_pixels: [(3, 4), (3, 5), (4, 5)]
+      adjacent_white_pixels: [(0, 1), (1, 0), (1, 2), (3, 1), (2, 0), (3, 2), (2, 3), (2, 4), (4, 4), (3, 3), (2, 5), (3, 6), (5, 5), (4, 6)]
+    - color: 1
+      instances_output: 2
+      instance_1_pixels: [(1,2)]
+      instance_2_pixels: [(4,4)]
+  actions:
+    - type: color_change
+      from_color: 0  # white
+      to_color: 1  # blue
+      locations: [(1, 2), (4, 4)] # adjacent to azure objects
+      notes: the locations chosen for color changes appear to be a deterministic choice among the available white cells

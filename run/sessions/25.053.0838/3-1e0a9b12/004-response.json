@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Locate all non-zero pixels (objects) within the input grid.\n2.  **Column Preservation:**  Each object *retains its original column index* in the output grid.\n3. **Yellow Stack:** The Yellow (4) objects move to the highest available row index for column index 0, one per row, starting at row index 3 and filling rows below.\n4.  **Object Ordering - Vertical Shift:** Other objects keep their column and shift down to the lowest available rows, but their *relative vertical order is preserved*. If two objects start in the same column, the object higher in the input will remain higher in the output within the \"available\" rows. Available means rows that aren't occupied after the yellows have been stacked.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    objects = []\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] != 0:\n                objects.append({\"value\": grid[r, c], \"row\": r, \"col\": c})\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # get objects\n    objects = get_objects(input_grid)\n\n    # separate yellow objects\n    yellow_objects = [obj for obj in objects if obj[\"value\"] == 4]\n    other_objects = [obj for obj in objects if obj[\"value\"] != 4]\n\n    # place yellow objects\n    yellow_row = 3\n    for obj in yellow_objects:\n        if yellow_row < rows:\n          output_grid[yellow_row, 0] = 4\n          yellow_row += 1\n\n    # place other objects, preserving column and relative order\n    available_rows = [r for r in range(rows) if r not in range(3, yellow_row)]\n    objects_by_column = {}\n    for obj in other_objects:\n        col = obj[\"col\"]\n        if col not in objects_by_column:\n            objects_by_column[col] = []\n        objects_by_column[col].append(obj)\n\n    for col in sorted(objects_by_column.keys()):\n        objects_by_column[col].sort(key=lambda x: x[\"row\"])  # Sort by original row\n        row_index = len(available_rows)-1 # start at the lowest available row index\n\n        for obj in objects_by_column[col]:\n            if row_index >=0:\n                output_grid[available_rows[row_index], obj[\"col\"]] = obj[\"value\"]\n                row_index -= 1\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4592,
+    "candidates_token_count": 645,
+    "total_token_count": 5237,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.922468,
+  "response_file": "004-response.json"
+}

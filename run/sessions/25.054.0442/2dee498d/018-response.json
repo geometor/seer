@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts the smallest repeating horizontal sequence from the input grid to form the output grid, ensuring the sequence can reconstruct the original row when repeated.\n\"\"\"\n\nimport numpy as np\n\ndef find_repeating_unit(row):\n    \"\"\"Finds the repeating unit in a single row.\"\"\"\n    width = len(row)\n    for unit_width in range(1, width // 2 + 1):\n        unit = row[:unit_width]\n        # Construct a hypothetical row by repeating the unit\n        hypothetical_row = (unit * (width // unit_width + 1))[:width]\n        if np.array_equal(hypothetical_row, row):\n            return unit\n    return row  # If no repeating unit found, return the entire row\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the repeating horizontal unit from each row of the input grid.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The output grid, formed by the repeating units of each row.\n    \"\"\"\n    output_grid = []\n    for row in input_grid:\n        # Find the repeating unit for each row\n        repeating_unit = find_repeating_unit(row)\n        output_grid.append(repeating_unit)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3126,
+    "candidates_token_count": 307,
+    "total_token_count": 3433,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.822646,
+  "response_file": "018-response.json"
+}

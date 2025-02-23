@@ -1,0 +1,25 @@
+objects:
+  blue_lines:
+    description: Vertical lines of blue (1) pixels.
+    properties:
+      start: [row, col]  # Topmost blue pixel
+      end: [row, col]    # Bottommost blue pixel
+      color: 1
+  blocking_cells:
+    description: Cells that prevent blue line extension.  Any color other than black(0) or blue(1).
+    properties:
+      color: [2, 3, 8] # Red, Green, Azure, and any other non-blue,non-black
+  background:
+      description: the black cells (0)
+      properties:
+          color: 0
+
+actions:
+  extend_blue_lines:
+    description: Extend blue lines upwards and downwards.
+    constraints:
+      - Cannot extend through blocking cells.
+      - Cannot extend through other blue cells.
+      - Extension stops at grid boundaries.
+      - Extension only in vertical direction.
+    direction: up_and_down

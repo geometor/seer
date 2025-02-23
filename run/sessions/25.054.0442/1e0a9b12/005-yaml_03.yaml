@@ -1,0 +1,22 @@
+observations:
+  - task: 39e19088
+  - objects:
+    - description: Non-zero pixels in the input grid.
+      properties:
+        - color: Defined by the pixel value (1-9).
+        - position: Original row and column index.
+    - description: Output grid
+      properties:
+        - dimensions: Same as the input grid.
+        - initial_state: Filled with zeros.
+  - actions:
+    - description: Collection of non-zero elements from input, row by row.
+      details: The original relative order of elements within each row must be preserved.
+    - description: Placement of collected elements at the bottom of the output grid.
+      details:
+        - Starting row: The last row of the output grid.
+        - Filling order: Left-to-right within each row, moving upwards to the next row when a row is filled.
+        - wrapping: if the top row is full, filling starts in the last row.
+  - constraints:
+        - description: The transformation preserves the count of each non-zero color.
+        - description: Transformation is performed in-place; input is not directly modified.

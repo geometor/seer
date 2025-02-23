@@ -1,0 +1,35 @@
+objects:
+  - id: red_pixel
+    color: red
+    value: 2
+    initial_position: (3, 2)
+  - id: blue_pixel
+    color: blue
+    value: 1
+    initial_position: (6, 6)
+  - id: yellow_pixels
+    color: yellow
+    value: 4
+    relation: "adjacent to red_pixel"
+  - id: orange_pixels
+    color: orange
+    value: 7
+    relation: "adjacent to blue_pixel"
+
+actions:
+  - type: add_pixels
+    object: yellow_pixels
+    pattern: "two pixels, one above and one below red_pixel"
+
+  - type: add_pixels
+    object: orange_pixels
+    pattern: "three pixels in an L shape, one above and two to the right of blue_pixel"
+relationships:
+  - object1: red_pixel
+    object2: yellow_pixels
+    type: adjacency
+    details: "Yellow pixels are vertically adjacent (above and below) to the red pixel."
+  - object1: blue_pixel
+    object2: orange_pixels
+    type: adjacency
+    details: "Orange pixels form an L-shape adjacent to the blue pixel (one above, and two to the right)."

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Locate all non-white pixels in the input grid. These are the \"key pixels\".\n\n2.  **Orange Expansion (Azure):**  For the azure pixel (8), change the color to orange (7) of *all* the white pixels that immediately *surround* it, horizontally and vertically.\n\n3.  **Yellow Expansion (Red and Blue):** For red (2) and blue (1) pixels, we replace every white pixel that is at L1 distance = 2 with a yellow pixel (4). L1 distance (Manhattan distance) of two indicates pixels that have a difference of two in either row or column, or one in both.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col, distance=1):\n    \"\"\"Gets the neighbors of a cell within a specified L1 distance.\"\"\"\n    neighbors = []\n    rows, cols = grid.shape\n    for i in range(max(0, row - distance), min(rows, row + distance + 1)):\n        for j in range(max(0, col - distance), min(cols, col + distance + 1)):\n            if (abs(row - i) + abs(col - j)) <= distance and (row,col) != (i,j):\n                neighbors.append((i, j))\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Identify Key Pixels\n    key_pixels = []\n    for i in range(rows):\n        for j in range(cols):\n            if input_grid[i, j] != 0:\n                key_pixels.append((i, j, input_grid[i, j]))\n\n    # Orange and Yellow Expansions\n    for r, c, color in key_pixels:\n        if color == 8:  # Azure -> Orange\n             neighbors = get_neighbors(input_grid, r, c)\n             for nr, nc in neighbors:\n                if output_grid[nr, nc] == 0:\n                    output_grid[nr, nc] = 7\n        elif color == 1 or color == 2: # Blue or Red -> Yellow\n            neighbors = get_neighbors(input_grid, r, c, distance=2)\n            for nr, nc in neighbors:\n                if output_grid[nr, nc] == 0:\n                    output_grid[nr, nc] = 4\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2414,
+    "candidates_token_count": 588,
+    "total_token_count": 3002,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.110918,
+  "response_file": "010-response.json"
+}

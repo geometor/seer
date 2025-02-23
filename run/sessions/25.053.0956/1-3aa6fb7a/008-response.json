@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Clusters:** Locate all contiguous clusters of azure (8) pixels in the input grid. A cluster can be a single isolated pixel or a group of adjacent pixels.\n\n2. **Inner Replacement** For each azure cluster of more than one pixel, going from left to right, top to bottom, find each 8 that has adjacent 8s on all four sides (up, down, left, right) and replace the first found 8 with a 1.\n\n3. **Outer Placement**: Locate all azure pixels on the edges of an azure cluster that are adjacent to zero (white) pixels on the top-left diagonal. If a 8 is found adjacent to a white on its top left diagonal, replace the white with a 1.\n\n4.  **Output:** The resulting grid, after these replacements, is the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Get the neighbors of a cell (up, down, left, right, diagonals).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for i in range(-1, 2):\n        for j in range(-1, 2):\n            if i == 0 and j == 0:\n                continue  # Skip the cell itself\n            neighbor_row, neighbor_col = row + i, col + j\n            if 0 <= neighbor_row < rows and 0 <= neighbor_col < cols:\n                neighbors.append((neighbor_row, neighbor_col))\n    return neighbors\n\ndef find_azure_clusters(grid):\n    \"\"\"Find all clusters of azure (8) pixels.\"\"\"\n    rows, cols = grid.shape\n    visited = set()\n    clusters = []\n\n    def dfs(row, col, current_cluster):\n        \"\"\"Depth-first search to find connected components.\"\"\"\n        if (row, col) in visited or grid[row, col] != 8:\n            return\n        visited.add((row, col))\n        current_cluster.append((row, col))\n        for neighbor_row, neighbor_col in get_neighbors(grid, row, col):\n            if abs(neighbor_row - row) <= 1 and abs(neighbor_col - col) <=1: # Check direct neighbors\n                if (neighbor_row, neighbor_col) not in visited:\n                    dfs(neighbor_row, neighbor_col, current_cluster)\n\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row, col] == 8 and (row, col) not in visited:\n                current_cluster = []\n                dfs(row, col, current_cluster)\n                clusters.append(current_cluster)\n    return clusters\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    clusters = find_azure_clusters(output_grid)\n\n    # Inner Replacement\n    for cluster in clusters:\n        if len(cluster) > 1:\n            for row, col in cluster:\n                neighbors = get_neighbors(output_grid, row, col)\n                num_azure_neighbors = 0\n                for n_row, n_col in neighbors:\n                    if abs(n_row - row) <=1 and abs(n_col - col) <= 1:\n                        if output_grid[n_row, n_col] == 8:\n                            num_azure_neighbors +=1\n                if num_azure_neighbors == 8:\n                    output_grid[row,col] = 1\n                    break # only first match should change\n\n    # Outer Placement\n    for row in range(rows):\n        for col in range(cols):\n            if output_grid[row, col] == 8:\n                neighbors = get_neighbors(output_grid, row, col)\n                for n_row, n_col in neighbors:\n                     if n_row == row - 1 and n_col == col - 1 and output_grid[n_row,n_col] == 0:\n                        output_grid[n_row,n_col] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2279,
+    "candidates_token_count": 957,
+    "total_token_count": 3236,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.596075,
+  "response_file": "008-response.json"
+}

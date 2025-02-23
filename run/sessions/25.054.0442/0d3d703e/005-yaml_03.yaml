@@ -1,0 +1,18 @@
+facts:
+  - task_id: "00d62c1b"
+  - objects:
+      - description: 3x3 grids
+        properties:
+          - type: 2D array
+          - values: integers (0-9) representing colors
+          - structure: Each row is identical to the other rows within the same grid
+          - columns: 3 columns, each with a unique transformation rule.
+  - actions:
+      - description: Column-wise addition modulo 10
+        details:
+          - Each column has a specific increment value.
+          - Increment is added to each cell in the column.
+          - Modulo 10 operation ensures the result stays within 0-9.
+      - description: Determine the increments:
+          details: for each grid, subtract, modulo 10, the first row of the
+            input from the first row of the output

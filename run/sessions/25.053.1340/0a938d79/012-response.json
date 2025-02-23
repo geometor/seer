@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies the row index where each distinct color first appears in the input grid. Then, it replicates each of these colored rows across the entire output grid. The vertical offset for replication is determined by the initial appearance of colors.\n\"\"\"\n\nimport numpy as np\n\ndef find_first_color_rows(input_grid):\n    \"\"\"Finds the row index where each distinct color first appears.\"\"\"\n    input_grid = np.array(input_grid)\n    color_rows = []\n    colors_found = []\n    rows, _ = input_grid.shape\n    for r in range(rows):\n        for c in range(input_grid.shape[1]):\n            color = input_grid[r, c]\n            if color != 0 and color not in colors_found:\n                color_rows.append((color, r))\n                colors_found.append(color)\n    return color_rows\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Find the row indices where each distinct color first appears.\n    color_rows = find_first_color_rows(input_grid)\n\n    # Replicate each colored row across the entire grid.\n    for color, initial_row in color_rows:\n        for i in range(rows):\n            row_index = (i) % rows\n            if (row_index - initial_row) % rows == 0 :\n                output_grid[row_index, :] = color\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7641,
+    "candidates_token_count": 387,
+    "total_token_count": 8028,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.747926,
+  "response_file": "012-response.json"
+}

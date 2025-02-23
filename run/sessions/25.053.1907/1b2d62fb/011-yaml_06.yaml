@@ -1,0 +1,29 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - colors: [0-9]
+      - blue_pixels: []
+
+  - name: cropped_grid
+    type: grid
+    properties:
+      - width: 3
+      - height: same as input_grid
+      - start_column: one to the left of the leftmost blue pixel in input_grid
+
+  - name: output_grid
+    type: grid
+
+actions:
+  - name: crop
+    input: input_grid
+    output: cropped_grid
+    description: Crop the input grid based on blue pixel positions.
+
+  - name: transform_color
+    input: [cropped_grid, input_grid]
+    output: output_grid
+    description: >-
+      Selectively change the color of pixels within the cropped region based on input blue pixels
+      Specifically set the color of pixels to azure for specific input blue pixels.

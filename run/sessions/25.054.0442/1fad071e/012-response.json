@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCounts the number of disconnected blue (1) regions in the input grid,\nwhere regions are connected horizontally or vertically, but *not* diagonally.\nThe output is a 1xN grid, where N is the number of blue regions plus one.\nAll pixels in the output are blue, except for the last pixel, which is white.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid, color):\n    \"\"\"\n    Finds objects (contiguous regions of the specified color) in a grid.\n    Considers only horizontal and vertical connections.\n    \"\"\"\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        # Only check horizontal and vertical neighbors\n        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n            dfs(r + dr, c + dc, current_object)\n        \n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    # Find disconnected blue regions (horizontal/vertical connections only).\n    blue_objects = get_objects(np.array(input_grid), 1)\n    num_blue_regions = len(blue_objects)\n\n    # Construct the output grid.\n    output_grid_width = num_blue_regions + 1\n    output_grid = np.ones((1, output_grid_width), dtype=int)\n\n    #change the last pixel to white\n    output_grid[0, -1] = 0\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3790,
+    "candidates_token_count": 517,
+    "total_token_count": 4307,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.11008,
+  "response_file": "012-response.json"
+}

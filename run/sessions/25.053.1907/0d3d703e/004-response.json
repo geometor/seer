@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is a one-to-one color mapping. Every pixel in the input\ngrid is replaced by a corresponding, predefined color in the output grid. The\nspecific color mapping is as follows:\n\n*   Blue (1) becomes Gray (5)\n*   Red (2) becomes Magenta (6)\n*   Green (3) becomes Yellow (4)\n*   Yellow (4) becomes Green (3)\n*   Gray (5) becomes Blue (1)\n*   Magenta (6) becomes Red (2)\n*   Azure (8) becomes Maroon (9)\n*   Maroon (9) becomes Azure (8)\n*   White (0) and Orange (7) remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms a grid of integers according to a predefined mapping.\n\n    Args:\n        input_grid (numpy.ndarray): A 2D numpy array representing the input grid.\n\n    Returns:\n        numpy.ndarray: A 2D numpy array representing the transformed output grid.\n    \"\"\"\n    # initialize output_grid as a copy of the input grid\n    output_grid = input_grid.copy()\n\n    # change output pixels based on the complete mapping\n    output_grid[input_grid == 1] = 5\n    output_grid[input_grid == 2] = 6\n    output_grid[input_grid == 3] = 4\n    output_grid[input_grid == 4] = 3\n    output_grid[input_grid == 5] = 1\n    output_grid[input_grid == 6] = 2\n    output_grid[input_grid == 8] = 9\n    output_grid[input_grid == 9] = 8\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3146,
+    "candidates_token_count": 413,
+    "total_token_count": 3559,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.775575,
+  "response_file": "004-response.json"
+}

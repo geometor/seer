@@ -1,0 +1,19 @@
+objects:
+  - name: green_region
+    type: contiguous_region
+    color: green
+    properties:
+      - surrounded:  # Indicates whether a green pixel is surrounded by other green pixels
+          type: boolean
+          value: varies  # True for inner pixels, False for edge pixels
+
+  - name: background
+    type: area
+    color: varies # Usually black (0)
+
+actions:
+  - name: transform_color
+    input: green_region
+    properties:
+        - surrounded: True  # Only apply transformation to surrounded green pixels
+    output_color: yellow

@@ -1,0 +1,16 @@
+observations:
+  - object: grid
+    properties:
+      rows: variable
+      cols: variable
+      cells: pixels with color values 0-9
+    actions:
+      - fill_columns:
+          trigger: presence of non-white pixels
+          mechanism: >
+            For each column, if there are any colored pixels, fill downwards 
+            from the top row using the color of the colored pixel in that
+            column with the smallest row index. If multiple, use the one
+            from the highest row, wrapping around to the top if needed.
+          interaction: columns are filled independently, taking the color of the
+            'highest' non-white pixel if any are in the column.

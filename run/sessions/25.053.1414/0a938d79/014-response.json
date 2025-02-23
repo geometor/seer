@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Locate all pixels in the input grid that are not white (color 0). In this case, find the red pixel (value 2) and the green pixel (value 3).\n2.  **Horizontal Expansion:** For each identified pixel, expand its color horizontally to fill the entire row.\n3.  **Vertical Repetition:** Duplicate each expanded row vertically. Alternate rows with orignal locations for red and green, so one row of red, then a row of white, the next a row of green and a row of white, etc, throughout the entire grid. If lines of different colors are on top of each other, they will overwrite each other in the order red and green pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_non_white_pixels(grid):\n    # Find coordinates of all non-white pixels\n    non_white_pixels = []\n    for row_idx, row in enumerate(grid):\n        for col_idx, pixel in enumerate(row):\n            if pixel != 0:\n                non_white_pixels.append((row_idx, col_idx, pixel))\n    return non_white_pixels\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input grid\n    output_grid = np.zeros_like(input_grid)\n    \n    # Find non-white pixels\n    non_white_pixels = find_non_white_pixels(input_grid)\n\n    # Expand each non-white pixel horizontally and repeat vertically\n    for row_idx, col_idx, pixel_value in non_white_pixels:\n        # Horizontal expansion\n        output_grid[row_idx, :] = pixel_value\n\n    # Alternate rows\n    for row in range(output_grid.shape[0]):\n        for r,c,v in non_white_pixels:\n            if (row - r) % 2 == 0 :\n                 output_grid[row,:] = v\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2892,
+    "candidates_token_count": 449,
+    "total_token_count": 3341,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.585205,
+  "response_file": "014-response.json"
+}

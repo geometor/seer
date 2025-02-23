@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Green Regions: Find all contiguous regions of green (value 3) pixels in the input grid. A contiguous region is a group of green pixels where each pixel is directly adjacent (up, down, left, or right \u2013 not diagonally) to at least one other pixel in the group.\n2. Determine Enclosure: For each identified green region, determine if it is \"enclosed.\" A region is considered enclosed if *none* of its pixels are on the edge of the grid.\n3. Transform Enclosed Pixels: Change the color of all pixels within the enclosed green regions from green (3) to yellow (4).\n\"\"\"\n\nimport numpy as np\n\ndef flood_fill(grid, r, c, visited, region):\n    \"\"\"Performs a flood fill to identify a contiguous region.\"\"\"\n    rows, cols = grid.shape\n    if (r < 0 or r >= rows or c < 0 or c >= cols or\n        grid[r, c] != 3 or (r, c) in visited):\n        return\n    visited.add((r, c))\n    region.append((r, c))\n    flood_fill(grid, r + 1, c, visited, region)\n    flood_fill(grid, r - 1, c, visited, region)\n    flood_fill(grid, r, c + 1, visited, region)\n    flood_fill(grid, r, c - 1, visited, region)\n\ndef is_enclosed(grid, region):\n    \"\"\"Checks if a region is enclosed (not touching the edge).\"\"\"\n    rows, cols = grid.shape\n    for r, c in region:\n        if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:\n            return False\n    return True\n\ndef transform(input_grid):\n    \"\"\"Transforms enclosed green regions to yellow.\"\"\"\n    grid = np.array(input_grid)  # Ensure we're working with a NumPy array\n    rows, cols = grid.shape\n    output_grid = grid.copy()\n    visited = set()\n    \n    # Iterate through all pixels\n    for r in range(rows):\n        for c in range(cols):\n            # If we find a green pixel that hasn't been visited yet\n            if grid[r, c] == 3 and (r, c) not in visited:\n                region = []\n                flood_fill(grid, r, c, visited, region)  # Find the contiguous region\n                \n                # If the region is enclosed, change all its pixels to yellow\n                if is_enclosed(grid, region):\n                    for row, col in region:\n                        output_grid[row, col] = 4\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5726,
+    "candidates_token_count": 624,
+    "total_token_count": 6350,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.626526,
+  "response_file": "007-response.json"
+}

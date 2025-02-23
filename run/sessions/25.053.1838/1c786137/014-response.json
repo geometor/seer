@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Treat contiguous blocks of the same color within the input grid as individual objects.\n2.  **Filter Objects:** Remove the largest object, which takes more than 25% of the image (the large azure '8' region in this example).\n3.  **Create a Bounding Box:** For the remaining pixels, find a bounding box.\n4. **Output the Bounding box** Construct the output grid from the bounding box.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Identifies contiguous objects in a grid.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(r, c, color, current_object):\n        if (r < 0 or r >= grid.shape[0] or c < 0 or c >= grid.shape[1] or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, color, current_object)\n        dfs(r - 1, c, color, current_object)\n        dfs(r, c + 1, color, current_object)\n        dfs(r, c - 1, color, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if not visited[r, c]:\n                current_object = []\n                dfs(r, c, grid[r, c], current_object)\n                if current_object:\n                    objects.append(current_object)\n    return objects\n\ndef bounding_box(points):\n    \"\"\"\n    Finds the bounding box of a set of points.\n    \"\"\"\n    if not points:\n        return (0, 0, 0, 0)\n    min_r, min_c = float('inf'), float('inf')\n    max_r, max_c = float('-inf'), float('-inf')\n    for r, c in points:\n        min_r = min(min_r, r)\n        min_c = min(min_c, c)\n        max_r = max(max_r, r)\n        max_c = max(max_c, c)\n    return (min_r, min_c, max_r, max_c)\n\ndef transform(input_grid):\n    # Identify Objects\n    objects = find_objects(input_grid)\n\n    # Filter Objects (remove largest object)\n    total_pixels = input_grid.size\n    largest_object = max(objects, key=len, default=[])\n    if len(largest_object) / total_pixels > 0.25:\n      objects.remove(largest_object)\n\n    # Get all remaining points\n    remaining_points = []\n    for obj in objects:\n      remaining_points.extend(obj)\n\n    # Create Bounding Box\n    min_r, min_c, max_r, max_c = bounding_box(remaining_points)\n\n\n    # Initialize the output grid\n    output_grid = np.zeros((max_r-min_r+1, max_c-min_c+1), dtype=int)\n\n    # Fill output grid\n    for r, c in remaining_points:\n      output_grid[r-min_r, c-min_c] = input_grid[r,c]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2796,
+    "candidates_token_count": 814,
+    "total_token_count": 3610,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.045608,
+  "response_file": "014-response.json"
+}

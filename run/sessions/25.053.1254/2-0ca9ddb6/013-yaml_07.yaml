@@ -1,0 +1,25 @@
+objects:
+  - type: pixel
+    properties:
+      color: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  # All possible colors
+      position: [row, col] #row and column in the grid
+      changed: [True, False]
+      new_color: [0,1,2,3,4,5,6,7,8,9, None]
+
+actions:
+  - name: change_color
+    agent: pixel #acting on other pixels
+    preconditions:
+      - agent.color == 8:  # Azure
+        target.color == 0: #white
+        distance: adjacent #L1 = 1, not diagonal
+      - agent.color in [1, 2]:  # Blue or Red
+        target.color == 0:
+        distance: L1=2 #and not L1=1
+    effects:
+      - agent.color == 8 and target.color == 0 and distance == adjacent:
+          target.new_color = 7   # Change to orange
+      - agent.color in [1, 2] and target.color == 0 and distance == L1 = 2 and distance != adjacent:
+          target.new_color = 4 #change to yellow
+    constraints:
+      - agent.color == 6 has no effect #magenta pixels should not change the colors

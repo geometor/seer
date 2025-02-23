@@ -1,0 +1,36 @@
+observations:
+  - object: azure_pixels
+    value: 8
+    input_positions: [[1, 1], [2, 1], [2, 2], [3, 4], [3, 5], [4, 5]]
+    output_positions: [[1, 1], [2, 1], [2, 2], [3, 4], [3, 5], [4, 5]]
+    properties:
+      - color: azure
+      - shape: single_pixels
+      - count: 6
+    behavior: remains_same
+
+  - object: blue_pixels
+    value: 1
+    input_positions: []
+    output_positions: [[1, 2], [4, 4]]
+    properties:
+      - color: blue
+      - shape: single_pixels
+      - count: 2
+    behavior:
+      - appears_adjacent_to: azure_pixels
+      - relative_position:
+          - input:
+              row: +0
+              col: +1
+          - input:
+              row: +0
+              col: -1
+
+  - object: background
+    value: 0
+    input_positions: "all except azure pixels"
+    output_positions: "all except azure and blue pixels"
+    properties:
+       - color: "white"
+    behavior: remains

@@ -1,0 +1,28 @@
+facts:
+  - object: grid
+    type: 2D array
+    elements: integers (0-9)
+    description: Represents a colored grid.
+  - object: pixel
+    type: element
+    property: color (represented by integer value)
+  - object: azure_pixel
+    type: pixel
+    value: 8
+    description:  Pixels with the value 8, representing the color azure.
+  - object: white_pixel
+    type: pixel
+    value: 0
+    description: Pixels with the value 0, representing white background.
+  - object: blue_pixel
+    type: pixel
+    value: 1
+    description: Pixels with the value 1, representing the color blue, that are introduced in the output.
+  - action: interaction
+    type: adjacency
+    trigger: azure_pixels
+    condition: diagonally adjacent
+    result: introduce blue_pixel
+  - relationship: diagonal_adjacency
+    between: azure_pixels
+    result: determines placement of blue_pixel

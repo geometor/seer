@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Double Rows:** Duplicate each row of the input grid, creating two identical rows in the output grid for each original row.\n2.  **Double and Fill Columns:** For each column (index `n`) in the input grid:\n    *   Create a new column in the output grid at index `2n`, filling it with the values from input column `n`.\n    *   Create another new column in the output grid at index `2n + 1`, also filling it with the values from input column `n`.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows * 2, cols * 2), dtype=int)\n\n    # Double Rows:\n    for i in range(rows):\n        output_grid[i*2, :] = input_grid[i, :]      # copy row i to 2i\n        output_grid[i*2+1, :] = input_grid[i, :]    # copy row i to 2i+1\n    \n    # Double, and fill Columns:\n    for j in range(cols):\n        output_grid[:,j*2] = output_grid[:,j*2]      # input col j to output col 2j\n        output_grid[:,j*2+1] = output_grid[:, j*2]  #   also to 2j + 1\n       \n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3536,
+    "candidates_token_count": 359,
+    "total_token_count": 3895,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.416286,
+  "response_file": "006-response.json"
+}

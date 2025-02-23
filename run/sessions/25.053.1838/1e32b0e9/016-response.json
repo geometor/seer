@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule identifies vertical blue lines and extends them upwards and downwards.  Any non-blue, non-black cell acts as a \"blocker,\" preventing the blue line from extending into adjacent cells (horizontally or vertically).  A blue line cannot extend through another blue cell.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_blue_lines(grid):\n    \"\"\"\n    Finds the starting and ending points of vertical blue lines.\n    Returns a list of tuples: (column_index, start_row, end_row)\n    \"\"\"\n    blue_lines = []\n    for col in range(grid.shape[1]):\n        in_line = False\n        start_row = -1\n        for row in range(grid.shape[0]):\n            if grid[row, col] == 1:\n                if not in_line:\n                    in_line = True\n                    start_row = row\n            elif in_line:\n                in_line = False\n                blue_lines.append((col, start_row, row - 1))\n                start_row = -1\n        if in_line:  # Handle lines that extend to the bottom\n            blue_lines.append((col, start_row, grid.shape[0] - 1))\n    return blue_lines\n\ndef is_blocking_cell(grid, row, col):\n    \"\"\"Checks if a cell is a blocking cell (non-black, non-blue).\"\"\"\n    rows, cols = grid.shape\n    if 0 <= row < rows and 0 <= col < cols:\n        return grid[row, col] != 0 and grid[row, col] != 1\n    return False  # Treat out-of-bounds as non-blocking\n\ndef is_adjacent_to_blocker(grid, row, col):\n    \"\"\"Checks for adjacent blocking cells (horizontally/vertically).\"\"\"\n    for dr in [-1, 1]:\n        if is_blocking_cell(grid, row + dr, col):\n            return True\n    for dc in [-1, 1]:\n        if is_blocking_cell(grid, row, col + dc):\n            return True\n    return False\n    \ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid: extends vertical blue lines, blocked by other colors.\n    \"\"\"\n    output_grid = input_grid.copy()\n    blue_lines = find_vertical_blue_lines(input_grid)\n\n    for col, start_row, end_row in blue_lines:\n        # Extend upwards\n        row = start_row - 1\n        while row >= 0:\n            if is_adjacent_to_blocker(output_grid, row, col) or output_grid[row, col] == 1: # added to avoid to paint over blue cells.\n                break  # Stop extending if adjacent to blocker or blue\n            if output_grid[row,col] != 0: # it's a blocker\n                break;\n            output_grid[row, col] = 1\n            row -= 1\n\n        # Extend downwards\n        row = end_row + 1\n        while row < input_grid.shape[0]:\n            if is_adjacent_to_blocker(output_grid, row, col) or output_grid[row, col] == 1: # added to avoid to paint over blue cells.\n                break  # Stop extending if adjacent to blocker or blue\n            if output_grid[row,col] != 0: # it's a blocker\n                break;    \n            output_grid[row, col] = 1\n            row += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8467,
+    "candidates_token_count": 832,
+    "total_token_count": 9299,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.10029,
+  "response_file": "016-response.json"
+}

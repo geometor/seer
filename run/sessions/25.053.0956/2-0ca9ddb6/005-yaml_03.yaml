@@ -1,0 +1,32 @@
+facts:
+  - type: grid
+    description: Input and output are 2D grids of pixels.
+    elements:
+      - value: 0
+        color: white
+        role: background
+      - value: 1
+        color: blue
+        role: original_pixel
+      - value: 2
+        color: red
+        role: original_pixel
+      - value: 6
+        color: magenta
+        role: original_pixel
+      - value: 4
+        color: yellow
+        role: new_pixel
+      - value: 7
+        color: orange
+        role: new_pixel
+  - type: object
+    description: Colored pixels can be considered as individual objects.
+  - type: action
+    description: New pixels are added around existing ones.
+  - type: relationship
+    description: The new pixels form a '+' shape around the original pixels where possible, extending one pixel in each cardinal direction.
+    details: If a new pixel location would be occupied by existing pixels, then that location is skipped.
+  - type: constraint
+    description: new pixels added will fit within the grid
+    details: If adding the full + shape would make new pixels fall outside of the input grid, it only fills up to the boundary.

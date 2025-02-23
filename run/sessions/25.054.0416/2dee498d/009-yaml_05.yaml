@@ -1,0 +1,21 @@
+objects:
+  - type: 3x3 subgrid
+    description: Non-overlapping contiguous blocks within the input grid.
+    properties:
+      - size: 3x3
+      - position: defined by row and column index in the larger grid
+
+  - type: pixel
+    description: A single cell within the grid.
+    properties:
+      - color: integer value (0-9) representing a color
+      - location: row and column index
+
+actions:
+  - name: extract_pixel
+    description: Select a specific pixel from each 3x3 subgrid.
+    parameters:
+      - selection_rule: "The pixel in the first column and the same row index of the subgrid."
+
+  - name: construct_output
+    description: Create output grid by placing selected pixels, maintaining relative spatial arrangement.

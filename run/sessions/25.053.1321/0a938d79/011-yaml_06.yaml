@@ -1,0 +1,18 @@
+objects:
+  - description: Single pixels of a specific color.
+    properties:
+      color: Value from 0 to 9.
+      location: (row, column) coordinates.
+      behavior: "Triggers row-filling."
+
+actions:
+  - name: FillRow
+    description: Replaces all pixels in a row with the color of a triggering pixel.
+    trigger: "Presence of a single isolated colored pixel in a row."
+    parameters:
+      row: The row index.
+      color: The color of the triggering pixel.
+
+rules:
+    - If a row contains only 0s and a single non-zero, replace all 0 with the non-zero.
+    - If a row contains multiple non-zero colors, and rows in the other example outputs that had the *same* non-zero, single-colored pixels are filled with the non-zero color, then fill the row with the non-zero color.

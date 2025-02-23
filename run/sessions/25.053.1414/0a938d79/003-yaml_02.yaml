@@ -1,0 +1,26 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: variable  # Height and width can vary.
+      cells: pixels
+      colors: 0-9  # Representing different colors.
+  - type: pixel
+    properties:
+      color: integer (0-9)
+      coordinates: (x, y)  # (column, row)
+  - type: source_row
+    properties:
+      row_index: integer
+      source_pixels: list of pixels  # Pixels within the row that have non-zero color.
+    behavior:  # Actions performed on the source_row
+      replication: |
+          The pattern of non-zero pixels in a source row is replicated
+          across the entire row, and then vertically down the grid, creating stripes.
+          Blank rows (all zero) will propagate the pattern from above until another source_row is found.
+actions:
+  - name: find_source_rows
+    description: Identify rows containing at least one non-zero pixel.
+  - name: replicate_row_pattern
+    description:  Extend the pattern of non-zero pixels in a source row horizontally to fill the row.
+  - name: stack_rows
+    description: Stack the filled source rows vertically to fill the grid.

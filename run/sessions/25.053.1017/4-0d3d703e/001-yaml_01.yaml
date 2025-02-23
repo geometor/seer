@@ -1,0 +1,21 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 3x3
+      elements: single-digit integers (0-9)
+      role: input/output container
+  - type: cell
+    properties:
+      value: integer
+      color: mapped from integer value
+      role: individual element within grid
+
+actions:
+  - type: value_substitution
+    description: Each input cell value is replaced with a corresponding output value.
+    logic: direct mapping
+
+relationships:
+  - type: one-to-one
+    description: Each input cell maps directly to a corresponding output cell.
+    constraint: same row and column index

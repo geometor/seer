@@ -1,0 +1,28 @@
+task_id: 014
+observations:
+  - object: input_grid
+    type: grid
+    properties:
+      dimensions: variable
+      colors: [0, 1, 9]  # white, blue, maroon
+  - object: output_grid
+    type: grid
+    properties:
+      dimensions: [5, 3] #fixed
+      colors: [0, 8]  # white, azure
+  - object: blue_pixels
+    type: pixel_set
+    properties:
+      color: 1  # blue
+      input_coordinates: variable
+  - object: azure_pixels
+      type: pixel_set
+      properties:
+          color: 8
+          output_coordinates: determined by blue_pixel input coordinates, specifically y // 2
+actions:
+  - action: map_blue_to_azure
+    description: Map blue pixels in input grid to azure pixels in output grid.
+    logic:
+      row_transform: "input_row // 2"
+      col_transform: "input_col // 2"

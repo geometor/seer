@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule takes the existing vertical blue lines and extends them, but the green cells act as \"blockers,\" preventing the blue lines from expanding into adjacent cells, either vertically or horizontally.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_lines(grid):\n    \"\"\"\n    Finds the starting and ending points of vertical blue lines.\n    Returns a list of tuples: (column_index, start_row, end_row)\n    \"\"\"\n    vertical_lines = []\n    for col in range(grid.shape[1]):\n        in_line = False\n        start_row = -1\n        for row in range(grid.shape[0]):\n            if grid[row, col] == 1:\n                if not in_line:\n                    in_line = True\n                    start_row = row\n            elif in_line:\n                in_line = False\n                vertical_lines.append((col, start_row, row - 1))\n                start_row = -1\n        if in_line:  # Handle lines that extend to the bottom\n            vertical_lines.append((col, start_row, grid.shape[0] - 1))\n    return vertical_lines\n\ndef is_adjacent_to_green(grid, row, col):\n    \"\"\"Checks if a cell is adjacent to a green cell (horizontally or vertically).\"\"\"\n    rows, cols = grid.shape\n    for dr in [-1, 0, 1]:\n        for dc in [-1, 0, 1]:\n            if (dr == 0 or dc == 0) and (dr != 0 or dc != 0):  # Check horizontal/vertical, not diagonal\n                nr, nc = row + dr, col + dc\n                if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == 3:\n                    return True\n    return False\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rule: extend vertical blue lines,\n    but green cells block the extension.\n    \"\"\"\n    output_grid = input_grid.copy()\n    vertical_lines = find_vertical_lines(input_grid)\n\n    for col, start_row, end_row in vertical_lines:\n        # Extend upwards\n        for row in range(start_row - 1, -1, -1):\n            if not is_adjacent_to_green(input_grid, row, col):\n                output_grid[row, col] = 1\n            else:\n                break  # Stop extending if adjacent to green\n\n        # Extend downwards\n        for row in range(end_row + 1, input_grid.shape[0]):\n            if not is_adjacent_to_green(input_grid, row, col):\n                output_grid[row, col] = 1\n            else:\n                break # Stop extending if adjacent to green\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3248,
+    "candidates_token_count": 666,
+    "total_token_count": 3914,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.799587,
+  "response_file": "014-response.json"
+}

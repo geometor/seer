@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a 3x3 grid by applying a specific color mapping, where each color in the input is replaced by a corresponding color in the output, while preserving the grid's structure.\n\nMapping:\n    2 -> 6 (Red -> Magenta)\n    3 -> 4 (Green -> Yellow)\n    8 -> 9 (Azure -> Maroon)\n    1 -> 5 (Blue -> Gray)\n    5 -> 1 (Gray -> Blue)\n    6 -> 2 (Magenta -> Red)\n    9 -> 8 (Maroon -> Azure)\n    4 -> 3 (Yellow -> Green)\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified color mapping.\n    \"\"\"\n    # Initialize the output grid with the same dimensions as the input grid.\n    output_grid = np.copy(input_grid)\n\n    # Define the complete color mapping.\n    mapping = {\n        1: 5,  # Blue -> Gray\n        2: 6,  # Red -> Magenta\n        3: 4,  # Green -> Yellow\n        4: 3,  # Yellow -> Green\n        5: 1,  # Gray -> Blue\n        6: 2,  # Magenta -> Red\n        8: 9,  # Azure -> Maroon\n        9: 8,  # Maroon -> Azure\n    }\n\n    # Apply the mapping to each element of the grid.\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            if input_grid[i, j] in mapping:\n                output_grid[i, j] = mapping[input_grid[i, j]]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2840,
+    "candidates_token_count": 398,
+    "total_token_count": 3238,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.356495,
+  "response_file": "012-response.json"
+}

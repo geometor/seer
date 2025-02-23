@@ -1,0 +1,15 @@
+objects:
+  - type: region
+    color: azure (8)
+    description: Contiguous areas of azure pixels.
+    properties:
+      connected: True  # Pixels are directly adjacent (up, down, left, right).
+      independent: True # each region is independent from the others
+
+actions:
+  - name: change_pixel
+    target: region
+    condition: |
+      Within each azure region, change exactly one pixel to blue. The changed pixel is defined as the first azure pixel found, traversing the region top-bottom, left-right, which has no azure neighbors above or to the left.
+    result:
+      color_change: azure (8) -> blue (1)

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find Center:** Locate the central vertical column of the input grid (index = width // 2).\n2.  **Extract Subgrid:** Extract a 3-column-wide subgrid centered on the identified central column. This means taking the central column itself, one column to its left, and one column to its right, while keeping all rows.\n3.  **Conditional Recolor:** For each row in the subgrid, if the output pixel is different from the input pixel, then it is replaced by the value of the other non-center pixel. If there is a change to a pixel in the left or right of the extracted subgrid, change to the color of the opposite side.\n4.  **Output:** The resulting 3xN subgrid (where N is the number of rows) is the output.\n\"\"\"\n\nimport numpy as np\n\ndef get_central_column_index(grid):\n    \"\"\"Helper function to find the index of the central column.\"\"\"\n    return grid.shape[1] // 2\n\ndef extract_subgrid(grid, center_col_index, width):\n    \"\"\"Helper function to extract a subgrid of specified width centered on a column.\"\"\"\n    start_col = max(0, center_col_index - width // 2)\n    end_col = min(grid.shape[1], center_col_index + width // 2 + 1)\n    return grid[:, start_col:end_col]\n\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # 1. Locate Center\n    center_col_index = get_central_column_index(input_grid)\n\n    # 2. Extract Subgrid\n    subgrid = extract_subgrid(input_grid, center_col_index, 3)\n    output_grid = subgrid.copy()\n\n    # 3. Conditional Recolor\n    center_sub = subgrid.shape[1] // 2\n    for i in range(subgrid.shape[0]):\n        # Check left neighbor\n        if subgrid[i, center_sub -1] != output_grid[i, center_sub-1] :\n          output_grid[i, center_sub - 1] = subgrid[i, center_sub+1]\n\n        # Check right neighbor\n        if subgrid[i, center_sub + 1] != output_grid[i, center_sub + 1]:\n            output_grid[i, center_sub+1] = subgrid[i, center_sub-1]\n        \n        #center neighbor\n        if subgrid[i, center_sub] != output_grid[i, center_sub] and subgrid[i, center_sub]==1:\n          output_grid[i, center_sub]=8\n    # 4. Output\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4122,
+    "candidates_token_count": 657,
+    "total_token_count": 4779,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.969175,
+  "response_file": "016-response.json"
+}

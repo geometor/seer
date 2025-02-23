@@ -1,0 +1,15 @@
+objects:
+  - name: green_regions
+    type: contiguous_area
+    color: green
+    properties:
+      - interior_pixels:
+          color: yellow
+          definition: "Pixels surrounded by other green pixels on all eight sides (including diagonals, and considers edge of grid)."
+
+actions:
+  - name: identify_regions
+    description: "Find all contiguous regions of green pixels."
+  - name: recolor_interior
+    description: "Change the color of interior green pixels to yellow."
+    condition: "Pixel is green and part of a green region and is an interior pixel"

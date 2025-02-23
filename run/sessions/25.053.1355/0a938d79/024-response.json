@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Seed Rows:** Examine each row of the input grid. A row is a \"seed row\" if it contains at least one non-white (non-zero) pixel.\n2.  **Record Seed Row Information:** For each seed row, store:\n    *   The color of the first non-white pixel.\n    *   The column index of that first non-white pixel.\n    *   The seed rows should be recorded in the order in which they appear in the input.\n3. **Initialize output:** create an output grid of matching size, filled with white.\n4.  **Create Horizontal Stripes:** Iterate through the rows of the *output* grid. For each row:\n    *   Determine the color to use by cycling through the colors of the seed rows, in order.  (e.g., If the seed row colors are red, blue, green, the output rows will be filled red, blue, green, red, blue, green, etc.)\n    *   Fill the *entire* output row with the selected color.\n5. **Output complete:** the output is a grid, with each row completely filled with the color of the seed row.\n\"\"\"\n\nimport numpy as np\n\ndef get_seed_rows(grid):\n    \"\"\"Finds the row indices and colors of the first non-white pixel in each row.\"\"\"\n    seed_rows = []\n    for row_idx, row in enumerate(grid):\n        for col_idx, pixel in enumerate(row):\n            if pixel != 0:\n                seed_rows.append((row_idx, pixel, col_idx))  # Store row index, color and col index\n                break  # Move to the next row once a colored pixel is found\n    return seed_rows\n\ndef transform(input_grid):\n    # initialize output_grid with all white (0)\n    output_grid = np.zeros_like(input_grid)\n\n    # Find seed rows, their first non-zero color and column index\n    seed_rows = get_seed_rows(input_grid)\n    num_seed_rows = len(seed_rows)\n\n    # Horizontal Striped Fill - Interleave colors\n    for row_idx in range(output_grid.shape[0]):\n        # use mod operator to pick the appropriate seed row, but only need color\n        if (num_seed_rows > 0):\n          seed_row_idx, color, _ = seed_rows[row_idx % num_seed_rows]\n\n          # fill the entire row with color\n          output_grid[row_idx, :] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7918,
+    "candidates_token_count": 583,
+    "total_token_count": 8501,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.472705,
+  "response_file": "024-response.json"
+}

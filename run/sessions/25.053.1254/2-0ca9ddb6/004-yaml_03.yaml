@@ -1,0 +1,90 @@
+examples:
+  - example_1:
+      input_objects:
+        - color: red (2)
+          location: (2, 2)
+          shape: single pixel
+        - color: blue (1)
+          location: (6, 6)
+          shape: single pixel
+      output_objects:
+        - color: red (2)
+          location: (3, 2)
+          shape: single pixel
+        - color: blue (1)
+          location: (6, 6)
+          shape: single pixel
+        - color: yellow (4)
+          location: [(2,1),(2,3),(4,1),(4,3)]
+          shape: multiple pixels
+        - color: orange (7)
+          location: [(5,6),(6,7), (7,6)]
+          shape: multiple pixels
+      transformation:
+        - A yellow (4) pixel appears to the left and right of the red (2) pixel on the rows above and below.
+        - An orange (7) pixel appears to the left and right of the blue (1) on the same row.
+        - If blue is below red, orange appears on the rows below and above blue.
+  - example_2:
+      input_objects:
+        - color: red (2)
+          location: [(2, 6), (7, 1)]
+          shape: single pixel
+        - color: blue (1)
+          location: [(3, 2), (6, 6)]
+          shape: single pixel
+        - color: azure (8)
+          location: (0, 3)
+          shape: single pixel
+      output_objects:
+        - color: red (2)
+          location:  [(2, 6), (7, 1)]
+          shape: single pixel
+        - color: blue (1)
+          location: [(3, 2), (6, 6)]
+          shape: single pixel
+        - color: azure (8)
+          location: (0, 3)
+          shape: single pixel
+        - color: yellow (4)
+          location: [(1,5), (1,7), (3,5), (3,7), (6,0), (6,2), (8,0), (8,2)]
+          shape: multiple pixels
+        - color: orange (7)
+          location: [(2,2), (3,1), (3, 3), (3,6), (6,5), (6,7), (7,6)]
+          shape: multiple pixels
+      transformation:
+        - If red or blue are present, yellow and orange appear around them.
+        - Yellow (4) pixels appear to the left and right of the blue (1) pixel on the rows above and below.
+        - Yellow pixels appear on the row below and above and to the left and right of any red pixel.
+        - Orange (7) pixels appear on either side of the blue (1) and red (2) pixels.
+        - The original azure (8) pixel is unchanged.
+  - example_3:
+      input_objects:
+        - color: red (2)
+          location: (2, 2)
+          shape: single pixel
+        - color: blue (1)
+          location: (7, 3)
+          shape: single pixel
+        - color: magenta (6)
+          location: (5, 6)
+          shape: single pixel
+      output_objects:
+        - color: red (2)
+          location: (2, 2)
+          shape: single pixel
+        - color: blue (1)
+          location: (7, 3)
+          shape: single pixel
+        - color: magenta (6)
+          location: (5, 6)
+          shape: single pixel
+        - color: yellow (4)
+          location: [(1,1), (1,3), (3,1), (3,3)]
+          shape: multiple pixels
+        - color: orange (7)
+          location: [(7,2), (7,4), (8, 3), (6,3)]
+          shape: multiple pixel
+      transformation:
+        - Yellow (4) appears around red, orange appears around blue
+        - Yellow (4) pixels appear to the left and right of the red (2) pixel on the rows above and below.
+        - Orange (7) pixels appear to the left and right of the blue (1) on the same row, and also above and below.

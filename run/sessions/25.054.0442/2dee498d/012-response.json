@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies the shortest repeating horizontal pattern within each input grid. This pattern is determined by finding the smallest width such that the input grid's rows can be constructed by repeating a sub-grid of that width. The output grid is then formed by extracting this shortest repeating pattern from the left side of the input grid. The height of the output is the same as the input.\n\"\"\"\n\nimport numpy as np\n\ndef get_shortest_pattern_width(row):\n    \"\"\"\n    Finds the width of the shortest repeating pattern in a single row.\n    \"\"\"\n    cols = len(row)\n    for width in range(1, cols + 1):\n        if cols % width == 0:  # Check if width is a divisor\n            is_repeating = True\n            for i in range(width, cols):\n                if row[i] != row[i % width]:\n                    is_repeating = False\n                    break\n            if is_repeating:\n                return width\n    return cols  # If no repetition is found, return full width\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the shortest repeating horizontal pattern from the input grid.\n    \"\"\"\n    # Get the dimensions of the input grid.\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n\n    # Determine the width of the repeating unit (output grid width)\n    # by checking the shortest repeating width across all rows.\n    pattern_widths = [get_shortest_pattern_width(row) for row in input_grid]\n    \n    # Find the most common (mode) pattern width. This handles cases where\n    # different rows suggest slightly different pattern lengths, prioritizing the most frequent.\n    output_cols = max(set(pattern_widths), key=pattern_widths.count)\n\n\n    # Initialize the output grid.\n    output_grid = []\n\n    # Extract the leftmost sub-grid of the determined width.\n    for i in range(rows):\n        output_grid.append(input_grid[i][:output_cols])\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3685,
+    "candidates_token_count": 467,
+    "total_token_count": 4152,
+    "cached_content_token_count": 0
+  },
+  "response_time": 18.551413,
+  "response_file": "012-response.json"
+}

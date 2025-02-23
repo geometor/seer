@@ -1,0 +1,20 @@
+observations:
+  - object: input_grid
+    properties:
+      - contains_colored_pixels: True  # All examples have non-zero pixels
+      - colored_pixel_rows: Varying indices # List of row indices with color
+      - colored_pixel_columns: Varying # The positions of the non-white pixels.
+    actions:
+      - identify_colored_rows: "Locate rows containing non-zero pixels."
+      - identify_colors: "Determine the colors (values) of the non-zero pixels."
+
+  - object: output_grid
+    properties:
+      - dimensions: "Same as input_grid"
+      - fill_pattern: "Horizontal stripes"
+      - stripe_colors: "Based on colors of non-zero pixels in input"
+      - stripe_order: "Corresponds to the order of colored rows in the input"
+    actions:
+       - horizontal_fill: "Each row is filled entirely with one color."
+       - interleave_colors: "Colors alternate based on the order of colored rows in input."
+       - column_placement: "There is some shifting in the column of colors between rows."

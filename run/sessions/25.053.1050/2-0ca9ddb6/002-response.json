@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFor each non-zero pixel in the input grid, create a cross-shaped pattern of a different color in the output grid. \nThe color of the cross depends on the original pixel's color: red (2) generates yellow (4) vertically, and blue (1) generates orange (7) horizontally and vertically.\n\"\"\"\n\nimport numpy as np\n\ndef get_colored_pixels(grid, color):\n    \"\"\"Finds the coordinates of pixels of a specific color.\"\"\"\n    pixels = []\n    for r, row in enumerate(grid):\n        for c, value in enumerate(row):\n            if value == color:\n                pixels.append((r, c))\n    return pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # Find red pixels and expand vertically.\n    red_pixels = get_colored_pixels(input_grid, 2)\n    for r, c in red_pixels:\n      output_grid[r,c] = 2 # transfer original\n      if r > 0:\n          output_grid[r - 1, c] = 4\n      if r < output_grid.shape[0] - 1:\n          output_grid[r + 1, c] = 4\n\n    # Find blue pixels and expand horizontally and vertically.\n    blue_pixels = get_colored_pixels(input_grid, 1)\n    for r, c in blue_pixels:\n        output_grid[r,c] = 1 # transfer original\n        if r > 0:\n            output_grid[r - 1, c] = 7\n        if r < output_grid.shape[0] - 1:\n            output_grid[r + 1, c] = 7\n        if c > 0:\n            output_grid[r, c - 1] = 7\n        if c < output_grid.shape[1] - 1:\n            output_grid[r, c + 1] = 7\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2344,
+    "candidates_token_count": 477,
+    "total_token_count": 2821,
+    "cached_content_token_count": 0
+  },
+  "response_time": 45.930028,
+  "response_file": "002-response.json"
+}

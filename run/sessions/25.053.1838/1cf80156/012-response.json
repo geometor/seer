@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Target Object:** Find the largest connected component (contiguous block of pixels) of a single, non-white (non-zero) color within the input grid. The color of the object varies from example.\n2.  **Precise Cropping:** Determine the smallest rectangular region that *exactly* encloses the target object identified in step 1. This bounding box should not include any extra rows or columns of white (0) pixels that are not part of the object itself. It seems that in cases where there are multiple connected components of the target color, we want to find the largest.\n3.  **Extract:**  Create the output grid by extracting the pixels within the determined bounding box from the input grid.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef find_largest_connected_component(grid):\n    \"\"\"Finds the largest connected component in a grid.\"\"\"\n    labeled_grid, num_features = label(grid)\n    if num_features == 0:\n        return np.zeros_like(grid), 0  # Return empty grid if no features\n\n    component_sizes = np.bincount(labeled_grid.ravel())\n    largest_component_label = np.argmax(component_sizes[1:]) + 1  # +1 because 0 is background\n    largest_component = (labeled_grid == largest_component_label).astype(int)\n    return largest_component, np.max(largest_component)\n\ndef get_bounding_box(grid):\n    \"\"\"Calculates the bounding box of a non-zero region in a grid.\"\"\"\n    rows = np.any(grid, axis=1)\n    cols = np.any(grid, axis=0)\n    if not np.any(rows) or not np.any(cols):\n        return 0, 0, 0, 0  # Handle empty grid case\n    min_row, max_row = np.where(rows)[0][[0, -1]]\n    min_col, max_col = np.where(cols)[0][[0, -1]]\n    return min_row, max_row, min_col, max_col\n    \n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # 1. Identify the Target Object (find largest connected component of each color)\n    non_white_colors = [color for color in np.unique(input_grid) if color != 0]\n    largest_component = np.zeros_like(input_grid)\n    largest_size = 0\n\n    for color in non_white_colors:\n      colored_grid = (input_grid == color).astype(int)\n      component, component_size = find_largest_connected_component(colored_grid)\n\n      if component_size > largest_size:\n        largest_size = component_size\n        largest_component = component * color\n\n    \n    # 2. Precise Cropping\n    min_row, max_row, min_col, max_col = get_bounding_box(largest_component)\n    \n    # 3. Extract\n    output_grid = input_grid[min_row:max_row+1, min_col:max_col+1]\n    output_grid = np.where(output_grid != 0, output_grid, 0)\n    \n    # handle all zero outputs\n    if output_grid.size == 0:\n        return []\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5926,
+    "candidates_token_count": 801,
+    "total_token_count": 6727,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.945445,
+  "response_file": "012-response.json"
+}

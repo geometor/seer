@@ -1,0 +1,29 @@
+objects:
+  - type: grid
+    name: input_grid
+    properties:
+      dimensions: 5x7
+      values: [0, 9, 1]
+      features:
+        - type: vertical_line
+          color: 1 # Blue
+          location: column 4
+  - type: grid
+    name: output_grid
+    properties:
+      dimensions: 5x3
+      values: [0, 8]
+      features:
+        - type: horizontal_line
+          color: 8 # Azure
+          location: row 4
+
+actions:
+  - type: condense
+    input: input_grid
+    output: output_grid
+    description: Reduces grid width and replaces a specific feature with another.
+
+relationships:
+  - type: spatial
+    description: The blue vertical line in the input corresponds to the azure horizontal line in the output.  The width reduction collapses columns around the blue line.

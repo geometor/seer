@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Colored Pixels:** Find all pixels in the input grid that are not white (value is not 0).\n2.  **Horizontal Fill:** For each colored pixel, fill its entire row in the output grid with that pixel's color.\n3.  **Interleaved Vertical Fill:**\n     * Consider all the colored input rows identified\n     * For each row of the output grid, the row is filled with the color that corresponds to the input row with colored object at an index based on simple modular arithmetic of the output row.\n\"\"\"\n\nimport numpy as np\n\ndef get_colored_rows(grid):\n    \"\"\"Finds the row indices and colors of rows with non-white pixels.\"\"\"\n    colored_rows = []\n    for row_idx, row in enumerate(grid):\n        for pixel in row:\n            if pixel != 0:\n                colored_rows.append((row_idx, pixel))  # Store row index and the first non-zero color\n                break  # Move to the next row once a colored pixel is found\n    return colored_rows\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    \n    # Find colored rows and their first non-zero colors\n    colored_rows = get_colored_rows(input_grid)\n    num_colored_rows = len(colored_rows)\n\n    # Horizontal and Interleaved Vertical Fill\n    for row_idx in range(output_grid.shape[0]):\n      # use mod operator to pick color\n      if (num_colored_rows > 0):\n        source_row_idx, color = colored_rows[row_idx % num_colored_rows]\n        output_grid[row_idx, :] = color\n\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7429,
+    "candidates_token_count": 409,
+    "total_token_count": 7838,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.655447,
+  "response_file": "020-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe original colored pixels act as \"seeds\". Each seed grows into a\nvertical column of its color. The spaces between these columns are filled with\nalternating columns of the seed colors, repeating the pattern until the grid is full.\n\"\"\"\n\nimport numpy as np\n\ndef get_source_pixels(grid):\n    \"\"\"Finds and returns a list of non-white pixels and their coordinates.\"\"\"\n    source_pixels = []\n    for y, row in enumerate(grid):\n        for x, color in enumerate(row):\n            if color != 0:\n                source_pixels.append(((x, y), color))\n    return source_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    source_pixels = get_source_pixels(input_grid)\n\n    # Sort source pixels by their x-coordinate to maintain left-to-right order\n    source_pixels.sort()\n\n    # Keep track of the colors used to alternate correctly.\n    colors_used = []\n    last_x = -1 # keep track of where we are in filling up grid\n    \n    # 3. Columnar Expansion\n    for (x, _), color in source_pixels:\n        output_grid[:, x] = color  # Fill the entire column\n        if color not in colors_used:\n          colors_used.append(color)\n        last_x = x\n\n    # 4. Alternating fill between colored columns.\n    if len(colors_used) > 0:  # Handle cases with no source colors\n      current_color_index = 0\n\n      for x in range(output_grid.shape[1]):\n          if output_grid[0,x] == 0:\n            output_grid[:,x] = colors_used[current_color_index % len(colors_used)]\n          else:\n            # find next color\n            current_color_index = (colors_used.index(output_grid[0,x]) + 1) % len(colors_used)\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3140,
+    "candidates_token_count": 499,
+    "total_token_count": 3639,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.083803,
+  "response_file": "002-response.json"
+}

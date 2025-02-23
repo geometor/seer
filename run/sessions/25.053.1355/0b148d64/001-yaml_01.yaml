@@ -1,0 +1,35 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 2D
+      elements: pixels
+      colors: [0, 2, 8] # white, red, azure
+    regions:
+      - name: top
+        colors: [0, 8]
+        description: mixed azure and white, seemingly random
+      - name: middle
+        colors: [0]
+        description: all white horizontal band
+      - name: bottom
+        colors: [0, 2]
+        description: red shape on white background
+
+  - type: shape
+    properties:
+      color: 2 # red
+      description: Contiguous region in the bottom part of input. Appears to define the boundaries.
+      location: bottom
+
+actions:
+  - type: crop
+    description: Extract a sub-grid from input.
+    parameters:
+      - start_row: row index where red shape starts
+      - start_col: column index where red shape starts
+      - end_row: bottom row index
+      - end_col: some fixed column based on observation.
+
+relationships:
+  - type: spatial
+    description: Output grid is a sub-region of the input grid, specifically a rectangle around part of the lower red and white pixel area.

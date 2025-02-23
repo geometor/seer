@@ -1,0 +1,36 @@
+objects:
+  - type: grid
+    properties:
+      rows: variable
+      columns: variable
+      cells: pixels
+      pixel_values: integers (0-9) representing colors
+
+  - type: pixel
+    properties:
+      color: integer (0-9)
+      row_index: integer
+      column_index: integer
+
+  - type: vertical_line
+    properties:
+      start_row: integer (always 0, top row)
+      column: integer
+      base_color: integer (color of the topmost non-zero pixel in the column)
+      alternating_color: integer (always 0, white)
+      pattern: [base_color, alternating_color] repeated
+
+actions:
+  - name: find_topmost_nonzero_pixel
+    input: grid, column_index
+    output: pixel (or null if no non-zero pixel in the column)
+
+  - name: create_vertical_line
+    input: grid, column_index, base_color
+    output: modified grid
+
+transformations:
+ - for each column:
+     find the topmost non-zero pixel
+     if a non-zero pixel is found:
+         use the color to create an vertical_line that preserves the first row, fills odd number rows from the color, and fill even number rows with white.

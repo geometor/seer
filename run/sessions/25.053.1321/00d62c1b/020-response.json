@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Input:** A grid of pixels with colors representing values (0-9).\n\n2.  **Identify Green Regions:** Find all contiguous regions of green (color value 3) pixels within the grid.\n\n3.  **Determine Inner Region for Each Green Region:**\n    *   For each contiguous green region:\n        *   Start an \"outer edge flood fill\" using the background color (0 in most examples), beginning from outside the bounds of the entire grid.\n        *   The area *not* filled by this flood fill represents the interior of the green shape, including the green pixels themselves.\n        *   Intersect the original green region with this \"inner\" area. This intersection defines the \"inner region.\"\n\n4.  **Transform Inner Regions:** Change the color of all pixels within each identified \"inner region\" from green (3) to yellow (4).\n\n5.  **Output:** The modified grid with the transformed inner regions.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_regions(grid, color):\n    \"\"\"Finds contiguous regions of a specific color in the grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    def dfs(row, col):\n        \"\"\"Depth-first search to explore a contiguous region.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return []\n\n        visited[row, col] = True\n        region = [(row, col)]\n\n        region.extend(dfs(row + 1, col))\n        region.extend(dfs(row - 1, col))\n        region.extend(dfs(row, col + 1))\n        region.extend(dfs(row, col - 1))\n        return region\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col] and grid[row, col] == color:\n                regions.append(dfs(row, col))\n\n    return regions\n\ndef flood_fill(grid, start_row, start_col, fill_color):\n    \"\"\"Performs a flood fill on the grid starting from (start_row, start_col) with fill_color.\"\"\"\n    rows, cols = grid.shape\n    filled_grid = grid.copy()\n    stack = [(start_row, start_col)]\n    original_color = grid[start_row, start_col]\n\n\n    if original_color == fill_color:\n        return filled_grid\n\n    while stack:\n        r, c = stack.pop()\n        if 0 <= r < rows and 0 <= c < cols and filled_grid[r,c] == original_color:\n            filled_grid[r, c] = fill_color\n            stack.extend([(r + 1, c), (r - 1, c), (r, c + 1), (r, c - 1)])\n    return filled_grid\n\ndef determine_inner_region(grid, green_region):\n    \"\"\"Determines the inner region of a green region using flood fill.\"\"\"\n    \n    # Create a slightly larger grid for flood filling from outside\n    rows, cols = grid.shape\n    large_grid = np.zeros((rows + 2, cols + 2), dtype=int)\n    \n    # Determine the background color by checking pixels around the region\n    background_color = 0  # Default to 0\n    \n    # Place the original grid in the center of the large grid\n    large_grid[1:rows+1, 1:cols+1] = grid\n    \n    # Convert green_region coordinates to the large grid coordinates\n    large_green_region = [(r + 1, c + 1) for r, c in green_region]\n    \n    \n    # Flood fill from the outside of the enlarged grid.\n    filled_large_grid = flood_fill(large_grid, 0, 0, -1)  # Use -1 as temporary fill color\n    \n    inner_region = []\n    for r, c in large_green_region:\n        if filled_large_grid[r,c] != -1:\n             inner_region.append((r-1,c-1)) # back to original coordinates\n\n    return inner_region\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # identify green regions\n    green_regions = find_contiguous_regions(output_grid, 3)\n        \n    # check enclosure\n    for region in green_regions:\n        inner_region = determine_inner_region(output_grid, region)\n        # paint inner region\n        for row, col in inner_region:\n            output_grid[row, col] = 4\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8033,
+    "candidates_token_count": 1141,
+    "total_token_count": 9174,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.060421,
+  "response_file": "020-response.json"
+}

@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      colors: [0, 3, 4]  # Background, green, yellow
+  - type: region
+    properties:
+      color: 3  # Green
+      shape: irregular
+      interior_pixels: []  # List of (row, col) tuples
+      contains_color: 4 #Yellow
+
+actions:
+  - type: identify_regions
+    input: grid
+    description: Find all contiguous regions of green pixels.
+  - type: identify_interior
+    input: region
+    description: Find all interior pixels within a region. A pixel is interior if all 8 neighbors are the same color (green).
+  - type: change_color
+    input: interior_pixels
+    new_color: 4  # Yellow
+    description: Change the color of all identified interior pixels to yellow.

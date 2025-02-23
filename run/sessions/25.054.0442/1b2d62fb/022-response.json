@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Columns**: Locate the first, last and middle columns of the\n    input grid.\n2.  **Create Output Grid:** initialize a grid with dimensions (rows x 3).\n3.  **Process Rows:** Iterate through each row of the input grid.\n4. **First Column Check:**\n    - Set first column of the output to 8 if color 9 is present in first column of input, otherwise set 0.\n5. **Center Column Check**:\n    - Set second (center) column of output to 8 if color 9 is present in the center column of input, otherwise set 0.\n6.  **Last Column Check:**\n    - Set third (last) column of the output to 8 if color 9 is present in last column of input, otherwise set 0.\n7.  **Output:** Return the new grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows, 3), dtype=int)\n\n    # process each row\n    for r in range(rows):\n        # first column check\n        if input_grid[r, 0] == 9:\n            output_grid[r, 0] = 8\n\n        # center column check\n        center_col = cols // 2\n        if input_grid[r, center_col] == 9:\n            output_grid[r, 1] = 8\n\n        # last column check\n        if input_grid[r, -1] == 9:\n            output_grid[r, 2] = 8\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3991,
+    "candidates_token_count": 406,
+    "total_token_count": 4397,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.027181,
+  "response_file": "022-response.json"
+}

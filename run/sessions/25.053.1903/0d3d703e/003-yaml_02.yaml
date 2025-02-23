@@ -1,0 +1,12 @@
+task: 002
+objects:
+  - description: grid
+    properties:
+      - dimensions: 3x3
+      - elements: single-digit integers (0-9) representing colors
+transformation_rule:
+  type: modular_arithmetic
+  operation: decrement
+  modulus: 10 # Integers from 0 to 9, then wrapping back to 9
+  details:
+    - "Each element in the input grid is decremented by 1. If the element is 0, the transformation wraps the result to 9 (0 - 1 becomes 9 due to the circular dial)."

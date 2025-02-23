@@ -1,0 +1,36 @@
+examples:
+  - id: 1
+    observations: |
+      - Two vertical lines of green.
+      - Green pixel at (2,2) becomes yellow
+      - Green pixel at (3,3) becomes yellow
+    metrics:
+      pixels_off: 2
+  - id: 2
+    observations: |
+     -  Several "L" shapes, created by green pixels.
+     -  Only a few green pixels change to yellow, specifically in two locations at "corners".
+    metrics:
+      pixels_off: 9
+  - id: 3
+    observations: |
+      - More complex green shapes.
+      - changes to yellow appear to be on lower or right sides of chains of green.
+    metrics:
+      pixels_off: 25
+  - id: 4
+    observations: |
+      - Green pixels form various horizontal and diagonal lines, and some squares.
+      - Yellow replacements appear between adjacent, connected green pixels.
+    metrics:
+      pixels_off: 31
+  - id: 5
+    observations: |
+      - The most complex case, with multiple interacting lines/shapes of green.
+      - Many more yellow changes. It's clear single adjacency isn't the rule.
+    metrics:
+      pixels_off: 87
+general_observations:
+  - The rule is not simply "any adjacent green becomes yellow".
+  - The context of *surrounding* green pixels (and possibly their connections) matters.
+  - It looks like pixels on the right or bottom side of a group of green pixels, and those pixels must also be next to another green pixel.

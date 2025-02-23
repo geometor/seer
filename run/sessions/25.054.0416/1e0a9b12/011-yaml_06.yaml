@@ -1,0 +1,24 @@
+facts:
+  - task: 010
+  - objects:
+      - description: Rows containing colors other than 0 or 4.
+        properties:
+          - contains_colors: [1, 2, 3, 6, 7, 8, 9]
+          - dynamic: True  # These rows are subject to movement and combination.
+      - description: Pixels within the rows.
+        properties:
+          - color: [0, 1, 2, 3, 4, 6, 7, 8, 9]
+          - dynamic: True # position determined by row
+  - actions:
+      - name: Select Key Rows
+        description: Identify rows that contain any color other than 0 or 4.
+      - name: Combine Rows
+        description: Combine the selected rows into a single sequence, preserving their bottom-up order from the input grid.
+      - name: Position Rows
+        description: Place the combined rows at the bottom of the output grid.
+      - name: Handle Color 9
+        description: Move any pixel with color 9 (maroon) to the last column of the row it occupies in the output.
+      - name: Fill Remaining
+        description: Fill any remaining rows in the output (above the combined rows) with color 0 (white).
+      - name: preserve_relative_order
+        description: preserve the original order of colors in each row, except for moving 9

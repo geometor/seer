@@ -1,0 +1,42 @@
+task: 016
+objects:
+  - id: grid
+    type: 2D array
+    properties:
+      height: variable (5-6)
+      width: variable (6-7)
+      center_column_index: width // 2
+      subgrid_width: 3
+
+  - id: subgrid
+    type: 2D array
+    derivation: extracted from grid
+    properties:
+      x_start: grid.center_column_index - 1
+      x_end: grid.center_column_index + 1
+      height: grid.height
+      width: subgrid_width
+
+  - id: pixel
+    type: cell
+    properties:
+      color: integer (0-9)
+      location: (row, col)
+
+actions:
+  - name: extract_subgrid
+    input: grid
+    output: subgrid
+    description: Extracts a 3-column wide subgrid centered on the center column of the input grid.
+
+  - name: recolor_center
+    input: subgrid
+    output: modified subgrid
+    description: >
+      If the center pixel in a row of the subgrid is blue (1), change to azure (8).
+
+  - name: recolor_sides
+    input: subgrid
+    output: modified_subgrid
+    description: >
+        if a pixel on the sides of the subgrid is not black(0), change to black(0).

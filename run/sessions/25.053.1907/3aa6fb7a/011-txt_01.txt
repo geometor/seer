@@ -1,0 +1,85 @@
+        0 0 0 0 0 0 0
+        0 8 0 0 0 0 0
+        0 8 8 0 0 0 0
+        0 0 0 0 8 8 0
+        0 0 0 0 0 8 0
+        0 0 0 0 0 0 0
+        0 0 0 0 0 0 0
+        ```
+
+    *   **Expected Output:**
+        ```
+        0 0 0 0 0 0 0
+        0 8 0 0 0 0 0
+        0 8 8 0 0 0 0
+        0 0 0 0 8 8 0
+        0 0 0 0 1 8 0
+        0 0 0 0 0 0 0
+        0 0 0 0 0 0 0
+        ```
+
+    *   **Transformed Output:** (from provided code)
+        ```
+        0 0 0 0 0 0 0
+        0 8 0 0 0 0 0
+        0 8 8 0 0 0 0
+        0 0 0 0 8 8 0
+        0 0 0 0 0 8 0
+        0 0 0 0 0 0 0
+        0 0 0 0 0 0 0
+        ```
+    * Pixels changed incorrectly to blue: (1,2), (4,4).
+    * Pixels correctly identified as azure: all others.
+
+    *   **Metrics:**
+        *   match: False
+        *   pixels\_off: 2
+        *   size\_correct: True
+        *   color\_palette\_correct: True
+        *   correct\_pixel\_counts: False
+
+*   **Example 2:**
+
+    *   **Input:**
+        ```
+        0 0 0 0 8 8 0
+        0 0 0 0 0 8 0
+        0 0 8 0 0 0 0
+        0 0 8 8 0 0 0
+        0 0 0 0 0 0 0
+        0 0 0 0 8 0 0
+        0 0 0 8 8 0 0
+        ```
+
+    *   **Expected Output:**
+        ```
+        0 0 0 0 8 8 0
+        0 0 0 0 1 8 0
+        0 0 8 1 0 0 0
+        0 0 8 8 0 0 0
+        0 0 0 0 0 0 0
+        0 0 0 1 8 0 0
+        0 0 0 8 8 0 0
+        ```
+
+    *   **Transformed Output:** (from provided code)
+        ```
+        0 0 0 0 8 8 0
+        0 0 0 0 0 8 0
+        0 0 8 0 0 0 0
+        0 0 8 8 0 0 0
+        0 0 0 0 0 0 0
+        0 0 0 0 8 0 0
+        0 0 0 8 8 0 0
+        ```
+    * Pixels changed incorrectly to blue: None.
+    * Pixels that should have changed to blue but didn't: (1,4), (2,3), (5,3).
+
+    *   **Metrics:**
+        *   match: False
+        *   pixels\_off: 3
+        *   size\_correct: True
+        *   color\_palette\_correct: True
+        *   correct\_pixel\_counts: False
+
+**YAML Facts:**

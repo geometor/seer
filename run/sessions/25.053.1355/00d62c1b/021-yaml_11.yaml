@@ -1,0 +1,18 @@
+task_id: "020"
+objects:
+  - color: green (3)
+    property: target_object
+    selection_criteria: largest contiguous region
+  - color: yellow (4)
+    property: interior_fill
+    relationship: fills interior of target_object
+actions:
+  - name: identify_largest_object
+    input: green pixels
+    output: coordinates of the largest green object
+  - name: identify_interior_pixels
+    input: largest green object coordinates, original grid
+    output: coordinates of interior pixels within the largest green object
+  - name: change_color
+    input: interior pixels, original grid
+    output: modified grid with interior pixels changed to yellow

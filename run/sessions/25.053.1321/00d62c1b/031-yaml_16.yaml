@@ -1,0 +1,29 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Contains pixels of different colors.
+  - name: green_region
+    type: contiguous_pixels
+    description: A connected set of green pixels (value 3). Connectivity is 8-way (including diagonals).
+  - name: interior_pixel
+    type: pixel
+    property: color (green, value 3)
+    description: A green pixel that is part of a green_region, but not on the outer boundary of the region.
+  - name: border_pixel
+    type: pixel
+    property: color
+    description: any pixel that is on the outer boundary of the region, or any non-green pixel.
+
+actions:
+  - name: identify_regions
+    input: grid
+    output: set of green_regions
+    description: Finds all contiguous green regions.
+  - name: identify_interior_pixels
+    input: green_region
+    output: set of interior_pixels within the region
+    description: Locates all interior pixels within a given green region.
+  - name: recolor_pixels
+    input: set of interior_pixels
+    output: modified grid
+    description: Changes the color of interior green pixels to yellow (value 4).

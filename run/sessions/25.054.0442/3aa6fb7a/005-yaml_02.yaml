@@ -1,0 +1,23 @@
+objects:
+  - name: grid
+    description: A 2D array of pixels.
+    properties:
+      - colors: Represents different pixel values (0-9).
+      - clusters: Groups of orthogonally connected pixels of the same color.
+
+  - name: cluster
+    description: A group of orthogonally connected pixels of color 8 (azure).
+    properties:
+      - color: 8 (azure)
+      - center_pixel:  The "center" pixel within the cluster, defined by the top-left priority of the group of central pixels.
+      - size: The number of pixels in the cluster.
+
+actions:
+  - name: identify_clusters
+    description: Find all distinct clusters of color 8 in the grid.
+
+  - name: find_center_pixel
+    description: Determine the "center" pixel of a cluster using top left priority.
+
+  - name: replace_pixel_color
+    description: Change the color of the center pixel of each identified cluster from 8 (azure) to 1 (blue).

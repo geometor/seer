@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is cropped to the bounding box defined by the red pixels.\nThe azure pixels are removed, leaving only the red and white pixels within the bounding box.\n\"\"\"\n\nimport numpy as np\n\ndef get_bounding_box(grid, color):\n    # Find rows and cols containing the specified color\n    rows = np.any(grid == color, axis=1)\n    cols = np.any(grid == color, axis=0)\n    # Get min and max row/col indices\n    rmin, rmax = np.where(rows)[0][[0, -1]]\n    cmin, cmax = np.where(cols)[0][[0, -1]]\n    return rmin, rmax, cmin, cmax\n\ndef transform(input_grid):\n    \"\"\"\n    Crops the input grid to the bounding box of the red pixels.\n    \"\"\"\n    # Convert input_grid to a NumPy array for easier manipulation.\n    input_grid = np.array(input_grid)\n\n    # Find the bounding box coordinates for the red pixels (color 2).\n    rmin, rmax, cmin, cmax = get_bounding_box(input_grid, 2)\n\n    # Crop the grid to the bounding box.\n    output_grid = input_grid[rmin:rmax+1, cmin:cmax+1]\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3051,
+    "candidates_token_count": 319,
+    "total_token_count": 3370,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.854655,
+  "response_file": "002-response.json"
+}

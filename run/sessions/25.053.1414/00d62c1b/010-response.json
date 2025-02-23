@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Clusters:** Locate all contiguous blocks (clusters) of green (3) pixels in the input grid.\n2.  **Identify Target Pixels within Clusters:**\n    *   For each green pixel within a cluster, examine its neighbors.\n    *   If a green pixel has green neighbors directly below (south), to its left (west) and diagonal down and to its left (southwest), it is a target pixel.\n3.  **Transform Target Pixels:** Change the color of all identified target pixels from green (3) to yellow (4).\n4.  The output grid is the same size as the input grid and all non-target pixels are the same as in the input.\n\"\"\"\n\nimport numpy as np\n\ndef find_green_clusters(grid):\n    \"\"\"\n    Identifies contiguous blocks of green pixels.\n    \"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    clusters = []\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_cluster):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != 3:\n            return\n        visited[r, c] = True\n        current_cluster.append((r, c))\n        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:  # Only cardinal directions for contiguity\n            dfs(r + dr, c + dc, current_cluster)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 3 and not visited[r, c]:\n                current_cluster = []\n                dfs(r, c, current_cluster)\n                clusters.append(current_cluster)\n    return clusters\n\ndef find_all_target_pixels(grid, clusters):\n    \"\"\"\n    Finds all target pixels within all green clusters based on the neighbor rule.\n    \"\"\"\n    target_pixels = []\n    rows, cols = grid.shape\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    for cluster in clusters:\n        for r, c in cluster:\n            # Check neighbors: below (south), left (west), and southwest\n            south = (r + 1, c)\n            west = (r, c - 1)\n            southwest = (r + 1, c - 1)\n\n            if (is_valid(south[0], south[1]) and grid[south] == 3 and\n                is_valid(west[0], west[1]) and grid[west] == 3 and\n                is_valid(southwest[0], southwest[1]) and grid[southwest] == 3):\n                target_pixels.append((r, c))\n    return target_pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # find clusters\n    clusters = find_green_clusters(output_grid)\n\n    # find all target pixels\n    target_pixels = find_all_target_pixels(output_grid, clusters)\n\n    # set target pixels to yellow\n    for r, c in target_pixels:\n        output_grid[r, c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7414,
+    "candidates_token_count": 797,
+    "total_token_count": 8211,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.896776,
+  "response_file": "010-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Initial Colored Objects:** Find all contiguous regions (objects) of non-white (non-0) colors in the input grid.\n\n2.  **Simultaneous Expansion:**\n    *   Iterate through each pixel of the grid.\n    *   For each non-white pixel, check its immediate neighbors (up, down, left, right).\n    *   If a neighbor is white, mark it for potential expansion with the current pixel's color.\n    *   *Crucially*, if multiple colors are trying to expand into the same white pixel, *none* of them expand into that pixel (this is the boundary condition). This prevents overwriting.\n\n3. **Apply Expansion:** After checking all pixels in a single iteration, update the grid with the marked expansions.\n\n4.  **Repeat:** Repeat steps 2 and 3 until no further changes occur to the grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_pixels(grid):\n    \"\"\"Returns a dictionary of non-white pixel coordinates and their colors.\"\"\"\n    rows, cols = grid.shape\n    non_white_pixels = {}\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                non_white_pixels[(r, c)] = grid[r, c]\n    return non_white_pixels\n\ndef expand_colors_simultaneously(grid, non_white_pixels):\n    \"\"\"Expands all non-white colors simultaneously, handling boundary conditions.\"\"\"\n    new_grid = grid.copy()\n    rows, cols = grid.shape\n    expansion_map = {}  # Track potential expansions: {(r, c): [color1, color2, ...]}\n    changed = False\n\n    for (r, c), color in non_white_pixels.items():\n        # Check adjacent cells\n        neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]\n        for nr, nc in neighbors:\n            if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == 0:\n                if (nr, nc) not in expansion_map:\n                    expansion_map[(nr, nc)] = []\n                expansion_map[(nr, nc)].append(color)\n\n    # Apply expansions, handling conflicts\n    for (nr, nc), colors in expansion_map.items():\n        if len(colors) == 1:  # Only expand if there's no conflict\n            new_grid[nr, nc] = colors[0]\n            changed = True\n\n    return new_grid, changed\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Iteratively expand colors until no change\n    changed = True\n    while changed:\n        # Identify non-white pixels\n        non_white_pixels = get_non_white_pixels(output_grid)\n\n        # expand\n        output_grid, changed = expand_colors_simultaneously(output_grid, non_white_pixels)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8436,
+    "candidates_token_count": 710,
+    "total_token_count": 9146,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.641195,
+  "response_file": "006-response.json"
+}

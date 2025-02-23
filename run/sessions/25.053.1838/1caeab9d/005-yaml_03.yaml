@@ -1,0 +1,28 @@
+objects:
+  - color: red
+    shape: rectangle
+    initial_position: varies
+    movement: down
+    constraints:
+      - blocked_by: different_color, bottom_edge, same_color
+  - color: blue
+    shape: rectangle
+    initial_position: varies
+    movement: down
+    constraints:
+      - blocked_by: different_color, bottom_edge, same_color
+  - color: yellow
+    shape: rectangle
+    initial_position: varies
+    movement: down
+    constraints:
+      - blocked_by: different_color, bottom_edge, same_color
+observations:
+  - type: stacking
+    description: Objects of the same color stack on top of each other.
+  - type: blocking
+    description: Objects are blocked by objects of different colors.
+  - type: movement
+    description: Objects move down as far as possible, subject to constraints.
+  - type: color_specific_behavior
+    description: All colored objects exhibit same behavior. Only colors 1, 2, and 4 are involved.

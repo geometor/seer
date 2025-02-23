@@ -1,0 +1,39 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      shape: variable (rows, cols)
+      colors: [0, 1, 5]  # white, blue, gray
+      center_column:
+        color: 5  # gray
+        index: cols // 2
+
+  - name: output_grid
+    type: grid
+    properties:
+      shape: (3, 3)
+      colors: [0, 2]  # white, red
+
+  - name: blue_regions
+    type: object_group
+    properties:
+      color: 1 #Blue
+      locations:
+        left: [] # coordinates of blue relative to the central column
+        right: []
+
+actions:
+  - name: identify_center_column
+    description: Find the central column index in the input grid.
+
+  - name: identify_blue_regions
+    description: Locate blue (1) pixels to the left and right.
+
+  - name: create_output_grid
+    description: Create a 3x3 output grid filled with white (0).
+
+  - name: map_blue_to_red
+    description: >
+      Map coordinates of blue pixels relative to the central column.
+      Left region maps to left side of output. Right region maps to right side.
+      Convert blue (1) pixels to red (2) in the output grid.

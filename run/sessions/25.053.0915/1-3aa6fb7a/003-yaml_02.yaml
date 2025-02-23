@@ -1,0 +1,24 @@
+observations:
+  - task_id: 002
+  - objects:
+    - color: azure (8)
+      type: pixel_group
+      properties:
+        - forms_horizontal_lines: true
+        - variable_length: true
+    - color: blue (1)
+      type: inserted_pixel
+      properties:
+        - placement: adjacent_to_azure_lines
+        - direction: conditional # Either left or right, not both
+        - insertion_rule: "outside of last azure in an azure sequence"
+  - actions:
+    - type: insertion
+      description: Insert blue pixels based on the extent of horizontal azure lines.
+      details:
+        - condition: "azure line exists"
+          action: "if an azure line of any length is identified,
+                    place 1 blue pixel to the right if the end of the line
+                    is not the edge of the grid.
+                    place one blue pixel to the left if the start of the
+                    line is not the beginning of the grid"

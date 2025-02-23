@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by first identifying rows that start with non-zero values and propagating those values across the row.\nThen, it takes those changed rows, and duplicates them, effectively repeating the modified pattern to create an output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule.\n\n    Args:\n        input_grid: A 2D numpy array representing the input grid.\n\n    Returns:\n        A 2D numpy array representing the transformed output grid.\n    \"\"\"\n    copied_grid = np.copy(input_grid)\n    rows, cols = copied_grid.shape\n\n    # Row Propagation: Iterate through rows of the copied grid.\n    changed_rows = []\n    for r in range(rows):\n        # Leading Non-Zero: If a row starts with a non-zero, replace all elements.\n        if copied_grid[r, 0] != 0:\n            copied_grid[r, :] = copied_grid[r, 0]\n            changed_rows.append(copied_grid[r,:].tolist())\n\n\n    output_grid = np.copy(input_grid)\n    # add the changed rows\n    for r in range(rows):\n        # Leading Non-Zero: If a row starts with a non-zero, replace all elements.\n        if output_grid[r, 0] != 0:\n            output_grid[r, :] = output_grid[r, 0]\n    \n    # append changed rows\n    for row in changed_rows:\n        output_grid = np.append(output_grid, [row], axis=0)\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7618,
+    "candidates_token_count": 388,
+    "total_token_count": 8006,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.546112,
+  "response_file": "012-response.json"
+}

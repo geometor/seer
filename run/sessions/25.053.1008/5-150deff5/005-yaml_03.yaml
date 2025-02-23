@@ -1,0 +1,40 @@
+objects:
+  - name: InputGrid
+    type: grid
+    properties:
+      - dimensions: 8x9
+      - values: [0, 5]
+  - name: OutputGrid
+    type: grid
+    properties:
+      - dimensions: 8x9
+      - values: [0, 2, 8]
+  - name: GreyShape
+    type: shape
+    properties:
+      - color: grey (5)
+      - composition: contiguous grey pixels
+  - name: RedShape
+    type: shape
+    properties:
+      - color: red (2)
+      - composition: contiguous red pixels
+    location:
+      - leftmost part of GreyShape
+  - name: AzureShape
+    type: shape
+    properties:
+      - color: azure (8)
+      - composition: contiguous azure pixels
+      location:
+       - right part of GreyShape
+
+actions:
+ - description: Divide GreyShape vertically
+ - description: Recolor the leftmost part Red
+ - description: Recolor the rest of GreyShape Azure
+
+relationships:
+  - InputGrid contains GreyShape
+  - OutputGrid contains RedShape and AzureShape
+  - RedShape and AzureShape constitute a recoloring of GreyShape

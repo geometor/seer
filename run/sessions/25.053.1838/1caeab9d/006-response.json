@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation aligns colored objects (red, blue, yellow) vertically while maintaining their relative horizontal positions. Objects move down as far as possible, stacking on top of objects of the same color, and being blocked by objects of other colors.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"Finds contiguous regions of the same color.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    objects = []\n\n    def dfs(r, c, color, obj_coords):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n            visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        obj_coords.append((r, c))\n        dfs(r + 1, c, color, obj_coords)\n        dfs(r - 1, c, color, obj_coords)\n        dfs(r, c + 1, color, obj_coords)\n        dfs(r, c - 1, color, obj_coords)\n\n    for r in range(rows):\n        for c in range(cols):\n            if not visited[r, c] and grid[r, c] != 0:\n                color = grid[r, c]\n                obj_coords = []\n                dfs(r, c, color, obj_coords)\n                # Find top-left and dimensions\n                min_r = min(coord[0] for coord in obj_coords)\n                min_c = min(coord[1] for coord in obj_coords)\n                max_r = max(coord[0] for coord in obj_coords)\n                max_c = max(coord[1] for coord in obj_coords)\n                objects.append({\n                    'color': color,\n                    'position': (min_r, min_c),\n                    'shape': (max_r - min_r + 1, max_c - min_c + 1),\n                    'pixels': obj_coords\n                })\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    # Find objects\n    objects = find_objects(input_grid)\n\n    # Sort objects by bottom row, then by top row (to handle cases with same bottom row)\n    objects.sort(key=lambda obj: (max(r for r, c in obj['pixels']), min(r for r, c in obj['pixels'])), reverse=True)\n\n    # Apply transformation rules\n    for obj in objects:\n        color = obj['color']\n        max_drop = 0\n        blocked = False\n\n        # Check for blockage below\n        for drop in range(1, input_grid.shape[0]): #check all the possible drop rows\n            for r, c in obj['pixels']:\n                new_r = r + drop #potential new row\n\n                if new_r >= input_grid.shape[0]: #check if we hit the bottom\n                    blocked = True\n                    break\n\n                if output_grid[new_r,c] != 0 and output_grid[new_r,c] != color:\n                    blocked = True\n                    break\n\n            if blocked: #we're blocked, don't drop any further\n                break\n            else: #if we haven't been blocked, we can go one further.\n                max_drop = drop\n\n        # Update output grid\n        for r, c in obj['pixels']:\n            output_grid[r + max_drop, c] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4433,
+    "candidates_token_count": 851,
+    "total_token_count": 5284,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.831418,
+  "response_file": "006-response.json"
+}

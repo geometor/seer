@@ -1,0 +1,33 @@
+facts:
+  - object: input_grid
+    type: grid
+    description: Initial grid of pixels, mostly white with some red and azure.
+    properties:
+      - width: 25
+      - height: 10
+      - cell_values: [0-9] representing colors
+
+  - object: output_grid
+    type: grid
+    description: Transformed grid, fully populated with a repeating pattern.
+    properties:
+      - width: 25
+      - height: 10
+      - cell_values: [0, 2, 8]
+
+  - observation: red_location
+    description: The red (2) pixel is in the top row of the input grid.
+    details: The specific column isn't crucial, just its presence in the top row.
+
+  - observation: azure_location
+    description:  The azure (8) pixel is in the bottom row of the input.
+    details: The specific column isn't crucial, just its presence in the bottom row.
+
+  - action: pattern_expansion
+    description: The output grid pattern seems to be generated based on expanding columns of 2 and 8.
+
+  - relationship: input_output_size
+    description: Input and output grids have the same dimensions.
+
+  - relation: pattern_columns
+    description: red and azure pixels in the input generate alternating columns in output

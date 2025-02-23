@@ -1,0 +1,39 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      dimensions: 8x10
+      colors: [0, 5]
+  - name: output_grid
+    type: grid
+    properties:
+      dimensions: 8x10
+      colors: [0, 2, 8]
+  - name: gray_object
+    type: object
+    properties:
+      color: 5
+      shape: irregular
+      location: varies
+
+actions:
+  - name: color_substitution
+    agent: system
+    input: gray_object
+    parameters:
+      - rule: "If a gray (5) pixel is adjacent to a white(0) pixel, change to azure(8), if not change to red(2)"
+
+relationships:
+  - type: adjacency
+    subject: gray_pixel
+    object: white_pixel
+    result: color_change_to_azure
+
+  - type: contained
+    subject: gray_object
+    object: input_grid
+
+  - type: correspondence
+    subject: input_grid
+    object: output_grid
+    properties: [dimensions]

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Preserve: Keep all original red, blue and azure pixels in their original locations.\n2. Add Yellow: For each red pixel, add a yellow pixel one step above, one step below, one to the left, and one to the right.\n3. Add Orange: For each blue pixel, add an orange pixel one step above, one step below, one to the left, and one to the right.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixels_by_color(grid, color_value):\n    \"\"\"Finds the coordinates of all pixels of a specific color.\"\"\"\n    return np.argwhere(grid == color_value)\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find red and blue pixels\n    red_pixels = find_pixels_by_color(input_grid, 2)\n    blue_pixels = find_pixels_by_color(input_grid, 1)\n\n    # Add yellow around red\n    for r, c in red_pixels:\n        # output_grid[r, c] = 2  # Keep original red (already done by copy)\n        if r > 0:\n            output_grid[r - 1, c] = 4  # Above\n        if r < rows - 1:\n            output_grid[r + 1, c] = 4  # Below\n        if c > 0:\n            output_grid[r, c - 1] = 4  # Left\n        if c < cols - 1:\n            output_grid[r, c + 1] = 4  # Right\n\n    # Add orange around blue\n    for r, c in blue_pixels:\n        # output_grid[r, c] = 1  # Keep original blue (already done by copy)\n        if r > 0:\n            output_grid[r - 1, c] = 7  # Above\n        if r < rows - 1:\n            output_grid[r + 1, c] = 7  # Below\n        if c > 0:\n            output_grid[r, c - 1] = 7  # Left\n        if c < cols - 1:\n            output_grid[r, c + 1] = 7  # Right\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4269,
+    "candidates_token_count": 557,
+    "total_token_count": 4826,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.800176,
+  "response_file": "004-response.json"
+}

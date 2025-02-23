@@ -1,0 +1,34 @@
+objects:
+  - type: grid
+    description: 2D array of pixels
+    dimensions: 20x20 (in the example)
+    elements: pixels
+  - type: pixel
+    properties:
+      color:
+        type: integer
+        values: [0, 3, 4]
+        mapping:
+          0: white
+          3: green
+          4: yellow
+  - type: region
+    description: Contiguous block of green pixels
+    properties:
+        shape: irregular
+
+actions:
+  - name: color_change
+    description: Change color of a subset of pixels within a green region.
+    parameters:
+      source_color: 3 (green)
+      target_color: 4 (yellow)
+      selection_criteria:  "unknown, but likely related to the shape or position of connected green components."
+
+relationships:
+  - type: adjacency
+    description: Pixels are adjacent horizontally and vertically.
+  - type: containment
+    description: Regions contain pixels.
+  - type: transformation
+    description: The input grid transforms to the output grid via the color_change action.

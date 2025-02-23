@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation moves the non-zero elements of the input grid to the last row of the output grid, preserving their original values, and all other cells are zeros. The last row ordering by index in original grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_nonzero_elements(grid):\n    # Find indices and values of non-zero elements\n    indices = np.nonzero(grid)\n    values = grid[indices]\n    # Combine row, col indices with values and sort them\n    elements = []\n    for i in range(len(values)):\n        elements.append((indices[0][i], indices[1][i], values[i]))\n    elements.sort()  # Sorts by row, then by column\n    return elements\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    \n    # Find non-zero elements and their original positions\n    nonzero_elements = get_nonzero_elements(input_grid)\n\n    # Place these elements in the last row of the output grid\n    last_row_index = 0\n    for _, _, value in nonzero_elements:\n        output_grid[-1, last_row_index] = value\n        last_row_index += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2106,
+    "candidates_token_count": 296,
+    "total_token_count": 2402,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.01151,
+  "response_file": "002-response.json"
+}

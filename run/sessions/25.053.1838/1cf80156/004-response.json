@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Object:** Find a non-black object within the input grid. Determine its color.\n2.  **Bounding Box:** Define a bounding box around the identified object.\n3.  **Crop:** Extract the section of the grid defined by the bounding box.\n4.  **Rotate:** Rotate the cropped section clockwise by 90 degrees.\n5.  **Output:** Return the rotated section.\n\"\"\"\n\nimport numpy as np\n\ndef get_bounding_box(grid, color):\n    rows, cols = np.where(grid == color)\n    if len(rows) == 0:  # Handle the case where the color is not found\n        return None, None, None, None\n    min_row, max_row = np.min(rows), np.max(rows)\n    min_col, max_col = np.min(cols), np.max(cols)\n    return min_row, max_row, min_col, max_col\n\ndef rotate_clockwise(grid):\n    return np.rot90(grid, k=-1)\n\ndef find_target_object_color(grid):\n    # Iterate through the grid to find the first non-black color\n    for color in np.unique(grid):\n        if color != 0:\n            return color\n    return None  # Return None if no object is found\n\ndef transform(input_grid):\n    # Convert input_grid to a NumPy array\n    input_grid = np.array(input_grid)\n\n    # 1. Identify Target Object and its color\n    target_color = find_target_object_color(input_grid)\n\n    if target_color is None:  # Handle cases where no object is found\n        return []  # Return an empty list\n\n    # 2. Bounding Box\n    min_row, max_row, min_col, max_col = get_bounding_box(input_grid, target_color)\n\n    # Handle the edge case\n    if min_row is None:\n        return [].tolist()\n        \n    # 3. Crop\n    cropped_grid = input_grid[min_row:max_row+1, min_col:max_col+1]\n\n    # 4. Rotate\n    rotated_grid = rotate_clockwise(cropped_grid)\n\n    # 5. Output\n    return rotated_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3301,
+    "candidates_token_count": 540,
+    "total_token_count": 3841,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.582038,
+  "response_file": "004-response.json"
+}

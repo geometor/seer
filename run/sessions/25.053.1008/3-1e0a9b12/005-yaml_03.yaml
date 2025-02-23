@@ -1,0 +1,24 @@
+facts:
+  - entity: grid
+    type: 2D array
+    size: 5x5
+    elements: integers (0-9) representing colors
+    description: input and output grids containing colored pixels
+
+  - entity: pixel
+    type: individual cell
+    properties:
+      color: integer (0-9) # white, blue, red, green, magenta
+      position: (row, column) coordinates
+
+  - action: move_color_block
+    description: Certain color blocks seem to maintain relative positioning to one another and move.
+
+  - observation: selective_preservation
+    description: Only specific colors (3, 6, 1, and 2) and their relative positions are preserved in the output. The 1 and 2 maintain position relative to each other in the bottom right.
+
+  - observation: positional_shift
+    description: The position of each color section shifts down and possibly across. The bottom row and right column are involved.
+
+  - observation: relative positioning
+    description: Green pixels appear to move down, maintaining a vertical stack

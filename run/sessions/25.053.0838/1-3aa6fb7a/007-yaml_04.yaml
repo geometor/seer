@@ -1,0 +1,21 @@
+facts:
+  input_grid_dimensions: 7x7
+  output_grid_dimensions: 7x7
+  objects:
+    - color: 8  # azure
+      instances_input: 3
+      instance_1_pixels: [(0, 4), (0, 5), (1, 5)]
+      instance_2_pixels: [(2, 2), (3, 2), (3, 3)]
+      instance_3_pixels: [(5, 4), (6, 4), (6, 5)]
+      adjacent_white_pixels: [(1, 4), (0, 3), (0, 6), (2, 5), (1, 6), (2, 1), (1, 2), (2, 3), (4, 2), (3, 1), (4, 3), (3, 4), (5, 3), (4, 4), (6, 3), (5, 5), (6, 6)]
+    - color: 1  #blue
+      instances_output: 3
+      instance_1_pixels: [(1,4)]  # Correctly predicted
+      instance_2_pixels: [(2,3)]  # needs to identify top-most, left most
+      instance_3_pixels: [(5,3)]  # needs to identify top-most, left most
+  actions:
+    - type: color_change
+      from_color: 0  # white
+      to_color: 1  # blue
+      locations: [(1, 4), (2, 3), (5,3)] # Adjacent to each azure object. Top-left rule confirmed.
+      notes: For each azure object, one adjacent white pixel is changed to blue. The top-most, left-most available white pixel is chosen.

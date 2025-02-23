@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n\n1.  **Identify Trigger:** Locate all occurrences of gray (5) in the input grid.\n2.  **Define Region:** Consider a vertical stripe defined by the column of each gray pixel.\n3.  **Map to Output:** In the output grid, the corresponding column where the gray pixel was, set it to red (2).\n4. **All Other Columns are White:** All other columns in output are set to White (0). In essence, the 3x7 input grid is reduced to a 3x3 output grid where each gray column in the input becomes a red column in the output, and all other colors columns are reduced to white.\n\"\"\"\n\nimport numpy as np\n\ndef get_columns_with_color(grid, color):\n    \"\"\"\n    Finds and returns a list of the indices of columns containing a specified color.\n    \"\"\"\n    columns = []\n    for x in range(grid.shape[1]):\n        if color in grid[:, x]:\n            columns.append(x)\n    return columns\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    Identifies columns with gray (5) pixels, creates output grid,\n    makes those columns Red(2), other columns White(0)\n    \"\"\"\n    # initialize output_grid\n    output_grid = np.zeros((input_grid.shape[0], 3), dtype=int)\n\n    # Find columns in the input containing gray (5)\n    gray_columns = get_columns_with_color(input_grid, 5)\n    \n    output_col_index = 0\n    \n    # Iterate a 'window' across the matrix from left to right one column at a time\n    for x in range(0, input_grid.shape[1] - 2 ):\n      window = input_grid[:, x:x+3]      \n      window_gray_cols = get_columns_with_color(window, 5)\n      \n      #If gray is in the center of the window\n      if len(window_gray_cols) > 0 and 5 in window[:,1]:          \n          # Map corresponding columns to red (2) in output.\n          output_grid[:, output_col_index] = 2\n          \n      output_col_index += 1       \n      if output_col_index >= 3:\n          break\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2123,
+    "candidates_token_count": 551,
+    "total_token_count": 2674,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.213563,
+  "response_file": "004-response.json"
+}

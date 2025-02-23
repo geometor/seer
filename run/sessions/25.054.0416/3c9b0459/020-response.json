@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nSwap the values of the cells at positions (0, 1) and (2, 0) with cell (2,1) circularly. All other cells remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by swapping the values of cells (0, 1) and (2,0) \n    circularly with cell (2,1).\n    \"\"\"\n    output_grid = np.copy(input_grid)\n\n    # Store original values\n    val_0_1 = input_grid[0, 1]\n    val_2_0 = input_grid[2, 0]\n    val_2_1 = input_grid[2, 1]\n\n    # Perform swaps\n    output_grid[0, 1] = val_2_0  # (0,1) <- (2,0)\n    output_grid[2, 0] = val_2_1  # (2,0) <- (2,1)\n    output_grid[2, 1] = val_0_1   # (2,1) <- (0,1)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2160,
+    "candidates_token_count": 272,
+    "total_token_count": 2432,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.646935,
+  "response_file": "020-response.json"
+}

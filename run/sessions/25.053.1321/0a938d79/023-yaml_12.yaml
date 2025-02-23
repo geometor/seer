@@ -1,0 +1,44 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - height: variable
+      - width: variable
+      - cells: integers (0-9 representing colors)
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      - height: same as input_grid
+      - width: same as input_grid
+      - cells: integers (0-9 representing colors)
+
+  - name: seed_row
+    type: row within input_grid
+    properties:
+      - row_index: integer
+      - seed_pixels: list of non-white pixels
+        - column_index: integer
+        - color: integer (1-9)
+
+  - name: color_sequence
+    type: ordered list of colors
+    properties:
+    - colors are from non-white seed row pixels, maintaining original order
+
+actions:
+  - name: identify_seed_rows
+    input: input_grid
+    output: list of seed_row objects
+    description: Find rows with at least one non-white pixel.
+
+  - name: extract_color_sequence
+    input: seed_rows
+    output: color_sequence
+    description: Create an ordered list of colors from the non-white pixels in the seed_row, preserving their left-to-right order.
+
+  - name: construct output
+    input: input grid, color sequence
+    output: output grid
+    description: Build output by stacking copies of the color sequence seed
+      rows until the input grid height is matched.

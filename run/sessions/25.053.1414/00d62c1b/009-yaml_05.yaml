@@ -1,0 +1,22 @@
+objects:
+  - name: green_cluster
+    type: contiguous_pixels
+    color: green
+    properties:
+      - shape: varies (can be 2x2, L-shaped, or larger)
+      - size: varies
+      - contains_target: boolean # Indicates if the cluster has pixel(s) to be changed
+
+actions:
+  - name: identify_target
+    input: green_cluster
+    description: Find green pixels within a cluster that meet specific criteria based on neighbor pixels.
+    criteria: |
+      A green pixel is a target if it has adjacent green neighbors
+      to the south, and west, and southwest.
+
+  - name: change_color
+    input: target_pixel
+    description: Change the color of the target pixel.
+    old_color: green
+    new_color: yellow

@@ -1,0 +1,17 @@
+observations:
+  - object: non_zero_pixels
+    properties:
+      color: varied # Represents the non-zero color value
+      original_row: row_index # Original row index of the pixel
+      original_col: col_index
+    actions:
+      - type: replicate_downwards
+        pattern: alternating
+        alternating_color: white # 0
+        details: "Non-zero pixels initiate a downward replication in their column. The replication alternates between the pixel's original color and white (0)."
+  - object: zero_pixels
+    properties:
+        color: white
+    actions:
+        - type: remain_unchanged_unless_overwritten
+          details: zero pixels are only overwritten by the downward replication of a non zero pixel.

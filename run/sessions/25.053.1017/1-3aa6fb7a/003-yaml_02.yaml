@@ -1,0 +1,31 @@
+observations:
+  - task_id: "002"
+  - example_set: "train"
+  - objects:
+      - description: "Contiguous regions of azure (8) pixels."
+        properties:
+          - color: 8  # Azure
+          - shape: "Irregular, defined by contiguous blocks."
+        instances:
+          - example_1:
+            - bounding_box: [1, 1, 2, 2]  # top-left x, top-left y, bottom-right x, bottom-right y
+            - bounding_box: [3, 4, 4, 5]
+            - changed_pixel: [1,2]
+            - changed_to: 1
+            - changed_pixel: [4,4]
+            - changed_to: 1
+          - example_2:
+            - bounding_box: [0, 4, 1, 5]
+            - bounding_box: [2, 2, 3, 3]
+            - bounding_box: [5, 4, 6, 5]
+            - changed_pixel: [0,5]
+            - changed_to: 1
+            - changed_pixel: [2,3]
+            - changed_to: 1
+            - changed_pixel: [5,4]
+            - changed_to: 1
+  - actions:
+    - description: "Change the color of a specific pixel within each azure object."
+      target: "The right-most pixel in the second row of multi-row objects or the right-most pixel in the second to last row for multi-row objects. Single row objects aren't changed."
+      from_color: 8  # Azure
+      to_color: 1  # Blue

@@ -1,0 +1,43 @@
+facts:
+  - description: "The input and output grids are 9x9."
+    type: "grid_size"
+    value: [9, 9]
+
+  - description: "The input grid contains two non-zero pixels."
+    type: "input_object_count"
+    value: 2
+
+  - description: "The first input pixel is red (color 2) at position (3, 2)."
+    type: "input_object"
+    color: 2
+    position: [3, 2]
+
+  - description: "The second input pixel is blue (color 1) at position (6, 6)."
+    type: "input_object"
+    color: 1
+    position: [6, 6]
+
+  - description: "The output grid contains ten non-zero pixels."
+    type: "output_object_count"
+    value: 10
+
+  - description: "The red pixel in the input remains in the same location in the output."
+    type: "output_object"
+    color: 2
+    position: [3, 2]
+  - description: "Yellow pixels (color 4) are added above and below the red pixel."
+    type: "transformation_rule"
+    input_color: 2
+    output_color: 4
+    relative_positions: [[-1, 0], [1, 0]]
+    
+  - description: "The blue pixel in the input remains at the same place."
+    type: "output_object"
+    color: 1
+    position: [6,6]
+
+  - description: "Orange pixels (color 7) are added to the left, right, top and bottom."
+    type: "transformation_rule"
+    input_color: 1
+    output_color: 7
+    relative_positions:  [[0, -1], [0, 1], [-1, 0], [1, 0]]

@@ -1,0 +1,32 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      rows: variable
+      columns: variable
+      cells: integers (0-9 representing colors)
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      rows: same as input_grid
+      columns: same as input_grid
+      cells: integers (0-9 representing colors)
+
+  - name: colored_row
+    type: 1D array
+    properties:
+      contains: pixels from a row in input_grid that has at least one non-zero pixel
+
+actions:
+  - name: identify_colored_rows
+    input: input_grid
+    output: list of row indices
+
+  - name: extend_colors
+    input: colored_row
+    output: 1D array representing a row with colors extended
+
+  - name: create_output
+    input: list of extended_colored_rows
+    output: output_grid, alternating extended_colored_rows with blank rows

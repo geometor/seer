@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe program slides clusters of colored pixels down, merging similar objects, and fills empty pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"Finds contiguous non-zero pixel regions in a grid, considering each row separately.\"\"\"\n    objects = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        current_object = []\n        for c in range(cols):\n            if grid[r, c] != 0:\n                current_object.append((r, c))\n            else:\n                if current_object:\n                    objects.append(current_object)\n                    current_object = []\n        if current_object:  # Handle objects at the end of a row\n            objects.append(current_object)\n    return objects\n\ndef move_object_down(grid, object_pixels):\n    \"\"\"Moves an object down one step, merging if necessary.\"\"\"\n    rows, cols = grid.shape\n    new_positions = []\n    can_move = True\n    \n    #Check for merge, by checking spots under\n    merge_target_row = -1\n    for r, c in object_pixels:\n        if r + 1 >= rows: #Object cannot move if at the bottom\n           can_move = False\n           break\n        if grid[r + 1, c] != 0 and (r + 1, c) not in object_pixels:  # Check for merge\n            merge_target_row = r+1\n            break\n\n    if not can_move:\n        return object_pixels, False #Return original\n\n    if merge_target_row > -1:\n       #Merge is happening\n       combined_object_pixels = object_pixels.copy()\n       for r in range(merge_target_row,rows):\n          for c in range(cols):\n             if grid[r,c] != 0 and (r,c) not in combined_object_pixels:\n                combined_object_pixels.append((r,c))\n       #remove dupes and sort\n       combined_object_pixels = sorted(list(set(combined_object_pixels)))\n       return move_object_down(grid, combined_object_pixels)\n\n    #Normal Move\n    for r, c in object_pixels:\n        if r + 1 >= rows or (grid[r + 1, c] != 0 and (r+1,c) not in object_pixels):  # Check for collision or boundary\n            can_move = False\n            break\n        new_positions.append((r + 1, c))\n\n    if can_move:\n        return new_positions, True\n    else:\n        return object_pixels, False\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by sliding clusters of colored pixels down, merging,\n    and filling the background.\n    \"\"\"\n    grid = np.array(input_grid)  # Work with a NumPy array\n    output_grid = np.zeros_like(grid)\n\n    objects = find_objects(grid)\n\n    # Move objects down iteratively until no more movement is possible\n    moved = True\n    while moved:\n        moved = False\n        new_objects = []\n        \n        for obj in objects:\n          \n            moved_obj, did_move = move_object_down(grid, obj)\n\n            if did_move:\n                moved = True\n\n            new_objects.append(moved_obj)\n           \n        #Rebuild the grid\n        grid = np.zeros_like(grid)\n        for obj_pix in new_objects:\n          for r,c in obj_pix:\n            grid[r,c] = input_grid[obj_pix[0][0],obj_pix[0][1]] #Original color\n            \n        objects = new_objects #Update current objects\n\n    # Copy final moved positions from grid\n    output_grid = grid.copy()\n    \n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2148,
+    "candidates_token_count": 907,
+    "total_token_count": 3055,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.622061,
+  "response_file": "006-response.json"
+}

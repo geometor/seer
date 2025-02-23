@@ -1,0 +1,30 @@
+task: extract_nonzero_subgrid
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - colors: [list of integers, varies per example]
+      - shape: [rows, cols]
+  - name: nonzero_subgrid
+    type: grid
+    properties:
+      - colors: [same as input_grid, but without 0]
+      - shape: [rows', cols'] #derived from bounding box
+    description: |
+        The smallest rectangular subgrid containing all
+        non-zero pixels in the input_grid.
+actions:
+  - name: find_bounding_box
+    input: input_grid
+    output: [top, left, bottom, right] #coordinates
+    description: |
+      Find the minimum and maximum row and column indices
+      containing non-zero pixels.
+  - name: extract_subgrid
+    input:
+      - input_grid
+      - bounding_box
+    output: nonzero_subgrid
+    description: |
+      Extract the portion of the input_grid defined by the
+      bounding_box.

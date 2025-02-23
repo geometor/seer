@@ -1,0 +1,29 @@
+objects:
+  - name: green_pixels
+    color: 3
+    properties:
+      - adjacency:
+          adjacent_to: [green, background]
+      - diagonal_count:
+        0: variable
+        1: variable
+        2: variable
+        3: variable
+        4: variable
+      - changed_correctly: 0 # for all examples
+      - changed_incorrectly: variable
+      - transformation:
+          to: yellow
+          conditions:
+            - "at least two green diagonal neighbors"
+            - OR
+            - "completely surrounded by green neighbors (all 8)"
+    actions:
+        - change_color:
+            from: 3
+            to: 4
+
+  - name: background_pixels
+    color: 0
+    properties: []
+    actions: []

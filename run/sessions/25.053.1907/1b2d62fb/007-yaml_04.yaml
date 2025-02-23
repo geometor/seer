@@ -1,0 +1,26 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    elements: integers (0-9) representing colors
+    properties:
+      width: 7
+      height: 5
+  - object: output_grid
+    type: 2D array
+    elements: integers (0-9) representing colors
+    properties:
+      width: 3
+      height: 5
+  - object: blue_line
+    type: vertical line
+    color: blue (1)
+    location: column 4 (in input_grid)
+  - action: cropping
+    description: Select a sub-region of the input grid
+  - action: color_change
+    description: Change the color of specific pixels
+    details:
+      - from: blue (1)
+        to: azure (8)
+  - relationship: output_grid is derived from input_grid
+    transformation: cropping and color_change

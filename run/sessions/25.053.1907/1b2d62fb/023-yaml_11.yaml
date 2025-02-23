@@ -1,0 +1,41 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - contains_blue_line: True
+      - blue_line_color: 1
+      - blue_line_position: varies  # Column index where the blue line is found
+      - height: varies
+      - width: varies
+
+  - name: output_grid
+    type: grid
+    properties:
+      - height: same as input_grid
+      - width: 3
+      - background_color: 0  # White
+      - azure_pattern:
+          row_0: varies # [0, 8, 0] or [0,0,0]
+          row_1: varies # [0, 0, 8] or [0,8,8] or [0,0,0]
+          row_2: varies # [0, 8, 8] or [0,0,0]
+          row_3: varies # [8, 0, 0] or [0,8,8] or [0,0,0]
+          row_4: varies # [8, 0, 0] or [0,8,8] or [0,0,0]
+
+actions:
+  - name: find_blue_line
+    input: input_grid
+    output: blue_line_position
+
+  - name: create_output_grid
+    input: input_grid height, fixed width (3)
+    output: output_grid (initially all white)
+
+  - name: apply_azure_pattern
+    input: output_grid, row index
+    output: modified output_grid (with azure pixels)
+    rules:
+      - "If row index is even and row above has two azure, current row has zero azure"
+      - "If row index is even and row above has no azure, current row may have 1 azure in col 1, or 2 in cols 1 and 2"
+      - "If row index is even and row above has one azure, current row may have two azure at col 1 and 2"
+      - "If row index is odd, and row above has two azure, this row has two azure, but position is unknown"
+      - "If row index is odd, and row above has zero azure, this row has two azure, but position is unknown"

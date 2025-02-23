@@ -1,0 +1,34 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - dimensions: 8x10
+      - values: integers (0-9)
+  - name: output_grid
+    type: grid
+    properties:
+      - dimensions: 8x10
+      - values: integers (0-9)
+  - name: shape
+    type: contiguous_block
+    properties:
+      - color: gray (5)
+      - location: varies
+      - outline: left, top, and middle are one color, while right is a different one
+
+actions:
+  - name: replace_color
+    description: Replaces the color of the shape pixels.
+    parameters:
+      - original_color: gray (5)
+      - replacement_colors: azure (8) and red (2)
+      - location_based_replacment: True
+    constraints:
+      - "azure on leftmost, top and center"
+      - "red on the right"
+
+relationships:
+  - type: spatial
+    description: The output grid maintains the same spatial layout as the input grid.
+  - type: transformational
+    description: The shape in the input grid is transformed into a new shape in the output grid by changing colors based on location.

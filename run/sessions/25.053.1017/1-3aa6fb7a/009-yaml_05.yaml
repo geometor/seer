@@ -1,0 +1,34 @@
+facts:
+  - object: grid
+    description: 2D array of pixels
+    properties:
+      - width: 7
+      - height: 7
+      - cells: integers representing colors
+    relations:
+      - contains: azure_objects, blue_objects, white_objects
+
+  - object: azure_objects
+    description: Contiguous blocks of azure (8) pixels
+    properties:
+      - color: azure
+      - shape: variable
+    relations:
+      - adjacent_to: blue_objects (in output)
+
+  - object: blue_objects
+    description: Individual blue (1) pixels
+    properties:
+      - color: blue
+    relations:
+      - adjacent_to: azure_objects (in output)
+    notes: |
+       introduced during the transformation; not present in the original input.
+
+  - object: white_objects
+    description: contiguous block of white(0) pixels
+    properties:
+      - color: white
+    relations:
+      - surrounds: azure_objects, blue_objects
+    notes: the background

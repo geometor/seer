@@ -1,0 +1,15 @@
+objects:
+  - color: 8  # Azure
+    description: Contiguous regions of azure pixels.
+    properties:
+      top_row: The row index of the highest pixel(s) in the object.
+      rightmost_col_top: The column index of the rightmost pixel on the top row.
+      target_row: "top_row + 1"
+      target_col: "rightmost_col_top"
+actions:
+  - type: place_pixel
+    value: 1  # Blue
+    location:
+      relative_to: object
+      row_offset: 1  # One row below the top-rightmost pixel.
+      col_offset: 0

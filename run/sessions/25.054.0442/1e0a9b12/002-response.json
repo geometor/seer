@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is to collect all non-zero elements from the input grid and place them, maintaining their original horizontal order, in the last row of the output grid. The remaining cells of the output grid are filled with zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero elements to the bottom row,\n    maintaining their original horizontal order, and filling the rest with zeros.\n    \"\"\"\n    # Initialize the output grid with the same dimensions as the input, filled with zeros.\n    output_grid = np.zeros_like(input_grid)\n\n    # Extract all non-zero elements from the input grid.\n    non_zero_elements = [val for row in input_grid for val in row if val != 0]\n\n    # Place the non-zero elements in the last row of the output grid.\n    output_grid[-1, :len(non_zero_elements)] = non_zero_elements\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2023,
+    "candidates_token_count": 230,
+    "total_token_count": 2253,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.442474,
+  "response_file": "002-response.json"
+}

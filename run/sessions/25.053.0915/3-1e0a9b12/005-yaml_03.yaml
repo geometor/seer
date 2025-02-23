@@ -1,0 +1,28 @@
+observations:
+  - description: "The grid is 5x5."
+    type: "grid_size"
+    value: [5, 5]
+
+  - description: "Non-zero pixels move down."
+    type: "object_movement"
+    details:
+      - object: "blue pixel (1) at (0,3)"
+        moved_to: "(3,3)"
+      - object: "blue pixel (1) at (2,3)"
+        moved_to: "(4,3)"
+      - object: "green pixel (3) at (1,1)"
+        moved_to: "(3,1)"
+      - object: "green pixel (3) at (2,1)"
+        moved_to: "(4,1)"
+     
+      - object: "magenta pixel (6) at (3,0)"
+        moved_to: "(4,0)"
+      - object: "red pixel (2) at (2,4)"
+        moved_to: "(4,4)"
+
+  - description: "All pixels in the top two rows of the output grid become 0 (white)."
+    type: rule
+    details: "row index < 2 set value to 0."
+
+  - description: "The bottom three rows are a shifted version of the input."
+    type: observation

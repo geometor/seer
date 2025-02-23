@@ -1,0 +1,57 @@
+observations:
+  - example: 1
+    input_objects:
+      - type: row
+        pattern: [0, 0, 0, 0, 0, 2, 0, 8]
+        start_index: 0
+        repeats: false #repeats within the row
+      - type: grid
+        repeating_rows: true
+        row_pattern_repeats: 5
+        row_pattern: [0,0,0,0,0,2,0,8]
+        stack_pattern: [[0, 0, 0, 0, 0, 2, 0, 8]]
+
+  - example: 2
+    input_objects:
+      - type: row
+        pattern: [0, 0, 0, 0, 0, 1, 0, 0, 3]
+        repeats: false
+      - type: grid
+        repeating_rows: true
+        row_pattern_repeats: 3
+        row_pattern: [0,0,0,0,0,1,0,0,3]
+        stack_pattern: [[0, 0, 0, 0, 0, 1, 0, 0, 3]]
+
+  - example: 3
+    input_objects:
+      - type: row
+        pattern: [2]
+        repeats: false
+      - type: row
+        pattern: [3]
+        repeats: false
+      - type: row
+        pattern: [0]
+        repeats: true # a row of all zeros
+      - type: grid
+        repeating_rows: true
+        row_pattern_repeats: 1 # not used
+        row_pattern: null
+        stack_pattern: [[2],[0],[3],[0]]
+
+  - example: 4
+    input_objects:
+      - type: row
+        pattern: [4]
+        repeats: false
+      - type: row
+        pattern: [1]
+        repeats: false
+      - type: row
+        pattern: [0]
+        repeats: true
+      - type: grid
+        repeating_rows: true
+        row_pattern_repeats: 1 # not used
+        row_pattern: null
+        stack_pattern: [[4], [0], [0], [0], [1], [0], [0], [0]]

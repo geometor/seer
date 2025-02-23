@@ -1,0 +1,16 @@
+objects:
+  - name: maroon_pixel
+    color: 9
+    behavior: moves to the bottom row, maintaining column
+  - name: azure_pixels
+    color: 8
+    behavior: vertically stacked instances consolidate to the lower cell, maintaining columns
+  - name: other_colored_pixels
+    colors: [1, 2, 3, 4, 6, 7]
+    behavior: move downwards, maintaining original columns, stacking on the bottom-most available row, or on top of other objects.
+
+actions:
+  - name: move_down
+    description: Objects move to the lowest available row in their original column.
+  - name: consolidate
+    description:  If multiple objects of the same color are stacked vertically, they merge into the lowest occupied position.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify \"L\"-shaped azure colored objects, and changes the \"inside\" pixel from azure to blue while all other pixels remain the same.\n\"\"\"\n\nimport numpy as np\n\ndef is_l_shape(grid, r, c, color):\n    \"\"\"Checks if the cell at (r, c) is part of an L-shape of the given color.\"\"\"\n    if grid[r, c] != color:\n        return False\n\n    rows, cols = grid.shape\n    count = 0\n    neighbors = []\n\n    # Check adjacent cells\n    if r > 0 and grid[r-1, c] == color:\n        count += 1\n        neighbors.append((r - 1, c))\n    if r < rows - 1 and grid[r+1, c] == color:\n        count += 1\n        neighbors.append((r + 1, c))\n    if c > 0 and grid[r, c-1] == color:\n        count += 1\n        neighbors.append((r, c - 1))\n    if c < cols - 1 and grid[r, c+1] == color:\n        count += 1\n        neighbors.append((r, c + 1))\n\n    # Check if it forms an L-shape (exactly two neighbors that are either both horizontal or both vertical)\n    if count == 2:\n        if neighbors[0][0] == neighbors[1][0] or neighbors[0][1] == neighbors[1][1]:  # Check rows or cols\n            return True\n\n    return False\n    \ndef find_l_shapes(grid, color):\n    \"\"\"Finds all pixels that are part of L-shapes of a given color.\"\"\"\n    l_shapes = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if is_l_shape(grid, r, c, color):\n               l_shapes.append((r,c))\n    return l_shapes\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the L-shape rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    azure = 8\n    blue = 1\n\n    l_shape_coords = find_l_shapes(input_grid, azure)\n    \n    \n    rows, cols = input_grid.shape\n\n    for r, c in l_shape_coords:\n       # Check adjacent cells for the 'inside' pixel to turn blue\n        if r > 0 and r+1 < rows and input_grid[r-1,c] == azure and input_grid[r+1,c] == azure:\n             output_grid[r,c] = blue\n        elif c > 0 and c+1 < cols and input_grid[r,c-1] == azure and input_grid[r,c+1] == azure:\n             output_grid[r,c] = blue        \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3238,
+    "candidates_token_count": 682,
+    "total_token_count": 3920,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.945488,
+  "response_file": "008-response.json"
+}

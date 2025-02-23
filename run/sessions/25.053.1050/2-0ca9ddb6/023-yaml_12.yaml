@@ -1,0 +1,49 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - height: variable
+      - width: variable
+      - cells: integers (0-9 representing colors)
+
+  - name: pixel
+    properties:
+      - color: integer (0-9)
+      - row: integer
+      - column: integer
+
+  - name: blue_pixel
+    instance_of: pixel
+    properties:
+      - color: 1
+
+  - name: red_pixel
+    instance_of: pixel
+    properties:
+      - color: 2
+
+  - name: yellow_pixel
+    instance_of: pixel
+    properties:
+      - color: 4
+
+  - name: orange_pixel
+    instance_of: pixel
+    properties:
+      - color: 7
+  - name: magenta_pixel
+    instance_of: pixel
+    properties:
+      - color: 6
+
+actions:
+  - name: mirror
+    input: pixel coordinates (row, col), grid dimensions (height, width)
+    output: mirrored pixel coordinates (mirrored_row, mirrored_col)
+    description: Reflects the pixel's position across the center of the grid.
+    formula: mirrored_row = height - 1 - row; mirrored_col = width - 1 - col
+
+  - name: place_orange_L
+    input: blue pixel coordinates (row, col), grid dimensions
+    output: places orange pixels around the blue pixel
+    description: Places orange pixels (7) in an "L" shape around a blue pixel, respecting grid boundaries.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Initialization:** Create an output grid of the same size as the input grid, filled entirely with zeros.\n2.  **Row-by-Row Processing:** Iterate through the input grid row by row.\n3.  **Collect Non-Zero Elements:** For each row:\n    *   Collect all non-zero elements, *preserving their original order within that row*.\n4.  **Placement in Output:**\n    *   Start at the *last* row of the output grid.\n    *   Place the collected elements from the current input row, from left to right, into the current output row.\n    *   If the current output row is full, move to the row *above* and continue placing elements from left to right.\n5.  **Iteration:** Repeat steps 3 and 4 for each row in the input grid.\n6. **Result:** The output grid now contains all non-zero elements from the input, arranged at the bottom, preserving the original relative horizontal order *of elements within each row*. All other cells in the output are zero.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid with zeros and the same shape as the input.\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = output_grid.shape\n\n    # Start placing non-zero elements from the last row.\n    current_row = rows - 1\n    current_col = 0\n\n    # Iterate through the input grid row by row.\n    for input_row in range(rows):\n        # Collect non-zero elements from the current row, preserving order.\n        non_zero_elements = []\n        for input_col in range(cols):\n            if input_grid[input_row, input_col] != 0:\n                non_zero_elements.append(input_grid[input_row, input_col])\n\n        # Place the collected elements in the output grid.\n        for element in non_zero_elements:\n            output_grid[current_row, current_col] = element\n            current_col += 1\n\n            # If the current output row is full, move to the next row up.\n            if current_col == cols:\n                current_col = 0\n                current_row -= 1\n                # Handle case where we run out of rows (top reached).\n                if current_row < 0:\n                    current_row = rows - 1 # wrap back to the bottom\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3385,
+    "candidates_token_count": 562,
+    "total_token_count": 3947,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.265051,
+  "response_file": "006-response.json"
+}

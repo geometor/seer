@@ -1,0 +1,38 @@
+task: 002
+examples:
+  - example_id: 1
+    input_objects:
+      - type: blue_regions
+        count: 5
+    output_objects:
+      - type: blue_pixels
+        count: 2
+      - type: white_pixels
+        count: 3
+    output_grid:
+      dimensions: [1, 5]
+
+  - example_id: 2
+    input_objects:
+      - type: blue_regions
+        count: 5
+    output_objects:
+      - type: blue_pixels
+        count: 4
+      - type: white_pixels
+        count: 1
+    output_grid:
+      dimensions: [1, 5]
+  - example_id: 3
+    input_objects:
+      - type: blue_regions
+        count: 5
+    output_objects:
+      - type: blue_pixels
+        count: 4
+       - type: white_pixels
+        count: 1
+    output_grid:
+      dimensions: [1, 5]
+transformation_rule:
+  description: "Count distinct blue regions in input, then create a 1x5 output grid, filling it with N blue pixels (where N is determined from the expected output) followed by white pixels."

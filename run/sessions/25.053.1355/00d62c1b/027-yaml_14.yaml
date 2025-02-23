@@ -1,0 +1,45 @@
+examples:
+  - example_id: 1
+    input_grid_size: [6, 6]
+    output_grid_size: [6, 6]
+    input_colors: {0: 32, 3: 4}
+    output_colors: {0: 32, 3: 2, 4: 2}
+    match: False
+    pixels_off: 2
+    notes: "Simple case with a 2x2 green square. Demonstrates the core concept, but highlights the need to improve neighborhood definition."
+
+  - example_id: 2
+    input_grid_size: [10, 10]
+    output_grid_size: [10, 10]
+    input_colors: {0: 87, 3: 13}
+    output_colors: {0: 87, 3: 12, 4: 1}
+    match: False
+    pixels_off: 7
+    notes: "More complex shape, including a single isolated green, multiple 2x2 blocks and one larger 3x2 block."
+
+  - example_id: 3
+    input_grid_size: [10, 10]
+    output_grid_size: [10, 10]
+    input_colors: {0: 79, 3: 21}
+    output_colors: {0: 79, 3: 15, 4: 6}
+    match: False
+    pixels_off: 20
+    notes: "Highlights a pattern in the interior of the image, multiple 2x2 block and several pixels missed."
+
+  - example_id: 4
+    input_grid_size: [10, 10]
+    output_grid_size: [10, 10]
+    input_colors: {0: 81, 3: 19}
+    output_colors: {0: 81, 3: 14, 4: 5}
+    match: False
+    pixels_off: 31
+    notes: "Demonstrates need for more robust corner detection in 2x2 blocks, misses some corner connections."
+
+  - example_id: 5
+    input_grid_size: [20, 20]
+    output_grid_size: [20, 20]
+    input_colors: {0: 368, 3: 32}
+    output_colors: {0: 368, 3: 21, 4: 11}
+    match: False
+    pixels_off: 87
+    notes: "Larger, more complex grid with many green blocks; illustrates how the error scales with increased complexity and larger 2x2 blocks or groups of them."

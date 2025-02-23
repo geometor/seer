@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the longest vertical line of blue (1) pixels** in the input grid. Record its starting row, column index, and length.\n2.  **Determine Output Grid Height:** The output grid has the same height as the length of the identified blue line.\n3.  **Determine the Region and Output Grid Width:**\n    - initialize the output grid width as 1.\n    - iterate through each row within the length of the blue vertical line.\n    - For each row:\n        - If the pixel to the *left* of the blue pixel is 0, then add a column to the beginning of the output grid.\n        - If the pixel to the *right* of the blue pixel is 0, then add a column to the end of the output grid.\n4.  **Create and Populate output grid:** Create the correctly sized and shaped output grid filled with white (0).\n    - Iterate through each row within the length of the blue vertical line.\n    - For each row:\n        - populate the central pixel with azure (8)\n        - If the pixel to the *left* of the blue pixel is 0, populate the left pixel with azure (8)\n        - If the pixel to the *right* of the blue pixel is 0, populate the right pixel with azure (8).\n5.  **Return** the resulting output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, value):\n    \"\"\"Finds the longest vertical line of a specific value in a grid.\"\"\"\n    rows, cols = grid.shape\n    max_len = 0\n    start_row = -1\n    col_index = -1\n\n    for j in range(cols):\n        current_len = 0\n        current_start_row = -1\n        for i in range(rows):\n            if grid[i, j] == value:\n                if current_len == 0:\n                    current_start_row = i\n                current_len += 1\n            else:\n                if current_len > max_len:\n                    max_len = current_len\n                    start_row = current_start_row\n                    col_index = j\n                current_len = 0\n                current_start_row = -1\n        # Check for line at the end of the column\n        if current_len > max_len:\n            max_len = current_len\n            start_row = current_start_row\n            col_index = j\n\n    return start_row, col_index, max_len\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # 1. Find the longest vertical line of blue (1) pixels\n    start_row, col_index, length = find_vertical_line(input_grid, 1)\n\n    # 2. Determine Output Grid Height (same as the length of the blue line)\n    output_height = length\n\n    # 3. Determine Output Grid Width and Region\n    output_width = 1\n    left_offset = 0  # how many columns added to the left\n    right_offset = 0 # how many columns added to the right\n   \n    for i in range(length):\n      row = start_row + i\n      # left\n      if col_index > 0 and input_grid[row, col_index-1] == 0:\n          left_offset = 1\n      # right\n      if col_index < input_grid.shape[1]-1 and input_grid[row, col_index + 1] == 0:\n          right_offset = 1\n\n    output_width = left_offset + output_width + right_offset\n\n    # 4. Create and Populate output grid\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    for i in range(length):\n        row_in_input = start_row + i\n        \n        # Central pixel (always azure)\n        output_grid[i, left_offset] = 8\n\n        # Check left neighbor\n        if col_index > 0 and input_grid[row_in_input, col_index - 1] == 0:\n            output_grid[i, 0] = 8\n\n        # Check right neighbor\n        if col_index < input_grid.shape[1] - 1 and input_grid[row_in_input, col_index + 1] == 0 :\n            output_grid[i, output_width - 1] = 8\n\n    # 5. Return the output grid\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4182,
+    "candidates_token_count": 1059,
+    "total_token_count": 5241,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.743153,
+  "response_file": "004-response.json"
+}

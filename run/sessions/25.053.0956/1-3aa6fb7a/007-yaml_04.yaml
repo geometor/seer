@@ -1,0 +1,30 @@
+facts:
+  - object: grid
+    description: 2D array of pixels
+    properties:
+      - width: 7
+      - height: 7
+      - cell_values: [0-9]
+
+  - object: pixel
+    properties:
+      - color:
+          mapping:
+            0: white
+            1: blue
+            8: azure
+
+  - observation: input_grid
+    description: Initial state of the grid
+    details: Contains white and azure pixels
+
+  - observation: output_grid
+    description: Transformed state of the grid
+    details: Contains white, azure, and blue pixels
+
+  - action: replacement
+    description: some azure pixels are changed
+    details: changed to blue pixels
+
+  - relationship: spatial_proximity
+    description: The blue pixels appear near the original azure pixels. They sometimes replace an 8 on the inside of a cluster of 8s and sometimes appear diagonally adjacent on the outside.

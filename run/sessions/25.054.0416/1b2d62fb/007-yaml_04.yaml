@@ -1,0 +1,26 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      colors: [0, 1, 9] # white, blue, maroon
+      shape: rectangle
+      dimensions: [5, 7] # rows, cols
+  - object: output_grid
+    type: grid
+    properties:
+      colors: [0, 8]    # white, azure
+      shape: rectangle
+      dimensions: [5, 3] # rows, cols
+  - object: blue_line
+    type: feature
+    properties:
+      color: 1         # blue
+      orientation: vertical
+      location: column_4 # in the input grid
+  - action: abstract
+    description: Create a simplified representation
+    input: input_grid
+    output: output_grid
+  - action: extract_region
+    description: extracts a region of all 8s, using the blue line as a base and shifting it to the right.
+    input: blue_line

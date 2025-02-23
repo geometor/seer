@@ -1,0 +1,31 @@
+observations:
+  - task: 028c975b
+  - type: ARC_task
+  - objects:
+    - id: input_grid
+      type: grid
+      properties:
+        shape: variable  # (rows, cols) varies across examples
+        values: integers [0-9]
+    - id: output_grid
+      type: grid
+      properties:
+        shape: (input_rows, 3)  # Always 3 columns, same rows as input
+        values: integers [0, 8]  # Only 0 and 8 are present
+    - id: fourth_column
+      type: grid_column
+      properties:
+          column_index: 3
+          values: integers [0,1] #contains only zero and one
+  - actions:
+    - type: extract_columns
+      input: input_grid
+      parameters: [0, 1, 2]  # First three columns
+      output: output_grid_initial
+    - type: conditional_replace
+      input: [output_grid_initial, input_grid]
+      parameters:
+        condition: "if input_grid[row, col] == 0 AND input_grid[row, 3] != 1 then output_grid[row, col] = 8, else if input_grid[row,col] !=0 then output_grid[row,col] = 0"
+        row: [0, input_rows - 1]
+        col: [0, 1, 2]
+      output: output_grid

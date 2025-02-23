@@ -1,0 +1,19 @@
+facts:
+  - type: grid
+    description: 2D array of integers (0-9) representing colors.
+    properties:
+      - dimensions: height and width are equal, and constant across input/output.
+      - values: integers in the range 0-9.
+  - type: object
+    description: contiguous block of pixels of the same color.
+    properties:
+      - color: integer value representing the color.
+      - location: row and column indices in the grid.
+  - type: transformation
+    description: modification of the grid based on specific rules.
+    actions:
+      - identify: find all pixels with the value '3'.
+      - modify: change the color of pixels that are direct horizontal or vertical neighbors (not diagonal) to '3', by updating the to value '4'.
+      - preserve: keeps the original pixels that were '3' as '3'.
+    constraints:
+      - spatial: only directly adjacent (up, down, left, right) pixels are affected, not diagonals.

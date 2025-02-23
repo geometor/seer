@@ -1,0 +1,17 @@
+objects:
+  - id: azure_pixels
+    color: azure (8)
+    description: Original pixels in the input grid.
+  - id: blue_pixels
+    color: blue (1)
+    description: New pixels introduced in the output grid.
+
+actions:
+  - name: introduce_blue
+    description: Add blue pixels based on the position of azure pixels.
+    rule: "If an azure pixel is at location (r, c), then if there isn't an
+      adjacent azure pixel at (r,c+1), add a single blue
+      pixel to the right at location (r, c + 1). If an azure
+      pixel has an adjacent pixel to its left (r,c-1),
+      add a blue pixel directly before that left neighbor.
+      "

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify all objects**: An object is defined as a single pixel.\n2.  **Shift Down**: Every object in the grid attempts to move down by one row.\n3. **Blocked**: Objects that have another object directly beneath it in the input grid do not change their position.\n4.  **Bottom Right**: If there is a maroon (9) pixel, it moves to the bottom-right corner of the grid, regardless of whether it's blocked. The existing value in bottom-right is removed.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Shift Down and Blocked\n    for r in range(rows - 1, -1, -1):  # Iterate from bottom to top\n        for c in range(cols):\n            if r < rows - 1:  # Not the bottom row\n                if input_grid[r+1, c] == 0: # if empty space below, we can move down\n                    output_grid[r+1, c] = input_grid[r,c]\n                    output_grid[r,c] = 0 # clear original location since it moved\n\n    # Bottom Right (Maroon 9)\n    maroon_present = False\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 9:\n                maroon_present = True\n                output_grid[r, c] = 0  # Clear the original maroon position\n                break  # only one maroon, exit inner loop.\n        if maroon_present:\n            break\n    if maroon_present:\n        output_grid[rows - 1, cols - 1] = 9\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3915,
+    "candidates_token_count": 433,
+    "total_token_count": 4348,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.84113,
+  "response_file": "010-response.json"
+}

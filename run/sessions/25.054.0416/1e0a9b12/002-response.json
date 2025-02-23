@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify all non-zero elements in the input grid. Move these non-zero elements to the last row of the output grid, maintaining their original order from left to right, top to bottom as they appeared in the input. Fill all other cells of the output grid with zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid, then filled with zeros.\n    output_grid = np.zeros_like(input_grid)\n    \n    # Flatten the input grid and filter out the zero elements\n    non_zero_elements = input_grid[input_grid != 0]\n\n    # Place the non_zero elements in the last row of the output grid.\n    output_grid[-1, :len(non_zero_elements)] = non_zero_elements\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2037,
+    "candidates_token_count": 197,
+    "total_token_count": 2234,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.057571,
+  "response_file": "002-response.json"
+}

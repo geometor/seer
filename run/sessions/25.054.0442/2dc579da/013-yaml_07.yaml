@@ -1,0 +1,41 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      colors: [green, blue, azure]
+      dimensions: 11x11
+      elements:
+        - color: green
+          value: 3
+          shape: background
+        - color: blue
+          value: 1
+          shape: vertical_stripe, horizontal_line
+          position: center_vertical, center_horizontal
+        - color: azure
+            value: 8
+            shape: single_pixel
+            position: left_of_vertical_stripe, row 3
+
+  - name: output_grid
+    type: grid
+    properties:
+      colors: [green, azure]
+      dimensions: 5x5
+      elements:
+        - color: green
+          value: 3
+          shape: background
+        - color: azure
+          value: 8
+          shape: single_pixel
+          position: row 3, column 2
+
+relationships:
+  - type: cropping
+    subject: input_grid
+    object: output_grid
+    description: The output grid is a cropped section of the top-left portion of the input grid.
+  - type: color_removal
+      subject: input_grid
+      colors_removed: [blue]

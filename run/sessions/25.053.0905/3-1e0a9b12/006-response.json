@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. For each column in the input grid:\n2. Collect all non-zero values within that column, maintaining their original top-to-bottom order.\n3. In the same column of the output grid, place these collected values starting from the top-most row and stacking them downwards, filling only previously empty cells.\n4. Leave columns that were entirely zeros in the input grid unchanged (all zeros) in the output grid.\n5. Any remaining unfilled cells in the output grid remain or become zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the column-wise stacking rule.\"\"\"\n\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = output_grid.shape\n\n    for j in range(cols):  # Iterate through columns\n        column_values = []\n        for i in range(rows):\n            if input_grid[i, j] != 0:\n                column_values.append(input_grid[i, j])\n\n        # Place values in the same column, stacking downwards\n        row_idx = 0\n        for val in column_values:\n            while row_idx < rows and output_grid[row_idx, j] != 0:\n              row_idx+=1\n            if (row_idx < rows):\n              output_grid[row_idx, j] = val\n            row_idx += 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5987,
+    "candidates_token_count": 329,
+    "total_token_count": 6316,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.579708,
+  "response_file": "006-response.json"
+}

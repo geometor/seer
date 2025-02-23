@@ -1,0 +1,20 @@
+facts:
+  - task: "Change green pixels to yellow within a green object."
+  - objects:
+      - color: 3  # Green
+        type: "contiguous shape"
+        properties:
+          - "can vary in size and shape"
+          - "pixels within the shape can change color"
+  - actions:
+      - find: "contiguous shapes of color 3"
+      - transform:
+          color_change:
+            from: 3  # Green
+            to: 4  # Yellow
+          conditions:
+            - "Applies to multiple pixels within the green shape"
+            - "Exact positions change are relative to the overall shape and inner adjacencies"
+  - constraints:
+    - "Only pixels within the identified green object are affected."
+    - "Pixels outside the object remain unchanged."

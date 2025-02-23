@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Azure Objects: Find all contiguous groups of azure (8) colored pixels.  Each group is considered a separate object.\n\n2.  Find Top-Left and Top-Right Pixels:  For *each* identified azure object:\n    *   Find the top-left most pixel. If the object is more than one pixel, transform the pixel to blue.\n    *   Find the top-right most pixel. If the object is more than one pixel, transform the pixel to blue.\n\n3.  Output: The output grid is a copy of the input grid, but with the top-left and top-right pixels of all azure objects are changed to blue (1).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = set()\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not (0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef find_top_left_pixel(object_pixels):\n    # Sort by row (ascending) then by column (ascending)\n    sorted_pixels = sorted(object_pixels, key=lambda x: (x[0], x[1]))\n    return sorted_pixels[0]\n\ndef find_top_right_pixel(object_pixels):\n    # Sort by row (ascending) then by column (descending)\n    sorted_pixels = sorted(object_pixels, key=lambda x: (x[0], -x[1]))\n    return sorted_pixels[0]\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find azure objects\n    azure_objects = find_objects(input_grid, 8)\n\n    # Change the color of the top-left and top-right pixel of each azure object to blue\n    for obj in azure_objects:\n        if len(obj) > 1:\n            top_left_pixel = find_top_left_pixel(obj)\n            output_grid[top_left_pixel]=1\n            top_right_pixel = find_top_right_pixel(obj)\n            output_grid[top_right_pixel]=1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2788,
+    "candidates_token_count": 694,
+    "total_token_count": 3482,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.407584,
+  "response_file": "004-response.json"
+}

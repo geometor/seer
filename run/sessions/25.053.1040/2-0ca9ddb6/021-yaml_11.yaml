@@ -1,0 +1,23 @@
+facts:
+  - object: grid
+    properties:
+      - dimensions: variable (rows x cols)
+      - cells: contain integer values 0-9 representing colors
+  - object: pixel
+    properties:
+      - color: integer value (0-9)
+      - position: (row, col) index
+      - neighbors: up to 4 adjacent pixels (up, down, left, right)
+  - action: expansion
+    description: White pixels change color based on neighboring non-white pixels.
+    rules:
+      - condition: neighbor is red (2)
+        result: white pixel becomes yellow (4)
+      - condition: neighbor is blue (1)
+        result: white pixel becomes orange (7)
+      - condition: neighbor is magenta (6)
+        result: no change
+      - condition: neighbor is any color other than 0, 1, 2, or 6
+        result: no change
+      - condition: white pixel is next to same color.
+        result: no change

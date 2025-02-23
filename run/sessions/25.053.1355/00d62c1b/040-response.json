@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Shapes:** Find all contiguous regions of green (3) pixels. These constitute the \"green shapes.\"\n\n2.  **Identify Boundaries:** For each green shape, find its boundary pixels. A boundary pixel is a green pixel that is directly adjacent (up, down, left, or right) to a non-green pixel (the background, color 0).\n\n3. **Identify Interior:** For each green shape, identify the interior pixels. An interior pixel is any pixel that meets all these criteria:\n    *   it is color 3 (green)\n    *   it is not a boundary pixel\n    *   it can be reached from another interior or boundary pixel by a path composed only of color 3 pixels\n\n4.  **Fill Interior:** Change the color of all identified interior pixels to yellow (4).\n\n5.  **Preserve Background:** All pixels that are not part of a green shape's interior (i.e., the background and any other non-green, non-interior pixels) remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef find_contiguous_regions(grid, color):\n    \"\"\"Finds all contiguous regions of a given color in the grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    def dfs(row, col, current_region):\n        \"\"\"Depth-first search to find contiguous pixels.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        current_region.append((row, col))\n        dfs(row + 1, col, current_region)\n        dfs(row - 1, col, current_region)\n        dfs(row, col + 1, current_region)\n        dfs(row, col - 1, current_region)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_region = []\n                dfs(row, col, current_region)\n                regions.append(current_region)\n    return regions\n\ndef find_boundary_pixels(grid, region):\n    \"\"\"Finds boundary pixels of a region (adjacent to a different color).\"\"\"\n    boundary = []\n    for r, c in region:\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            nr, nc = r + dr, c + dc\n            if (\n                0 <= nr < grid.shape[0]\n                and 0 <= nc < grid.shape[1]\n                and grid[nr, nc] != 3\n            ):\n                boundary.append((r, c))\n                break  # Once a neighbor of a different color is found, it's a boundary\n    return boundary\n\ndef find_interior_pixels(grid, region, boundary):\n    \"\"\"\n    Finds interior pixels of region bounded by the boundary.\n    Interior pixels are the green pixels that are not boundary pixels.\n    \"\"\"\n    \n    interior = []\n\n    for r, c in region:\n        if (r,c) not in boundary:\n            interior.append((r,c))\n    \n    return interior\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by filling the interior of green shapes with yellow.\"\"\"\n    output_grid = input_grid.copy()\n    green_regions = find_contiguous_regions(input_grid, 3)  # Find green shapes\n\n    for region in green_regions:\n        boundary = find_boundary_pixels(input_grid, region) # identify boundary\n        interior = find_interior_pixels(input_grid, region, boundary) # find interior\n\n        for r, c in interior:\n            output_grid[r,c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7799,
+    "candidates_token_count": 933,
+    "total_token_count": 8732,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.624243,
+  "response_file": "040-response.json"
+}

@@ -1,0 +1,56 @@
+objects:
+  - name: Grid
+    type: 2D Array
+    elements: Pixels
+    properties:
+      rows: Variable (1-30)
+      cols: Variable (1-30)
+      cell_values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] # Colors
+  - name: Pixel
+    properties:
+      color:  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      coordinates: (row, col)
+      neighbor_types:
+        adjacent:  # Directly touching, no diagonals
+          - distance: 1  # L1 distance
+          - colors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        l1_distance_2:
+          - distance: 2  # L1 distance
+          - colors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+actions:
+  - name: ChangeColor
+    preconditions:
+      - object: Pixel
+        property: color
+        value: 0  # White
+      - object: Neighbor Pixel (Adjacent)
+        property: color
+        value: 8  # Azure
+    postconditions:
+      - object: Pixel
+        property: color
+        new_value: 7  # Orange
+  - name: ChangeColor
+    preconditions:
+      - object: Pixel
+        property: color
+        value: 0  # White
+      - object: Neighbor Pixel (L1 Distance 2)
+        property: color
+        value:
+          - 1  # Blue
+          - 2  # Red
+    postconditions:
+      - object: Pixel
+        property: color
+        new_value: 4  # Yellow
+  - name: NoChange
+    preconditions:
+        - object: Pixel
+          property: color
+          value: 6
+    postconditions:
+      - object: Pixel #Any Other Pixel
+        property: color
+        new_value: No Change

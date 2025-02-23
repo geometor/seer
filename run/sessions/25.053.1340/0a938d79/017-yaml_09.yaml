@@ -1,0 +1,26 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - colors: [white, red, green]
+      - red_pixel_location: [5,0]
+      - green_pixel_location: [7,8]
+      - dimensions: [22, 9]
+
+  - name: output_grid
+    type: grid
+    properties:
+      - colors: [white, red, green]
+      - dimensions: [22, 9]
+
+actions:
+  - name: extend_color_horizontally
+    description: Replaces all pixels in a row with the color of a specific pixel in that row.
+  - name: repeat_color_line
+    description: extend_color_horizontally for specific rows, and then repeat that through out the grid
+
+relationships:
+  - type: transformation
+    from: input_grid
+    to: output_grid
+    rule: "Replicate red and green pixels horizontally and create repeating blocks."

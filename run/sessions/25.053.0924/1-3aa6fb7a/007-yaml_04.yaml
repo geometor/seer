@@ -1,0 +1,30 @@
+objects:
+  - color: 8  # Azure
+    type: pixel_group
+    instances:
+      - id: 1
+        coordinates: [[0, 4], [0, 5]]  # Example: Top-right cluster
+      - id: 2
+        coordinates: [[1,5]]
+      - id: 3
+        coordinates: [[2,2]]
+      - id: 4
+        coordinates: [[3,2],[3,3]]
+      - id: 5
+         coordinates: [[5,4]]
+      - id: 6
+        coordinates: [[6,3],[6,4]]
+  - color: 1  # Blue
+    type: inserted_pixel
+    instances:
+      - coordinates: [1, 4]  #  Next to azure cluster
+        neighbor_count: 3
+      - coordinates: [2, 3]  #  Next to azure cluster
+        neighbor_count: 3
+      - coordinates: [5, 3]
+        neighbor_count: 3
+
+transformations:
+    - type: insertion
+      description: Insert '1' (blue) pixels near '8' (azure) pixel groups.
+      details: Each inserted '1' pixel is adjacent to three '8' pixels, at least one of which is adjacent on a side, not a corner.

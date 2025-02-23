@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies rows with colored pixels in the input grid. Extends those colored pixels horizontally across their respective rows, handling single and multiple colors. The output grid alternates these extended color rows with blank (all-zero) rows, repeating this pattern until the output grid is filled.\n\"\"\"\n\nimport numpy as np\n\ndef get_colored_rows(grid):\n    # Find rows that have at least one non-zero pixel.\n    colored_rows = []\n    for i, row in enumerate(grid):\n        if np.any(row != 0):\n            colored_rows.append(i)\n    return colored_rows\n\ndef extend_colors_horizontally(grid, row_index):\n    # Extend colors horizontally, handling single and multiple colors.\n    rows, cols = grid.shape\n    extended_row = np.zeros(cols, dtype=int)\n    non_zero_pixels = grid[row_index][grid[row_index] != 0]\n    unique_colors = np.unique(non_zero_pixels)\n\n    if len(unique_colors) == 1:\n        # If only one color, fill the entire row.\n        extended_row[:] = unique_colors[0]\n    else:\n        # If multiple colors, create a repeating sequence.\n        for j in range(cols):\n            extended_row[j] = unique_colors[j % len(unique_colors)]\n    return extended_row\n\ndef transform(input_grid):\n    # Initialize output_grid as all zeros with the same dimensions as input.\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows, cols), dtype=int)\n\n    # Identify rows with colored pixels.\n    colored_rows_indices = get_colored_rows(input_grid)\n\n    # Create the repeating output pattern.\n    output_row_index = 0\n    colored_row_index = 0\n    \n    while output_row_index < rows:\n        if colored_row_index < len(colored_rows_indices):\n           # Extend the colored row.\n            extended_row = extend_colors_horizontally(input_grid, colored_rows_indices[colored_row_index])\n            output_grid[output_row_index, :] = extended_row\n            output_row_index += 1\n\n            # Add a blank row if there is space.\n            if output_row_index < rows:\n                output_row_index += 1 # Already initialized to zeros\n        else:\n            # Reset to repeat the pattern.\n            colored_row_index = 0\n            continue # Check if output_row_index is still valid.\n\n        colored_row_index += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8074,
+    "candidates_token_count": 620,
+    "total_token_count": 8694,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.851916,
+  "response_file": "024-response.json"
+}

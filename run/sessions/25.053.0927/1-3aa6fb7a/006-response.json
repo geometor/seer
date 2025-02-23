@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** all *horizontal sequences* of one or more contiguous azure pixels (value `8`) in each row of the input grid.\n2.  **Preserve** all azure pixels in these sequences in their original positions in the output grid.\n3.  **For each row**, *if* there is a horizontal azure sequence:\n    *   **Introduce** a *single* blue pixel (value `1`) immediately to the right of the *end* of the azure pixel sequence, if there is available space within the grid boundaries and in the current row.\n    *   **Introduce** a *single* blue pixel (value `1`) immediately to the left of the *start* of the azure pixel sequence, if there is available space within the grid boundaries and in the current row.\n4.  **Fill** all other positions in the output grid with `0` (white).\n\"\"\"\n\nimport numpy as np\n\ndef get_horizontal_sequences_per_row(grid, value):\n    sequences_per_row = []\n    for row in range(grid.shape[0]):\n        row_sequences = []\n        in_sequence = False\n        start = -1\n        for col in range(grid.shape[1]):\n            if grid[row, col] == value:\n                if not in_sequence:\n                    in_sequence = True\n                    start = col\n            elif in_sequence:\n                in_sequence = False\n                row_sequences.append(((row, start), (row, col - 1)))\n                start = -1\n        if in_sequence:\n            row_sequences.append(((row, start), (row, grid.shape[1] - 1)))\n        sequences_per_row.append(row_sequences)\n    return sequences_per_row\n\ndef transform(input_grid):\n    # Initialize output_grid with zeros (white)\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get horizontal sequences of azure pixels (value 8) for each row\n    azure_sequences_per_row = get_horizontal_sequences_per_row(input_grid, 8)\n    \n    # Process each row separately\n    for row_sequences in azure_sequences_per_row:\n        # Preserve azure pixels in the output grid\n        for start, end in row_sequences:\n            for col in range(start[1], end[1] + 1):\n                output_grid[start[0], col] = 8\n\n        # Introduce blue pixels (value 1) at the boundaries of azure sequences in the same row\n        for start, end in row_sequences:\n            # To the left of the start\n            if start[1] - 1 >= 0:\n                output_grid[start[0], start[1] - 1] = 1\n            # To the right of the end\n            if end[1] + 1 < output_grid.shape[1]:\n                output_grid[end[0], end[1] + 1] = 1\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3189,
+    "candidates_token_count": 695,
+    "total_token_count": 3884,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.29655,
+  "response_file": "006-response.json"
+}

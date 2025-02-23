@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Center Column:** Find the vertical column in the input grid that contains a contiguous line of blue (1) pixels. This is the center column.\n2.  **Determine Extraction Region:** Define a 5x3 region centered on the identified center column. The vertical position is determined such that the first row of the blue is always in position row 1.\n3.  **Extract Region:** Create new output by copying the 5x3 extraction region.\n4. **Color Replacement**: Within the extracted region\n    - all blue (1) pixels are changed to azure (8).\n    - All other colors are converted to black (0).\n\n5.  **Output:** The resulting 5x3 modified subgrid is the output.\n\"\"\"\n\nimport numpy as np\n\ndef find_blue_line_center(grid):\n    # Find the column indices where blue (1) forms a vertical line\n    rows, cols = grid.shape\n    for j in range(cols):\n        for i in range(rows):\n            if grid[i,j] == 1:\n                if all(grid[k, j] == 1 for k in range(i, rows) if k < rows):\n                  return j, i\n    return -1, -1\n\n\ndef transform(input_grid):\n    # Convert input_grid to a NumPy array\n    input_grid = np.array(input_grid)\n\n    # Find the central feature (vertical blue line) and top blue pixel row\n    center_col, top_row = find_blue_line_center(input_grid)\n    \n    # Calculate start row index such that top_row is at index 0\n    start_row = top_row -1\n\n    # Calculate the extraction boundaries\n    start_row = max(0, start_row)\n    end_row = start_row + 5\n    start_col = center_col - 1\n    end_col = center_col + 2\n    \n    # Ensure that we don't go out of the bounds\n    \n    end_row = min(input_grid.shape[0], end_row)\n    start_col = max(0, start_col)\n    end_col = min(input_grid.shape[1], end_col)\n\n    # Create output grid initialized with zeros\n    output_grid = np.zeros((5, 3), dtype=int)\n\n    # Extract the region and handle cases when region is not fully available, padding with black.\n    extracted_region = input_grid[start_row:end_row, start_col:end_col]\n\n    # Determine slice of extracted region to copy\n    extracted_rows, extracted_cols = extracted_region.shape\n    output_grid[:extracted_rows, :extracted_cols] = extracted_region\n    \n    # Modify colors within the extracted region\n    output_grid[output_grid == 1] = 8  # Blue to azure\n    output_grid[(output_grid != 0) & (output_grid != 8)] = 0 # Other non-black and non-azure to black\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3836,
+    "candidates_token_count": 709,
+    "total_token_count": 4545,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.552639,
+  "response_file": "004-response.json"
+}

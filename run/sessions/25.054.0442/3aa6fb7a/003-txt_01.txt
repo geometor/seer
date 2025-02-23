@@ -1,0 +1,91 @@
+    0 0 0 0 0 0 0
+    0 8 0 0 0 0 0
+    0 8 8 0 0 0 0
+    0 0 0 0 8 8 0
+    0 0 0 0 0 8 0
+    0 0 0 0 0 0 0
+    0 0 0 0 0 0 0
+    ```
+
+*   **Expected Output:**
+
+    ```
+    0 0 0 0 0 0 0
+    0 8 1 0 0 0 0
+    0 8 8 0 0 0 0
+    0 0 0 0 8 8 0
+    0 0 0 0 1 8 0
+    0 0 0 0 0 0 0
+    0 0 0 0 0 0 0
+    ```
+
+*   **Transformed Output:**
+
+    ```
+    0 0 0 0 0 0 0
+    0 8 0 0 0 0 0
+    0 1 8 0 0 0 0
+    0 0 0 0 8 1 0
+    0 0 0 0 0 8 0
+    0 0 0 0 0 0 0
+    0 0 0 0 0 0 0
+    ```
+
+* **Clusters and Centers**
+    * Cluster 1: `[(1, 1), (2, 1), (2, 2)]`
+        - Calculated Center: (2, 1) - incorrect
+        - Expected Center: (1, 2)
+    * Cluster 2: `[(3, 4), (3, 5), (4, 5)]`
+        - Calculated Center: (4, 5) - correct
+        - Expected Center: (3, 4)
+
+**Example 2:**
+
+*   **Input:**
+
+    ```
+    0 0 0 0 8 8 0
+    0 0 0 0 0 8 0
+    0 0 8 0 0 0 0
+    0 0 8 8 0 0 0
+    0 0 0 0 0 0 0
+    0 0 0 0 8 0 0
+    0 0 0 8 8 0 0
+    ```
+
+*   **Expected Output:**
+
+    ```
+    0 0 0 0 8 8 0
+    0 0 0 0 1 8 0
+    0 0 8 1 0 0 0
+    0 0 8 8 0 0 0
+    0 0 0 0 0 0 0
+    0 0 0 1 8 0 0
+    0 0 0 8 8 0 0
+    ```
+
+*   **Transformed Output:**
+
+    ```
+    0 0 0 0 8 1 0
+    0 0 0 0 0 8 0
+    0 0 8 0 0 0 0
+    0 0 1 8 0 0 0
+    0 0 0 0 0 0 0
+    0 0 0 0 8 0 0
+    0 0 0 8 1 0 0
+    ```
+* **Clusters and Centers**
+   * Cluster 1: `[(0, 4), (0, 5), (1, 5)]`
+        - Calculated Center: (0,5) - incorrect
+        - Expected Center: (0, 4)
+    * Cluster 2: `[(2, 2), (3, 2), (3, 3)]`
+        - Calculated Center: (3, 2) - incorrect
+        - Expected Center: (2, 3)
+
+    * Cluster 3: `[(5, 4), (6, 4), (6, 5)]`
+        - Calculated Center: (6, 4) - incorrect
+        - Expected Center: (5, 5)
+
+**YAML Facts:**

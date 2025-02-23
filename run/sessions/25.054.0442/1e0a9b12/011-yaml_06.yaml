@@ -1,0 +1,21 @@
+objects:
+  - description: Single pixels of any color.
+    properties:
+      color:
+        type: integer (0-9)
+        description: Represents the color of the pixel.
+      position:
+        type: tuple (row, column)
+        description: The location of the pixel in the grid.
+
+actions:
+  - name: Shift Down
+    description: >
+      Each pixel attempts to move down as many rows as possible. The movement
+      stops if it encounters another pixel (of any color, including 0/white) or
+      the bottom edge of the grid.
+  - name: Maroon to Bottom-Right
+    description: >
+      If a maroon pixel (color 9) is present, it moves to the bottom-right
+      corner of the grid.  The value in the bottom right is overwritten and
+      cleared from its previous position.

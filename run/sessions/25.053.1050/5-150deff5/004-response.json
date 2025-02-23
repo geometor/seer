@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Identify contiguous shapes of gray (5) pixels in the input grid.\n2. Outline the outermost layer of the shape:\n   - A gray pixel is considered part of the outline if it is directly adjacent (up, down, left, or right) to a pixel that is *not* gray (including out-of-bounds).\n   - Replace these outline pixels with azure (8).\n3. Fill the interior of the outlined shape:\n   - Any gray pixel that is *not* part of the outline is considered interior.\n   - Replace these interior pixels with red (2).\n4. Preserve the white (0) background.\n\"\"\"\n\nimport numpy as np\n\ndef is_part_of_shape(grid, r, c, shape_color):\n    \"\"\"Checks if a pixel is within bounds and of the specified color.\"\"\"\n    rows, cols = grid.shape\n    return 0 <= r < rows and 0 <= c < cols and grid[r, c] == shape_color\n\ndef is_outermost(grid, row, col, shape_color):\n    \"\"\"\n    Checks if a pixel at (row, col) is on the outermost layer of the shape.\n    A pixel is outermost if it's part of the shape and has at least one \n    neighbor (up, down, left, right) that is not part of the shape.\n    \"\"\"\n    rows, cols = grid.shape\n    if not is_part_of_shape(grid, row, col, shape_color):\n        return False\n\n    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n        nr, nc = row + dr, col + dc\n        if not is_part_of_shape(grid, nr, nc, shape_color):\n            return True  # Directly adjacent to a non-shape pixel or edge\n\n    return False\n\ndef transform(input_grid):\n    # Initialize output_grid with the same dimensions and background as input_grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n    shape_color = 5\n\n    # Iterate through all pixels to find and process the shape.\n    for row in range(rows):\n        for col in range(cols):\n            if is_outermost(input_grid, row, col, shape_color):\n                output_grid[row, col] = 8  # Azure for outline\n            elif input_grid[row,col] == shape_color:\n                output_grid[row, col] = 2  # Red for fill\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6584,
+    "candidates_token_count": 605,
+    "total_token_count": 7189,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.486811,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify:** Locate all pixels within the input grid that have a value of '3' (green).\n2.  **Iterate:** For each pixel found in step 1, examine its four immediate neighbors (up, down, left, and right). Do not consider diagonal neighbors.\n3.  **Modify:** If a neighboring pixel's value is not '3', change it to '4' (yellow).\n4. **Preserve:** The original pixel that was found having the value '3' should keep it's same '3' value.\n5.  **Output:** Produce the modified grid. All other pixels retain their original values.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by changing the color of pixels adjacent to '3' (green)\n    pixels to '4' (yellow), while keeping other pixels unchanged.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Identify pixels with value '3'\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 3:\n                # Iterate through neighbors (up, down, left, right)\n                neighbors = []\n                if r > 0:\n                    neighbors.append((r - 1, c))  # Up\n                if r < rows - 1:\n                    neighbors.append((r + 1, c))  # Down\n                if c > 0:\n                    neighbors.append((r, c - 1))  # Left\n                if c < cols - 1:\n                    neighbors.append((r, c + 1))  # Right\n\n                # Modify neighbors to '4' if they are not '3'\n                for nr, nc in neighbors:\n                    if output_grid[nr, nc] != 3:\n                        output_grid[nr, nc] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2202,
+    "candidates_token_count": 451,
+    "total_token_count": 2653,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.526755,
+  "response_file": "002-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Objects:** Locate all contiguous blocks of azure (8) pixels within the input grid.\n2.  **Insert Blue Pixels Diagonally**: For some azure pixels, place a blue (1) pixel diagonally adjacent to the azure pixel, specifically, either directly above or directly below *and* left one position or right one position.\n3. **Selective transformation**: Not all azure pixels get a blue neighbor, only those that are at the diagonal edges of an azure shape.\n4.  **Preserve Other Pixels:** All other pixels, including the existing azure pixels, remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Find contiguous objects of a specific color in the grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, current_object):\n        \"\"\"Depth-first search to find contiguous pixels.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n    \n    # change output pixels\n    for obj in azure_objects:\n        for r, c in obj:\n            # Check for diagonal placement above and to the left\n            if r > 0 and c > 0 and input_grid[r-1,c-1] == 0:\n                if (r-1, c) not in obj and (r,c-1) not in obj:\n                    output_grid[r - 1, c - 1] = 1\n                    continue #only do one\n            # Check for diagonal placement above and to the right\n            if r > 0 and c < input_grid.shape[1] - 1 and input_grid[r - 1, c + 1] == 0:\n                if (r-1,c) not in obj and (r,c+1) not in obj:\n                    output_grid[r - 1, c + 1] = 1\n                    continue\n            # Check for diagonal placement below and to the left\n            if r < input_grid.shape[0] - 1 and c > 0 and input_grid[r + 1, c - 1] == 0:\n                if (r + 1, c) not in obj and (r,c-1) not in obj:\n                    output_grid[r + 1, c - 1] = 1\n                    continue\n            # Check for diagonal placement below and to the right\n            if r < input_grid.shape[0] - 1 and c < input_grid.shape[1] - 1 and input_grid[r+1,c+1] == 0:\n                if (r+1,c) not in obj and (r, c+1) not in obj:\n                    output_grid[r + 1, c + 1] = 1\n                    continue\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2262,
+    "candidates_token_count": 911,
+    "total_token_count": 3173,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.867778,
+  "response_file": "010-response.json"
+}

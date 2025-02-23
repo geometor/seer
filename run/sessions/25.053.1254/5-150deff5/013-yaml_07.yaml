@@ -1,0 +1,33 @@
+facts:
+  - description: "The input grids contain gray (5) shapes."
+    type: "object_identification"
+    objects: ["gray shape"]
+    properties:
+      color: 5
+      shape: "contiguous"
+
+  - description: "Gray shapes are transformed into combinations of red (2) and azure (8) pixels."
+    type: "transformation_rule"
+    input_object: "gray shape"
+    output_objects: ["red shape", "azure shape"]
+    properties:
+      red_color: 2
+      azure_color: 8
+      transformation_type: "color replacement"
+
+  - description: "Red pixels form the outer edge of the transformed shape."
+    type: "spatial_relationship"
+    objects: ["red pixels", "azure pixels"]
+    relationship: "red pixels surround azure pixels"
+    property: edge
+    
+  - description: "Azure pixels form the internal region of the transformed shapes."
+    type: "spatial_relationship"
+    objects: ["azure pixels", "gray pixels"]
+    relationship: "replaces gray pixels not on edge"
+
+  - description: "Empty cells remain unchanged"
+    type: observation
+    objects: ["empty cells"]
+    properties:
+      value: 0

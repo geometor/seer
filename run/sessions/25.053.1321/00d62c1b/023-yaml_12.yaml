@@ -1,0 +1,26 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Represents the input and output image.
+  - name: green_region
+    type: list of tuples
+    description: A contiguous block of green pixels.
+  - name: pixel
+    type: tuple (row, col)
+    description: Represents a single cell in the grid.
+    properties:
+      color: int (0-9)
+
+actions:
+  - name: find_contiguous_regions
+    input: grid, color
+    output: list of green_regions
+    description: Identifies all contiguous regions of the specified color.
+  - name: is_inner_pixel
+    input: grid, row, col, color
+    output: boolean
+    description: Determines if a pixel is surrounded on all four sides by pixels of the same color within a contiguous block.
+  - name: transform
+    input: input_grid
+    output: output_grid
+    description: Modifies the input grid by changing inner green pixels to yellow.

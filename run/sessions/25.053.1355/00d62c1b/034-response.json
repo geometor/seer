@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Green Shape:** Locate the contiguous region of pixels with the value '3' (green). This forms the primary object.\n\n2.  **Fill Interior with Yellow:** change to the colour yellow (4) all green pixels adjacent to white background pixels.\n\n3  **Leave Background Unchanged:** Maintain all the white pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_regions(grid, color):\n    \"\"\"Finds all contiguous regions of a given color in the grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    regions = []\n\n    def dfs(row, col, current_region):\n        \"\"\"Depth-first search to find contiguous pixels.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        current_region.append((row, col))\n        dfs(row + 1, col, current_region)\n        dfs(row - 1, col, current_region)\n        dfs(row, col + 1, current_region)\n        dfs(row, col - 1, current_region)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_region = []\n                dfs(row, col, current_region)\n                regions.append(current_region)\n    return regions\n\ndef is_adjacent_to_color(grid, row, col, color):\n    \"\"\"Checks if a cell is adjacent to a cell of a specified color.\"\"\"\n    for dr in [-1, 0, 1]:\n        for dc in [-1, 0, 1]:\n            if dr == 0 and dc == 0:\n                continue\n            nr, nc = row + dr, col + dc\n            if (\n                0 <= nr < grid.shape[0]\n                and 0 <= nc < grid.shape[1]\n                and grid[nr, nc] == color\n            ):\n                return True\n    return False\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by filling the interior of green shapes with yellow.\"\"\"\n    output_grid = input_grid.copy()\n    green_regions = find_contiguous_regions(input_grid, 3) #find green regions\n\n    for region in green_regions:\n        for row, col in region:\n            if is_adjacent_to_color(input_grid, row, col, 0): # Check for adjacency to white (0)\n              output_grid[row, col] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3570,
+    "candidates_token_count": 657,
+    "total_token_count": 4227,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.914237,
+  "response_file": "034-response.json"
+}

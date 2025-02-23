@@ -1,0 +1,30 @@
+input:
+  dimensions: [4, 4]
+  colors: [0, 4, 9, 6, 1]
+  non_zero_pixels: 5
+  objects:
+    - color: 4
+      positions: [[0, 1], [2,1]]
+    - color: 9
+      positions: [[0, 3]]
+    - color: 6
+      positions: [[2, 2]]
+    - color: 1
+      positions: [[3, 0]]
+output:
+  dimensions: [4, 4]
+  colors: [0, 4, 9, 6, 1]
+  non_zero_pixels: 4
+  objects:
+     - color: 4
+       positions: [[3,1]]
+     - color: 9
+       positions: [[3,3]]
+     - color: 6
+       positions: [[3,2]]
+     - color: 1
+       positions: [[3,0]]
+
+transformations:
+  - action: move_all_non_zero_to_bottom_row
+  - action: sort_bottom_row_ascending

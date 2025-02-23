@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find Blue Stripe:** Locate a vertical column in the input grid that consists entirely of blue (1) pixels. If no such column exists, return an empty grid that is the same dimensions as the input.\n\n2.  **Record Stripe Index:** Note the column index (x-coordinate) of this blue stripe.\n\n3.  **Extract Column:** Extract all pixel values from the input grid at the recorded column index.\n\n4.  **Conditional Replacement:** For *each* blue pixel in the *extracted column*:\n    *   Check its immediate neighbors (up, down, left, and right) in the *original input grid*.\n    *   If *any* of these neighbors are a color other than blue (1) or white (0), replace the blue pixel in the extracted column with azure (8).\n    *   If all neighbors are blue or white, leave the blue pixel unchanged.\n\n5.  **Create Output Grid:**\n     *   Start with an empty grid with a width of 1 and height of the original input\n     *   Insert the extracted, and potentially transformed, central column.\n\n6. **Replicate Column - Left**\n    * Check the column immediately to the left of the blue stripe. If the column contains a pixel that is neither blue (1) or white (0), insert a copy of the central column to the left.\n\n7. **Replicate Column - Right**\n    * Check the column immediately to the right of the blue stripe. If the column contains a pixel that is neither blue (1) or white (0), insert a copy of the central column to the right.\n\n8. **Pad Output:** If the output has width of 1 (only the central column), pad both sides with a single column of zeros.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_stripe(grid, color):\n    \"\"\"Finds the index of a vertical stripe of the specified color.\"\"\"\n    height, width = grid.shape\n    for x in range(width):\n        is_stripe = True\n        for y in range(height):\n            if grid[y, x] != color:\n                is_stripe = False\n                break\n        if is_stripe:\n            return x\n    return -1\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the colors of the immediate neighbors of a pixel.\"\"\"\n    height, width = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append(grid[row - 1, col])  # Top\n    if row < height - 1:\n        neighbors.append(grid[row + 1, col])  # Bottom\n    if col > 0:\n        neighbors.append(grid[row, col - 1])  # Left\n    if col < width - 1:\n        neighbors.append(grid[row, col + 1])  # Right\n    return neighbors\n\ndef transform(input_grid):\n    # 1. Find the Blue Stripe and its index.\n    blue_stripe_index = find_vertical_stripe(input_grid, 1)\n    height, width = input_grid.shape\n\n    # 2. If no blue stripe is found, return an empty grid with input size\n    if blue_stripe_index == -1:\n        return np.zeros_like(input_grid)\n\n    # 3. Extract Column\n    extracted_column = input_grid[:, blue_stripe_index]\n\n    # 4. Conditional Replacement\n    transformed_column = extracted_column.copy()\n    for i, pixel in enumerate(extracted_column):\n        if pixel == 1:\n            neighbors = get_neighbors(input_grid, i, blue_stripe_index)\n            if any(neighbor not in [0, 1] for neighbor in neighbors):\n                transformed_column[i] = 8\n\n    # 5. Create Output Grid (start with width 1)\n    output_grid = np.zeros((height, 1), dtype=int)\n    output_grid[:, 0] = transformed_column\n\n    # 6. Replicate Column - Left\n    if blue_stripe_index > 0:\n      left_column = input_grid[:, blue_stripe_index-1]\n      if any(pixel not in [0,1] for pixel in left_column):\n        output_grid = np.insert(output_grid, 0, transformed_column, axis=1)\n    \n    # 7. Replicate Column - Right\n    if blue_stripe_index < width -1:\n      right_column = input_grid[:, blue_stripe_index + 1]\n      if any(pixel not in [0,1] for pixel in right_column):\n        output_grid = np.insert(output_grid, output_grid.shape[1], transformed_column, axis=1)\n\n    # 8. Pad with white (0) if no columns added\n    if output_grid.shape[1] == 1:\n      output_grid = np.pad(output_grid, ((0,0),(1,1)), constant_values=0)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4231,
+    "candidates_token_count": 1150,
+    "total_token_count": 5381,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.268716,
+  "response_file": "012-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule detects a vertical line of blue (1) pixels, collapses the grid horizontally, and replaces the detected feature with a horizontal line of azure (8) pixels in the fourth row. The rest of the output grid is filled with white (0) pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    \"\"\"Finds the column index of a vertical line of the specified color.\"\"\"\n    height, width = grid.shape\n    for j in range(width):\n        is_line = True\n        for i in range(height):\n            if grid[i, j] != color:\n                is_line = False\n                break\n        if is_line:\n            return j\n    return -1  # Return -1 if no such line is found\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    # Find the vertical blue line\n    blue_column = find_vertical_line(input_grid, 1)\n\n    # Initialize the output grid (5x3, filled with 0s)\n    output_grid = np.zeros((5, 3), dtype=int)\n\n    # Condense and place the azure line in the output grid at row index 3 (fourth row)\n    if blue_column != -1:\n        output_grid[3, :] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2196,
+    "candidates_token_count": 316,
+    "total_token_count": 2512,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.059119,
+  "response_file": "002-response.json"
+}

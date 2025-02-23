@@ -1,0 +1,30 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 6x6
+      elements: integers (0-9)
+      color_map:
+        0: white
+        3: green
+        4: yellow
+  - type: object
+    properties:
+      shape: cross
+      color: green
+      composition: contiguous pixels of value 3
+
+actions:
+  - type: color_change
+    properties:
+      target: specific pixels within the cross
+      initial_color: green
+      final_color: yellow
+    conditions:
+      - target pixels are horizontally and vertically adjacent to a green pixel
+      
+
+relationships:
+  - type: adjacency
+    description: Pixels are considered adjacent horizontally or vertically, not diagonally.
+  - type: containment
+    description: The cross object is contained within the grid.

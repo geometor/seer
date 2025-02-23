@@ -1,0 +1,17 @@
+facts:
+  - observation: "Input and output grids have the same dimensions."
+  - object: grid
+    properties:
+      - dimensions: 2D array (rows x columns)
+      - cells: "contain single-digit integers (0-9)"
+      - color_map: "0: white, 1: blue, 3: green"
+  - object: cell
+    properties:
+      - value: integer (0-9)
+      - color: "determined by color_map"
+      - position: (row, column)
+  - action: replication
+    description: "Values 1 and 3 are replicated horizontally."
+    details: "The replication alternates between 1 and 3 across the entire row, starting with the original position of the digit."
+  - relationship: "positional_transformation"
+    description: "Non-zero values in the input grid trigger a horizontal replication in the output grid at the same row."

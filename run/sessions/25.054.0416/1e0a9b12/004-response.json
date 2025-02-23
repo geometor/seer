@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtract all non-zero elements from the input grid and place them in order on the last row of the output grid, which is the same size as the input. All rows are shifted upward a number of rows equal to the number of rows containing at least on nonzero value.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Create output grid of the same size as input, filled with zeros.\n    output_grid = np.zeros_like(input_grid)\n    \n    # Extract non-zero elements, preserving order (left-to-right, top-to-bottom).\n    non_zero_elements = input_grid[input_grid != 0]\n    \n    # Count rows with at least one non-zero element\n    rows_with_non_zero = np.any(input_grid != 0, axis=1)\n    num_rows_to_shift = np.sum(rows_with_non_zero)\n\n    # Extract rows *without* any non-zero elements and shift\n    empty_rows = input_grid[~rows_with_non_zero]\n    output_grid[:-num_rows_to_shift,:] = empty_rows\n\n    # Place the non_zero elements in the last row of the output grid.\n    output_grid[-1, :len(non_zero_elements)] = non_zero_elements\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2864,
+    "candidates_token_count": 319,
+    "total_token_count": 3183,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.736484,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the central column:** Find the vertical line of pixels with the color blue (value 1) in the input grid.\n2.  **Resize:** The width is changed from the original to a new smaller width of 3.\n3.  **Translate:** Create the output grid with the same height as the input.\n4. **Recolor:** Change the color of some of the vertical line's pixels from blue (1) to azure (8), based on row.\n5. **Fill Surrounding:** Change the remaining of the output grid to white (0).\n6. **Alternating Pattern:** If the row index is even, the azure pixel is in column 1. If the row index is odd and there are two azure pixels, they appear on column 1 and 2. If there is only one, it will still be in column 1.\n\n\"\"\"\n\nimport numpy as np\n\ndef find_central_blue_line(grid):\n    # Find the column index where all rows have the value 1 (blue).\n    rows, cols = grid.shape\n    for j in range(cols):\n        if np.all(grid[:, j] == 1):\n            return j\n    return -1  # Return -1 if no such column is found\n\ndef transform(input_grid):\n    # Find the central blue line's column index.\n    blue_line_col = find_central_blue_line(input_grid)\n\n    # Initialize the output grid with the same height as the input and width 3, filled with white (0).\n    rows, _ = input_grid.shape\n    output_grid = np.zeros((rows, 3), dtype=int)\n\n    # If a blue line was found, replace the corresponding pixels in the output grid with azure (8).\n    if blue_line_col != -1:\n        for i in range(rows):\n            if i % 2 == 0:\n                output_grid[i, 1] = 8  # Even rows: azure in the second column (index 1)\n            else:\n                output_grid[i,1] = 8\n                \n                # check to see if we need an additional azure\n                example = (input_grid, output_grid)\n                \n                metrics = analyze_example(input_grid, output_grid, output_grid)\n                \n                if len(metrics['expected_azure_cols']) > 1 :\n                    output_grid[i, 2] = 8\n\n    return output_grid\n\ndef analyze_example(input_grid, expected_output, actual_output):\n    \"\"\"Analyzes a single example and gathers metrics.\"\"\"\n\n    input_grid = np.array(input_grid)\n    expected_output = np.array(expected_output)\n    actual_output = np.array(actual_output)\n\n    # Find blue line column in input\n    blue_col = -1\n    for j in range(input_grid.shape[1]):\n        if np.all(input_grid[:, j] == 1):\n            blue_col = j\n            break\n\n    # azure pattern\n    azure_cols_expected = []\n    \n    for j in range(expected_output.shape[1]):\n        if np.any(expected_output[:,j] == 8):\n            azure_cols_expected.append(j)\n\n    metrics = {\n        \"input_size\": input_grid.shape,\n        \"expected_output_size\": expected_output.shape,\n        \"actual_output_size\": actual_output.shape,\n        \"blue_line_col\": blue_col,\n        \"expected_azure_cols\": azure_cols_expected\n    }\n    return metrics\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4417,
+    "candidates_token_count": 841,
+    "total_token_count": 5258,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.085834,
+  "response_file": "022-response.json"
+}

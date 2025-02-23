@@ -1,0 +1,16 @@
+objects:
+  - type: pixel
+    properties:
+      value: int # 0-9
+      row: int # 0-4
+      col: int # 0-4
+  - type: grid
+    properties:
+      dimensions: [5, 5]
+
+actions:
+  - name: shift_down
+    description: Non-zero pixels move down vertically.
+    constraints:
+      - Pixels seem to stack, or are blocked by, pixels below
+      - Empty rows on the top are added as pixels shift down

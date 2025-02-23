@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the blue line:** Locate the vertical line of blue (1) pixels in the input grid. In this instance there is a single complete vertical line.\n2.  **Crop the grid:** Extract a section of the input grid. The cropped section consists of three columns: The column to the left of the blue line and the two columns to the right. The height of the cropped section should be the height of the original section.\n3.  **Change Colors**: Transform the pixels that were blue (1) to be azure(8). Leave all other pixel in the cropped section as color 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    # Find columns where all elements are of the specified color.\n    rows, cols = grid.shape\n    line_cols = []\n    for j in range(cols):\n        if all(grid[:, j] == color):\n            line_cols.append(j)\n    return line_cols\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the blue (1) vertical line\n    blue_line_cols = find_vertical_line(input_grid, 1)\n\n    # Handle case where no blue line is found or multiple\n    if not blue_line_cols:\n        return np.zeros((rows, 3), dtype=int).tolist()\n        \n    blue_line_col = blue_line_cols[0]\n\n    # Crop the grid\n    start_col = max(0, blue_line_col - 1)\n    end_col = min(cols, blue_line_col + 2)\n    cropped_grid = input_grid[:, start_col:end_col]\n    \n    output_grid = np.zeros_like(cropped_grid)\n\n    # change output pixels\n    cropped_rows, cropped_cols = cropped_grid.shape\n    for r in range (cropped_rows):\n        for c in range(cropped_cols):\n            if cropped_grid[r,c] == 1:\n                output_grid[r,c] = 8\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2159,
+    "candidates_token_count": 512,
+    "total_token_count": 2671,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.530672,
+  "response_file": "008-response.json"
+}

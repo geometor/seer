@@ -1,0 +1,26 @@
+facts:
+  - observation: Input and output grids are 9x9.
+  - observation: Cells contain integer values from 0 to 9, corresponding to colors.
+  - object: red_pixel
+    properties:
+      color: red (2)
+      location: input grid (row 3, column 2)
+    actions:
+      creates: yellow_square
+  - object: blue_pixel
+    properties:
+      color: blue (1)
+      location: input grid (row 6, column 6)
+    actions:
+      creates: orange_square
+  - object: yellow_square
+    properties:
+      color: yellow (4)
+      shape: 2x2 square
+      location: output grid, centered around red_pixel location
+  - object: orange_square
+    properties:
+      color: orange (7)
+      shape: 3x3 square
+      location: output grid, centered around blue_pixel location
+  - relationship: The colored pixels in the input grid determine the location and color of squares in the output grid.

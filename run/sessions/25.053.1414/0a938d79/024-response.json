@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Iterate** through each row of the input grid.\n2.  **Check** if the current row contains any non-zero pixels.\n3.  **If the row is all zeros:** Copy the all-zero row directly to the corresponding row in the output grid.\n4.  **If the row has non-zero pixels:**\n    *   Find the first non-zero pixel value (color) in that row.\n    *   Fill the *entire* corresponding output row with this color.\n5.  **Repeat**: After processing each input row and creating a corresponding output row, inspect the input grid for rows below the just processed row, and if the color of this lower row is the same as the just processed row in the input, replicate the output row. Continue until a row of a different color (including 0) is found, then proceed.\n\"\"\"\n\nimport numpy as np\n\ndef get_first_non_zero(row):\n    \"\"\"Finds the first non-zero element in a row.\"\"\"\n    for pixel in row:\n        if pixel != 0:\n            return pixel\n    return 0\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    height, width = input_grid.shape\n    row_index = 0\n\n    while row_index < height:\n        row = input_grid[row_index]\n        first_non_zero = get_first_non_zero(row)\n\n        if first_non_zero == 0:\n            # Copy the all-zero row\n            output_grid[row_index] = row\n            row_index += 1\n        else:\n            # Fill the output row with the first non-zero color\n            output_grid[row_index] = np.full(width, first_non_zero)\n\n            # Check for row repetition\n            next_row_index = row_index + 1\n            while next_row_index < height and get_first_non_zero(input_grid[next_row_index]) == first_non_zero:\n                output_grid[next_row_index] = np.full(width, first_non_zero)\n                next_row_index += 1\n\n            row_index = next_row_index\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8314,
+    "candidates_token_count": 537,
+    "total_token_count": 8851,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.568146,
+  "response_file": "024-response.json"
+}

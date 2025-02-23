@@ -1,0 +1,31 @@
+task: 002-py
+description: Determine grid dimensions and represent in a 1x5 grid.
+objects:
+  input_grid:
+    type: 2D array
+    properties:
+      rows: integer, number of rows in the input grid
+      cols: integer, number of columns in the input grid
+  output_grid:
+    type: 2D array (1x5)
+    properties:
+      row_value: integer, representation of number of rows.
+      col_value: integer, representation of number of columns.
+      padding: integer, always zero
+
+actions:
+  - get_dimensions:
+      input: input_grid
+      output: [rows, cols]
+      description: Determine the number of rows and columns of the input grid.
+  - encode_dimension:
+      input: dimension
+      output: encoded_value
+      description: >
+          If the input dimension (rows or cols) is a single digit (less than 10),
+          the encoded value is same as dimension.
+          Otherwise the encoded value is 1.
+  - construct_output:
+      input: [encoded_rows, encoded_cols]
+      output: output_grid
+      description: Create a 1x5 grid.  The first element is encoded_rows, the second is encoded_cols, and the rest are zeros.

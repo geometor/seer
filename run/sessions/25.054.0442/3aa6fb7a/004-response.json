@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Clusters:** Find all distinct clusters of '8' (azure) pixels in the input grid. A cluster is a group of orthogonally connected '8' pixels.\n2.  **Find Cluster Center:** For each cluster:\n    *   Calculate the centroid of the cluster (average row and average column of all pixels in the cluster).\n    *   Identify all pixels within the cluster that are closest to the centroid (using Euclidean distance).\n    *    Among the closest pixels, select the one with the smallest row index. If there's a tie, select the one with the smallest column index (prioritize top-left).\n3.  **Replace Pixel:** Change the value of the selected center pixel in each cluster from '8' (azure) to '1' (blue).\n4.  **Preserve Other Pixels:** All other pixels in the grid remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_clusters(grid, value):\n    visited = np.zeros_like(grid, dtype=bool)\n    clusters = []\n\n    def dfs(row, col, current_cluster):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != value):\n            return\n        visited[row, col] = True\n        current_cluster.append((row, col))\n        dfs(row + 1, col, current_cluster)\n        dfs(row - 1, col, current_cluster)\n        dfs(row, col + 1, current_cluster)\n        dfs(row, col - 1, current_cluster)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == value and not visited[row, col]:\n                current_cluster = []\n                dfs(row, col, current_cluster)\n                clusters.append(current_cluster)\n    return clusters\n\ndef find_center(cluster):\n    # find the centermost pixel, prioritizing the pixel closer to the top left\n    rows = [p[0] for p in cluster]\n    cols = [p[1] for p in cluster]\n\n    # Calculate the centroid\n    centroid_row = sum(rows) / len(rows)\n    centroid_col = sum(cols) / len(cols)\n\n    # Find the point in the cluster closest to the centroid\n    min_dist = float('inf')\n    closest_pixels = []\n    for row, col in cluster:\n        dist = (row - centroid_row)**2 + (col - centroid_col)**2\n        if dist < min_dist:\n            min_dist = dist\n            closest_pixels = [(row, col)]\n        elif dist == min_dist:\n            closest_pixels.append((row, col))\n\n    # Prioritize top-left among closest pixels\n    if len(closest_pixels) > 1:\n        closest_pixels.sort(key=lambda x: (x[0], x[1]))\n    return closest_pixels[0]\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    # find clusters of 8s\n    clusters = find_clusters(output_grid, 8)\n    # replace center of each cluster with 1s\n    for cluster in clusters:\n        center = find_center(cluster)\n        output_grid[center] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4346,
+    "candidates_token_count": 810,
+    "total_token_count": 5156,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.283489,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Regions:** Find all contiguous regions (objects) of green pixels.  Pixels are considered connected if they share an edge (4-connectivity).\n\n2.  **Prioritize 2x2 Blocks:** Within each green region, check *every* green pixel to see if it is the top-left corner of a 2x2 block of green pixels. If it is, change *all four* pixels in that 2x2 block to yellow (value 4).\n\n3.  **Identify Boundaries:** For each green region, determine its boundary pixels. A boundary pixel is a green pixel that has at least one neighbor (4-connectivity) that is *not* green.\n\n4. **Fill Interior with Yellow**: For each green region change green pixels to yellow if all neighbors are part of the same green object AND it is NOT part of a 2x2 block.\n\n5.  **Output:** Create the output grid by applying these transformation rules. All unchanged pixels retain original values.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all contiguous objects of a given color.\"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_object):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return\n        visited.add((r, c))\n        current_object.append((r, c))\n        neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]\n        for nr, nc in neighbors:\n            dfs(nr, nc, current_object)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_2x2_block(grid, r, c, color):\n    \"\"\"check for 2x2 block\"\"\"\n    rows, cols = grid.shape\n\n    if (r + 1 < rows and c + 1 < cols):\n        if (grid[r+1,c] == color and\n            grid[r,c+1] == color and\n            grid[r+1,c+1] == color):\n\n            return True\n\n    return False\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Returns the valid neighbors of a cell (4-connectivity).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols:\n            neighbors.append((nr, nc))\n    return neighbors\n\ndef is_boundary(grid, r, c, object_pixels):\n    \"\"\"Checks if a pixel is on the boundary of its object.\"\"\"\n    for nr, nc in get_neighbors(grid, r, c):\n        if (nr, nc) not in object_pixels:\n            return True\n    return False\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Find green objects\n    green_objects = find_objects(input_grid, 3)\n    \n    # 2. Handle 2x2 blocks (priority)\n    for obj in green_objects:\n        for r, c in obj:\n            if is_2x2_block(input_grid, r, c, 3):\n                output_grid[r, c] = 4\n                output_grid[r + 1, c] = 4\n                output_grid[r, c + 1] = 4\n                output_grid[r + 1, c + 1] = 4\n\n    # Create sets for faster lookup\n    green_object_sets = [set(obj) for obj in green_objects]\n\n    # Re-iterate to handle the fill operation.  Need to do this *after* 2x2 blocks.\n    for obj_set in green_object_sets:\n        for r, c in obj_set:\n\n            # Skip if already changed by 2x2 rule\n            if output_grid[r,c] == 4:\n                continue\n\n            # 3. and 4. Check if it's an interior pixel and not part of a 2x2 block.\n            if not is_boundary(input_grid, r, c, obj_set):\n               output_grid[r,c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9179,
+    "candidates_token_count": 1147,
+    "total_token_count": 10326,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.349126,
+  "response_file": "016-response.json"
+}

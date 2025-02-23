@@ -1,0 +1,17 @@
+objects:
+  - type: grid
+    properties:
+      - name: input_grid
+        dimensions: [4 x 12]
+        colors: [0, 1, 2, 4]
+      - name: output_grid
+        dimensions: [4 x 4]
+        colors: [0, 1, 2, 4]
+
+actions:
+  - type: cropping
+    description: Removing columns from the right side of the input_grid.
+
+relationships:
+  - output_grid is a subset of input_grid.
+  - color and relative position of pixels within the overlapping region is preserved

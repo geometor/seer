@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Scan the input grid to identify contiguous blocks of pixels with the same color. Each contiguous block is an object.\n2.  **Merge Vertically Adjacent Objects:**\n    *   Iterate through the grid, from top to bottom.\n    *   For each column, identify vertically adjacent pixels that have the same color.\n    *   Merge vertically adjacent pixels of the same color into a single object that occupies the rows of all merged pixels. Other tiles of different colors should be eliminated.\n    *   Consolidate all merged objects to the left side of the row.\n3.  **Maintain Grid Height:** Add an empty row to the top of the grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid based on vertical merging and shifting.\"\"\"\n\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Merge Vertically Adjacent Objects and shift\n    merged_row = np.zeros(cols, dtype=int)\n    merged_col_idx = 0\n\n    for c in range(cols):\n      for r in range(rows - 1):\n        if input_grid[r,c] == input_grid[r+1,c] and input_grid[r,c]!=0:\n          merged_row[merged_col_idx] = input_grid[r,c]\n          merged_col_idx+=1\n          break # move onto the next column after a merge\n\n    # Place merged row into output\n    for r in range(rows - 1):\n      output_grid[r+1] = output_grid[r]\n    \n    output_grid[0] = merged_row\n    \n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3839,
+    "candidates_token_count": 416,
+    "total_token_count": 4255,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.452346,
+  "response_file": "016-response.json"
+}

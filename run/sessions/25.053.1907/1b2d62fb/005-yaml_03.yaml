@@ -1,0 +1,21 @@
+objects:
+  - name: blue_line
+    color: blue (1)
+    shape: vertical line
+    properties:
+      length: varies
+      start_row: varies
+      column: varies
+  - name: white_pixels
+    color: white (0)
+    shape: individual pixels
+    properties:
+      adjacency: adjacent to blue_line, either left or right
+
+actions:
+  - name: determine_output_dimensions
+    input: blue_line, white_pixels
+    description: Determine height and width of output grid based on blue line and presence of adjacent white pixels.
+  - name: populate_output_grid
+    input: output_dimensions, blue_line, white_pixels
+    description: Fill the output grid with azure (8) pixels based on position of blue_line and the presence of white pixels on either side, in corresponding rows

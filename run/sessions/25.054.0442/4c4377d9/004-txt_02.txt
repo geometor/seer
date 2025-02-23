@@ -1,0 +1,30 @@
+# Conceptual - this would actually be calculated within the code environment
+example_metrics = []
+for i, example in enumerate(examples):
+    input_grid = example["input"]
+    expected_output = example["expected"]
+    transformed_output = example["transformed"] # from the INCORRECT hypothesis
+
+    num_rows_in = input_grid.shape[0]
+    num_cols_in = input_grid.shape[1]
+    num_rows_out = expected_output.shape[0]
+    num_cols_out = expected_output.shape[1]
+
+    unique_colors_in = np.unique(input_grid)
+    unique_colors_out = np.unique(expected_output)
+
+    incorrect_pixels = analyze_results(input_grid, expected_output, transformed_output) # reusing provided function
+    num_incorrect = len(incorrect_pixels)
+
+    example_metrics.append({
+        "example_num": i + 1,
+        "input_shape": (num_rows_in, num_cols_in),
+        "output_shape": (num_rows_out, num_cols_out),
+        "unique_colors_input": list(unique_colors_in),
+        "unique_colors_output": list(unique_colors_out),
+        "num_incorrect_pixels": num_incorrect,
+        "incorrect_pixel_details": incorrect_pixels, # list of dicts
+    })
+
+for metric_set in example_metrics:
+  print(metric_set)

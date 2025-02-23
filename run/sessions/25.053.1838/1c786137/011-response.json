@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe output grid represents a condensed version of the input, selecting a representative row of largest objects of each color from input.\n\nTransformation Rule:\n1. Identify the largest object of each unique color in the input grid.\n2. Find the bounding box that encloses the largest object for each color.\n3. Extract the first row of each bounding box, taking only the first 3 pixels.\n4. Assemble the output grid with these rows, maintaining the order of colors corresponding to the sizes of the objects, largest to smallest.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef get_objects(grid):\n    \"\"\"Finds contiguous objects in a grid.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def get_neighbors(r, c):\n        neighbors = []\n        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1]:\n                neighbors.append((nr, nc))\n        return neighbors\n\n    def dfs(row, col, color):\n        if visited[row, col] or grid[row, col] != color:\n            return []\n        visited[row, col] = True\n        object_pixels = [(row, col)]\n        for r, c in get_neighbors(row, col):\n            object_pixels.extend(dfs(r, c, color))\n        return object_pixels\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col]:\n                color = grid[row, col]\n                object_pixels = dfs(row, col, color)\n                if object_pixels:\n                    objects.append({\n                        'color': color,\n                        'pixels': object_pixels,\n                        'size': len(object_pixels)\n                    })\n    return objects\n\ndef get_bounding_box(pixels):\n    \"\"\"Calculates the bounding box of a set of pixels.\"\"\"\n    min_row = min(p[0] for p in pixels)\n    max_row = max(p[0] for p in pixels)\n    min_col = min(p[1] for p in pixels)\n    max_col = max(p[1] for p in pixels)\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rule.\"\"\"\n\n    # Find objects in the input grid\n    objects = get_objects(input_grid)\n\n    # Find the largest object for each color\n    largest_objects = {}\n    for obj in objects:\n        color = obj['color']\n        if color not in largest_objects or obj['size'] > largest_objects[color]['size']:\n            largest_objects[color] = obj\n\n    # Sort largest objects by size in descending order\n    sorted_largest_objects = sorted(largest_objects.values(), key=lambda x: x['size'], reverse=True)\n    \n    # Initialize the output grid\n    output_grid = np.zeros((len(sorted_largest_objects), 3), dtype=int)\n\n    # Extract the first row of the bounding box for each largest object\n    for i, obj in enumerate(sorted_largest_objects):\n        min_row, max_row, min_col, max_col = get_bounding_box(obj['pixels'])\n        first_row = input_grid[min_row, min_col:min_col + 3]\n        \n        # Pad with zeros if the row has fewer than 3 pixels\n        if len(first_row) < 3:\n          padding = np.zeros(3-len(first_row), dtype=int)\n          first_row = np.concatenate((first_row, padding))\n\n        output_grid[i, :] = first_row\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5616,
+    "candidates_token_count": 926,
+    "total_token_count": 6542,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.631993,
+  "response_file": "011-response.json"
+}

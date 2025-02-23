@@ -1,0 +1,21 @@
+facts:
+  - object: grid
+    properties:
+      - type: 2D array
+      - values: integers (0-9)
+      - colors: [white, green, yellow]
+  - object: pixel
+    properties:
+      - color: integer (representing a color)
+      - position: (row, column)
+  - observation:
+      - description: Green pixels form a connected shape.
+      - context: input and output
+  - transformation:
+      - action: color change
+      - from: green (3)
+      - to: yellow (4)
+      - condition: specific green pixels within the shape
+  - unchanged:
+      - object: white pixels (0)
+      - property: color, position

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Iterate:** Go through each column of the input grid one by one.\n2.  **Collect:** For the current column, identify and collect all the non-zero pixels, noting their original row order.\n3.  **Stack:** In the corresponding column of the output grid, place these collected non-zero pixels starting from the *bottom* row, going upwards. Maintain the original row order from the input.\n4.  **Fill:** Fill any remaining empty cells at the top of the output column with zeros.\n5.  **Repeat:** Repeat steps 2-4 for all columns in the input grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output grid with zeros and same dimensions as input.\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each column\n    for c in range(cols):\n        # Collect non-zero pixels and their row indices in the current column\n        non_zero_pixels = []\n        for r in range(rows):\n            if input_grid[r, c] != 0:\n                non_zero_pixels.append((r, input_grid[r, c]))\n\n        # Stack non-zero pixels at the bottom of the corresponding output column\n        output_row = rows - 1\n        for _, value in reversed(non_zero_pixels):  # Iterate in reverse order to stack\n            output_grid[output_row, c] = value\n            output_row -= 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3312,
+    "candidates_token_count": 357,
+    "total_token_count": 3669,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.957743,
+  "response_file": "004-response.json"
+}

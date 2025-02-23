@@ -176,20 +176,27 @@ class Session:
             response_parts, prompt_count, description, response.to_dict(), elapsed_time
         )
 
-    def log_error(self, error_message: str, context: str = ""):
-        error_log_file = self.session_dir / "error_log.txt"  
+    def log_error(self, e: Exception, context: str = ""):
+        error_log_file = self.task_dir / "error_log.txt"  
+        print(f"Caught a general exception: {type(e).__name__} - {e}")
+
+        # Capture stack trace for general exceptions too
+        stack_trace = traceback.format_exc()
         try:
             with open(error_log_file, "a") as f:
-                f.write(f"[{datetime.now().isoformat()}] ERROR: {error_message}\n")
+                f.write(f"[{datetime.now().isoformat()}] ERROR: {e}\n")
                 if context:
                     if isinstance(context, str):
                         f.write(f"Context: {context}\n")
                     else:
                         f.write(f"Context: {str(context)}\n")
-                f.write("\n")
+                    f.write("\n")
+                if stack_trace:
+                    f.write(f"{stack_trace}\n")
+                    f.write("\n")
         except (IOError, PermissionError) as e:
             print(f"FATAL: Error writing to error log: {e}")
-            print(f"Attempted to log: {error_message=}, {context=}")
+            print(f"Attempted to log: {e=}, {context=}")
 
     def display_prompt(
         self, prompt: list, instructions: list, prompt_count: int, description: str

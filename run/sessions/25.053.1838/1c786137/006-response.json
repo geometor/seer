@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Bordered Region:** Find a contiguous region within the input grid that is completely enclosed by a border of black (color 0) pixels. The border must be one pixel thick. The bordered region will form a rectangle.\n\n2.  **Identify Interior:** The \"interior\" consists of all pixels *inside* the black border.\n\n3.  **Extract Interior:** Create a new, smaller grid containing *only* the pixels within the identified bordered region, *excluding* the black border pixels. The dimensions of the new grid will match the height and width of the interior region.\n\n4.  **Output:** Return the extracted interior region as the new grid. If no black border exists, the output will be an empty grid. The output grid includes only the inside of the rectangle.\n\"\"\"\n\nimport numpy as np\n\ndef find_border_and_interior(grid, border_color=0):\n    \"\"\"Finds the bounding box of the interior of a bordered region.\"\"\"\n    rows, cols = grid.shape\n    min_row, max_row = rows, -1\n    min_col, max_col = cols, -1\n\n    # Check for border and interior existence.\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == border_color:\n                # Check surrounding pixels for interior\n                if r + 1 < rows and grid[r+1, c] != border_color:\n                   \n                    max_row = max(max_row, r)\n                    min_row = min(min_row, r)\n                    max_col = max(max_col,c)\n                    min_col = min(min_col,c)\n                elif c+1 < cols and grid[r,c+1] != border_color:\n                    \n                    max_row = max(max_row, r)\n                    min_row = min(min_row, r)\n                    max_col = max(max_col,c)\n                    min_col = min(min_col,c)\n                elif r - 1 >= 0 and grid[r-1, c] != border_color:\n                   \n                    max_row = max(max_row, r)\n                    min_row = min(min_row, r)\n                    max_col = max(max_col,c)\n                    min_col = min(min_col,c)\n                elif c - 1 >= 0 and grid[r, c-1] != border_color:\n                    \n                    max_row = max(max_row, r)\n                    min_row = min(min_row, r)\n                    max_col = max(max_col,c)\n                    min_col = min(min_col,c)\n    #Move inwards to exclude border\n    if max_row > -1:\n        min_row +=1\n        max_row -= -1\n        min_col += 1\n        max_col -=1\n    \n    \n    return min_row, max_row, min_col, max_col\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by extracting the region within a bordered region.\"\"\"\n    input_grid = np.array(input_grid)\n    \n    # Find the bounding box of interior\n    min_row, max_row, min_col, max_col = find_border_and_interior(input_grid)\n\n\n    if max_row == -1: # Handle cases with no border.\n        return [[]]\n\n    # Extract interior\n    output_grid = input_grid[min_row:max_row, min_col:max_col]\n    \n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7249,
+    "candidates_token_count": 840,
+    "total_token_count": 8089,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.030056,
+  "response_file": "006-response.json"
+}

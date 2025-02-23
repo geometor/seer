@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Find all pixels in the input grid that are not white (0).\n\n2.  **Azure (8) Expansion:** If a pixel is azure (8), change *adjacent* white (0)\n    pixels to orange (7). Adjacent pixels are those directly above, below,\n    left, or right (not diagonal, not L1=2).\n\n3. **Red (2) and Blue (1) Expansion**: For red (2) or blue (1) pixels replace white pixels (0) at L1 distance 2 with yellow (4).\n\n4.  **Magenta Behavior**: Pixels that are magenta (6) do not change the color of any surrounding pixels.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col, distance=1):\n    \"\"\"Gets the neighbors of a cell within a specified L1 distance.\"\"\"\n    neighbors = []\n    rows, cols = grid.shape\n    for i in range(max(0, row - distance), min(rows, row + distance + 1)):\n        for j in range(max(0, col - distance), min(cols, col + distance + 1)):\n            if (abs(row - i) + abs(col - j)) <= distance and (row,col) != (i,j):\n                neighbors.append((i, j))\n    return neighbors\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Identify Key Pixels\n    key_pixels = []\n    for i in range(rows):\n        for j in range(cols):\n            if input_grid[i, j] != 0:\n                key_pixels.append((i, j, input_grid[i, j]))\n\n    # change output pixels\n    for r, c, color in key_pixels:\n        # Azure (8) Expansion\n        if color == 8:\n             neighbors = get_neighbors(input_grid, r, c) # distance = 1, default\n             for nr, nc in neighbors:\n                if output_grid[nr, nc] == 0:  # Check if white\n                    output_grid[nr, nc] = 7   # Change to orange\n\n        # Red (2) and Blue (1) Expansion\n        elif color == 1 or color == 2:\n            neighbors = get_neighbors(input_grid, r, c, distance=2)\n            for nr, nc in neighbors:\n                if output_grid[nr, nc] == 0:   # Check if white\n                    output_grid[nr, nc] = 4    # Change to Yellow\n\n        # Magenta (6) behavior - no change\n        elif color == 6:\n            pass  # Do nothing.\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4237,
+    "candidates_token_count": 647,
+    "total_token_count": 4884,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.779737,
+  "response_file": "012-response.json"
+}

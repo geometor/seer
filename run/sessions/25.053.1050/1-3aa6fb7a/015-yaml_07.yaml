@@ -1,0 +1,19 @@
+objects:
+  - type: grid
+    properties:
+      rows: 7
+      columns: 7
+      colors: [0, 1, 8] # white, blue, azure
+  - type: pixel
+    properties:
+      color:
+        white: 0
+        blue: 1
+        azure: 8
+
+transformations:
+  - rule: "A white pixel changes to blue if and only if there are azure pixels both to its left and to its right on the same row."
+    conditions:
+      - left_azure: "An azure pixel exists to the left of the white pixel on the same row."
+      - right_azure: "An azure pixel exists to the right of the white pixel on the same row."
+    action: "Change the white pixel to blue."

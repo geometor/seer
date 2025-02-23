@@ -1,0 +1,38 @@
+objects:
+  - name: red_pixel
+    type: pixel
+    color: red
+    value: 2
+    initial_location: (5,0)
+    behavior: expands horizontally and repeats vertically
+
+  - name: green_pixel
+    type: pixel
+    color: green
+    value: 3
+    initial_location: (7,8)
+    behavior: expands horizontally and repeats vertically
+
+  - name: white_pixel
+      type: pixel
+      color: white
+      value: 0
+      initial_location: everywhere else
+      behavior: gets overwritten by red and green lines, else remains white
+properties:
+  - grid_size:
+    input: (22, 9)
+    output: (22, 9)
+  - expansion: horizontal
+  - repetition: vertical alternating
+actions:
+  - expand:
+    agent: red_pixel, green_pixel
+    direction: horizontal
+  - repeat_pattern:
+     agent: red_pixel, green_pixel
+     pattern: vertical alternating starting with the original color.
+relationships:
+  - red_pixel:
+    to: green_pixel
+    relation: alternate vertical repetition

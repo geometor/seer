@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Collect all non-zero values from the input grid.\n2. Sort the non-zero values in ascending order.\n3. Place the sorted values in the bottom row of the output grid, starting from the leftmost column.\n4. Maintain the original row order relationship of duplicate values in the input to the output. For instance, a value in a higher row in the input should be positioned above other instances of that same number in the output.\n5. Fill the remaining cells of the output grid with zeros.\n\"\"\"\n\nimport numpy as np\n\ndef get_nonzero_elements(grid):\n    \"\"\"Extracts non-zero elements and their original row indices.\"\"\"\n    elements = []\n    for row_idx, row in enumerate(grid):\n        for col_idx, value in enumerate(row):\n            if value != 0:\n                elements.append((value, row_idx, col_idx))\n    return elements\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rule.\"\"\"\n\n    # Initialize output grid with zeros\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = output_grid.shape\n\n    # Get non-zero elements with their original row indices\n    nonzero_elements = get_nonzero_elements(input_grid)\n\n    # Sort elements primarily by value, secondarily by original row index\n    sorted_elements = sorted(nonzero_elements, key=lambda x: (x[0], x[1]))\n\n    # Place sorted elements in the last row\n    col_idx = 0\n    for value, original_row, original_col in sorted_elements:\n        if len(set([x[0] for x in sorted_elements])) == len(sorted_elements):          \n            output_grid[rows - 1, col_idx] = value\n        else:\n            # find row for the element\n            output_row = rows -1\n            for r in range(rows):\n                if input_grid[r, original_col] == value:\n                    output_row = r\n                    if output_grid[r,col_idx] == 0 and output_grid[rows-1,col_idx] != value :\n                        output_row = r\n                        break;                    \n                    elif (original_col == col_idx):\n                        for rr in range(rows-1):\n                            if (output_grid[rr,original_col] == 0):\n                                output_row=rr\n                                break\n                        \n            output_grid[output_row, col_idx] = value\n                        \n        col_idx += 1\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 1968,
+    "candidates_token_count": 591,
+    "total_token_count": 2559,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.028094,
+  "response_file": "002-response.json"
+}

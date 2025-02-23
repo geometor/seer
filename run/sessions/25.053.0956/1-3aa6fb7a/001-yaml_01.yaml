@@ -1,0 +1,25 @@
+objects:
+  - type: pixel
+    properties:
+      value:
+        type: integer
+        range: [0, 1, 8]
+      color:
+        mapping:
+          0: white
+          1: blue
+          8: azure
+      position:
+        type: coordinates
+        description: (row, column) within grid
+
+actions:
+  - name: change_color
+    agent: system
+    target: pixel
+    precondition: "pixel.color == azure"
+    effect: "pixel.color becomes blue based on some rule"
+
+relationships:
+ - type: adjacency
+   relation: "A pixel is adjacent to another if it is directly above, below, left, or right"

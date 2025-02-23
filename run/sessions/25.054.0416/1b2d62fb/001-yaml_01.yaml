@@ -1,0 +1,20 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      - colors: [0, 9, 1] # white, maroon, blue
+      - dimensions: 5x7
+      - features:
+        - vertical_line:
+            color: 1 # blue
+            location: center_column
+  - object: output_grid
+    type: grid
+    properties:
+      - colors: [0, 8] # white, azure
+      - dimensions: 5x3
+      - relationship_to_input: "subset and modified"
+  - action: extraction
+    description: "A 3x5 subgrid is extracted from around the feature of interest (central blue line)"
+  - action: modification
+    description: "Within extracted subgrid, replace blue(1) color with azure color(8)"

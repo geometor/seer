@@ -1,0 +1,28 @@
+task: grid_transformation
+input:
+  type: 2D grid
+  dimensions: 9x9
+  data_type: integer (0-9)
+  colors: [white, blue, red, green, yellow, gray, magenta, orange, azure, maroon]
+output:
+  type: 2D grid
+  dimensions: 3x3
+  data_type: integer (0-9)
+  colors: [white, orange, azure, maroon, yellow]
+objects:
+  - name: input_grid
+    properties:
+      dimensions: 9x9
+      elements: pixels with color values
+  - name: output_grid
+    properties:
+      dimensions: 3x3
+      elements: pixels with color values
+actions:
+  - type: selection/extraction
+    description: A sub-grid is selected from the input_grid.
+relationships:
+  - type: spatial
+    description: The relative positions of pixels in the output_grid are preserved from the input_grid.
+  - type: subset
+    description: output grid pixels are a subset of the input grid

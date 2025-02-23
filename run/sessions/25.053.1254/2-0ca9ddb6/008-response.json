@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Locate Key Pixels:** Find the locations of the red (2) and blue (1) pixels within the input grid.  There will be at most one of each.\n\n2.  **Create Yellow Region (Conditional):** Around the red (2) pixel, create a 3x3 square region. Within this region, change *only* the background (0) pixels to yellow (4). If the original input grid contains a non-zero color at the position of the red pixel, preserve it, and place it in the center of the 3x3 yellow region.\n\n3.  **Create Orange Region (Conditional):** Around the blue (1) pixel, create a 3x3 square region.  Within this region, change *only* the background (0) pixels to orange (7). If the original input grid contains a non-zero color at the position of the blue pixel, preserve it, and place it in the center of the 3x3 orange region.\n\n4.  **Preserve Other Colors:** Pixels in the input grid that have colors other than 0, 1 and 2 should be preserved and included in the output at their original coordinates.\n\n5.  **Output:** The modified grid is the output.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel(grid, color):\n    # Find the coordinates of a specific color pixel.\n    coords = np.where(grid == color)\n    if len(coords[0]) > 0:\n        return (coords[0][0], coords[1][0])  # Return first occurrence\n    return None\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the red (2) pixel\n    red_pixel_coords = find_pixel(input_grid, 2)\n    if red_pixel_coords:\n        # Create a 3x3 yellow (4) region around the red pixel, conditionally\n        row, col = red_pixel_coords\n        for i in range(max(0, row - 1), min(output_grid.shape[0], row + 2)):\n            for j in range(max(0, col - 1), min(output_grid.shape[1], col + 2)):\n                if output_grid[i, j] == 0:  # Only replace if background (0)\n                    output_grid[i, j] = 4\n        output_grid[row,col] = input_grid[row,col] # preserve input color\n\n\n    # Find the blue (1) pixel\n    blue_pixel_coords = find_pixel(input_grid, 1)\n    if blue_pixel_coords:\n        # Create a 3x3 orange (7) region around the blue pixel, conditionally\n        row, col = blue_pixel_coords\n        for i in range(max(0, row - 1), min(output_grid.shape[0], row + 2)):\n            for j in range(max(0, col - 1), min(output_grid.shape[1], col + 2)):\n                if output_grid[i, j] == 0:  # Only replace if background (0)\n                    output_grid[i, j] = 7\n        output_grid[row,col] = input_grid[row,col] # preserve input color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7283,
+    "candidates_token_count": 777,
+    "total_token_count": 8060,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.556081,
+  "response_file": "008-response.json"
+}

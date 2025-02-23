@@ -1,0 +1,17 @@
+observations:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: variable
+      - values: integers (0-9) representing colors
+  - object: output_grid
+    type: grid
+    properties:
+      - dimensions: minimum of (3, input_row_count) x minimum of (3, input_column_count)
+      - values: copied from corresponding positions in input_grid, starting at [0,0]
+  - action: copy
+    description: Values from the input_grid are copied to the output_grid.
+    constraints:
+      - The copied region starts at the top-left corner (0, 0) of the input_grid.
+      - output row count = min(3, input row count).
+      - output column count = min(3, input column count).

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by replicating non-zero values (1 and 3) horizontally in an alternating pattern.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the observed rule.\n    \n    Args:\n        input_grid: A 2D numpy array representing the input grid.\n    \n    Returns:\n        A 2D numpy array representing the transformed output grid.\n    \"\"\"\n    # Initialize output_grid with the same dimensions and filled with 0s.\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each row\n    for r in range(rows):\n        # Iterate through each column in the current row\n        for c in range(cols):\n            # Check if the current cell value is 1 or 3\n            if input_grid[r, c] == 1:\n                # Replicate 1 and 3 alternately across the row\n                for i in range(c, cols):\n                    output_grid[r, i] = 1 if (i - c) % 2 == 0 else 3\n            elif input_grid[r, c] == 3:\n                # Replicate 3 and 1 alternately across the row\n                for i in range(c, cols):\n                    output_grid[r, i] = 3 if (i - c) % 2 == 0 else 1\n            elif input_grid[r,c] == 0:\n                # keep 0s\n                output_grid[r,c] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2878,
+    "candidates_token_count": 378,
+    "total_token_count": 3256,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.3513,
+  "response_file": "008-response.json"
+}

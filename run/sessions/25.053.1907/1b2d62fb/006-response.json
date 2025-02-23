@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find the Longest Blue Line:** Identify the longest vertical line of blue (1) pixels in the input grid. Note its starting row, column index, and length.\n2.  **Check for Adjacent Whites:** Determine if there are *any* white (0) pixels directly to the left *or* right of the *entire* blue line (not just row by row, but for the column as a whole).\n3.  **Determine Output Dimensions:**\n    *   **Height:** The output grid height is equal to the length of the longest blue line.\n    *   **Width:**\n        *   If there are *any* white pixels to the left *or* right of the blue line, the output width is 3.\n        *   If there are *no* white pixels to the left *or* right of the blue line, the output width is 1.\n4.  **Create Output Grid:** Create an output grid filled with black (0) pixels, with the determined height and width.\n5.  **Populate with Azure:**\n    *    A vertical line of Azure (8) will always exist in the center of the output grid, for all rows, with a height equal to the length of the blue line.\n    *   Iterate through each row of the *input grid* that corresponds to the blue line:\n      * If, in a given row, there's a white pixel to the immediate left of the blue pixel *in the input*, place an azure pixel in the first column of the corresponding row in the *output* grid.\n      * If, in a given row, there's a white pixel to the immediate right of the blue pixel *in the input*, place an azure pixel in the third column of the corresponding row in the *output* grid.\n6.  **Return:** Return the resulting output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, value):\n    \"\"\"Finds the longest vertical line of a specific value in a grid.\"\"\"\n    rows, cols = grid.shape\n    max_len = 0\n    start_row = -1\n    col_index = -1\n\n    for j in range(cols):\n        current_len = 0\n        current_start_row = -1\n        for i in range(rows):\n            if grid[i, j] == value:\n                if current_len == 0:\n                    current_start_row = i\n                current_len += 1\n            else:\n                if current_len > max_len:\n                    max_len = current_len\n                    start_row = current_start_row\n                    col_index = j\n                current_len = 0\n                current_start_row = -1\n        # Check for line at the end of the column\n        if current_len > max_len:\n            max_len = current_len\n            start_row = current_start_row\n            col_index = j\n\n    return start_row, col_index, max_len\n\ndef check_adjacent_whites(grid, start_row, col_index, length):\n    \"\"\"Checks for white pixels to the left or right of the entire blue line.\"\"\"\n    for i in range(length):\n        row = start_row + i\n        if (col_index > 0 and grid[row, col_index - 1] == 0) or \\\n           (col_index < grid.shape[1] - 1 and grid[row, col_index + 1] == 0):\n            return True\n    return False\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # 1. Find the longest blue line\n    start_row, col_index, length = find_vertical_line(input_grid, 1)\n\n    # 2. Check for adjacent whites\n    has_adjacent_whites = check_adjacent_whites(input_grid, start_row, col_index, length)\n\n    # 3. Determine output dimensions\n    output_height = length\n    output_width = 3 if has_adjacent_whites else 1\n\n    # 4. Create output grid\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # 5. Populate with Azure\n    center_col = 1 if output_width == 3 else 0\n    for i in range(length):\n        output_grid[i, center_col] = 8  # Center azure line\n\n        row_in_input = start_row + i\n        if output_width == 3:\n            # Check left\n            if col_index > 0 and input_grid[row_in_input, col_index - 1] == 0:\n                output_grid[i, 0] = 8\n            # Check right\n            if col_index < input_grid.shape[1] - 1 and input_grid[row_in_input, col_index + 1] == 0:\n                output_grid[i, 2] = 8\n\n    # 6. Return the output grid\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4745,
+    "candidates_token_count": 1172,
+    "total_token_count": 5917,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.156316,
+  "response_file": "006-response.json"
+}

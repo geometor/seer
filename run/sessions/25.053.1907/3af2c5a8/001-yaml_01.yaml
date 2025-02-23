@@ -1,0 +1,21 @@
+objects:
+  - type: grid
+    properties:
+      dimensions:
+        input: 3x4 (rows x columns)
+        output: 6x8 (rows x columns)
+      elements: pixels
+      colors: [0, 8]  # 0: white, 8: azure
+
+actions:
+  - name: expand
+    description: The input grid is expanded to double its original dimensions.
+    details:
+        rows: input_rows * 2
+        cols: input_cols * 2
+
+  - name: replicate_pattern
+    description: The pattern of azure pixels is replicated in a specific way within the expanded grid.
+    details: >
+      The azure pixels in the output grid maintain their relative positions but also extend a copy to the right.
+      Each row of the pattern is duplicated and repeats with each element repeating and extra space (0) is added on each side.

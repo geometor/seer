@@ -1,0 +1,33 @@
+input:
+  grid_size: [8, 10]
+  objects:
+    gray_object:
+      color: gray (5)
+      shape: irregular
+      coordinates: [(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6), (3, 3), (3, 6), (4, 4), (4, 5), (4, 6), (5, 4), (5, 5), (5, 6), (6, 4)]
+      bounding_box:
+        top_left: [1, 1]
+        bottom_right: [6, 6]
+
+output:
+  grid_size: [8, 10]
+  objects:
+    azure_object:
+      color: azure (8)
+      shape: irregular
+      coordinates: [(1, 1), (1, 2), (1, 4), (1, 5), (2, 1), (2, 2), (2, 4), (2, 5), (4, 5), (4, 6), (5, 5), (5, 6)]
+      bounding_box:
+        top_left: [1, 1]
+        bottom_right: [5, 6]
+    red_object:
+      color: red (2)
+      shape: irregular
+      coordinates: [(1, 3), (1, 6), (2, 3), (2, 6), (3, 3), (3, 6), (4, 4), (5, 4), (6, 4)]
+      bounding_box:
+        top_left: [1, 3]
+        bottom_right: [6, 6]
+
+transformation:
+  type: color_change_and_split
+  input_object: gray_object
+  output_objects: [azure_object, red_object]

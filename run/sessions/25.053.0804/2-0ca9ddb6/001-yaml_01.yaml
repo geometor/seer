@@ -1,0 +1,36 @@
+objects:
+  input:
+    red_pixel:
+      color: red
+      value: 2
+      position: (3, 2)  # (row, col)
+    blue_pixel:
+      color: blue
+      value: 1
+      position: (6, 6)
+  output:
+    red_pixel:
+      color: red
+      value: 2
+      position: (3, 2)
+    blue_pixel:
+      color: blue
+      value: 1
+      position: (6, 6)
+    yellow_pixels:
+      color: yellow
+      value: 4
+      positions: [(2, 1), (2, 3), (4, 1), (4, 3)]
+    orange_pixels:
+      color: orange
+      value: 7
+      positions: [(5, 6), (6, 5), (6, 7), (7, 6)]
+
+transformations:
+    - create yellow pixels:
+        - description: "Yellow pixels are created based on the position of the red pixel."
+        - relative_positions: "One row above and one column to the left and right.  And, one row below, one column to the left and right"
+
+    - create orange pixels:
+        - description: "Orange pixels are created based on the position of the blue pixel."
+        - relative_positions: "One row above, same column; Same row, one column left and right, one row below, same column"

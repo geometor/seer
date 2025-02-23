@@ -1,0 +1,18 @@
+facts:
+  - object: vertical_line
+    type: line
+    color: blue (1)
+    property: longest
+    relation: defines_region
+
+  - object: region_of_interest
+    type: subgrid
+    relation: centered_on_vertical_line
+    property: dynamic_width # Width is not always 3, can be 2 or 1
+
+  - action: transform_pixels
+    condition: "pixel is within region_of_interest, AND is blue OR adjacent pixel in vertical line is 0"
+    transformation: "set pixel to azure (8) otherwise to white (0)"
+
+  - object: output_grid
+      property: height_matches_vertical_line
