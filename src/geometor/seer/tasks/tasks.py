@@ -117,9 +117,10 @@ class Task:
 
         return json_str
 
-    def to_image(self):
+    def to_image(self, cell_spacing=10):
         """
         Creates a combined image for all train and test pairs in the task.
+        Adds spacing between grids.
         """
         train_images = []
         for pair in self.train:
@@ -140,39 +141,42 @@ class Task:
             max_height = max(max_height, img.height)
 
         # Create combined image for train pairs
-        train_table_width = len(self.train) * max_width
-        train_table_height = 2 * max_height  # 2 rows: input and output
-        train_table = Image.new(
-            "RGB", (train_table_width, train_table_height), color="white"
-        )
-        x_offset = 0
+        train_table_width = len(self.train) * (max_width + cell_spacing) + cell_spacing
+        train_table_height = 2 * (max_height + cell_spacing) + cell_spacing
+        train_table = Image.new("RGB", (train_table_width, train_table_height), color="black")
+        x_offset = cell_spacing
         for i in range(0, len(train_images), 2):
-            train_table.paste(train_images[i], (x_offset, 0))
-            train_table.paste(train_images[i + 1], (x_offset, max_height))
-            x_offset += max_width
+            train_table.paste(train_images[i], (x_offset, cell_spacing))
+            train_table.paste(train_images[i + 1], (x_offset, max_height + 2 * cell_spacing))
+            x_offset += max_width + cell_spacing
 
         # Create combined image for test pairs
-        test_table_width = len(self.test) * max_width
+        test_table_width = len(self.test) * (max_width + cell_spacing) + cell_spacing
         test_table_height = (
-            2 * max_height if any(pair.output for pair in self.test) else max_height
-        )  # Check for test outputs
-        test_table = Image.new(
-            "RGB", (test_table_width, test_table_height), color="white"
+            2 * (max_height + cell_spacing) + cell_spacing
+            if any(pair.output for pair in self.test)
+            else max_height + 2 * cell_spacing  # Corrected height
         )
-        x_offset = 0
+        test_table = Image.new("RGB", (test_table_width, test_table_height), color="black")
+        x_offset = cell_spacing
         for i in range(0, len(test_images), 2):
-            test_table.paste(test_images[i], (x_offset, 0))
+            test_table.paste(test_images[i], (x_offset, cell_spacing))
             # Handle potential missing test outputs
             if i + 1 < len(test_images):
-                test_table.paste(test_images[i + 1], (x_offset, max_height))
-            x_offset += max_width
+                test_table.paste(test_images[i + 1], (x_offset, max_height + 2 * cell_spacing))
+            x_offset += max_width + cell_spacing
 
         # Combine train and test tables vertically
         total_width = max(train_table_width, test_table_width)
         total_height = train_table_height + test_table_height
-        final_image = Image.new("RGB", (total_width, total_height), color="white")
-        final_image.paste(train_table, (0, 0))
-        final_image.paste(test_table, (0, train_table_height))
+        final_image = Image.new("RGB", (total_width, total_height), color="black")
+
+        # Center the train and test tables
+        train_x_offset = (total_width - train_table_width) // 2
+        test_x_offset = (total_width - test_table_width) // 2
+
+        final_image.paste(train_table, (train_x_offset, 0))
+        final_image.paste(test_table, (test_x_offset, train_table_height))
 
         return final_image
 
