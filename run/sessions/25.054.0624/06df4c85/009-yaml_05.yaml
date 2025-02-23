@@ -1,0 +1,59 @@
+observations:
+  - example: 1
+    objects:
+      - color: 8  # Azure
+        shape: vertical_strip
+        action: expand_vertically
+      - color: 2  # Red
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+      - color: 3 # Green
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+    horizontal_expansion:
+      rule: "If a blue pixel is between two non-white, non-blue pixels, change the blue pixel to match the color of adjacent non-white and non-blue."
+      correct: false
+    vertical_expansion:
+      rule: "If a vertical_strip with color 8 is found, fill its whole column with color 8, if it is not blocked."
+      correct: partially #only expands between min and max columns.
+  - example: 2
+    objects:
+      - color: 2
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+      - color: 4
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+      - color: 9
+        shape: vertical_strip
+        action: expand_vertically
+      - color: 8
+        shape: vertical_strip
+        action: expand_vertically
+    horizontal_expansion:
+      rule: "If a blue pixel is between two non-white, non-blue pixels, change the blue pixel to match the color of adjacent non-white and non-blue."
+      correct: false
+    vertical_expansion:
+      rule: "If a vertical_strip with color 9 or 8 is found, fill its whole column with respective color, if it is not blocked."
+      correct: false
+  - example: 3
+    objects:
+      - color: 4
+        shape: vertical_strip
+        action: expand_vertically
+      - color: 3
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+      - color: 2
+        shape: vertical_strip
+        action: expand_horizontally, expand_vertically
+    horizontal_expansion:
+      rule: "If a blue pixel is between two non-white, non-blue pixels, change the blue pixel to match the color of adjacent non-white and non-blue."
+      correct: false
+    vertical_expansion:
+      rule: "If a vertical_strip with certain colors is found, fill its whole column with respective color, if it is not blocked."
+      correct: false
+general_observations:
+  - "Shapes are consistently altered to create vertically extended strips."
+  - "Horizontal filling is context-dependent and incomplete."
+  - "Vertical expansion logic is consistently misapplied in all given examples."

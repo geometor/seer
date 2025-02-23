@@ -1,0 +1,69 @@
+example_1:
+  objects:
+    - color: azure (8)
+      shape: background
+    - color: blue (1)
+      shape: irregular, large, two disconnected components
+      outline: red (2)
+      notes: |
+        The blue object is outlined, although some interior pixels
+        are incorrectly colored red. Contains two green (3) pixels.
+    - color: green (3)
+      shape: two single pixels.
+      notes: inside the blue object, swapped to be next to the red outline.
+  transformation:
+    - action: outline
+      object_color: blue (1)
+      outline_color: red (2)
+    - action: highlight
+      object_color: blue
+      highlight_color: green
+    - action: mirror
+      axis: vertical
+example_2:
+  objects:
+    - color: blue (1)
+      shape: background
+    - color: red (2)
+      shape: irregular
+      contains: green highlight
+      notes: Contains a green (3) and yellow(4) pixels
+    - color: green (3)
+      shape: small region adjacent to yellow
+    - color: yellow (4)
+      shape: small region
+  transformation:
+     - action: outline
+       object_color: red
+       outline_color: blue
+     - action: highlight
+       object_color: red
+       highlight_color: green
+     - action: mirror
+       axis: vertical
+
+example_3:
+  objects:
+    - color: azure (8)
+      shape: background
+    - color: green (3)
+      shape: irregular, large connected region with one disconnected segment
+      notes: contains one yellow (4) pixel
+    - color: yellow(4)
+      shape: point
+    - color: grey(5)
+      shape: small region
+      contains: yellow and magenta pixels
+    - color: magenta (6)
+      shape: small region, adjacent to grey
+  transformation:
+    - action: outline
+      object_color: green
+      outline_color: azure (8)
+    - action: highlight
+      object_color: green
+      highlight_color: grey (5)
+    - action: copy
+      object_color: grey
+    - action: mirror
+      axis: vertical

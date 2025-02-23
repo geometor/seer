@@ -1,0 +1,24 @@
+observations:
+  - object_type: maroon_rectangle
+    description: Rectangular regions of color 9.
+    properties:
+      - bounding_box: Defines the top-left and bottom-right corners.
+      - size: width and height of rectangle
+
+  - action: fill_green
+    description: Fill an area with color 3 (green).
+    constraints:
+      - bounded_by:  maroon rectangles, and white cells.
+      - location:  Specifically above and to the left of certain maroon rectangles.
+
+  - action: fill_blue
+    description: Fill an area with color 1 (blue).
+    constraints:
+      - bounded_by:  maroon rectangles and grid edges.
+      - location:  Specifically above and to the left of certain maroon objects.
+
+  - action: fill_white_area
+    description: Fill white regions above maroon with green or blue based on location relative to the bounding box.
+    constraints:
+      - color: Depends on other object properties and relative locations.
+      - shape: defined by surrounding colored and white cells

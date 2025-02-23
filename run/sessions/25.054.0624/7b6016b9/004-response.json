@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Background Transformation:** Change all white (0) pixels in the input grid to green (3).\n2.  **Object Identification:** Identify all closed objects. A closed object consists of a contiguous region of pixels of the same color, fully enclosing one or more pixels of a *different* color. The color of the outer object can be any color other than the background color.\n3. **Interior Filling:** For each identified closed object, replace the color of all pixels within the enclosed region with red (2). The enclosed pixels will be of *any* color other than the enclosing object color.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"\n    Finds objects of all colors in the grid.\n\n    Args:\n        grid: The input grid (NumPy array).\n\n    Returns:\n        A dictionary of objects, where keys are colors and values are lists of objects.\n        Each object is a set of (row, col) coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, current_object):\n        if (\n            row < 0\n            or row >= rows\n            or col < 0\n            or col >= cols\n            or grid[row, col] != color\n            or (row, col) in visited\n        ):\n            return\n        visited.add((row, col))\n        current_object.add((row, col))\n        dfs(row + 1, col, color, current_object)\n        dfs(row - 1, col, color, current_object)\n        dfs(row, col + 1, color, current_object)\n        dfs(row, col - 1, color, current_object)\n\n    for row in range(rows):\n        for col in range(cols):\n            color = grid[row, col]\n            if (row, col) not in visited:\n                current_object = set()\n                dfs(row, col, color, current_object)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(current_object)\n    return objects\n\ndef flood_fill(grid, start_row, start_col, target_color, replacement_color):\n    \"\"\"\n    Performs a flood fill operation on the grid.\n    \"\"\"\n    rows, cols = grid.shape\n    if target_color == replacement_color:\n      return grid\n    \n    def get_neighbors(r, c):\n        neighbors = []\n        if r > 0:\n            neighbors.append((r-1,c))\n        if r < rows - 1:\n            neighbors.append((r+1, c))\n        if c > 0:\n          neighbors.append((r, c - 1))\n        if c < cols - 1:\n          neighbors.append((r, c+1))\n        return neighbors\n\n    q = [(start_row, start_col)]\n    visited = set()\n    output_grid = np.copy(grid)\n\n    while q:\n      r, c = q.pop()\n\n      if (r,c) in visited or output_grid[r,c] != target_color:\n        continue\n\n      visited.add((r,c))\n      output_grid[r,c] = replacement_color\n\n      for nr, nc in get_neighbors(r,c):\n        q.append((nr,nc))\n    return output_grid\n        \n\ndef is_closed_object(grid, object_pixels, object_color):\n    \"\"\"\n    Checks if an object is a closed object (encloses other colors).\n    \"\"\"\n    rows, cols = grid.shape\n    # Find bounding box\n    min_row = min(r for r, c in object_pixels)\n    max_row = max(r for r, c in object_pixels)\n    min_col = min(c for r, c in object_pixels)\n    max_col = max(c for r, c in object_pixels)\n\n\n    for r in range(min_row, max_row + 1):\n        for c in range(min_col, max_col + 1):\n            if (r, c) not in object_pixels:\n                # Check if this pixel is enclosed by object\n                if grid[r,c] != object_color:\n                    return True\n\n    return False\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # change white background to green\n    output_grid[output_grid == 0] = 3\n\n    # Find all objects\n    objects_by_color = get_objects(output_grid)\n\n    # Iterate through objects and fill interiors\n    for color, objects in objects_by_color.items():\n        if color == 3:  # Skip background color\n            continue\n        for obj in objects:\n            if is_closed_object(output_grid, obj, color):\n              #find a pixel within the object to use as the seed for flood_fill\n              min_row = min(r for r, c in obj)\n              max_row = max(r for r, c in obj)\n              min_col = min(c for r, c in obj)\n              max_col = max(c for r, c in obj)\n\n              for r in range(min_row + 1, max_row):\n                for c in range(min_col+1, max_col):\n                  if (r,c) not in obj: #found interior\n                    output_grid = flood_fill(output_grid, r, c, output_grid[r,c], 2)\n                    break #only fill once per object\n                else:\n                  continue\n                break\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 2174,
+            "end_index": 2452,
+            "uri": "https://github.com/Anuj-cs20/IIITDMK_CSE_Coursework",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12629,
+    "candidates_token_count": 1331,
+    "total_token_count": 13960,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.406684,
+  "response_file": "004-response.json"
+}

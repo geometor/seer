@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies and removes \"noisy\" objects based on size and\nreplaces them with a padding of the most common background color.\nThe objects are then filled back based on rules that apply to object size, shape, and color\nand context, based on the comparison with the original input.\nSingle pixel object are handled differently, based on their context.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef get_objects(grid):\n    \"\"\"Identifies connected components (objects) in the grid.\"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, current_object):\n        if (row, col) in visited or not (0 <= row < rows and 0 <= col < cols) or grid[row, col] == 0:\n            return\n        visited.add((row, col))\n        current_object.append(((row, col), grid[row, col]))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(rows):\n        for col in range(cols):\n            if grid[row, col] != 0 and (row, col) not in visited:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\n\ndef get_background_color(grid):\n    \"\"\"\n    Determines the most common color on the edges of the grid.\n    \"\"\"\n    rows, cols = grid.shape\n    edge_pixels = []\n    edge_pixels.extend(grid[0, :].tolist())  # Top row\n    edge_pixels.extend(grid[rows - 1, :].tolist())  # Bottom row\n    edge_pixels.extend(grid[:, 0].tolist())  # Left column\n    edge_pixels.extend(grid[:, cols - 1].tolist())  # Right column\n    \n    color_counts = Counter(edge_pixels)\n    \n    most_common_color = color_counts.most_common(1)[0][0]\n    return most_common_color\n\ndef get_object_bounding_box(obj):\n    \"\"\"Calculates the bounding box of an object.\"\"\"\n    coords, _ = zip(*obj)\n    coords_array = np.array(coords)\n    rows_obj = coords_array[:, 0]\n    cols_obj = coords_array[:, 1]\n    min_row, max_row = np.min(rows_obj), np.max(rows_obj)\n    min_col, max_col = np.min(cols_obj), np.max(cols_obj)\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by removing and reconstructing objects.\"\"\"\n    \n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid) # initialize to all zeros\n    background_color = get_background_color(input_grid)\n    output_grid[:] = background_color  # Fill with background\n\n    # Get objects from the original grid\n    original_objects = get_objects(input_grid)\n    \n    # Initial filtering: Keep large and medium structured objects.\n    for obj in original_objects:\n        coords, color = zip(*obj)\n        min_row, max_row, min_col, max_col = get_object_bounding_box(obj)\n\n        width = max_col - min_col + 1\n        height = max_row - min_row + 1\n        size = len(obj)\n\n        if size >= 9: # large objects\n            if height > 2 and width > 2: # Check for structured shape (not just a line)\n                for (r, c), val in obj:\n                    output_grid[r, c] = val\n            \n        elif size >= 3 and size <= 8: # medium-sized objects\n            if height > 1 and width > 1:  # structured object\n                for (r, c), val in obj:\n                    output_grid[r, c] = val\n            \n    # Single pixel objects\n    \n    temp_grid = output_grid.copy()\n    \n    for obj in original_objects:\n      if len(obj) == 1:  # single pixel\n        ((r,c),val) = obj[0]\n        \n        # Check neighbors in original grid\n        neighbors = []\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if (dr, dc) != (0, 0):  # Exclude the pixel itself\n                    nr, nc = r + dr, c + dc\n                    if 0 <= nr < rows and 0 <= nc < cols:\n                        neighbors.append(input_grid[nr, nc])\n        \n        neighbor_counts = Counter(neighbors)\n        most_common_neighbor = neighbor_counts.most_common(1)[0][0] if neighbor_counts else background_color # if empty use background\n        if (most_common_neighbor != background_color and most_common_neighbor != 0):\n          # Check if the object is a part of larger solid object\n            temp_grid[r,c] = val\n    \n    output_grid = temp_grid\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 31974,
+    "candidates_token_count": 1277,
+    "total_token_count": 33251,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.889362,
+  "response_file": "018-response.json"
+}

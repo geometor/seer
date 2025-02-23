@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Red Objects:** Locate all connected regions of red (2) pixels in the input grid.  These define the boundaries.\n2.  **Identify White Regions:**  Locate all connected regions of white (0) pixels.\n3.  **Fill Enclosed White Regions:** For each white region, determine if it's fully enclosed by red pixels (using 8-connectivity). If a white region is fully enclosed, change all pixels in that region to green (3).\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label, measurements\n\ndef get_connected_regions(grid, color):\n    \"\"\"\n    Finds connected regions of a specific color in the grid.\n\n    Args:\n        grid: A 2D numpy array representing the grid.\n        color: The color to find connected regions for.\n\n    Returns:\n        A list of tuples, where each tuple contains the (row, col) coordinates\n        of pixels belonging to a connected region of the specified color.\n        Also return the labeled array, where each region is a unique integer,\n        and the number of regions\n    \"\"\"\n    colored_pixels = (grid == color)\n    labeled_array, num_features = label(colored_pixels)\n    regions = []\n    for i in range(1, num_features + 1):  # Iterate through each labeled region\n        region_pixels = np.where(labeled_array == i)\n        regions.append(list(zip(region_pixels[0], region_pixels[1])))\n    return regions, labeled_array, num_features\n\ndef is_enclosed(region, labeled_array, boundary_color, grid_shape):\n    \"\"\"\n    Checks if a region is fully enclosed by a boundary color.\n\n    Args:\n      region: list of (row, col) of the region to check\n      labeled_array: labeled array from the connected regions\n      boundary_color:  color of the boundary\n      grid_shape: (height, width)\n\n    Returns:\n        True if the region is fully enclosed, False otherwise.\n    \"\"\"\n\n    rows, cols = zip(*region)  # Unzip the coordinates\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n\n    # Check if the region touches the edges of the grid\n    if min_row == 0 or max_row == grid_shape[0] - 1 or min_col == 0 or max_col == grid_shape[1] - 1:\n      return False\n\n    # Check all neighboring pixels around the *bounding box* of the region\n    for r in range(min_row - 1, max_row + 2):\n        for c in range(min_col - 1, max_col + 2):\n          # skip the inside of the bounding box, we only care about the perimeter\n            if min_row <= r <= max_row and min_col <=c <= max_col:\n              continue\n\n            # Check boundaries - if out of grid, or not red.\n            if (0 <= r < grid_shape[0] and 0 <= c < grid_shape[1]):\n                if labeled_array[r, c] != boundary_color:\n                  \n                  return False\n            \n    return True\n  \n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    grid_shape = input_grid.shape\n\n    # Get red regions\n    red_regions, red_labeled_array, red_num_features = get_connected_regions(input_grid, 2)\n\n    # Label the entire red-colored area (all red regions combined) with a single label '2'\n    red_combined_mask = (input_grid == 2)\n    red_labeled_combined, _ = label(red_combined_mask) #we do not care about number of objects\n    \n    # Get white regions\n    white_regions, white_labeled_array, white_num_features = get_connected_regions(input_grid, 0)\n\n    # Fill enclosed white regions\n    for white_region in white_regions:\n        # Check if enclosed by red using the combined red labeled array\n        if is_enclosed(white_region, red_labeled_combined, 2, grid_shape):\n            for r, c in white_region:\n                output_grid[r, c] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 26156,
+    "candidates_token_count": 1027,
+    "total_token_count": 27183,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.514172,
+  "response_file": "016-response.json"
+}

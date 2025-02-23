@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Preserve Maroon: Copy all maroon (9) pixels from the input to the output grid.\n2. Green Outline:\n    *   Any white (0) pixel that is adjacent (up, down, left, or right) to a maroon (9) pixel is changed to green (3) in the output.\n    *   Any white pixel that is adjacent to the edge of the grid is changed to green (3) in the output\n3.  Blue Object: Identify the spaces created enclosed by a green outline. Fill this shape with blue (1) pixels.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighbors of a cell (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # Up\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # Down\n    if col > 0:\n        neighbors.append((row, col - 1))  # Left\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # Right\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Preserve Maroon\n    # (No change needed here - already correct)\n\n   # Green Outline (including edge)\n    for row in range(rows):\n        for col in range(cols):\n            if input_grid[row, col] == 9:  #Maroon\n                for r, c in get_neighbors(input_grid, row, col):\n                    if input_grid[r,c] == 0:\n                        output_grid[r,c] = 3\n            elif input_grid[row,col] == 0:\n                is_edge = row == 0 or row == rows -1 or col == 0 or col == cols - 1\n                if is_edge:\n                    output_grid[row,col] = 3\n\n    # Flood fill for blue objects\n    for row in range(rows):\n        for col in range(cols):\n            if output_grid[row, col] == 0:\n                output_grid[row,col] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 624,
+            "end_index": 916,
+            "uri": "https://github.com/Kaeltherol/Minesweeper",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9466,
+    "candidates_token_count": 563,
+    "total_token_count": 10029,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.081501,
+  "response_file": "004-response.json"
+}

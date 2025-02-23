@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements: pixels
+  - type: pixel
+    properties:
+      color:
+        values: [red, azure, gray]
+        mapping:
+          red: 2
+          azure: 8
+          gray: 5
+
+actions:
+  - type: replace_color
+    input_color: azure
+    output_color: gray
+    location: central_horizontal_line
+
+relationships:
+  - type: spatial
+    description: The grid is a 2D arrangement of pixels.
+  - type: transformation
+    description: Input pixels on the central horizontal line are changed based on their color.

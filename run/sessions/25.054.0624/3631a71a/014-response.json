@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nA 3x3 \"median filter\" approach with a special rule for a clear majority is\napplied on the grid. The \"majority\" color, or if none, fill with an external common\ncolor.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef get_surrounding_colors(grid, row, col, block_size=3):\n    \"\"\"Gets colors surrounding a block in the grid.\"\"\"\n    surrounding = []\n    start_row, start_col = row - 1, col - 1\n    end_row, end_col = row + block_size, col + block_size\n\n    for i in range(start_row, end_row + 1):\n        for j in range(start_col, end_col + 1):\n            if (start_row <= i < end_row and start_col <= j < end_col):\n                continue  # Skip the inner block itself\n            if 0 <= i < grid.shape[0] and 0 <= j < grid.shape[1]:\n                surrounding.append(grid[i, j])\n    return surrounding\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by applying a 3x3 filter.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n    block_size = 3\n\n    for row in range(rows - block_size + 1):\n        for col in range(cols - block_size + 1):\n            block = input_grid[row:row+block_size, col:col+block_size]\n            \n            # Count occurrences of each color in the block\n            color_counts = Counter(block.flatten())\n            most_common_color, count = color_counts.most_common(1)[0]\n\n            # If a color occupies more than half the block, fill with that color\n            if count > (block_size * block_size) // 2:\n                output_grid[row:row+block_size, col:col+block_size] = most_common_color\n            else:\n                # Find most common surrounding color\n                surrounding_colors = get_surrounding_colors(input_grid, row, col)\n                if surrounding_colors:\n                    surrounding_counts = Counter(surrounding_colors)\n                    most_common_surrounding = surrounding_counts.most_common(1)[0][0]\n                    output_grid[row:row+block_size, col:col+block_size] = most_common_surrounding\n                # else: leave as is (this case should be handled by initialization copy)\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5786,
+    "candidates_token_count": 608,
+    "total_token_count": 6394,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.322582,
+  "response_file": "014-response.json"
+}

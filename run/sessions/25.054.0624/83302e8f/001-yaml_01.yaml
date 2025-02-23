@@ -1,0 +1,41 @@
+objects:
+  - name: background
+    type: pixel_group
+    properties:
+      color:
+        initial: 0  # white
+        final: [3, 4] # green or yellow
+      shape: fills the space not occupied by the cross
+
+  - name: cross
+    type: pixel_group
+    properties:
+      color:
+        initial: 8  # azure
+        final: [8, 4]   # azure or yellow
+      shape: diagonal lines forming an "X"
+
+  - name: changed_background_pixels
+    type: pixel_group
+    properties:
+     color:
+       initial: 0
+       final: 3
+
+actions:
+  - type: recolor
+    target: background
+    properties:
+      new_color:
+        rule: "alternating diagonal stripes of 3 and 4 based on position of cross shape"
+
+  - type: recolor_inside
+    target: cross
+    properties:
+      new_color: 4 #yellow
+
+relationships:
+  - type: spatial
+    description: "The 'cross' is centered within the 'background'."
+  - type: color_change
+    description: "background pixels near to cross are recolored, cross pixels are recolored."

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is rotated 90 degrees counter-clockwise. After the rotation, the pixel in the lower-left corner of the input grid moves to the lower-right corner of the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Rotates the input grid 90 degrees counter-clockwise and moves the lower-left pixel to the lower-right.\n\n    Args:\n        input_grid (list of lists): The input grid represented as a list of lists.\n\n    Returns:\n        list of lists: The rotated and modified output grid.\n    \"\"\"\n    # Convert the input grid to a NumPy array.\n    input_array = np.array(input_grid)\n\n    # Rotate the array 90 degrees counter-clockwise.\n    rotated_array = np.rot90(input_array)\n\n    # Convert the rotated array back to a list of lists.\n    output_grid = rotated_array.tolist()\n\n    # Get the dimensions of the grid.\n    rows = len(output_grid)\n    cols = len(output_grid[0])\n\n    # Move the lower-left pixel to the lower-right.\n    lower_left_pixel = output_grid[rows - 1][0]\n    output_grid[rows - 1][cols - 1] = lower_left_pixel\n    output_grid[rows-1][0] = rotated_array[rows-1][cols-1] # original value in that spot\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3042,
+    "candidates_token_count": 342,
+    "total_token_count": 3384,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.83197,
+  "response_file": "016-response.json"
+}

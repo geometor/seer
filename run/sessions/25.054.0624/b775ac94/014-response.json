@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nDuplicates and expands colored objects in a grid, with exceptions of shifting for yellow and azure objects.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds all contiguous colored regions (objects) in the grid.\n    Returns a dictionary where keys are colors and values are lists of (row, col) coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, obj_coords):\n        if (row, col) in visited or row < 0 or row >= rows or col < 0 or col >= cols or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        obj_coords.append((row, col))\n        dfs(row + 1, col, color, obj_coords)\n        dfs(row - 1, col, color, obj_coords)\n        dfs(row, col + 1, color, obj_coords)\n        dfs(row, col - 1, color, obj_coords)\n\n    for row in range(rows):\n        for col in range(cols):\n            color = grid[row, col]\n            if color != 0 and (row, col) not in visited:\n                obj_coords = []\n                dfs(row, col, color, obj_coords)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(obj_coords)\n    return objects\n\n\ndef transform(input_grid):\n    # Initialize output grid with the same dimensions and background color\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n   # Find all objects in the input grid\n    objects = find_objects(input_grid)\n\n    # Process each object based on its color\n    for color, obj_list in objects.items():\n        for obj_coords in obj_list:\n            if color == 4:  # Yellow object\n                #shift yellow right\n                for r, c in obj_coords:\n                    output_grid[r,min(cols-1,c+1)] = 4\n\n                # check if 1-cell or L-shape to see if expand\n                if len(obj_coords) == 4:\n                    coords = np.array(obj_coords)\n                    min_row, min_col = np.min(coords, axis=0)\n                    max_row, max_col = np.max(coords, axis=0)\n                    \n                    #check if L\n                    is_l_shape = (max_row - min_row == 1) and (max_col - min_col == 1)\n\n                    if is_l_shape:\n                        for r, c in obj_coords:\n                            if r == min_row or c == max_col:\n                                output_grid[r,min(cols-1,c+2)] = 4\n\n            elif color == 8: #azure object\n                #shift azure right\n                for r, c in obj_coords:\n                    output_grid[r,min(cols-1,c+1)] = 8\n\n            else: #other objects\n                # Duplicate and expand other colored objects\n                for r, c in obj_coords:\n                    output_grid[r, c] = color\n                    output_grid[r, min(cols-1,c + (c - min([c_ for _, c_ in obj_coords]) + 1))] = color #expand\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2853,
+    "candidates_token_count": 814,
+    "total_token_count": 3667,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.705304,
+  "response_file": "014-response.json"
+}

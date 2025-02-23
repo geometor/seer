@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all 3x3 squares in the input grid. Note their colors and top-left corner positions.\n\n2.  **Swap Rule:** If there are 3x3 squares of yellow (4) and magenta (6), they swap positions. The swapping process involves these steps for each pair:\n    *   Record the top-left coordinates of both the yellow and magenta squares.\n    *   Copy the 3x3 yellow square to the original top-left position of the magenta square in the output grid.\n    *  Copy the 3x3 magenta square to the original top-left position of the yellow square in the output grid.\n\n3.  **Preserve Context (Restoration around swapped elements):**\n    + Immediately after swapping any pair of squares:\n      * The 5x5 area centered on the *original* top-left corner of the magenta 3x3 region is copied from input to output.\n      * The 5x5 area centered on the *original* top-left corner of the yellow 3x3 region is copied from input to output.\n\n4.  **Other 3x3 blocks:**\n    + Blocks of color green(3) are translated one row up.\n    + Blocks of color red(2) are translated one column right.\n\n5.  **Other Pixels:**\n    + All other pixels that are *not* involved with swapping or translating operations are copied from input directly to output.\n\n\"\"\"\n\nimport numpy as np\n\ndef find_squares(grid, color=None):\n    \"\"\"Finds the top-left corner coordinates of all 3x3 squares of a given color (or any color if color is None).\"\"\"\n    squares = []\n    rows, cols = grid.shape\n    for r in range(rows - 2):\n        for c in range(cols - 2):\n            if color is None or np.all(grid[r:r+3, c:c+3] == color):\n                squares.append((r, c))\n    return squares\n\ndef copy_square(grid, r, c, size=3):\n    \"\"\"Copies a square region from the grid.\"\"\"\n    return np.copy(grid[r:r+size, c:c+size])\n\ndef paste_square(grid, r, c, square):\n    \"\"\"Pastes a square region into the grid.\"\"\"\n    size = square.shape[0]\n    grid[r:r+size, c:c+size] = square\n    \ndef restore_context(input_grid, output_grid, r, c, size=5):\n    \"\"\"Copies a region of size x size centered at (r+1, c+1) from input_grid to output_grid.\"\"\"\n    \n    r0 = max(0, r - (size//2))\n    r1 = min(output_grid.shape[0], r + (size//2) + 2)\n    c0 = max(0, c- (size//2))\n    c1 = min(output_grid.shape[1], c + (size//2) + 2)\n    \n    output_grid[r0:r1,c0:c1] = input_grid[r0:r1,c0:c1]\n\n\ndef transform(input_grid):\n    # Initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find objects\n    yellow_squares = find_squares(input_grid, 4)\n    magenta_squares = find_squares(input_grid, 6)\n    green_squares = find_squares(input_grid,3)\n    red_squares = find_squares(input_grid, 2)\n\n    # Swap yellow and magenta squares\n    for y_r, y_c in yellow_squares:\n        for m_r, m_c in magenta_squares:\n            # Copy squares\n            yellow_square = copy_square(input_grid, y_r, y_c)\n            magenta_square = copy_square(input_grid, m_r, m_c)\n\n            # Paste squares in swapped positions\n            paste_square(output_grid, y_r, y_c, magenta_square)\n            paste_square(output_grid, m_r, m_c, yellow_square)\n            \n            #restore\n            restore_context(input_grid,output_grid,y_r,y_c)\n            restore_context(input_grid,output_grid,m_r,m_c)\n\n    # Translate green blocks up\n    for g_r,g_c in green_squares:\n        green_square = copy_square(input_grid,g_r,g_c)\n        if(g_r > 0):\n          paste_square(output_grid,g_r-1,g_c,green_square)\n          #restore\n          restore_context(input_grid, output_grid, g_r - 1,g_c)\n        \n    # Translate red blocks right\n    for r_r, r_c in red_squares:\n        red_square = copy_square(input_grid, r_r, r_c)\n        if(r_c < input_grid.shape[1]):\n            paste_square(output_grid,r_r,r_c + 1,red_square)\n            restore_context(input_grid,output_grid,r_r,r_c + 1)\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 15679,
+    "candidates_token_count": 1251,
+    "total_token_count": 16930,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.128297,
+  "response_file": "012-response.json"
+}

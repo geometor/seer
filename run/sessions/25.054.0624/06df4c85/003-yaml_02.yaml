@@ -1,0 +1,26 @@
+objects:
+  - name: red_block
+    type: 2x2_block
+    color: 2
+    initial_positions: [[3,3], [3,9], [3,15]]
+    replication_rule: "duplicate next to original, and then every 6 columns if original x is odd"
+
+  - name: blue_block
+    type: 2x2_block
+    color: 1
+    initial_positions: [[6,9]]
+    replication_rule: "duplicate next to original, and then every 6 columns if original x is odd"
+
+  - name: green_block
+    type: 2x2_block
+    color: 3
+    initial_positions: [[12,3],[12,9]]
+    replication_rule: "duplicate next to original, and then every 6 columns if original x is odd"
+
+  - name: background
+    type: static
+    color: [0,1,4,8,9] #can be multiple color based on example
+    positions_rule: "rows 0-2 always stay the same, and first and last 3 columns"
+
+actions:
+    - replicate: "colored blocks based on replication rule"

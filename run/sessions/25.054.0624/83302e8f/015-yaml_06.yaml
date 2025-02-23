@@ -1,0 +1,27 @@
+- task: color_change_by_bounding_object
+- objects:
+    - name: bounding_object
+      color: variable #can be 1, 8 or 9 in these examples
+      role: bounds
+      properties:
+         - static: true
+    - name: target_region
+      color: 0
+      role: target
+      properties:
+         - contiguous: true
+         - change_color: true
+- actions:
+    - name: change_color
+      target: target_region
+      parameters:
+        - color: 4 #yellow
+        - condition: "within_bounds_and_upper_left"
+      parameters:
+        - color: 3 #green
+        - condition: "within_bounds_but_not_upper_left"
+- rules:
+    - "identify contiguous regions of color 0"
+    - "identify bounding object by color (not 0)"
+    - "change color of target region to 4 if within the bounding box created by the bounding object, and is the upper and left region."
+    - "otherwise change to color 3"

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Maroon Rectangles:** Find all contiguous regions of color 9 (maroon) and determine their bounding boxes.\n\n2.  **Categorize White Areas:** Divide the white (0) areas into regions based on proximity to maroon rectangles:\n    *   Areas directly above and to the left of *left-most* maroon rectangles.\n    *   Areas above and to the left of *right-most* maroon rectangle, bounded by the edge of the grid.\n    *   Areas that are not directly above and left of any maroon rectangles.\n\n3.  **Fill Green:** Fill the area categorized as being above and to the left of a left-most maroon rectangle with green (3), up to white cells or other colors.\n\n4.  **Fill Blue:** Fill the areas categorized as being above and to the left of the right-most maroon rectangle with blue (1), up to the edges of the grid.\n\n5.  **Remaining Areas:** Leave all other cells unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, current_object):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                if current_object:\n                    objects.append(current_object)\n    return objects\n\ndef get_bounding_box(obj):\n    min_row = min(p[0] for p in obj)\n    max_row = max(p[0] for p in obj)\n    min_col = min(p[1] for p in obj)\n    max_col = max(p[1] for p in obj)\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    maroon_objects = find_objects(input_grid, 9)\n\n    # Find left-most and right-most maroon objects\n    if maroon_objects:\n        leftmost_object = min(maroon_objects, key=lambda obj: get_bounding_box(obj)[2])\n        rightmost_object = max(maroon_objects, key=lambda obj: get_bounding_box(obj)[3])\n\n\n    # Fill Green above and left of leftmost maroon object(s)\n        min_row, _, min_col, _ = get_bounding_box(leftmost_object)\n        for r in range(min_row):\n            for c in range(min_col):\n                if output_grid[r, c] == 0: # Fill only white cells\n                     output_grid[r,c] = 3\n\n    # Fill Blue above rightmost object\n    if len(maroon_objects) >1:\n        min_row, _, min_col, _ = get_bounding_box(rightmost_object)\n        for r in range(min_row):\n           for c in range(input_grid.shape[1]):\n               if output_grid[r,c] == 0:\n                   output_grid[r,c] = 1\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10334,
+    "candidates_token_count": 908,
+    "total_token_count": 11242,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.236199,
+  "response_file": "010-response.json"
+}

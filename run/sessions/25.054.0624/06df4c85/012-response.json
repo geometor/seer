@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Initial Objects:** Locate contiguous blocks of pixels of the same color (excluding white (0) and blue (1)) in the input grid. These form the initial \"vertical strips.\"\n\n2.  **Horizontal Expansion:**\n    *   Iterate through each row of the grid.\n    *   For each blue (1) pixel:\n        *   Check horizontally adjacent pixels. If an adjacent pixel belongs to a colored strip (non-white and non-blue), change the blue pixel to that strip's color.\n        *   Continue propagation: repeat the check for the newly colored pixel and propagate the change.\n\n3.  **Vertical Expansion:**\n    *   Iterate through each *newly colored* pixel (resulting from horizontal expansion).\n    *   For each blue pixel directly above or below a newly colored pixel, change the blue pixel to the same color, but only if there is a pixel of the same color directly adjacent vertically.\n    *   Continue propagation: repeat the check for the newly colored pixel and propagate the change.\n\n4.  **Preservation:** White (0) pixels act as boundaries and should not be changed.\n\"\"\"\n\nimport numpy as np\n\ndef get_vertical_strips(grid):\n    \"\"\"Identifies initial vertical strips (objects) in the grid.\"\"\"\n    rows, cols = grid.shape\n    strips = []\n    for col in range(cols):\n        current_strip = []\n        for row in range(rows):\n            color = grid[row, col]\n            if color not in [0, 1]:\n                if not current_strip or current_strip[-1][1] == color:\n                    current_strip.append((row, col, color))\n                else:\n                    strips.append(current_strip)\n                    current_strip = [(row, col, color)]\n            elif current_strip:\n                strips.append(current_strip)\n                current_strip = []\n        if current_strip:\n            strips.append(current_strip)\n    return strips\n\ndef horizontal_expansion(grid):\n    \"\"\"Expands colors horizontally, replacing blue pixels.\"\"\"\n    rows, cols = grid.shape\n    new_grid = np.copy(grid)\n    changed_pixels = []\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 1:\n                # Check left\n                if c > 0 and grid[r, c-1] not in [0, 1]:\n                    new_grid[r, c] = grid[r, c-1]\n                    changed_pixels.append((r, c, grid[r, c-1]))\n                # Check Right\n                elif c < cols - 1 and grid[r, c+1] not in [0, 1]:\n                    new_grid[r,c] = grid[r, c+1]\n                    changed_pixels.append((r, c, grid[r, c+1]))\n\n    # propagate changes horizontally\n    while len(changed_pixels) > 0:\n      new_changed_pixels = []\n      for r, c, color in changed_pixels:\n        # propagate left\n        if c > 0 and new_grid[r, c-1] == 1:\n          new_grid[r, c-1] = color\n          new_changed_pixels.append( (r, c-1, color) )\n        # propagate right\n        if c < cols - 1 and new_grid[r, c+1] == 1:\n          new_grid[r, c+1] = color\n          new_changed_pixels.append( (r, c+1, color) )\n      changed_pixels = new_changed_pixels\n\n    return new_grid, changed_pixels\n\ndef vertical_expansion(grid, changed_pixels):\n    \"\"\"Expands colors vertically from changed pixels.\"\"\"\n    rows, cols = grid.shape\n    new_grid = np.copy(grid)\n    new_changed_pixels = []\n\n    while len(changed_pixels) > 0:\n       for r, c, color in changed_pixels:\n           # Check above\n           if r > 0 and new_grid[r - 1, c] == 1:\n               new_grid[r - 1, c] = color\n               new_changed_pixels.append((r - 1, c, color))\n           # Check below\n           if r < rows - 1 and new_grid[r + 1, c] == 1:\n               new_grid[r + 1, c] = color\n               new_changed_pixels.append((r + 1, c, color))\n       changed_pixels = new_changed_pixels\n\n    return new_grid\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Identify initial objects (vertical strips) - not used\n    # vertical_strips = get_vertical_strips(output_grid)\n\n    # Horizontal Expansion and get changed pixels\n    output_grid, changed_pixels = horizontal_expansion(output_grid)\n\n\n    # Vertical Expansion from changed pixels\n    output_grid = vertical_expansion(output_grid, changed_pixels)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11757,
+    "candidates_token_count": 1210,
+    "total_token_count": 12967,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.028158,
+  "response_file": "012-response.json"
+}

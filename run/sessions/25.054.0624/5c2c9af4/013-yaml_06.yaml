@@ -1,0 +1,33 @@
+objects:
+  - name: green_pixel
+    color: green
+    value: 3
+    properties:
+      - isolated: true  # Indicates it's not directly adjacent to other green pixels
+      - surrounded: true #in output
+
+  - name: white_pixel
+    color: white
+    value: 0
+    properties:
+      - background: true
+
+actions:
+  - name: expand
+    agent: green_pixel
+    description: Expands outwards horizontally and vertically, changing white pixels to green.
+    constraints:
+        - limited to single expansion in straight lines
+
+  - name: constrain
+    agent: edge
+    description: limit the fill to within a specific area.
+
+relationships:
+  - subject: green_pixel
+    relation: surrounded_by
+    object: white_pixels #in the input
+    
+  - subject: expanded area
+    relation: bounded
+    object: constraint

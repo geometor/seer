@@ -15,6 +15,8 @@ from rich.table import Table
 from rich.console import Console
 from rich import print
 import re  
+import contextlib
+import traceback
 
 from geometor.seer.session.summary import summarize_session, summarize_task
 import geometor.seer.verifier as verifier

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Maroon Regions:** Locate all contiguous regions of maroon (color value 9) pixels within the input grid.\n2.  **Check for enclosed objects:** For each maroon region, check if it contains pixels of any color other than maroon.\n3.  **Conditional Removal:** If a maroon region contains other colors, change all pixels *within that maroon region* to white (color value 0).\n4. **Preserve other pixels:** If a maroon region contains *only* the color maroon, it is not modified. All other pixels in the input grid remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef find_regions(grid, color_value):\n    \"\"\"\n    Finds all contiguous regions of a specific color in a grid.\n\n    Args:\n        grid: The input grid (NumPy array).\n        color_value: The color value to search for.\n\n    Returns:\n        A labeled array where each region has a unique integer label, and the number of features.\n    \"\"\"\n    colored_pixels = (grid == color_value).astype(int)\n    labeled_array, num_features = label(colored_pixels)\n    return labeled_array, num_features\n\ndef has_other_colors(grid, region_mask):\n    \"\"\"\n    Checks if a region contains colors other than its primary color.\n\n    Args:\n        grid: The input grid (NumPy array).\n        region_mask: A boolean mask representing the region.\n\n    Returns:\n        True if the region contains colors other than the primary color, False otherwise.\n    \"\"\"\n    region_pixels = grid[region_mask]\n    unique_colors = np.unique(region_pixels)\n    return len(unique_colors) > 1\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by removing maroon (9) regions that contain other colors.\n    \"\"\"\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find all maroon regions\n    maroon_labeled_array, num_maroon_regions = find_regions(input_grid, 9)\n\n    # Iterate through each maroon region\n    for region_label in range(1, num_maroon_regions + 1):\n        region_mask = (maroon_labeled_array == region_label)\n        # Check if the region contains other colors\n        if has_other_colors(input_grid, region_mask):\n            # Remove the region by setting it to white (0)\n            output_grid[region_mask] = 0\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 24507,
+    "candidates_token_count": 589,
+    "total_token_count": 25096,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.755518,
+  "response_file": "004-response.json"
+}

@@ -1,0 +1,30 @@
+objects:
+  - type: vertical_strip
+    description: Initial colored regions, excluding white and blue, forming vertical lines.
+    properties:
+      color:
+        - value: varies (2, 3, 4, 8, 9) # Colors observed in the examples
+        - description: The color of the vertical strip.
+      height:
+        - value: variable
+        - description:  Extends to the full height of contiguous, same-colored pixels in original.
+      width:
+        - value: variable
+actions:
+  - name: horizontal_expansion
+    description: >-
+      Expands the color of each vertical strip horizontally,
+      replacing adjacent blue pixels. Propagation continues
+      until a non-blue, non-white, pixel is encountered.
+    constraints:
+      - Only replaces blue pixels.
+      - Expands bidirectionally.
+      - Stops at white or different-colored pixels
+  - name: vertical_expansion
+    description: >-
+      Expands the color of each vertical strip and horizontally expanded
+      pixels, replacing adjacent blue pixels.
+    constraints:
+      - Only replaces blue pixels.
+      - Expands bidirectionally.
+      - Stopts at white pixels

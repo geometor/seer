@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCounts the number of distinct white (0) regions in the input grid, considering diagonal adjacency.\n\"\"\"\n\nimport numpy as np\n\ndef find_regions(grid, color):\n    \"\"\"\n    Finds distinct regions of a specific color in the grid, including diagonal connections.\n    \"\"\"\n    rows, cols = len(grid), len(grid[0])\n    visited = set()\n    region_count = 0\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(row, col):\n        \"\"\"\n        Depth-first search to explore a connected region, including diagonals.\n        \"\"\"\n        if (row, col) in visited or not is_valid(row, col) or grid[row][col] != color:\n            return\n        visited.add((row, col))\n        # Explore all 8 adjacent cells (including diagonals)\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:  # Skip the current cell itself\n                    continue\n                dfs(row + dr, col + dc)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] == color and (r, c) not in visited:\n                dfs(r, c)\n                region_count += 1\n    return region_count\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Counts the number of distinct white (0) regions in the input grid, considering diagonal adjacency.\n    \"\"\"\n    # Convert input_grid to a NumPy array for easier processing.\n    grid = np.array(input_grid)\n\n    # Find and count white regions, including diagonal connections.\n    white_regions_count = find_regions(grid, 0)\n    \n    # The output should be represented as a single-element grid (1x1) showing\n    # the count.\n    output_grid = np.array([[white_regions_count]])\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3030,
+    "candidates_token_count": 478,
+    "total_token_count": 3508,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.663968,
+  "response_file": "016-response.json"
+}

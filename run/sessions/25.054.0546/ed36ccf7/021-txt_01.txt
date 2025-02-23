@@ -1,0 +1,30 @@
+import numpy as np
+
+input_grid = np.array([
+    [0, 6, 6],
+    [0, 0, 0],
+    [6, 6, 0]
+])
+expected_output = np.array([
+    [6, 0, 6],
+    [6, 0, 6],
+    [6, 0, 6]
+])
+transformed_output = np.array([
+    [6, 0, 0],
+    [6, 0, 6],
+    [0, 0, 6]
+])
+
+# Find differing pixels
+diff_pixels = np.where(expected_output != transformed_output)
+print(f"Differing pixel locations (row, col): {list(zip(diff_pixels[0], diff_pixels[1]))}")
+
+for row, col in zip(diff_pixels[0], diff_pixels[1]):
+    print(f"Expected value at ({row}, {col}): {expected_output[row, col]}")
+    print(f"Transformed value at ({row}, {col}): {transformed_output[row, col]}")
+
+#find original input
+rotated_input = np.rot90(input_grid, k=-1) #rotate clockwise to locate source of incorrect pixel
+for row, col in zip(diff_pixels[0], diff_pixels[1]):
+  print(f"original input value {rotated_input[row, col]} at {row, col}")

@@ -1,0 +1,48 @@
+examples:
+  - example_id: 1
+    objects:
+      - color: 8  # Azure
+        shape: Irregular, forms boundaries
+        role: Enclosing boundary
+      - color: 0  # White
+        shape: Irregular, within and outside boundaries
+        role: Target for filling if enclosed
+      - color: 3  # Green
+        shape: Irregular, within boundaries
+        role: Unchanged
+      - color: 6  # Magenta
+        shape: Irregular, within boundaries
+        role: Unchanged
+    actions:
+      - type: Fill
+        target: White (0) pixels
+        condition: Enclosed by azure (8)
+        new_color: 4  # Yellow
+  - example_id: 2
+    objects:
+      - color: 3
+        shape: forms boundaries, but is NOT the enclosing color
+        role: boundary
+      - color: 0
+        role: unchanged
+      - color: 6
+        role: unchanged
+      - color: 4
+        role: unchanged
+    actions: []  # Note: Incorrect - needs to fill white with yellow
+  - example_id: 3
+    objects:
+        - color: 8
+          shape: forms boundaries, but is NOT the enclosing color
+          role: boundary
+        - color: 0
+          role: target
+        - color: 2
+          role: unchanged
+        - color: 4
+          role: incorrectly changed
+    actions:
+      - type: Fill
+        target: white (0) pixels
+        condition: Enclosed by azure (8)
+        new_color: 4

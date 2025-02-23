@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Find the pixel with the value 6 (magenta) in the input grid.\n2.  **Magenta Propagation:**  Propagate the value '6' downwards and to the left, replacing any '0' (white) pixels encountered. Stop propagation in a direction when a non-zero pixel is met.\n3. **Yellow propogation** Propogate the value '4' downwards.\n4. Ignore other non-zero pixels.\n\"\"\"\n\nimport numpy as np\n\ndef get_top_right_nonzero(grid):\n    for j in range(grid.shape[1] - 1, -1, -1):\n        for i in range(grid.shape[0]):\n            if grid[i, j] != 0:\n                return (i, j)\n    return None\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # find top right non zero\n    top_right_coords = get_top_right_nonzero(input_grid)\n    if top_right_coords is None:\n        return output_grid\n\n    top_right_value = input_grid[top_right_coords]\n\n    # propogate magenta\n    i, j = top_right_coords\n    # Propagate left\n    for k in range(j, -1, -1):\n        if input_grid[i,k] == 0:\n            output_grid[i, k] = top_right_value\n        else:\n          if (i,k) != (i,j):\n            break\n\n    # Propagate down\n    for k in range(i, rows):\n        if input_grid[k, j] == 0:\n            output_grid[k, j] = top_right_value\n        else:\n          if (k,j) != (i,j):\n            break\n          \n\n    # propogate 4 downwards\n\n    for row_index in range(rows):\n        for col_index in range(cols):\n          if output_grid[row_index,col_index] == 4:\n              for k in range(row_index + 1, rows):\n                  if output_grid[k,col_index] == 0:\n                      output_grid[k,col_index] = 4\n                  else:\n                      break\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2032,
+    "candidates_token_count": 564,
+    "total_token_count": 2596,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.38136,
+  "response_file": "002-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRotates the input grid 90 degrees counter-clockwise. If a pixel in the rotated\ngrid would have a value of 0, and the pixel in the *original* grid at the\nlocation that would have rotated to the current position has a non-zero value,\nthen that pixel value is carried over to the rotated/output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Convert the input list of lists to a NumPy array.\n    input_np = np.array(input_grid)\n\n    # Rotate the array 90 degrees counter-clockwise.\n    output_np = np.rot90(input_np)\n\n    # Iterate through the *output* grid and apply the conditional overwrite.\n    rows, cols = output_np.shape\n    for row in range(rows):\n        for col in range(cols):\n            # Calculate corresponding input coordinates\n            input_row = col\n            input_col = rows - 1 - row\n\n            if output_np[row, col] == 0 and input_np[input_row, input_col] != 0:\n                output_np[row, col] = input_np[input_row, input_col]\n\n    # Convert the NumPy array back to a list of lists.\n    output_grid = output_np.tolist()\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4176,
+    "candidates_token_count": 309,
+    "total_token_count": 4485,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.56972,
+  "response_file": "024-response.json"
+}

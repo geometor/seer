@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Identify Colored Objects:** Locate all contiguous blocks of pixels with colors other than white (0) and blue (1). These are the initial \"colored objects\" (red, yellow, maroon, and azure).\n\n2. **Horizontal Expansion:** Iterate through each row of the grid.\n    *   If a pixel is blue (1) and is horizontally adjacent to the *same* colored object on *both* its left and right, change the blue pixel's color to match that of the object.\n    * if a blue pixel has different colored objects to its left and right, then maintain its color\n\n3.  **Iterate through colored objects:**\n    * For the objects with the colors, maroon(9) and azure(8), expand the objects within their respective vertical sections in the entire column if there is an azure object.\n\n4. **No vertical consideration:** The color propagation/modification of the blue pixel happens only horizontally within a row.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"Finds contiguous objects of the same color, excluding white (0) and blue (1).\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, obj):\n        if (row < 0 or row >= rows or col < 0 or col >= cols or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        obj.append((row, col))\n        dfs(row + 1, col, color, obj)\n        dfs(row - 1, col, color, obj)\n        dfs(row, col + 1, color, obj)\n        dfs(row, col - 1, color, obj)\n\n    for row in range(rows):\n        for col in range(cols):\n            if not visited[row, col] and grid[row, col] not in [0, 1]:\n                obj = []\n                dfs(row, col, grid[row, col], obj)\n                objects.append((grid[row, col], obj))  # Store color and object pixels\n    return objects\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    objects = find_objects(input_grid)\n\n    # Horizontal Expansion\n    for row in range(rows):\n        for col in range(1, cols - 1):  # Iterate through inner columns\n            if output_grid[row, col] == 1:\n                left_color = output_grid[row, col - 1]\n                right_color = output_grid[row, col + 1]\n                if left_color == right_color and left_color not in [0, 1]:\n                    output_grid[row, col] = left_color\n\n    # Vertical Expansion of maroon(9) and azure(8) objects\n    for color, obj_pixels in objects:\n         if color in [8, 9]:\n            obj_rows = [p[0] for p in obj_pixels]\n            obj_cols = [p[1] for p in obj_pixels]\n\n            min_col = min(obj_cols)\n            max_col = max(obj_cols)\n\n            \n            for r in range(rows):\n              for c in range(min_col, max_col+1):\n                  if input_grid[r,c] == 1:\n                    left_color = -1\n                    right_color = -1\n\n                    for i in range(c-1, -1, -1):\n                      if input_grid[r,i] in [8,9]:\n                        left_color = input_grid[r,i]\n                        break\n                    for i in range(c+1, cols):\n                      if input_grid[r,i] in [8,9]:\n                        right_color = input_grid[r,i]\n                        break\n                    if left_color == right_color and left_color == color:\n\n                        output_grid[r,c] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4378,
+    "candidates_token_count": 965,
+    "total_token_count": 5343,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.853013,
+  "response_file": "008-response.json"
+}

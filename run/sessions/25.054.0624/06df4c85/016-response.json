@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Horizontal Bands:** Locate the horizontal bands of solid yellow (4) pixels. These bands are three pixels high.\n\n2.  **Identify Islands:** Within each yellow band, identify \"islands\" of green (3) and red (2) pixels. These islands are 2x2 blocks.\n\n3.  **Propagate Colors (Conditional):**\n    *   If a 2x2 island is green (3): Expand the green color horizontally to the left and right *within* the yellow band. The expansion fills the yellow band, replacing any yellow (4) pixels.\n    *   If a 2x2 island is red (2): Expand the red color horizontally to the left and right *within* the yellow band, replacing any yellow (4) pixels. Furthermore, if the row immediately above has green, do not replace yellow with red.\n\n4.  **No Change Outside Bands:** Pixels outside the identified yellow bands remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_horizontal_bands(grid, band_color, band_height):\n    bands = []\n    rows, cols = grid.shape\n    for r in range(rows - band_height + 1):\n        is_band = True\n        for i in range(band_height):\n            if not np.all(grid[r + i, :] == band_color):\n                is_band = False\n                break\n        if is_band:\n            bands.append(r)\n    return bands\n\ndef is_island(grid, r, c, color):\n    rows, cols = grid.shape\n    if r + 1 >= rows or c + 1 >= cols:\n        return False\n    return (grid[r, c] == color and\n            grid[r + 1, c] == color and\n            grid[r, c + 1] == color and\n            grid[r + 1, c + 1] == color)\n\ndef propagate_color_in_band(grid, band_start_row, band_height, color):\n    for r in range(band_start_row, band_start_row + band_height):\n        for c in range(grid.shape[1]):\n            if grid[r,c] == 4:  # Only replace yellow pixels\n              grid[r, c] = color\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find horizontal bands of yellow (4) with height 3\n    yellow_bands = find_horizontal_bands(output_grid, 4, 3)\n\n    # Iterate through each yellow band\n    for band_start_row in yellow_bands:\n        # Iterate within the band to find islands\n        for r in range(band_start_row, band_start_row + 3):\n            for c in range(cols):\n                # Green island propagation\n                if is_island(output_grid, r, c, 3):\n                    propagate_color_in_band(output_grid, band_start_row, 3, 3)\n                # Red island propagation\n                elif is_island(output_grid, r, c, 2):\n                    # Check for green in the row above\n                    if r > band_start_row and 3 in output_grid[r - 1, :]:\n                        continue  # Skip red propagation\n                    else:\n                        propagate_color_in_band(output_grid, band_start_row, 3, 2)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 19008,
+    "candidates_token_count": 824,
+    "total_token_count": 19832,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.439505,
+  "response_file": "016-response.json"
+}

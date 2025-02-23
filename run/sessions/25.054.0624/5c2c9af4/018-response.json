@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies isolated pixels (of any color) in the input grid. A pixel is isolated if it's not white (0) and none of its four immediate neighbors (up, down, left, right) have the same color. For each isolated pixel, a cross of the same color is drawn, extending horizontally and vertically. The arms of the cross stop when they reach the edge of the grid or a pixel that is neither white (0) nor the same color as the isolated pixel.\n\"\"\"\n\nimport numpy as np\n\ndef is_isolated(grid, row, col):\n    \"\"\"Checks if a pixel is isolated (not adjacent to same-color pixels, excluding diagonals).\"\"\"\n    color = grid[row, col]\n    if color == 0:  # White pixels are not considered isolated\n        return False\n\n    height, width = grid.shape\n    neighbors = []\n\n    # Check up, down, left, and right neighbors\n    if row > 0:\n        neighbors.append(grid[row - 1, col])  # Up\n    if row < height - 1:\n        neighbors.append(grid[row + 1, col])  # Down\n    if col > 0:\n        neighbors.append(grid[row, col - 1])  # Left\n    if col < width - 1:\n        neighbors.append(grid[row, col + 1])  # Right\n\n    # Check if any neighbor has the same color\n    for neighbor_color in neighbors:\n        if neighbor_color == color:\n            return False  # Not isolated\n\n    return True  # Isolated\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    height, width = input_grid.shape\n\n    # Iterate through each pixel\n    for row in range(height):\n        for col in range(width):\n            # Check if the pixel is isolated\n            if is_isolated(input_grid, row, col):\n                color = input_grid[row, col]\n\n                # Expand horizontally to the left\n                j = col - 1\n                while j >= 0 and (output_grid[row, j] == 0 or output_grid[row,j] == color):\n                    output_grid[row, j] = color\n                    j -= 1\n\n                # Expand horizontally to the right\n                j = col + 1\n                while j < width and (output_grid[row, j] == 0 or output_grid[row,j] == color):\n                    output_grid[row, j] = color\n                    j += 1\n\n                # Expand vertically upwards\n                i = row - 1\n                while i >= 0 and (output_grid[i, col] == 0 or output_grid[i,col] == color):\n                    output_grid[i, col] = color\n                    i -= 1\n\n                # Expand vertically downwards\n                i = row + 1\n                while i < height and (output_grid[i, col] == 0 or output_grid[i,col] == color):\n                    output_grid[i, col] = color\n                    i += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12516,
+    "candidates_token_count": 729,
+    "total_token_count": 13245,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.25911,
+  "response_file": "018-response.json"
+}

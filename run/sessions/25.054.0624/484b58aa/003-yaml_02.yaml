@@ -1,0 +1,56 @@
+observations:
+  - task: 002
+    examples:
+      - example_id: 1
+        input_objects:
+          - object_id: grid_1
+            type: grid
+            colors: [1, 2, 3, 4, 5, 6]
+            shape: [29, 29]
+            has_white: true
+            white_pixel_count: 59
+        output_objects:
+          - object_id: grid_1_transformed
+            type: grid
+            colors: [1, 2, 3, 4, 5, 6]
+            shape: [29, 29] #expected shape
+            has_white: false # ideally
+            white_pixel_count: 0
+        transformation: remove_white
+        notes: "The output grid should not contain any white pixels (0). The positions of other color pixels should be maintained relative to each other."
+
+      - example_id: 2
+        input_objects:
+          - object_id: grid_2
+            type: grid
+            colors: [1, 2, 3, 4, 5, 6, 7]
+            shape: [29, 29]
+            has_white: true
+            white_pixel_count: 72
+        output_objects:
+          - object_id: grid_2_transformed
+            type: grid
+            colors:  [1, 2, 3, 4, 5, 6, 7]
+            shape: [29, 29] # expected shape
+            has_white: false
+            white_pixel_count: 0
+        transformation: remove_white
+        notes: "Similar to example 1, white pixels need to be removed."
+
+      - example_id: 3
+        input_objects:
+          - object_id: grid_3
+            type: grid
+            colors: [1, 2, 4, 6, 8]
+            shape: [29, 29]
+            has_white: true
+            white_pixel_count: 106
+        output_objects:
+          - object_id: grid_3_transformed
+            type: grid
+            colors: [1, 2, 4, 6, 8]
+            shape: [29, 29]  #expected shape
+            has_white: false
+            white_pixel_count: 0
+        transformation: remove_white
+        notes: "White pixel removal is the consistent transformation across all examples."

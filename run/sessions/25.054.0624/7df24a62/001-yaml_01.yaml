@@ -1,0 +1,29 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [23, 23]  # Both input and output grids have these dimensions
+      colors: [0, 1, 4] #white, blue, yellow
+  - type: region
+    properties:
+      color: 1 #blue
+      shape: irregular # the shape is not a regular geometric object
+      contiguous: True  # All blue pixels within a region are connected
+  - type: pixel
+    properties:
+      color: 4   # Yellow
+      state: isolated # These exist as single pixels
+      possible_actions:
+        - retained
+        - replaced
+
+actions:
+ - type: fill
+   agent: region, color 1
+   target: certain pixels where color = 4
+   conditions: location is within/near expanded blue region
+
+relationships:
+  - type: adjacency
+    between: [blue region, yellow pixels] # important for the transformation
+  - type: containment
+    between: [grid, all regions and pixels]

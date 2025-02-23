@@ -84,7 +84,7 @@ class Seer:
         try:
             self._investigate(task)
         except Exception as e:
-            self.session.log_error(e, stack_trace)
+            self.session.log_error(e)
 
         summarize_task(session.task_dir, session.log_error)
 

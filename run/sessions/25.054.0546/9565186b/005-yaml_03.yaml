@@ -1,0 +1,51 @@
+observations:
+  - example: 1
+    input_colors: [2, 1, 8]  # Red, Blue, Azure
+    output_colors: [2, 5]  # Red, Gray
+    transformations:
+      - color: 1  # Blue
+        to: 5  # Gray
+      - color: 8  # Azure
+        to: 5  # Gray
+    invariants:
+      - color: 2  # Red
+        status: unchanged
+  - example: 2
+    input_colors: [1, 8, 3, 2]  # Blue, Azure, Green, Red
+    output_colors: [1, 5]  # Blue, Gray
+    transformations:
+      - color: 8  # Azure
+        to: 5  # Gray
+      - color: 3 # Green
+        to: 5 # Gray
+      - color: 2 # Red
+        to: 5
+    invariants:
+      - color: 1 # Blue
+        status: unchanged
+  - example: 3
+    input_colors: [2, 8]  # Red, Azure
+    output_colors: [2, 5]  # Red, Gray
+    transformations:
+      - color: 8  # Azure
+        to: 5  # Gray
+    invariants:
+      - color: 2  # Red
+        status: unchanged
+  - example: 4
+    input_colors: [3, 4, 8, 1] # Green, Yellow, Azure, Blue
+    output_colors: [5, 4] # Gray, Yellow
+    transformations:
+      - color: 3 # Green
+        to: 5 # Gray
+      - color: 8 # Azure
+        to: 5 # Gray
+      - color: 1 # Blue
+        to: 5 # Gray
+    invariants:
+      - color: 4  # Yellow
+        status: unchanged
+
+overall_rule:
+    - change_to_gray: [1, 3, 8] # Blue, Green, Azure
+    - remain_same: [2, 4]

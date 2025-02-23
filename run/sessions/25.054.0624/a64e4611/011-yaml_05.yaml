@@ -1,0 +1,33 @@
+examples:
+  - example_id: 1
+    objects:
+      - color: 8 # Azure
+        description: Multiple, disconnected regions, one large rectangular region in the top-left.
+        stripe_significance: The rightmost edge of the largest azure object seems to define the transformation region.
+    transformation:
+      - type: color_region
+        start_column: "right edge of significant azure object + 1"
+        color: 3 # Green
+        region: "All pixels to the right of start_column"
+
+  - example_id: 2
+    objects:
+      - color: 1 # Blue
+        description: One large, irregular, connected region and a few isolated pixels.
+        stripe_significance: The rightmost continuous vertical edge of the largest blue object.
+    transformation:
+      - type: color_region
+        start_column: "right edge of significant blue object + 1"
+        color: 3 # Green
+        region: "All pixels to the right of start_column"
+
+  - example_id: 3
+    objects:
+      - color: 2
+        description:  Multiple disconnected regions of red (objects)
+        stripe_significance: The transformation does *not* start from the right. The left-most columns are changed.
+    transformation:
+      - type: color_region
+        start_column: "left most column - find longest object"
+        color: 3
+        region: "right of significant object, up to first black object"

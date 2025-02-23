@@ -1,0 +1,98 @@
+examples:
+  - example_id: 1
+    input_grid:
+      dimensions: [3, 3]
+      objects:
+        - color: 3  # Green
+          positions: [[0, 0], [0, 1]]
+        - color: 8  # Azure
+          positions: [[0, 2]]
+        - color: 7 # Orange
+          positions: [[1,1]]
+        - color: 0 # black
+          positions: [[1,2], [2,1], [2,2]]
+        - color: 5 # grey
+          positions: [[2,0]]
+    expected_output:
+      dimensions: [3, 3]
+      objects:
+          - color: 0
+            positions: [[0,0], [0,1], [1,0]]
+          - color: 5
+            positions: [[0,2]]
+          - color: 7
+            positions: [[1,1]]
+          - color: 3
+            positions: [[1,2], [2,1]]
+          - color: 8
+            positions: [[2,0]]
+    transformed_output:
+        dimensions: [3, 3]
+        objects:
+          - color: 8
+            positions: [[0,0]]
+          - color: 0
+            positions: [[0,1],[0,2]]
+          - color: 3
+            positions: [[1,0],[2,0],[2,1]]
+          - color: 7
+            positions: [[1,1]]
+          - color: 5
+            positions: [[2,2]]
+    observations:
+      - The grid is rotated 90 degrees counter-clockwise.
+      - Colors/numbers maintain their existence but change positions.
+      - The relative positioning appears incorrect for some colors.
+      - shapes:
+          - A group of 2 green cells
+          - A single azure cell
+          - A single orange cell
+          - A group of 2 black cells
+          - A single grey cell
+    discrepancies:
+      - pixel mismatches: 6
+
+  - example_id: 2
+    input_grid:
+      dimensions: [3, 3]
+      objects:
+        - color: 5
+          positions: [[0,0], [0,1]]
+        - color: 2
+          positions: [[0,2]]
+        - color: 1
+          positions: [[1,0]]
+        - color: 0
+          positions: [[1,1],[1,2], [2,0], [2,1], [2,2]]
+    expected_output:
+      dimensions: [3, 3]
+      objects:
+        - color: 0
+          positions: [[0,0], [0,1], [0,2], [1,0], [1,1]]
+        - color: 1
+          positions: [[1,2]]
+        - color: 2
+          positions: [[2,0]]
+        - color: 5
+          positions: [[2,1], [2,2]]
+    transformed_output:
+      dimensions: [3, 3]
+      objects:
+        - color: 2
+          positions: [[0,0]]
+        - color: 0
+          positions: [[0,1], [0,2], [1,1],[1,2],[2,2]]
+        - color: 5
+          positions: [[1,0], [2,0]]
+        - color: 1
+          positions: [[2,1]]
+    observations:
+      - Grid rotation is consistent with example 1.
+      - Positional errors of colors/numbers are present.
+      - shapes:
+        - group of 2 grey cells
+        - a single red cell
+        - a single blue cell
+        - group of 5 black cells
+    discrepancies:
+      - pixel mismatches: 6

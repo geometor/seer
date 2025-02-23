@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExpands azure (8) pixels in the input grid both vertically and horizontally, creating lines and filling enclosed areas, bounded by grid edges or other azure regions.\n\"\"\"\n\nimport numpy as np\n\ndef get_azure_pixels(grid):\n    \"\"\"Finds the coordinates of all azure (8) pixels in the grid.\"\"\"\n    return np.argwhere(grid == 8)\n\ndef expand_vertically(grid, start_coords):\n    \"\"\"Expands azure pixels vertically, creating lines.\"\"\"\n    rows, cols = grid.shape\n    expanded_grid = grid.copy()\n\n    for r, c in start_coords:\n        # Expand upwards\n        for i in range(r - 1, -1, -1):\n            if grid[i, c] == 8:\n                break\n            expanded_grid[i,c] = 8\n        # Expand downwards\n        for i in range(r + 1, rows):\n            if grid[i, c] == 8:\n                break\n            expanded_grid[i,c] = 8\n\n    return expanded_grid\n\ndef expand_horizontally(grid, start_coords):\n    \"\"\"Expands azure pixels horizontally, creating lines.\"\"\"\n    rows, cols = grid.shape\n    expanded_grid = grid.copy()\n    for r, c in start_coords:\n      # expand left\n        for j in range(c - 1, -1, -1):\n            if grid[r, j] == 8:\n                break\n            expanded_grid[r,j] = 8\n        # Expand right\n        for j in range(c + 1, cols):\n            if grid[r, j] == 8:\n                break\n            expanded_grid[r,j] = 8\n    return expanded_grid\n\ndef fill_between(grid):\n  \"\"\"fill the area between the border and expanded areas\"\"\"\n  filled_grid = grid.copy()\n  rows, cols = filled_grid.shape\n\n  #fill horizontal\n  for r in range(rows):\n    left = -1\n    right = -1\n\n    for c in range(cols):\n      if filled_grid[r,c] == 8:\n        if left == -1:\n          left = c\n        else:\n          right = c\n    if left > -1 and right > -1:\n        filled_grid[r,left:right+1] = 8\n\n  #fill vertical\n  for c in range(cols):\n    top = -1\n    bottom = -1\n    for r in range(rows):\n        if filled_grid[r, c] == 8:\n            if top == -1:\n              top = r\n            else:\n              bottom = r\n\n    if top > -1 and bottom > -1:\n        filled_grid[top:bottom+1,c] = 8\n\n  return filled_grid\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rules.\"\"\"\n\n    # Initialize output grid as a copy of the input grid.\n    output_grid = input_grid.copy()\n\n    # Get initial azure pixel coordinates.\n    azure_coords = get_azure_pixels(output_grid)\n    #expand area to include the borders\n    rows, cols = output_grid.shape\n    for r in range(rows):\n        output_grid[r,0] = 8\n        output_grid[r,cols-1] = 8\n    for c in range(cols):\n        output_grid[0,c] = 8\n        output_grid[rows-1,c] = 8\n    # Expand vertically.\n    output_grid = expand_vertically(output_grid, azure_coords)\n    # Get new azure coordinates\n    azure_coords_v = get_azure_pixels(output_grid)\n    # Expand horizontally.\n    output_grid = expand_horizontally(output_grid, azure_coords_v)\n\n    # fill areas\n    output_grid = fill_between(output_grid)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4204,
+    "candidates_token_count": 929,
+    "total_token_count": 5133,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.679761,
+  "response_file": "002-response.json"
+}

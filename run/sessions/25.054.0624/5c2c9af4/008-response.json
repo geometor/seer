@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule takes sparse red pixels in the input grid and generates a pattern of nested red squares in the output grid. The red pixels in the input do not directly map to the output, but their presence triggers the generation of the nested square pattern.\n\"\"\"\n\nimport numpy as np\n\ndef get_red_pixels(grid):\n    \"\"\"\n    Finds the coordinates of all red pixels in the input grid.\n    \"\"\"\n    return np.argwhere(grid == 2)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid into an output grid with nested red squares.\n    \"\"\"\n    # Initialize the output grid with all white pixels.\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find red pixels in the input (though their exact locations aren't directly used).\n    red_pixels = get_red_pixels(input_grid)\n\n    #if no red pixels, return blank grid\n    if len(red_pixels) == 0:\n      return output_grid\n\n    # Determine the number of nested squares and their sizes/spacing.\n    # Drawing nested squares\n    for i in range(min(rows, cols) // 2):\n       \n        #top\n        output_grid[i, i:cols-i] = 2\n\n        #bottom\n        output_grid[rows-1-i, i:cols-i] = 2\n\n        #left\n        output_grid[i:rows-i, i] = 2\n\n        #right\n        output_grid[i:rows-i, cols-1-i] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4164,
+    "candidates_token_count": 380,
+    "total_token_count": 4544,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.487915,
+  "response_file": "008-response.json"
+}

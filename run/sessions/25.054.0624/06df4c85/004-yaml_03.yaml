@@ -1,0 +1,24 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - height: variable
+      - width: variable
+      - cells: integers (0-9) representing colors
+
+  - name: pixel_group
+    type: contiguous_block
+    properties:
+      - color: integer (0-9)
+      - shape: any
+      - adjacent_colors: list of integers
+      - size: area
+
+actions:
+  - name: recolor_adjacent
+    description: Change the color of a pixel group based on adjacent colors.
+    parameters:
+      - source_color: integer
+      - target_color: integer
+      - adjacent_color : integer
+      - new_color: integer

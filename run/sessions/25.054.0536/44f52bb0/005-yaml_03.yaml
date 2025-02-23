@@ -1,0 +1,25 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    elements: integers (0-9) representing colors
+  - name: red_pixels
+    type: list of tuples
+    description: Coordinates (row, column) of red pixels (value 2) in the input grid.
+  - name: output_grid
+    type: 2D array (1x1)
+    elements: integer (1 or 7)
+    description: Represents the output color, blue (1) or orange (7).
+
+actions:
+  - name: count_red_pixel_groups
+    input: input_grid
+    process:
+      - Find all red pixels.
+      - Group red pixels into connected sets.
+      - find the count of the groups
+    output: Number of groups
+  - name: determine_output_color
+    input:  count of groups of red pixels
+    process:
+      - if group count is > 1 then set the output color to 7 (orange) else 1 (blue)
+    output: output_grid

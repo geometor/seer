@@ -1,0 +1,40 @@
+objects:
+  - name: TopLeftMaroonShape
+    type: rectangle
+    color: 9 (maroon)
+    initial_position: top-left
+    properties:
+      - contiguous
+      - solid
+
+  - name: BottomRightMaroonShape
+    type: rectangle
+    color: 9 (maroon)
+    initial_position: bottom-right
+    properties:
+      - contiguous
+      - solid
+
+  - name: Background
+    type: grid
+    color: 0 (white)
+
+actions:
+  - name: ColorChange
+    target: TopLeftMaroonShape
+    from_color: 9 (maroon)
+    to_color: varies #changes to blue and green
+
+  - name: ColorChange
+    target: BottomRightMaroonShape
+    from_color: 9 (maroon)
+    to_color: varies #changes to blue and green
+
+  - name: fill_background_adjacent
+    target: background pixels surrounding object
+    from_color: 0 (white)
+    to_color: 3 (green) or 1(blue)
+
+relationships:
+  - TopLeftMaroonShape: adjacent to Background
+  - BottomRightMaroonShape: adjacent to Background

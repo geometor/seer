@@ -1,0 +1,28 @@
+objects:
+  - grid:
+      type: 2D array
+      elements: integers (0-9) representing colors
+      properties:
+        height: 29
+        width: 30
+  - pixel:
+      type: individual cell
+      properties:
+        color: integer (0-9)
+        position: (row, column)
+  - filled_shape:
+    type: connected component
+    properties:
+      color: white(0)
+      shape: irregular
+      boundary: enclosed by colors
+
+actions:
+ - remove_white_shape:
+        input: a "filled_shape" of white pixels
+        operation: remove pixels of filled_shape
+        output: none
+
+relationships:
+  - spatial: pixels are adjacent (horizontally, vertically, diagonally)
+  - containment:  the grid contains pixels, filled shapes contains many pixels of white

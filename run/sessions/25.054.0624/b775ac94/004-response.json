@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all contiguous clusters of non-zero pixels in the input grid. Each cluster is an object.\n2.  **Object Expansion:** Each object attempts to expand.\n3.  **Expansion Rules:**\n    *   An object expands horizontally and/or vertically into adjacent (including diagonally) background (0-colored) pixels.\n    *   If an object is adjacent to another object, it may take on some of other objects color during expansion, as long as the color is adjacent. The color will extend in alternating lines.\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef find_objects(grid):\n    \"\"\"Finds contiguous objects in the grid.\"\"\"\n    visited = set()\n    objects = []\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def bfs(start_r, start_c):\n        queue = deque([(start_r, start_c)])\n        visited.add((start_r, start_c))\n        object_pixels = []\n        color = grid[start_r, start_c]\n\n        while queue:\n            r, c = queue.popleft()\n            object_pixels.append((r, c))\n\n            for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:\n                nr, nc = r + dr, c + dc\n                if is_valid(nr, nc) and (nr, nc) not in visited:\n                    if grid[nr,nc] == color or grid[nr, nc] == 0:\n                        queue.append((nr, nc))\n                        visited.add((nr, nc))\n        return object_pixels, color\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] != 0 and (r, c) not in visited:\n                objects.append(bfs(r, c))\n\n    return objects\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Gets the valid neighbors (including diagonals) of a pixel.\"\"\"\n    neighbors = []\n    for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1]:\n            neighbors.append((nr, nc))\n    return neighbors\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # find objects\n    objects = find_objects(input_grid)\n    \n    # expand the object\n    expanded_objects = []\n    for obj_pixels, color in objects:\n        new_pixels = obj_pixels.copy()\n        for r,c in obj_pixels:\n            neighbors = get_neighbors(input_grid, r, c)\n            for nr, nc in neighbors:\n                if input_grid[nr,nc] == 0:\n                   new_pixels.append((nr,nc))\n        expanded_objects.append( (new_pixels, color) )\n\n    # apply identified object changes and expansion to output\n    for obj_pixels, color in expanded_objects:\n      for (r,c) in obj_pixels:\n        output_grid[r,c] = color\n\n    # apply identified object changes with alternating adjacent object colors\n    for obj_pixels, color in expanded_objects:\n        for r, c in obj_pixels:\n            neighbors = get_neighbors(output_grid, r, c)\n            neighbor_colors = [output_grid[nr, nc] for nr, nc in neighbors if output_grid[nr, nc] != 0 and output_grid[nr,nc] != color]\n            if neighbor_colors:\n                # Simple alternation - could be more sophisticated based on row/col\n                alt_color = neighbor_colors[0]\n                if (r + c) % 2 == 0:  # Alternate based on row+col parity\n                  for nr,nc in neighbors:\n                    if output_grid[nr,nc] == 0:\n                      output_grid[nr, nc] = alt_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12224,
+    "candidates_token_count": 1048,
+    "total_token_count": 13272,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.024743,
+  "response_file": "004-response.json"
+}

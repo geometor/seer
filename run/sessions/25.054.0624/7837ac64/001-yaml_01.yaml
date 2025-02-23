@@ -1,0 +1,23 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    description: Large grid with various pixel colors.
+    properties:
+      colors: [0, 1, 3, 4] # white, blue, green, yellow
+
+  - name: output_grid
+    type: 2D array
+    description: Small grid representing a transformation of the input grid.
+    properties:
+      colors: [0, 1, 3] # white, blue, green
+      dimensions: [3, 3]
+
+actions:
+ - name: extract_colors
+   description: Extract the specified colors from the image
+
+relationships:
+  - type: transformation
+    from: input_grid
+    to: output_grid
+    description: The output grid is derived from the input grid through a specific rule.

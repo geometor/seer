@@ -1,0 +1,28 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      rows: 3
+      columns: 3
+      colors: [0, 5]  # Varies per example, but these are the only colors present
+  - name: output_grid
+    type: grid
+    properties:
+      rows: 3
+      columns: 3
+      colors: [2, 3, 4] # Varies, but this is the superset
+  - name: gray_pixel #object that stops the transformation
+    type: pixel
+    properties:
+      value: 5
+      role: stopper
+
+actions:
+  - name: generate_pattern
+    description: Creates a repeating color pattern in the output grid.
+    parameters:
+      pattern: [3, 3, 3, 4, 4, 4, 2, 2, 2] #The core pattern, this seems to be altered based on the initial conditions, may be better to start from different points in the array.
+      start_row: 0
+      start_col: 0
+  - name: stop_at_gray
+    description: Halts pattern generation at the position of a '5' in the input grid.

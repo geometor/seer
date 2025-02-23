@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify all colors** present in the input grid.\n2.  **Check for Uniform Rows:** Examine each row of the input grid. If a row is found where all pixels have the *same* color, designate that color as the \"retained color\". If multiple rows have this property, use the color in the higher row.\n3.  **Create Output Grid:** Create a new grid with the same dimensions as the input grid, initially filled with gray (color value 5).\n4.  **Populate Output Grid:** Iterate through each pixel of the input grid. If a pixel's color matches the \"retained color\", set the corresponding pixel in the output grid to the \"retained color\". Otherwise, leave the output pixel as gray (5).\n5. If no row is uniform, keep the entire output grid as gray.\n\"\"\"\n\nimport numpy as np\n\ndef get_retained_color(grid):\n    \"\"\"Helper function to find the color of the first uniform row.\"\"\"\n    for row in grid:\n        if np.all(row == row[0]):\n            return row[0]\n    return None  # No uniform row found\n\ndef transform(input_grid):\n    # Create output grid filled with gray (5)\n    output_grid = np.full(input_grid.shape, 5, dtype=int)\n\n    # Find the retained color (color of the first uniform row)\n    retained_color = get_retained_color(input_grid)\n\n    # If a retained color is found, populate the output grid\n    if retained_color is not None:\n        for i in range(input_grid.shape[0]):\n            for j in range(input_grid.shape[1]):\n                if input_grid[i, j] == retained_color:\n                    output_grid[i, j] = retained_color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3396,
+    "candidates_token_count": 422,
+    "total_token_count": 3818,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.51633,
+  "response_file": "024-response.json"
+}

@@ -1,0 +1,30 @@
+facts:
+  - object: grid
+    properties:
+      dimensions: 3x3
+      elements: pixels
+  - object: pixel
+    properties:
+      color:
+        - yellow (4)
+        - red (2)
+        - white (0)
+      position: (row, column)
+  - action: copy_down
+    parameters:
+      - color: yellow (4)
+      - direction: downwards
+    conditions: original_position = (0,0)
+    result: replace pixels below with copies of color
+
+  - action: copy_down
+    parameters:
+      - color: red(2)
+      - direction: downwards
+    conditions: original_position = (1,1)
+    result: replace pixels below with copies of color
+
+  - action: stay
+    parameters:
+      -color: white(0)
+    result: all white pixels remain unchanged

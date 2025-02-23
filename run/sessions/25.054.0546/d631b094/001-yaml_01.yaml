@@ -1,0 +1,36 @@
+objects:
+  - type: grid
+    dimensions: [3, 3]
+    elements: [0, 1]
+    role: input
+    description: Input grid containing white (0) and blue (1) pixels.
+  - type: grid
+    dimensions: [1, 2]
+    elements: [1]
+    role: output
+    description: Output grid containing only blue (1) pixels.
+
+actions:
+  - type: count
+    target: "blue pixels (1)"
+    from: input_grid
+    result: count_of_ones
+
+  - type: construct
+    target: output_grid
+    dimensions:
+       height: 1
+       width: "count_of_ones"
+    elements: 1
+
+relationships:
+  - type: element_of
+    subject: "0, 1"
+    object: input_grid
+  - type: element_of
+    subject: "1"
+    object: output_grid
+  - type: transformation
+    subject: input_grid
+    object: output_grid
+    rule: natural_language_program

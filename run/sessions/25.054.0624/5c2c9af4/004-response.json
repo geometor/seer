@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFills the entire grid with the most frequent non-black, non-white color in the input grid.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef find_most_frequent_non_background_color(grid):\n    \"\"\"Finds the most frequent color in the grid, excluding black (0) and white/background.\"\"\"\n    # Flatten the grid to a 1D array for easier counting\n    flat_grid = grid.flatten()\n\n    # Count the occurrences of each color\n    color_counts = Counter(flat_grid)\n\n    # Remove black (0) and white (if present)\n    color_counts.pop(0, None)  # Remove black, if it exists\n    # this task has a white/background-color: find the value if this applies\n    # this is consistent across all ARC-AGI data\n    if np.max(grid) == 0 and np.min(grid) == 0:\n        #pop the background color 0, already completed\n        pass\n    elif len(color_counts)>0:\n       most_common_color = color_counts.most_common(1)[0][0]\n       return most_common_color\n    return 0\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = input_grid.copy()\n    rows, cols = output_grid.shape\n\n    # Find the most frequent non-background color\n    fill_color = find_most_frequent_non_background_color(input_grid)\n\n    # Fill the entire output grid with the fill color\n    output_grid[:] = fill_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 19962,
+    "candidates_token_count": 377,
+    "total_token_count": 20339,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.601815,
+  "response_file": "004-response.json"
+}

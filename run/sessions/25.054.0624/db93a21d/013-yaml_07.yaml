@@ -1,0 +1,27 @@
+objects:
+  - type: rectangle
+    color: maroon (9)
+    properties:
+      - width
+      - height
+      - position (top-left corner)
+  - type: background
+    color: white (0)
+  - type: outline
+    properties:
+      - color # green(3) or blue(1)
+      - location #related to rectangle position.
+  - type: filling
+    color: green(3)
+    properties:
+      - fills spaces around rectangles and blue outlines
+
+actions:
+  - identify_rectangles: Locate maroon rectangles.
+  - create_outline: Generate outline around each rectangle.
+  - fill: filling spaces with green color.
+
+relationships:
+  - rectangle_outline:  The outline is adjacent to the rectangle it surrounds, with some outlines possibly one pixel thick and others of various thickness.
+  - outline_color:  Different colors (green, blue) are used for different outlines.
+  - filling_color: fills the empty spaces.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify all Blue Regions: Find *all* contiguous blue (1) regions in the input grid, considering diagonal connections.\n2. Determine Bounding Boxes: For *each* blue region, calculate its bounding box (min/max rows and columns).\n3. Fill Regions: For *each* blue region:\n    *   Iterate through all pixels within the bounding box of that blue region.\n    *   Change *all* pixels within the current bounding box to blue (1), including yellow pixels.\n4. Preserve other colors outside of the box: Iterate through all pixels in the entire grid. If the source pixel is not 1 (blue) or 4 (yellow), then restore the pixel in the destination grid.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef find_all_blue_regions(grid):\n    # Use 8-connectivity to include diagonals\n    labeled_grid, num_regions = label(grid == 1, structure=np.array([[1,1,1],[1,1,1],[1,1,1]]))\n    regions = []\n    for i in range(1, num_regions + 1):\n        coords = np.argwhere(labeled_grid == i)\n        min_row = np.min(coords[:, 0])\n        max_row = np.max(coords[:, 0])\n        min_col = np.min(coords[:, 1])\n        max_col = np.max(coords[:, 1])\n        regions.append(((min_row, max_row, min_col, max_col), coords))\n    return regions\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input\n    output_grid = input_grid.copy()\n\n    # Find all blue regions with diagonal connectivity\n    blue_regions = find_all_blue_regions(input_grid)\n\n    # Fill each bounding box with blue\n    for (min_row, max_row, min_col, max_col), _ in blue_regions:\n        for row in range(min_row, max_row + 1):\n            for col in range(min_col, max_col + 1):\n                output_grid[row, col] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 15702,
+    "candidates_token_count": 513,
+    "total_token_count": 16215,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.678045,
+  "response_file": "006-response.json"
+}

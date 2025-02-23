@@ -1,0 +1,91 @@
+# db93a21d • 007 • example_2 • investigate_dreamer
+
+---
+Okay, here's my analysis of the provided example, focusing on perception, factual documentation, and a natural language program describing the transformation.
+
+**Perception of Elements:**
+
+The input and output are grids of digits, representing colored pixels. The primary colors involved are white (0), maroon/dark red (9), green (3), and blue (1). There are distinct maroon shapes in the input. The output seems to retain the maroon shapes but alters their surrounding context with green and blue colors. The shapes influence the colors around them. The output includes additional colors that weren't as prominent or organized in the input.
+
+**YAML Block (Facts):**
+
+
+
+```yaml
+objects:
+  - name: maroon_shape_1
+    type: contiguous_region
+    color: 9
+    initial_position: [2,8]  # Top-left corner coordinates
+    shape: rectangle
+    dimensions: [4,4]
+  - name: maroon_shape_2
+    type: contiguous_region
+    color: 9
+    initial_position: [6,3]
+    shape: rectangle
+    dimensions: [2,2]
+  - name: maroon_shape_3
+    type: contiguous_region
+    color: 9
+    initial_position: [9, 13]
+    shape: rectangle
+    dimensions: [2,2]
+  - name: green_background
+    type: region
+    color: 3
+  - name: blue_background
+    type: region
+    color: 1
+
+actions:
+  - type: expand_region
+    object: maroon_shape_1
+    color_added: 3
+    notes: expands up and to the left
+  - type: expand_region
+    object: maroon_shape_2
+    color_added: 3
+    notes: expands up and to the left
+
+  - type: expand_region
+      object: maroon_shape_3
+      color_added: 1
+      notes: expands up and to the left
+  - type: expand_color_region
+    start_color: 0
+    new_color: 3
+    direction: specific
+    notes: "changes 0s above and beside certain 9 regions to 3, and other areas to 1"
+
+relationships:
+  - type: spatial
+    relation: above
+    object1: maroon_shape_1
+    object2: green_background
+  - type: spatial
+    relation: surrounds
+    object1: green_background, blue_background
+    object2: maroon_shapes
+
+```
+
+
+
+**Natural Language Program:**
+
+1.  **Identify Maroon Shapes:** Locate all contiguous regions of color 9 (maroon). These are rectangular shapes.
+
+2.  **Green Expansion (Top-Left):**
+    *   For the 4x4 and 2x2 maroon shapes on the left side of the grid, expand a region of color 3 (green) upwards and to the left.
+    * The area of green is bound at the top and left by white.
+
+3.  **Blue Expansion (Top-Right):**
+      *   For the remaining maroon shape, create a new background using 1 (blue)
+        in the area up and to the left
+
+4. **Green fill:** Change white (0) cells above the top most maroon (9) shapes to green (3)
+
+5. **Blue Fill:** Change white (0) cells in an area above and to the left of other
+   maroon shapes using color blue (1).
+

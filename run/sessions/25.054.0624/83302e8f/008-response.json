@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Blue Lines:** Locate all blue (1) pixels in the input grid. These pixels form the \"blue lines\" object.\n2.  **Identify Enclosed Regions.** Determine the regions enclosed by the continuous blue lines. An enclosed region is a set of contiguous white pixels that are completely surrounded by blue pixels, directly adjacent, forming a closed loop.\n3. **Change color of first enclosed area:** Change the enclosed area above the first horizontal solid line of 1's to green (3)\n4. **Change color of second enclosed area:** Change the enclosed area below the first horizontal solid line of 1's to yellow (4).\n5.  **Preserve Blue Lines:** Maintain the blue (1) pixels in their original positions in the output grid.\n6.  **Other areas:** All other enclosed areas not specified before get a fill value according to their position, if they are above the first line of 1's then the value is 3, otherwise the value is 4.\n\"\"\"\n\nimport numpy as np\n\ndef find_blue_lines(grid):\n    # Find the coordinates of all blue pixels.\n    return np.where(grid == 1)\n\ndef is_enclosed(grid, coord, blue_lines_set):\n    \"\"\"\n    Checks if a given coordinate is within an enclosed region.\n    Uses a flood-fill algorithm.\n    \"\"\"\n    rows, cols = grid.shape\n    x, y = coord\n\n    # If the starting coordinate is blue, it's not enclosed.\n    if grid[x, y] == 1:\n        return False\n\n    visited = set()\n    queue = [(x, y)]\n\n    while queue:\n        curr_x, curr_y = queue.pop(0)\n\n        if (curr_x, curr_y) in visited:\n            continue\n        visited.add((curr_x, curr_y))\n\n        # If we hit a boundary, it's not enclosed.\n        if curr_x == 0 or curr_x == rows - 1 or curr_y == 0 or curr_y == cols - 1:\n            return False\n\n        # Check neighbors\n        neighbors = [\n            (curr_x - 1, curr_y),\n            (curr_x + 1, curr_y),\n            (curr_x, curr_y - 1),\n            (curr_x, curr_y + 1),\n        ]\n\n        for nx, ny in neighbors:\n            if 0 <= nx < rows and 0 <= ny < cols:\n                if grid[nx, ny] == 0 and (nx, ny) not in visited:\n                    queue.append((nx, ny))\n                elif grid[nx,ny] == 1:\n                    continue #part of boundary, do nothing\n                else:\n                    return False #hit a color other than blue or white\n    return True\n\ndef find_first_solid_line(grid):\n     rows, cols = grid.shape\n     for r in range(rows):\n        if all(grid[r,c] == 1 for c in range(cols)):\n            return r\n     return -1 #no line found\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    blue_lines = find_blue_lines(input_grid)\n    blue_lines_set = set(zip(blue_lines[0], blue_lines[1]))\n\n    first_line = find_first_solid_line(input_grid)\n\n\n    rows, cols = input_grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if (r,c) not in blue_lines_set:\n                if is_enclosed(input_grid, (r, c), blue_lines_set):\n                    if r < first_line:\n                        output_grid[r,c] = 3\n                    else:\n                        output_grid[r, c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5637,
+    "candidates_token_count": 923,
+    "total_token_count": 6560,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.287956,
+  "response_file": "008-response.json"
+}

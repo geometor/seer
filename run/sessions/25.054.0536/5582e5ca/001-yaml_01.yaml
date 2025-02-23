@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 3x3
+      elements: pixels
+      pixel_values: [0, 3, 4, 6, 8]  # Unique pixel values in the input
+  - type: pixel
+    properties:
+       color_id:  #possible values from COLOR_MAP
+
+actions:
+  - name: identify_dominant_color
+    input: input_grid
+    output: color_id
+  - name: fill_grid
+    input:
+      - grid
+      - color_id
+    output: output_grid
+
+relationships:
+  - input_grid contains multiple pixels
+  - output_grid contains single color_id pixels
+  - dominant_color is derived from input_grid

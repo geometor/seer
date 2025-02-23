@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements: pixels
+    description: Input grid containing colored pixels.
+  - type: integer
+    value: output_value
+    description: Output, represented as a single integer.
+
+properties:
+  - name: color
+    type: categorical
+    values: [0, 2]  # Based on the observed input
+    description: Represents the color of a pixel, with 0 as white and 2 as red.
+  - name: count
+    type: numerical
+    description: Number of the specified object in the input
+
+actions:
+    - name: count_colored_pixels, returns a value
+    - change the value
+
+relationships:
+  - input_grid_to_output_value: "The output value appears to relate a change to a single color based on the count."

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRemoves interior white (0) pixels from the input grid, leaving only white pixels that are on the edges of the grid or adjacent to non-white pixels.\n\nThe algorithm can be described as:\n\n1.  Iterate through each pixel of the input grid.\n2.  If a pixel is white (0):\n    a. Check if it is on the edge of the grid. If yes, keep it.\n    b. Check its immediate neighbors (up, down, left, right, and diagonals).\n    c. If *all* valid neighbors are also white, change the pixel to a neighboring, non-white, color in the output grid. If there aren't any non-white neighbors, keep the original white pixel.\n3. Copy all non-white pixels directly to the output grid in their original positions.\n\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of input_grid\n    rows, cols = input_grid.shape\n    output_grid = np.copy(input_grid)\n\n    # change output pixels\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 0:  # if pixel is white\n                # keep edge pixels\n                if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:\n                    continue\n\n                neighbors = []\n                neighbor_colors = []\n                # check neighbors and collect colors, skip self\n                for dr in [-1, 0, 1]:\n                    for dc in [-1, 0, 1]:\n                        if dr == 0 and dc == 0:\n                            continue\n                        nr, nc = r + dr, c + dc\n                        if 0 <= nr < rows and 0 <= nc < cols:\n                            neighbors.append((nr, nc))\n                            neighbor_colors.append(input_grid[nr, nc])\n\n                # if all neighbor colors are white, replace current with a neighbor, non-white color\n                if all(color == 0 for color in neighbor_colors):\n                    replacement_color = 0\n                    for color in neighbor_colors:\n                      if color != 0:\n                        replacement_color = color\n                        break # use the first non-white color found\n                    # if there were no non-white neighbors, we'll keep it white, otherwise, use replacement_color\n                    if replacement_color != 0:\n                      output_grid[r,c] = replacement_color # change this white pixel\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 20269,
+    "candidates_token_count": 580,
+    "total_token_count": 20849,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.748521,
+  "response_file": "012-response.json"
+}

@@ -1,0 +1,73 @@
+def get_color_counts(grid_string):
+    """Counts the occurrences of each color in a grid."""
+    grid = np.array(eval(grid_string))
+    unique, counts = np.unique(grid, return_counts=True)
+    color_counts = dict(zip(unique, counts))
+    return color_counts
+
+print("Example 1 Color Counts:")
+print("Input:", get_color_counts(
+"""
+[[4, 4, 4],
+ [2, 3, 2],
+ [2, 3, 3]]
+"""
+))
+
+print("Expected Output:", get_color_counts(
+"""
+[[5, 5, 5],
+ [0, 0, 0],
+ [0, 0, 0]]
+"""
+))
+
+print("Example 2 Color Counts:")
+print("Input:", get_color_counts(
+"""
+[[7, 3, 3],
+ [6, 6, 6],
+ [3, 7, 7]]
+"""
+))
+
+print("Expected Output:", get_color_counts(
+"""
+[[0, 0, 0],
+ [5, 5, 5],
+ [0, 0, 0]]
+"""
+))
+
+print("Example 3 Color Counts:")
+print("Input:", get_color_counts(
+"""
+[[2, 9, 2],
+ [4, 4, 4],
+ [9, 9, 9]]
+"""
+))
+print("Expected Output:", get_color_counts(
+"""
+[[0, 0, 0],
+ [5, 5, 5],
+ [5, 5, 5]]
+"""
+))
+
+print("Example 4 Color Counts:")
+print("Input:", get_color_counts(
+"""
+[[2, 2, 4],
+ [2, 2, 4],
+ [1, 1, 1]]
+"""
+))
+
+print("Expected Output:", get_color_counts(
+"""
+[[0, 0, 0],
+ [0, 0, 0],
+ [5, 5, 5]]
+"""
+))

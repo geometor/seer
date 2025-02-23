@@ -1,0 +1,20 @@
+facts:
+  - type: grid
+    dimensions: 3x3
+    elements: colored pixels (represented by digits)
+  - type: transformation
+    input: grid
+    output: grid
+  - observation: color_retention
+    details: "One color from the input grid is consistently present in the output grid."
+  - observation: color_change
+    details: "Colors other than the retained color change to a specific color."
+  - specific_observation:
+      input_color: 4 (yellow)
+      output_color: 4 (yellow)
+      location: center row
+      status: retained
+  - specific_observation:
+      input_colors: [3(green), 8(azure), 1(blue)]
+      output_color: 5 (gray)
+      status: changed

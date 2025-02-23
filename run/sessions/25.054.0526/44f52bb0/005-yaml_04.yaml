@@ -1,0 +1,27 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - colors: [0-9]
+      - shape: variable
+  - name: red_pixels
+    type: pixels
+    properties:
+      - color: 2 (red)
+      - count: variable
+  - name: output_grid
+    type: grid
+    properties:
+      - colors: [1, 7]
+      - shape: 1x1
+
+actions:
+  - name: count_red_pixels
+    input: input_grid
+    output: red_pixels.count
+  - name: determine_parity
+    input: red_pixels.count
+    output: even/odd
+  - name: set_output_pixel
+    input: even/odd
+    output: output_grid

@@ -1,0 +1,28 @@
+facts:
+  - observation: |
+      Each input grid contains multiple colors.
+  - observation: |
+      Each output grid contains only one color, matching one of the colors from the input grid.
+  - observation: |
+      The dimensions (height and width) of the input and output grids are identical.
+  - rule: |
+      The output grid is filled entirely with the color that appears most frequently in the input grid.
+  - object: input_grid
+    properties:
+      - height: int (number of rows)
+      - width: int (number of columns)
+      - unique_colors: list[int] (all colors present in the grid)
+      - color_counts: dict[int, int] (number of times each color appears)
+  - object: output_grid
+    properties:
+      - height: int (number of rows)
+      - width: int (number of columns)
+      - unique_colors: list[int] (should contain only one color)
+      - color_counts: dict[int, int] (all counts for the fill color)
+  - action: fill
+    agent: system
+    input: input_grid
+    parameters:
+      - fill_color: |
+          The color from input_grid.color_counts that occurs most frequently.
+    output: output_grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation removes white (0) pixels that form contiguous 2x2 or larger squares within the input grid.\nOther white pixels, which are not part of such squares, are retained.\n\"\"\"\n\nimport numpy as np\n\ndef is_part_of_square(grid, row, col, min_size=2):\n    \"\"\"\n    Checks if the pixel at (row, col) is part of a square of size min_size x min_size or larger.\n\n    Args:\n        grid: The 2D numpy array.\n        row: Row index of the pixel.\n        col: Column index of the pixel.\n        min_size: The minimum size of the square.\n\n    Returns:\n        True if the pixel is part of a square of at least min_size, False otherwise.\n    \"\"\"\n    if grid[row, col] != 0:\n        return False\n\n    max_size = min(grid.shape[0] - row, grid.shape[1] - col)\n    for size in range(min_size, max_size + 1):\n        # Check if a square of this size exists\n        is_square = True\n        for i in range(size):\n            for j in range(size):\n                if grid[row + i, col + j] != 0:\n                    is_square = False\n                    break\n            if not is_square:\n                break\n        if is_square:\n            return True\n\n    return False\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms an input grid by removing white pixels that are part of 2x2 or larger squares.\n\n    Args:\n        input_grid: A 2D numpy array representing the input grid.\n\n    Returns:\n        A 2D numpy array with white pixels within 2x2 or larger squares removed,\n        maintaining the relative positions of other pixels.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each pixel in the input grid.\n    for row in range(rows):\n        for col in range(cols):\n            # Check if pixel is white and part of a 2x2 or larger square\n            if is_part_of_square(input_grid, row, col):\n                output_grid[row, col] = -1  # Mark for removal\n\n    # Create a new grid excluding the marked pixels (-1)\n    rows_to_keep = []\n    for r in range(output_grid.shape[0]):\n      row = output_grid[r]\n      new_row = row[row != -1]\n      if new_row.size > 0: #prevent empty rows\n        rows_to_keep.append(new_row)\n\n    if len(rows_to_keep) > 0:\n        # Find maximum row length\n        max_row_length = max(len(r) for r in rows_to_keep)\n\n        # Pad rows with -2 (or any other unique value) to create uniform shape\n        padded_rows = []\n        for row in rows_to_keep:\n          padding_size = max_row_length - len(row)\n          padded_row = np.pad(row, (0, padding_size), constant_values=-2)\n          padded_rows.append(padded_row)\n        \n        output_grid = np.array(padded_rows)\n    else:\n        output_grid = np.array([])\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 19858,
+    "candidates_token_count": 801,
+    "total_token_count": 20659,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.653905,
+  "response_file": "018-response.json"
+}

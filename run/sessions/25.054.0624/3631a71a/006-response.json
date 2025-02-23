@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Maroon Regions:** Locate all contiguous regions of maroon (color value 9) pixels within the input grid.\n2.  **Check for Enclosed Regions:** For each maroon region, determine if it *completely encloses* one or more regions of a different color.  \"Completely encloses\" means that if you expand the non-maroon region slightly, the boundary of that expanded region is entirely within the maroon region.\n3.  **Conditional Removal:** If a maroon region fully encloses other colored regions, change all pixels *within that maroon region* to white (color value 0).\n4.  **Preserve Other Pixels:** Maroon regions that do not fully enclose other colors are not modified. All other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label, binary_dilation, binary_erosion, generate_binary_structure\n\ndef find_regions(grid, color_value):\n    \"\"\"\n    Finds contiguous regions of a specific color.\n    \"\"\"\n    colored_pixels = (grid == color_value).astype(int)\n    labeled_array, num_features = label(colored_pixels)\n    return labeled_array, num_features\n\ndef is_fully_enclosed(grid, maroon_mask):\n    \"\"\"\n    Checks if a maroon region fully encloses other colors.\n    \"\"\"\n    # Get the inverse of the maroon mask (everything *but* the maroon)\n    non_maroon_mask = ~maroon_mask\n\n    # If the maroon region is on the edge, it can't fully enclose\n    if np.any(maroon_mask[0, :]) or np.any(maroon_mask[-1, :]) or \\\n       np.any(maroon_mask[:, 0]) or np.any(maroon_mask[:, -1]):\n        return False\n\n    # Label the non-maroon regions\n    labeled_non_maroon, num_non_maroon = label(non_maroon_mask)\n\n    # Iterate through each non-maroon region *within* the bounding box of the maroon region\n    min_row, min_col = np.min(np.where(maroon_mask)[0]), np.min(np.where(maroon_mask)[1])\n    max_row, max_col = np.max(np.where(maroon_mask)[0]), np.max(np.where(maroon_mask)[1])\n\n    for region_label in range(1, num_non_maroon + 1):\n        region_mask = (labeled_non_maroon == region_label)\n\n        # Check if this non-maroon region intersects with the current maroon region's bounding box\n        if np.any(region_mask[min_row:max_row+1, min_col:max_col+1]):\n            # Expand the non-maroon region slightly\n            struct = generate_binary_structure(2, 2)  # 3x3 structuring element\n            expanded_region = binary_dilation(region_mask, structure=struct, border_value=0)\n\n            # Check if the boundary of the expanded region is entirely within the maroon region\n            boundary_mask = expanded_region ^ binary_erosion(expanded_region, structure=struct, border_value=0)\n            if not np.all(grid[boundary_mask] == 9):\n                return False  # Not fully enclosed\n\n    return True # if all non-maroon regions inside bounding box pass check\n\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms grid, removing maroon regions enclosing other colors.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    maroon_labeled_array, num_maroon_regions = find_regions(input_grid, 9)\n\n    for region_label in range(1, num_maroon_regions + 1):\n        region_mask = (maroon_labeled_array == region_label)\n        if is_fully_enclosed(input_grid, region_mask):\n            output_grid[region_mask] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 31779,
+    "candidates_token_count": 930,
+    "total_token_count": 32709,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.333063,
+  "response_file": "006-response.json"
+}

@@ -1,0 +1,35 @@
+facts:
+  - observation: |
+      The input grids are always square (NxN).
+  - observation: |
+      The output grids are always 1x1.
+  - observation: |
+      The output value is a single digit integer.
+  - observation: |
+      White (0) pixels seem to act as padding or separators and are not part of the core pattern.
+  - object: main_diagonal
+    description: |
+      Pixels along the main diagonal (top-left to bottom-right) of the input grid.
+    properties:
+      - values: List of integer values [0-9].
+  - object: anti_diagonal
+    description: |
+      Pixels along the anti-diagonal (top-right to bottom-left) of the input grid.
+    properties:
+      - values: List of integer values [0-9].
+  - relationship: main_vs_anti_diagonal
+    description: |
+      Compares the non-white pixels on the main diagonal with the non-white pixels on the anti-diagonal.
+    states:
+      - equal: Non-white elements are identical in value and order.
+      - different: Non-white elements are not identical.
+      - main_only: Non-white elements exist only on main diagonal
+      - anti_only: Non-white elements exist only on anti-diagonal
+      - neither: No non-white elements.
+  - action: count_occurrences
+    description: |
+      Increments a counter based on the relationship between the main and anti-diagonals.
+    conditions:
+      - if: main_vs_anti_diagonal is equal, increment counter to 1, or to 2 if not equal.
+      - if: non-white values are on main or anti diagonal, but not equal, increment to 2.
+      - if: no non-white values, counter is 0.

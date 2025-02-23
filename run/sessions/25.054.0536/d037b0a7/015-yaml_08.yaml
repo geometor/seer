@@ -1,0 +1,17 @@
+objects:
+  - description: Input grid
+    properties:
+      - rows: variable
+      - columns: variable
+      - pixels: 2D array of color values (0-9)
+  - description: Output grid
+    properties:
+      - rows: same as input grid
+      - columns: same as input grid
+      - pixels: Transformed 2D array of color values
+
+actions:
+  - name: Propagate color downwards
+    description: For each column, the color value of the top-most pixel is copied to all pixels below it in the same column.
+    input: Column index, top-row color
+    output: Modified column in output grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Locate all contiguous blocks of pixels of the same color, excluding white (0) and blue (1). These are initial colored objects and are vertical strips.\n\n2.  **Horizontal Expansion:**\n    *   Iterate through each row of the grid.\n    *   If a blue (1) pixel is horizontally adjacent to non-white and non-blue colors, change the blue pixel's color to the color of the strip.\n\n3.  **Vertical Expansion:**\n    * Iterate through each column.\n    *   If a column contains colored objects (excluding 0 and 1), extend those colors vertically to fill the entire column, replacing blue(1) pixels. If a column has multiple colored objects, then expand all of them within the column.\n\n4. **Preservation:**\n    * The horizontal and vertical lines with color white(0) are preserved.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Horizontal Expansion\n    for row in range(rows):\n        for col in range(cols):\n            if output_grid[row, col] == 1:\n                left_color = 0  # Default to white\n                right_color = 0 # Default to white\n\n                # Find the nearest non-blue/white color to the left\n                for i in range(col - 1, -1, -1):\n                    if output_grid[row, i] not in [0, 1]:\n                        left_color = output_grid[row, i]\n                        break\n\n                # Find the nearest non-blue/white color to the right.\n                for i in range(col + 1, cols):\n                    if output_grid[row, i] not in [0, 1]:\n                        right_color = output_grid[row, i]\n                        break\n\n                # if the color is between two non-white, non-blue pixels, propagate color\n                if left_color != 0 and right_color != 0 and left_color == right_color:\n                   output_grid[row,col] = left_color\n                elif left_color != 0 and right_color != 0 :\n                    output_grid[row, col] = left_color\n\n    # Vertical Expansion\n    for col in range(cols):\n        column_colors = []\n        for row in range(rows):\n            color = output_grid[row, col]\n            if color not in [0, 1]:\n                column_colors.append((row, color))  # Store row index and color\n\n        # Fill the entire column based on the colors found\n        for row in range(rows):\n           if output_grid[row,col] == 1:\n              if len(column_colors) > 0:\n                 for r, c in column_colors:\n                   output_grid[row,col] = c\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12434,
+    "candidates_token_count": 687,
+    "total_token_count": 13121,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.313292,
+  "response_file": "010-response.json"
+}

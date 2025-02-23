@@ -1,0 +1,64 @@
+examples:
+  - example_id: 1
+    input_objects:
+      - color: 4  # Yellow
+        shape: Vertical lines and large block
+      - color: 1  # Blue
+        shape: Scattered pixels within the yellow block
+      - color: 3  # Green
+        shape: Scattered pixels within the yellow block
+    output_objects:
+      - color: 1
+        relative_position: top-left
+      - color: 3
+        relative_position: top-right
+    transformation: Downsample to 3x3, preserve relative positions of non-white colors.
+    notes: The output seems to pick specific non-white and non-background colors, and place some of them in the top row.
+
+  - example_id: 2
+    input_objects:
+      - color: 3  # Green
+        shape: Vertical lines and background fill
+      - color: 2  # Red
+        shape: Scattered pixels within green areas
+      - color: 8  # Azure
+        shape: Scattered pixels within green areas
+    output_objects:
+      - color: 2  # red
+        relative_position: top-center and middle-left
+      - color: 8
+        relative_position: bottom-right
+    transformation: Downsample to 3x3, focus on red and azure.
+    notes: output contains correct color.
+
+  - example_id: 3
+    input_objects:
+      - color: 1
+        shape: Vertical Lines
+      - color: 6
+        shape: Isolated pixels
+      - color: 3
+        shape: isolated pixels
+    output_objects:
+      - color: 6
+        relative_position: top row
+      - color: 3
+        relative_position: bottom row
+    transformation: Downsample to 3x3 grid focusing on colors 3 and 6. The top row contains 6s, and the bottom row contains 3s. The middle row is all white (0).
+    notes: output is not just positioning of the objects, but entire rows of the output are a single color
+
+  - example_id: 4
+    input_objects:
+     - color: 8
+       shape: Vertical Lines, background
+     - color: 1
+       shape: scattered pixels
+     - color: 2
+       shape: scattered pixels
+    output_objects:
+      - color: 1
+        relative_position: Top-left
+      - color: 2
+        relative_position: all other positions
+    transformation: Downsample to a 3x3. Colors 1 and 2 are present, with color 2 taking the most area.
+    notes: output is not just positioning of the objects, but entire rows of the output are a single color

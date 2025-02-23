@@ -1,0 +1,37 @@
+objects:
+  - type: grid
+    properties:
+      rows: 19
+      columns: 19
+      cell_values: [0, 3, 4, 9]
+  - type: pixel
+    properties:
+      colors:
+        white: 0
+        maroon: 9
+        yellow: 4
+        green: 3
+      possible_states: [ unchanged, changed ]
+  - type: region
+    properties:
+      contiguous: True
+      color: varies
+      boundary: maroon pixels
+
+actions:
+  - name: color_change
+    agent: unknown
+    precondition:
+      pixel_color: white
+    postcondition:
+      pixel_color: [yellow, green]
+    constraints:
+      region_specific: True
+
+relationships:
+  - type: adjacency
+    relation: pixels next to each other (horizontally, vertically, or diagonally)
+  - type: containment
+    relation: regions contained within the grid
+  - type: boundary
+    relation: maroon pixels form the boundary of white regions

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies a blue object within an azure background, traces (fully or partially) its outline with red pixels, and highlights points on the outline with green.\nOriginal and copied objects have green highlights swapped.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    # Find coordinates of all pixels of the specified color.\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None\n    return coords\n\ndef get_object_bounds(coords):\n    # bounding box\n    min_row = np.min(coords[:, 0])\n    max_row = np.max(coords[:, 0])\n    min_col = np.min(coords[:, 1])\n    max_col = np.max(coords[:, 1])\n    return min_row, max_row, min_col, max_col\n\ndef outline_object(grid, object_coords, outline_color):\n    # Create an outline of the traced object with red pixels.\n    min_row, max_row, min_col, max_col = get_object_bounds(object_coords)\n    output_grid = np.copy(grid)\n\n    for r in range(min_row, max_row + 1):\n        for c in range(min_col, max_col + 1):\n            if grid[r,c] == grid[object_coords[0][0], object_coords[0][1]]:\n\n                #check neighbors\n                neighbors = []\n                for i in range(-1,2):\n                    for j in range(-1,2):\n                        if (i != 0 or j != 0):\n                            neighbor_row = r + i\n                            neighbor_col = c + j\n                            if (0 <= neighbor_row < grid.shape[0] and 0 <= neighbor_col < grid.shape[1]):\n                                  neighbors.append(grid[neighbor_row,neighbor_col])\n                #if a neighbor is a different color than the object, we have an outline\n                if any(neighbor != grid[object_coords[0][0], object_coords[0][1]] for neighbor in neighbors):\n                    output_grid[r,c] = outline_color\n\n\n    return output_grid\n\ndef find_green_highlight(grid, object_coords, highlight_color):\n    # Find the green highlight within the traced object.\n    min_row, max_row, min_col, max_col = get_object_bounds(object_coords)\n    for r in range(min_row, max_row + 1):\n        for c in range(min_col, max_col + 1):\n             if grid[r, c] == highlight_color:\n                return (r,c)\n    return None\n\ndef transform(input_grid):\n    # Initialize output grid with the same background color.\n    output_grid = np.full(input_grid.shape, input_grid[0, 0])  # Assume background is top-left pixel\n\n    # Find the blue object.\n    blue_object_coords = find_object(input_grid, 1)\n\n    # Trace the blue object with red.\n    output_grid = outline_object(input_grid, blue_object_coords, 2)\n\n    # find original green\n    green_highlight_coords = find_green_highlight(input_grid,blue_object_coords, 3 )\n\n    if (green_highlight_coords):\n        output_grid[green_highlight_coords] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5698,
+    "candidates_token_count": 814,
+    "total_token_count": 6512,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.580049,
+  "response_file": "002-response.json"
+}

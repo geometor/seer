@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  Identify all green (3) objects in the input grid.\n2.  For each green object, check if it forms a 2x2 square.\n3.  If a green object is a 2x2 square, keep it unchanged in the output grid.\n4.  If a green object is NOT a 2x2 square, transform it to the background color (0) in the output grid.\n5.  All other colors in input grid transform to themselves in output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds contiguous objects of a specific color in the grid.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, current_object):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n        dfs(row + 1, col + 1, current_object)  # Check diagonals\n        dfs(row + 1, col - 1, current_object)\n        dfs(row - 1, col + 1, current_object)\n        dfs(row - 1, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_2x2_square(object_pixels, grid):\n    \"\"\"\n    Checks if an object is a 2x2 square.\n    \"\"\"\n    if len(object_pixels) != 4:\n        return False\n\n    rows = [r for r, c in object_pixels]\n    cols = [c for r, c in object_pixels]\n\n    if max(rows) - min(rows) != 1 or max(cols) - min(cols) != 1:\n        return False\n        \n    min_row, min_col = min(rows), min(cols)\n\n    # Check if the 4 pixels form a filled 2x2 square\n    expected_pixels = {(min_row, min_col), (min_row + 1, min_col), (min_row, min_col + 1), (min_row + 1, min_col + 1)}\n    return set(object_pixels) == expected_pixels\n\n\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid based on 2x2 green squares.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    green_objects = find_objects(input_grid, 3)\n\n    for obj in green_objects:\n        if not is_2x2_square(obj, input_grid):\n            for r, c in obj:\n                output_grid[r, c] = 0  # Change to background color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 32106,
+    "candidates_token_count": 815,
+    "total_token_count": 32921,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.722884,
+  "response_file": "024-response.json"
+}

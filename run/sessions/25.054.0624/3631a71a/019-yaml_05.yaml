@@ -1,0 +1,27 @@
+objects:
+  - type: grid
+    dimensions: 30x30
+    elements: pixels
+    properties:
+      color: integer (0-9)
+
+  - type: object
+    definition: contiguous block of one or more pixels of the same color
+    properties:
+        color: integer (0-9)
+        shape: irregular
+        size: variable
+
+actions:
+  - type: compare_grids
+    description: element by element comparison between two grids
+
+  - type: replace_pixel
+    description: Replace the pixel in a grid with a different value
+    
+  - type: find_and_replace
+    description: Find specific object or pixel and replace based on a certain property
+
+relationships:
+  - input_grid: contains multiple objects
+  - output_grid: contains modified objects from input_grid

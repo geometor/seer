@@ -1,0 +1,35 @@
+objects:
+  - id: background
+    color: white (0)
+    type: background
+    properties:
+      - contiguous
+
+  - id: red_shapes
+    color: red (2)
+    type: shape
+    properties:
+      - scattered
+      - non-contiguous
+  - id: green_fill
+    color: green (3)
+    type: fill
+    properties:
+      - contiguous
+      - rectangular
+
+actions:
+  - name: fill
+    agent: system
+    target: background
+    condition: bounded by red_shapes
+    instrument: green color (3)
+
+relationships:
+    - type: bounding
+      subject: red_shapes
+      object: green_fill
+    - type: spatial
+      relation: surrounds_partially, top_left_corner
+      subject: green
+      object: red

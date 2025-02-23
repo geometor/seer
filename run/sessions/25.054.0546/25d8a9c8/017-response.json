@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Unique Colors in the Top Row:** Examine the first row of the input grid and determine the unique colors present.\n2.  **Map to Output Colors:** Observe that in all examples there are two distinct colors in each grid. There are also two distinct colors in the top row of each grid. The transformation changes all pixels of color A in the input to color B, where A and B are a unique combination per row.\n3. **Apply color changes:** Using the color change mapping from the first row, apply these transformations to the entire grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_color_map_for_row(input_row, output_row):\n    \"\"\"\n    Creates a color mapping dictionary for a single row.\n\n    Args:\n      input_row: list\n      output_row: list\n\n    Returns:\n      A dictionary for converting colors\n    \"\"\"\n    color_map = {}\n    for i in range(len(input_row)):\n        color_map[input_row[i]] = output_row[i]\n    return color_map\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the observed rule.\"\"\"\n\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows = input_grid.shape[0]\n    \n    # Iterate through each row to generate color maps.\n    for row in range(rows):\n      input_row = input_grid[row,:]\n      if row == 0:\n        #find output row and set colors\n        unique_input_colors = sorted(list(set(input_row)))\n        if len(unique_input_colors) == 1:\n          output_row = [5 if unique_input_colors[0] != 5 else 0] * len(input_row)\n        else:\n          output_row = [0] * len(input_row)\n      else:\n        # find output row by checking the color changes in input\n        unique_input_colors = sorted(list(set(input_grid.flatten())))\n        if len(unique_input_colors) <= 2:\n          output_color = [c for c in [0,5] if c not in output_grid[0,:]]\n          if len(output_color)>0:\n            output_row = [output_color[0]] * len(input_row)\n          else:\n            output_row = output_grid[0,:]\n        \n        else:\n          output_row = output_grid[0,:]\n\n      color_map = get_color_map_for_row(input_row, output_row)\n          \n      # Apply the color mapping to the entire row in output\n      for col in range(output_grid.shape[1]):\n          output_grid[row, col] = color_map[input_grid[row, col]]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3491,
+    "candidates_token_count": 672,
+    "total_token_count": 4163,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.000184,
+  "response_file": "017-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExamine each row in the input grid.\nIf all pixels in the row are the same non-zero color, change all pixels in that row to gray (5) in the output grid.\nOtherwise, change all the pixels in the row to white (0).\nReturn the changed grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n\n    # iterate over each row of the grid\n    for row_index, row in enumerate(input_grid):\n        # check if all pixels in the row are the same and not zero\n        first_pixel = row[0]\n        all_same = True\n        for pixel in row:\n            if pixel != first_pixel or first_pixel == 0:\n                all_same = False\n                break\n        \n        # If all pixels are the same non-zero color, change the row to gray (5)\n        if all_same:\n            output_grid[row_index, :] = 5\n        # Otherwise, change the row to white (0).\n        else:\n            output_grid[row_index, :] = 0\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2601,
+    "candidates_token_count": 284,
+    "total_token_count": 2885,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.2462,
+  "response_file": "022-response.json"
+}

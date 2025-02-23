@@ -1,0 +1,21 @@
+objects:
+  - type: block
+    description: Contiguous region of pixels with the same color.
+    properties:
+      - color: Integer (0-9) representing the color.
+      - shape: The geometrical arrangement of pixels within the block.
+      - size: Number of pixels in the block.
+      - position: Location of the block within the grid (e.g., top-left coordinates).
+
+actions:
+  - name: expand
+    description: Replicates a block of pixels.
+    parameters:
+      - direction: Horizontal and vertical.
+      - factor: Based on existing pattern, duplication.
+
+relationships:
+  - type: spatial
+    description: Describes the relative positions of blocks (e.g., adjacent, overlapping).
+  - type: color-based
+    description: Operations may depend on the color of the blocks.

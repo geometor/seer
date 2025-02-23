@@ -1,0 +1,30 @@
+task: color_replacement
+input:
+  type: grid
+  dimensions: 3x3
+  elements:
+    - value: 4
+      color: yellow
+      count: 3
+    - value: 6
+      color: magenta
+      count: 2
+    - value: 3
+      color: green
+      count: 2
+    - value: 8
+      color: azure
+      count: 1
+    - value: 0
+      color: white
+      count: 1
+output:
+  type: grid
+  dimensions: 3x3
+  elements:
+    - value: 4
+      color: yellow
+      count: 9
+transformation:
+  type: flood_fill
+  criteria: most_frequent_color

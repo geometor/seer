@@ -1,0 +1,25 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Represents the input and output data.
+  - name: seed_row
+    type: 1D array
+    description: The first row of the grid, which contains the seed colors.
+  - name: seed_colors
+    type: list
+    description: The non-zero colors present in the seed row.  Each is an 'object'
+                 that will 'act'.
+  - name: expanded_region
+    type: 2D array
+    description: The region of the grid below the seed row where expansion occurs.
+
+actions:
+  - name: identify_seeds
+    description: Find all non-zero colors in the seed row.
+  - name: expand_downward
+    description: For each seed color, extend it downwards in the grid.
+    parameters:
+      - seed_color: The color to expand.
+      - column: The column in which the seed color appears.
+    stopping_condition: Stop when encountering a non-zero cell.
+    replacement: Replace 0 colors with the seed color.

@@ -13,7 +13,9 @@ def run():
 
     #  tasks = Tasks("one")
     #  tasks = Tasks("first-six")
-    tasks = Tasks("44").get_ordered_tasks()
+    #  tasks = Tasks("44").get_ordered_tasks()
+    tasks = Tasks("ARC-800-tasks/training").get_ordered_tasks()
+    tasks = reversed(tasks)
     #  tasks = Tasks("other-six")
 
     seer = Seer(

@@ -1,0 +1,41 @@
+        1 0 3
+        1 0 0
+        1 0 0
+        ```
+    *   Observed: All yellow (4).
+    *   Analysis: The expected output reflects the *single pixel substitutions* in some of the solid yellow rows, *not* the dominant color. The top row of the output corresponds to a section of input rows that includes the blue and green substitutions. The second and third rows pick up the blue. It is picking certain rows, and extracting only the colors in the row that are not the repeating vertical color (yellow).
+*   **Example 2:**
+
+    *   Input: Alternating columns of green (3) and white (0), with solid green rows and rows with green/red(2) and green/azure(8) changes.
+    *   Expected:
+        ```
+        0 2 0
+        2 0 0
+        0 0 8
+        ```
+    *   Observed: All green (3).
+    *   Analysis: Similar to Example 1. The output captures the non-green colors that appear within the regions of repeating green vertical lines. The output extracts the colors other than the dominant vertical color in three regions.
+*   **Example 3:**
+
+    *   Input: Alternating columns of blue (1) and white (0), solid rows, some with magenta(6), or green(3).
+    *   Expected:
+        ```
+        6 6 0
+        0 0 0
+        3 3 3
+        ```
+    *   Observed: All blue (1).
+    *   Analysis:  Again, the non-dominant colors in the vertical repetition are captured.
+*   **Example 4:**
+
+    *   Input: Alternating columns of azure (8) and white (0), rows with blue(1), red(2)
+    *   Expected:
+        ```
+        1 0 2
+        0 0 2
+        2 2 2
+        ```
+    *   Observed: All azure (8).
+    *   Analysis: Same pattern.
+
+**YAML Facts:**

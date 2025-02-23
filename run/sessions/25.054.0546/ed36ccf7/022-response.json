@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe output grid is a 90 degree counter-clockwise rotation of the input grid.\nAdditionally, if a pixel in the rotated grid would have a value of 0, and the\npixel in the *original* grid at that location (pre-rotation) had a non-zero value,\nthen that pixel value is carried over to the rotated/output grid.  This is a\nform of conditional overwrite based on comparing the \"would-be\" rotated value\nto the original input value.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Rotates the input grid 90 degrees counter-clockwise, with a conditional overwrite.\n    \"\"\"\n    # Convert the input list of lists to a NumPy array.\n    input_np = np.array(input_grid)\n\n    # Rotate the array 90 degrees counter-clockwise.\n    output_np = np.rot90(input_np)\n\n    # Create a \"pre-rotated\" version by rotating clockwise once. This allows us\n    # to easily index into the original input using the *output* coordinates.\n    pre_rotated_np = np.rot90(input_np, k=-1)\n\n    # Iterate through the *output* grid and apply the conditional overwrite.\n    rows, cols = output_np.shape\n    for row in range(rows):\n        for col in range(cols):\n            if output_np[row, col] == 0 and pre_rotated_np[row, col] != 0:\n                output_np[row, col] = pre_rotated_np[row, col]\n\n\n    # Convert the NumPy array back to a list of lists.\n    output_grid = output_np.tolist()\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2867,
+    "candidates_token_count": 394,
+    "total_token_count": 3261,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.813157,
+  "response_file": "022-response.json"
+}

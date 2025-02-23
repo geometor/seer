@@ -1,0 +1,32 @@
+objects:
+  - type: grid
+    properties:
+      rows: 23
+      columns: 23
+      values: [0-9]
+  - type: pixel
+    properties:
+      color:
+        0: white
+        1: blue
+        2: red
+        4: yellow
+        8: azure
+        9: maroon
+  - type: object
+    properties:
+        colors: [red, yellow, maroon, azure]
+        shape: Adjacent pixels of same color
+
+actions:
+    - type: modify
+      description: Changing a blue pixel to match a neighboring color.
+      conditions:
+        - adjacency: The pixel is directly adjacent to a colored object.
+    - type: expand
+      description: expanding the color along the rows.
+
+relationships:
+  - adjacency: Pixels can be horizontally, or vertically adjacent.
+  - containment: Colored objects are contained within the grid.
+  - modification: color '1' (blue) changes color adjacent to colored objects

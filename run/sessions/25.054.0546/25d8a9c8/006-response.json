@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Horizontal Lines: For each row in the input grid, find contiguous horizontal lines of the same color.\n2. Find Most Frequent Horizontal Line Color: Determine the color that appears most frequently within those horizontal lines across the entire grid.\n3. Transform Colors, most frequent first:\n    *   Pixels matching that color become Gray (5).\n    *   All other pixels become White (0).\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef find_horizontal_lines(grid):\n    \"\"\"Finds contiguous horizontal lines of the same color in each row.\"\"\"\n    lines = []\n    for row in grid:\n        current_line = []\n        for i in range(len(row)):\n            if i == 0:\n                current_line.append((row[i], 1))  # (color, length)\n            else:\n                if row[i] == current_line[-1][0]:\n                    current_line[-1] = (row[i], current_line[-1][1] + 1)\n                else:\n                    current_line.append((row[i], 1))\n        lines.append(current_line)\n    return lines\n\ndef most_frequent_horizontal_line_color(lines):\n    \"\"\"Determines the most frequent color across all horizontal lines.\"\"\"\n    color_counts = Counter()\n    for row_lines in lines:\n        for color, length in row_lines:\n            color_counts[color] += length  # count all pixels, not lines\n    if not color_counts: # handle the case with empty grid\n      return None\n    most_common_color = color_counts.most_common(1)[0][0]\n    return most_common_color\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid based on the most frequent horizontal line color.\"\"\"\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # Find horizontal lines\n    lines = find_horizontal_lines(input_grid)\n\n    # Find the most frequent color in horizontal lines\n    most_frequent_color = most_frequent_horizontal_line_color(lines)\n    if most_frequent_color is None:\n        return output_grid # return blank grid\n\n    # Transform pixels:  most_frequent_color to Gray(5), others to White (0)\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            if input_grid[i, j] == most_frequent_color:\n                output_grid[i, j] = 5\n            else:\n                output_grid[i, j] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2884,
+    "candidates_token_count": 623,
+    "total_token_count": 3507,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.398455,
+  "response_file": "006-response.json"
+}

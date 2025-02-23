@@ -1,0 +1,24 @@
+facts:
+  - observation: |
+      The input grid contains pixels of different colors, represented by integers 0-9.
+      Black (0) seems to be the background color.
+  - object: non_zero_pixels
+    description: |
+        Pixels in the input grid that are not black (0).
+    properties:
+      color: |
+        The color of the non-zero pixel.  This varies across examples.
+      count: |
+          The number of times the non-zero color appears in the input grid.
+  - action: count_and_replicate
+    description: |
+      Counts the number of non-zero pixels of a specific color and creates a 1xN output grid.
+    input: non_zero_pixels
+    output: output_grid
+    parameters:
+      color: |
+        The non-zero color to be counted and replicated.
+      count: |
+          The number of times the color appears in the input (and the width of the output).
+  - context: |
+      The transformation identifies a single non-black color in the input grid, counts its occurrences, and generates a 1xN output grid filled with that color.

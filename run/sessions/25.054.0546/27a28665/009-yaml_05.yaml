@@ -1,0 +1,25 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - corners: [top_left, top_right, bottom_left, bottom_right]
+      - colors: [0-9] # All possible colors
+  - name: output_grid
+    type: 2D array
+    properties:
+      - shape: 1x1
+      - value: count_of_non_black_corners
+
+actions:
+  - name: count_non_black_corners
+    input: input_grid
+    process: |
+      Iterate through the corner positions (top_left, top_right, bottom_left, bottom_right) of the input grid.
+      For each corner, check if the pixel color is not black (value != 0).
+      Increment a counter for each non-black corner pixel.
+    output: count
+
+  - name: create_output
+    input: count
+    process: Create a 1x1 grid where the single cell's value represents the 'count'.
+    output: output_grid

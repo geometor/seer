@@ -1,0 +1,27 @@
+facts:
+  - observation: |
+      The input and output grids are the same size (30x30).
+  - object: Grid
+    properties:
+      - dimensions: 30x30
+      - elements: Pixels
+  - object: Pixel
+    properties:
+      - color: Integer (0-9) representing a color.
+  - observation: |
+      Large connected regions of the same color tend to be preserved in the output.
+  - observation: |
+      Isolated or small clusters of pixels are often removed or changed.
+  - observation: |
+     The central 9x9 area appears to be "cleaned", with inner color sections mostly replaced by the surrounding color.
+  - observation: The output looks like it has had some 3x3 "sweeps" over it to find the dominant color.
+  - action: Noise Reduction
+    description: |
+      Small, isolated pixel groups are replaced based on the colors of surrounding pixels.
+  - action: Shape Preservation
+    description: |
+      Large contiguous areas of the same color are maintained.
+  - relation: |
+      The output appears to be a simplified, less noisy version of the input.
+  - relation: |
+      9's in lower left corner are almost completely removed.

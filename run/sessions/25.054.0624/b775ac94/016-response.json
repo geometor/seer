@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nDuplicates and expands colored objects in a grid, with specific rules for colors 1, 2, 3, 4, 6, 7 and 8.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds all contiguous colored regions (objects) in the grid.\n    Returns a dictionary where keys are colors and values are lists of (row, col) coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, obj_coords):\n        if (row, col) in visited or row < 0 or row >= rows or col < 0 or col >= cols or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        obj_coords.append((row, col))\n        dfs(row + 1, col, color, obj_coords)\n        dfs(row - 1, col, color, obj_coords)\n        dfs(row, col + 1, color, obj_coords)\n        dfs(row, col - 1, color, obj_coords)\n\n    for row in range(rows):\n        for col in range(cols):\n            color = grid[row, col]\n            if color != 0 and (row, col) not in visited:\n                obj_coords = []\n                dfs(row, col, color, obj_coords)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(obj_coords)\n    return objects\n\ndef get_object_width(obj_coords):\n    \"\"\"Calculates the width of an object.\"\"\"\n    if not obj_coords:\n        return 0\n    min_col = min(c for _, c in obj_coords)\n    max_col = max(c for _, c in obj_coords)\n    return max_col - min_col + 1\n\ndef get_object_height(obj_coords):\n    \"\"\"Calculates the height of an object.\"\"\"\n    if not obj_coords:\n        return 0\n    min_row = min(r for r, _ in obj_coords)\n    max_row = max(r for r, _ in obj_coords)\n    return max_row - min_row + 1\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find all objects in the input grid\n    objects = find_objects(input_grid)\n    \n    # Duplicate based on color\n    for color, obj_list in objects.items():\n        for obj_coords in obj_list:\n            obj_width = get_object_width(obj_coords)\n            obj_height = get_object_height(obj_coords)\n\n            if color != 8:  # All colors except 8\n                # Duplicate one full object-width to the right\n                for r, c in obj_coords:\n                    output_grid[r,c] = color\n                    new_c = min(cols - 1, c + obj_width)\n                    \n                    #check other color on the right\n                    if output_grid[r,new_c] !=0 and output_grid[r,new_c]!=color:\n                        output_grid[r,new_c] = color\n                    else:\n                        output_grid[r,new_c] = color\n            \n            elif color == 8:\n                for r,c in obj_coords:\n                    output_grid[r,c] = 8\n                \n                #check adj\n                has_adjacent = False\n                adjacent_obj_coords = []\n                for r, c in obj_coords:\n                    if c + 1 < cols and input_grid[r,c+1] != 8 and input_grid[r,c+1]!=0:\n                        has_adjacent = True\n                        adjacent_obj_coords.append((r,c+1))\n\n                    elif c -1 >= 0 and input_grid[r,c-1] !=8 and input_grid[r,c-1] !=0:\n                        has_adjacent = True\n                        adjacent_obj_coords.append((r,c-1))\n                if has_adjacent:\n                    first_adj_r = adjacent_obj_coords[0][0]\n                    first_adj_c = adjacent_obj_coords[0][1]\n                    adj_color = input_grid[first_adj_r,first_adj_c]\n\n                    #get obj 8 min row\n                    min_r = min(r for r,_ in obj_coords)\n                    for i in range(obj_height * 2):\n                        if min_r - 1 - i >=0:\n                            output_grid[min_r - 1 - i,first_adj_c] = 8\n\n    #Expand\n    for color, obj_list in objects.items():\n            for obj_coords in obj_list:\n                obj_width = get_object_width(obj_coords)\n                if color == 1:  # Color 1\n                    min_row = min(r for r, _ in obj_coords)\n                    max_row = max(r for r, _ in obj_coords)\n                    for r, c in obj_coords:\n                        # Check for adjacent color 2\n                        if (r, c + 1) in [(r,c) for obj in objects.get(2,[]) for r,c in obj]: #check for any 2 obj coord\n                            for i in range(max_row - min_row+1):\n                                output_grid[min(rows-1,r+1+i),c] = 1\n\n                        if output_grid[r,c] !=1: #prevent override\n                           output_grid[r,c] = 1\n                        \n                \n                elif color == 6: #color 6\n                    for r,c in obj_coords:\n                        output_grid[r,min(cols-1,c+obj_width)] = 6\n    \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12544,
+    "candidates_token_count": 1412,
+    "total_token_count": 13956,
+    "cached_content_token_count": 0
+  },
+  "response_time": 14.783133,
+  "response_file": "016-response.json"
+}

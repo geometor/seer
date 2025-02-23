@@ -1,0 +1,18 @@
+objects:
+  - name: yellow_regions
+    color: yellow (4)
+    description: Scattered, irregularly shaped regions of yellow pixels.
+  - name: blue_square
+    color: blue (1)
+    description: A 3x3 square of blue pixels, somewhat centrally located in the input.
+  - name: output_blue_regions
+    color: blue (1)
+    description: Blue regions appearing where yellow and existing blue pixels interact, taking a particular shape based on relative positions
+
+actions:
+  - name: overlay
+    description:  A new blue object forms based on overlap of yellow and existing blue
+
+relationships:
+  - input blue overlaps some yellow -> output contains new blue pixels at these yellow pixels
+  - input yellow is one pixel away from existing blue -> new blue pixels one pixel away from existing blue are turned on

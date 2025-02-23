@@ -1,0 +1,23 @@
+objects:
+  - name: background
+    type: grid
+    properties:
+      colors: [0, 8] # white, azure
+      shape: rectangle
+  - name: cross
+    type: shape
+    properties:
+      color: 3 # green
+      shape: plus sign
+
+actions:
+  - name: overlay
+    description: overlay the cross shape onto the background
+    agent: cross
+    target: background
+
+relationships:
+  - type: spatial
+    description: The cross shape is centered within the background grid.
+    subject: cross
+    object: background

@@ -1,0 +1,26 @@
+objects:
+  - type: grid
+    description: 2D array of pixels
+    properties:
+      - width: 24
+      - height: 25
+      - cells: integers (0-9) representing colors
+
+  - type: color_block
+    description: contiguous regions of the same color
+    properties:
+       - color: integer value
+       - shape: irregular
+
+actions:
+  - type: color_swap
+    description:  substitutes all instances of one color with another within the same grid positions.
+    parameters:
+      - from_color: 6
+        to_color: 3
+      - from_color: 3
+        to_color: 6
+
+relationships:
+  - type: spatial
+    description: The grid layout defines the spatial relationship between pixels.

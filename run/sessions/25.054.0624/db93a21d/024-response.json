@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms input grids containing maroon rectangles. The transformation involves:\n1. Recoloring the interior of each maroon rectangle: top-left quarter green, the rest blue.\n2. Adding a 1-pixel thick green border around each rectangle.\n3. Adding a 2-pixel wide green extension to the right of the top-leftmost rectangle.\n4. Adding a 2-pixel tall blue extension below the top-leftmost rectangle.\n5. Adding a 2-pixel wide blue extension to the left of the bottom-rightmost rectangle.\n6. Adding a 2-pixel tall green extension above the bottom-rightmost rectangle.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all rectangular objects of a given color.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, current_object):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != color:\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                # Get bounding box\n                min_row = min(cell[0] for cell in current_object)\n                max_row = max(cell[0] for cell in current_object)\n                min_col = min(cell[1] for cell in current_object)\n                max_col = max(cell[1] for cell in current_object)\n                objects.append(((min_row, min_col), (max_row, max_col)))\n\n    return objects\n\ndef get_top_left_rectangle(rectangles):\n    \"\"\"Returns the top-leftmost rectangle.\"\"\"\n    if not rectangles:\n        return None\n    return min(rectangles, key=lambda rect: (rect[0][0], rect[0][1]))\n\ndef get_bottom_right_rectangle(rectangles):\n    \"\"\"Returns the bottom-rightmost rectangle.\"\"\"\n    if not rectangles:\n        return None\n    return max(rectangles, key=lambda rect: (rect[1][0], rect[1][1]))\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the maroon rectangles\n    maroon_rectangles = find_objects(input_grid, 9)\n\n    for rect in maroon_rectangles:\n        top_left, bottom_right = rect\n        height = bottom_right[0] - top_left[0] + 1\n        width = bottom_right[1] - top_left[1] + 1\n        \n        # Inner recolor\n        if height > 1 and width > 1:\n            # Calculate quarter boundaries\n            row_mid = top_left[0] + height // 2\n            col_mid = top_left[1] + width // 2\n            # Green quadrant\n            output_grid[top_left[0]:row_mid, top_left[1]:col_mid] = 3\n            # Blue otherwise\n            output_grid[top_left[0]:bottom_right[0] + 1, top_left[1]:bottom_right[1] + 1] = 1\n            output_grid[top_left[0]:row_mid, top_left[1]:col_mid] = 3\n\n        # Border recolor (1-pixel thick)\n        # Top row\n        output_grid[top_left[0]:top_left[0] + 1, top_left[1]:bottom_right[1] + 1] = 3\n        # Bottom row\n        output_grid[bottom_right[0]:bottom_right[0] + 1, top_left[1]:bottom_right[1] + 1] = 3\n        # Left column\n        output_grid[top_left[0]:bottom_right[0] + 1, top_left[1]:top_left[1] + 1] = 3\n        # Right column\n        output_grid[top_left[0]:bottom_right[0] + 1, bottom_right[1]:bottom_right[1] + 1] = 3\n    \n\n    # Surround with color\n    top_left_rect = get_top_left_rectangle(maroon_rectangles)\n    if top_left_rect:\n        # Fill right with green (2 pixels wide)\n        output_grid[top_left_rect[0][0]:top_left_rect[1][0]+1, top_left_rect[1][1] + 1:top_left_rect[1][1] + 3] = 3\n        # Fill below with blue (2 pixels tall)\n        output_grid[top_left_rect[1][0] + 1:top_left_rect[1][0] + 3, top_left_rect[0][1]:top_left_rect[1][1]+1] = 1\n        \n    bottom_right_rect = get_bottom_right_rectangle(maroon_rectangles)\n    \n    if bottom_right_rect:\n        # Fill left with blue (2 pixels wide)\n        output_grid[bottom_right_rect[0][0]:bottom_right_rect[1][0]+1, bottom_right_rect[0][1]-2:bottom_right_rect[0][1]] = 1\n        # Fill above with green (2 pixels tall)\n        output_grid[bottom_right_rect[0][0]-2:bottom_right_rect[0][0], bottom_right_rect[0][1]:bottom_right_rect[1][1]+1] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 17765,
+    "candidates_token_count": 1492,
+    "total_token_count": 19257,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.680808,
+  "response_file": "024-response.json"
+}

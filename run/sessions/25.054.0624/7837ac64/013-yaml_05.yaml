@@ -1,0 +1,21 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - colors: [0, 1, 6, 3] # white, blue, magenta, green
+      - dimensions: [29, 29]
+      - pattern: vertical stripes (alternating 0 and 1)
+      - separators: horizontal lines of color 1
+      - highlighted_colors: [6, 3] within striped sections
+  - name: output_grid
+    type: 2D array
+    properties:
+      - colors: [0, 6, 3]
+      - dimensions: [3, 3]
+relationships:
+  - type: contains
+    from: input_grid
+    to: output_grid # Conceptual containment, not literal embedding
+  - type: represents # the output colors represent highlighted color stripes
+    from:  output_grid
+    to: input_grid

@@ -1,0 +1,21 @@
+objects:
+  - grid:
+      type: 2D array
+      properties:
+        rows: integer
+        cols: integer
+        cells:
+          type: pixel
+          properties:
+            color: integer (0-9)
+            row_index: integer
+            col_index: integer
+actions:
+  - transform:
+      input: grid
+      output: grid
+      rules:
+        - condition: "color 4 is present in the input grid"
+          action: "change colors 1, 2, 3, and 8 to 5; keep color 4"
+        - condition: "color 4 is not present in the input grid"
+          action: "change colors 1, 2, 3, and 8 to 5"

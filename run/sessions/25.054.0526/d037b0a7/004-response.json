@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Locate all non-zero pixels in the input grid.\n2. **Vertical Propagation**: For each non-zero pixel, copy its value downwards to all cells directly below it in the same column, within the bounds of the grid.\n3. **Preserve 0's**: Leave the 0 valued pixels unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the vertical fill-down rule.\"\"\"\n    output_grid = np.copy(input_grid)  # Initialize output grid as a copy\n    rows, cols = input_grid.shape\n\n    # Iterate through each column.\n    for j in range(cols):\n        # Iterate through each row in the current column.\n        for i in range(rows):\n            # Check if the current pixel is non-zero.\n            if input_grid[i, j] != 0:\n                # Propagate the non-zero value downwards.\n                for k in range(i + 1, rows):\n                    output_grid[k, j] = input_grid[i, j]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2916,
+    "candidates_token_count": 263,
+    "total_token_count": 3179,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.074021,
+  "response_file": "004-response.json"
+}
