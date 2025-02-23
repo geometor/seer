@@ -82,6 +82,15 @@ class Seer:
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
         try:
+            # --- Save task.json and task.png ---
+            task_image = task.to_image()
+            self.session.log_prompt_image(task_image, 0, "task")  # Save task image
+
+            task_json_str = task.nice_json_layout()
+            task_json_file = session.task_dir / "task.json"
+            task_json_file.write_text(task_json_str)
+            # --- End of added section ---
+
             self._investigate(task)
         except Exception as e:
             self.session.log_error(e)
@@ -93,6 +102,13 @@ class Seer:
         investigate all training pairs
         """
         self.task_solved = False  # Reset at the start of each task
+
+        # --- Add Task Image Logging ---
+        if include_images:
+            task_image = task.to_image()
+            task_image_filename = self.session.log_prompt_image(
+                task_image, 0, "task_overview"  # Use prompt_count 0 for overview
+            )
 
         for i, pair in enumerate(task.train, 1):
             # reset history for each pair
