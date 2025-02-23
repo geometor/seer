@@ -1,0 +1,43 @@
+objects:
+  - name: grid
+    type: 2D array
+    elements: pixels
+    properties:
+      rows: variable
+      cols: variable
+
+  - name: pixel
+    type: cell
+    properties:
+      color: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] # Represents colors
+      position: [row_index, col_index]
+
+  - name: region
+    type: connected_pixels
+    properties:
+      color: single_value
+      boundary: [list_of_pixels]
+
+  - name: modified_region
+    type: connected_pixels
+    properties:
+       base_color: 0
+       fill_color: 2
+       start_row: variable
+       end_row: variable
+
+actions:
+  - name: identify_regions
+    input: grid
+    output: list_of_regions
+
+  - name: find_first_white_region
+    input: grid, list_of_regions
+    output: region
+
+  - name: fill_region
+    input: grid, region
+    parameters:
+      start_row: integer
+      fill_color: integer
+    output: modified_grid

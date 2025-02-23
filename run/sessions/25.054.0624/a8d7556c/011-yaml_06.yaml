@@ -1,0 +1,31 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - pixels: integers (0-9 representing colors)
+      - dimensions: rows x columns (variable)
+  - name: region
+    type: contiguous block
+    properties:
+      - color: integer (0-9)
+      - boundary: grey pixels (5) or grid edge
+      - contiguous: pixels connected orthogonally
+  - name: first_white_region
+    type: region
+    properties:
+      - color: white (0)
+      - priority: top-most row, then left-most column
+
+actions:
+  - name: identify_regions
+    input: grid, color
+    output: list of regions
+    description: Finds all contiguous blocks of the specified color, bounded by grey or grid edge.
+  - name: find_first_white_region
+    input: list of white regions
+    output: first_white_region
+    description: Selects the white region with the highest priority (top-most, then left-most).
+  - name: fill_region
+    input: grid, first_white_region
+    output: modified grid
+    description: Replaces all white pixels within the specified region with red pixels, stopping at grey pixels or the grid boundary.

@@ -1,0 +1,24 @@
+facts:
+  - objects:
+      - shape_1:
+          color: azure (8)
+          type: rectangle
+          initial_position: row 7-9, column 7-9
+      - shape_2:
+          color: green (3)
+          type: single pixel
+          initial_position: row 8, column 11
+      - shape_3:
+          color: red (2)
+          type: rectangle
+          initial_position: row 11, column 7-9
+  - actions:
+      - replicate:
+          object: shape_2
+          pattern: extend horizontally right, repeating original, repeat,original...
+      - replicate:
+          object: shape_3
+          pattern: extend vertically, alternating original shape and a shape with the middle pixel removed.
+  - spatial_relationships:
+    - shape_2: to the right of shape_1
+    - shape_3: below shape_1, aligned vertically

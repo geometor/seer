@@ -1,0 +1,57 @@
+objects:
+  - id: background
+    type: grid
+    color: white (0)
+    dimensions: 27x25
+  - id: green_region
+    type: shape
+    color: green (3)
+    location: top-center
+  - id: multi_colored_region
+    type: grid
+    dimensions: 3x3
+    location: bottom-left
+    elements:
+      - color: red (2)
+        position: (0,0)
+      - color: blue (1)
+         position: (0,1)
+      - color: orange (7)
+        position:(0,2)
+      - color: yellow(4)
+         position: (1,0)
+      - color: azure (8)
+        position: (1,1)
+      - color: maroon(9)
+        position: (1,2)
+      - color: azure (8)
+        position: (2,0)
+      - color: magenta (6)
+        position: (2,1)
+      - color: blue (1)
+        position: (2,2)
+
+  - id: output_grid
+    type: grid
+    dimensions: 3x3
+    elements:
+      - color: red (2)
+      - color: white (0)
+      - color: orange (7)
+      - color: yellow (4)
+      - color: azure (8)
+      - color: white (0)
+      - color: white (0)
+      - color: magenta (6)
+      - color: blue (1)
+relations:
+  - type: spatial
+    description: multi_colored_region is contained within the background.
+  - type: spatial
+    description: green_region is contained within background.
+  - type: transformation
+    description: output_grid is derived from multi_colored_region.
+actions:
+   - selection of the multi_colored region
+   - cropping/extraction of the 3x3 multi-colored region
+   - producing an output using the region.

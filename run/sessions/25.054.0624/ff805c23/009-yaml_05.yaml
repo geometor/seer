@@ -1,0 +1,44 @@
+examples:
+  - id: example_1
+    input_objects:
+      - color: 3 # Green
+        shape: irregular, large, top-left
+      - color: 2 # Red
+        shape: irregular, large, center-left
+      - color: 1 # Blue
+        shape: vertical bar, center-right
+    output_objects:
+      - color: 3  #green
+        shape: rectangle
+        notes: seems related to largest green object
+    transformation: |
+      Extract the subgrid of the largest green object using the same process used for the magenta objects.
+  - id: example_2
+    input_objects:
+      - color: 3 # Green
+        shape: irregular, top/bottom edges
+      - color: 8 # Cyan
+        shape: irregular, surrounds magenta object
+      - color: 6 # Magenta
+        shape: rectangle, central
+      - color: 1
+        shape: rectangle within magenta, bottom
+    output_objects:
+      - color: 6
+        shape: irregular, touching edges
+    transformation: |
+      Extract the subgrid of the largest magenta object.
+
+  - id: example_3
+    input_objects:
+      - color: 3  #green
+        shape: irregular
+      - color: 5  #gray
+        shape: surrounds central region
+      - color: 1  #blue
+        shape: internal rectangle, bottom
+    output_objects:
+      - color: 5
+        shape: irregular
+    transformation: |
+          Extract the subgrid of the largest gray object.

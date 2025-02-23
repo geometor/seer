@@ -1,0 +1,32 @@
+observations:
+  - example_1:
+      input:
+        yellow_line:
+          present: true
+          row: 2
+        green_objects:
+          above_line:
+            - coordinates: [[0, 4], [1, 4]]
+          below_line:
+            - coordinates: [[3, 4], [3, 5], [3, 6], [4, 6], [5, 6], [6, 5], [6, 6], [7, 5], [8, 4], [8, 5], [8, 6], [8,7]]
+        orange_objects:
+          below_line:
+              - coordinates: [] # coordinates are correctly found
+        
+      output:
+        green_removed: true # error
+        orange_removed: true #correct
+
+  - example_2:
+      input:
+        yellow_line:
+          present: true
+          row: 6
+        orange_objects:
+          above_line:
+            - coordinates: [[0, 4], [0, 5], [0, 6], [0, 7], [0, 8], [0, 9], [1, 2], [1, 3], [1, 4], [2, 2], [3, 2], [4, 2], [4, 3], [4, 4], [4, 5], [5, 5]]
+          below_line:
+            - coordinates: [[7, 3], [7, 4], [7, 5], [8, 3], [9, 3], [10, 3], [10, 4], [10, 5], [10, 6], [10, 7], [10, 8], [10, 9], [11, 9], [12, 6], [12, 7], [12, 8], [12, 9]]
+      output:
+        orange_removed_below: true
+        orange_retained_above: true

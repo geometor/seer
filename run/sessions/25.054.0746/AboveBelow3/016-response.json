@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation involves identifying the top-most horizontal rectangle in the input grid and moving it down by one position (one row below current position).\n\"\"\"\n\nimport numpy as np\n\ndef find_top_rectangle(grid):\n    \"\"\"Finds the top-most horizontal rectangle in the grid.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros_like(grid, dtype=bool)\n    top_rectangle = None\n    top_row = rows  # Initialize with a row number that's beyond the grid\n\n    for r in range(rows):\n        for c in range(cols):\n            if not visited[r, c] and grid[r, c] != 0:\n                color = grid[r, c]\n                width = 0\n                # Check for horizontal rectangle\n                c_temp = c\n                while c_temp < cols and grid[r, c_temp] == color:\n                    width += 1\n                    c_temp += 1\n\n                if width > 0: # is it a rectangle?\n                    # check if all rows below until color changes are same\n                    height = 1\n                    r_temp = r + 1\n                    valid_rect = True\n                    while r_temp < rows and grid[r_temp,c] == color:\n                        for i in range(width):\n                            if c + i >= cols or grid[r_temp, c+i] != color:\n                                valid_rect = False\n                                break\n                        if not valid_rect:\n                            break\n\n                        height += 1\n                        r_temp += 1\n\n                    if valid_rect: # we found a rectangle, now check to mark it as visited.\n                        for i in range(r, r + height):\n                            for j in range(c, c + width):\n                                visited[i,j] = True\n\n                        if r < top_row: # is this the top most?\n                            top_row = r\n                            top_rectangle = ((r, c), (width, height), color)\n\n\n    return top_rectangle\n\ndef move_rectangle_down(grid, start_pos, size, color):\n    \"\"\"Moves the specified rectangle down by one position.\"\"\"\n    new_grid = np.copy(grid)\n    r, c = start_pos\n    width, height = size\n\n    # Clear old position\n    for i in range(r, r + height):\n        for j in range(c, c + width):\n            new_grid[i, j] = 0\n\n    # Set new position - one position down\n    new_r = r + 1\n    for i in range(new_r, new_r + height):\n        for j in range(c, c + width):\n          if i < new_grid.shape[0]:\n            new_grid[i, j] = color\n\n    return new_grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the top-most horizontal rectangle\n    top_rect = find_top_rectangle(output_grid)\n\n    if top_rect:\n        start_pos, size, color = top_rect\n        # Move the rectangle down by one row\n        output_grid = move_rectangle_down(output_grid, start_pos, size, color)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4494,
+    "candidates_token_count": 761,
+    "total_token_count": 5255,
+    "cached_content_token_count": 0
+  },
+  "response_time": 13.566097,
+  "response_file": "016-response.json"
+}

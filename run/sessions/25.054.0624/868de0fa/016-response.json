@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Find Blue Regions:** Identify all distinct, connected regions of blue (1) pixels in the input grid.  These are our `blue_region` objects.\n2. **Find Inner Region 1 (Orange Boundary):** Within each `blue_region`, locate all blue pixels that are directly adjacent (up, down, left, or right) to a white (0) pixel. These pixels form `inner_region_1`.\n3. **Find Inner Region 2 (Red Interior):** Within each `blue_region`, identify all pixels that belong to the `blue_region` but are *not* part of `inner_region_1`. These pixels form `inner_region_2`. It is the area remaining after identifying `inner_region_1`, and could include originally white or blue pixels.\n4. **Color Inner Region 1:** Change the color of all pixels in `inner_region_1` to orange (7).\n5. **Color Inner Region 2:** Change the color of all pixels in `inner_region_2` to red (2).\n6. **Preserve Other Colors:**  All pixels that are not part of any `blue_region` should remain their original color.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Gets the valid neighbors of a cell in a grid (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols:\n            neighbors.append((nr, nc))\n    return neighbors\n\ndef find_regions(grid, color):\n    \"\"\"Finds contiguous regions of a specific color in the grid.\"\"\"\n    mask = (grid == color)\n    labeled_array, num_features = label(mask)\n    return labeled_array, num_features\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = input_grid.copy()\n    rows, cols = input_grid.shape\n\n    # 1. Find Blue Regions\n    blue_regions, num_blue_regions = find_regions(input_grid, 1)\n\n    # Iterate through each blue region\n    for region_id in range(1, num_blue_regions + 1):\n        inner_region_1 = []\n        inner_region_2 = []\n        \n        # Create a mask for the current blue region.\n        current_blue_region_mask = (blue_regions == region_id)\n\n        # 2. Identify Inner Region 1 (adjacent to white pixels)\n        for r in range(rows):\n            for c in range(cols):\n                if current_blue_region_mask[r,c]:\n                    neighbors = get_neighbors(input_grid, r, c)  # Use 4-connectivity\n                    for nr, nc in neighbors:\n                        if input_grid[nr, nc] == 0:\n                            inner_region_1.append((r, c))\n                            break\n\n        #create a mask for inner region 1\n        inner_region_1_mask = np.zeros_like(input_grid, dtype=bool)\n        for r, c in inner_region_1:\n            inner_region_1_mask[r,c] = True\n\n        # 3. Identify inner region 2 (remaining pixels inside blue region)\n        for r in range(rows):\n            for c in range(cols):\n                if current_blue_region_mask[r,c] and not inner_region_1_mask[r,c]:\n                    inner_region_2.append((r,c))\n\n        # 4. & 5. Color Changes\n        for r, c in inner_region_1:\n            output_grid[r, c] = 7  # Orange\n\n        for r,c in inner_region_2:\n            output_grid[r,c] = 2 #Red\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9443,
+    "candidates_token_count": 951,
+    "total_token_count": 10394,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.525925,
+  "response_file": "016-response.json"
+}

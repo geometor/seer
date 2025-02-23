@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is based on the interaction between a background and other, smaller objects. The background color changes to match any adjacent object of a different color, and this change spreads outwards.\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef get_objects(grid):\n    \"\"\"Finds contiguous objects (non-background pixels) in a grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, color, obj_pixels):\n        \"\"\"Depth-first search to find contiguous pixels of the same color.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        obj_pixels.append((row, col))\n        dfs(row + 1, col, color, obj_pixels)\n        dfs(row - 1, col, color, obj_pixels)\n        dfs(row, col + 1, color, obj_pixels)\n        dfs(row, col - 1, color, obj_pixels)\n        dfs(row + 1, col + 1, color, obj_pixels)  # Check diagonals\n        dfs(row - 1, col - 1, color, obj_pixels)\n        dfs(row + 1, col - 1, color, obj_pixels)\n        dfs(row - 1, col + 1, color, obj_pixels)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col]:\n                obj_pixels = []\n                dfs(row, col, grid[row, col], obj_pixels)\n                if obj_pixels:  # Ensure object is not empty\n                    objects.append((grid[row,col], obj_pixels))\n    return objects\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Get the neighbors of a pixel, including diagonals.\"\"\"\n    neighbors = []\n    for r in range(max(0, row - 1), min(grid.shape[0], row + 2)):\n        for c in range(max(0, col - 1), min(grid.shape[1], col + 2)):\n            if (r, c) != (row, col):\n                neighbors.append((r, c))\n    return neighbors\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find objects\n    objects = get_objects(input_grid)\n\n    # Determine background color (most frequent, for now)\n    color_counts = {}\n    for color, _ in objects:\n        color_counts[color] = color_counts.get(color, 0) + 1\n    background_color = max(color_counts, key=color_counts.get)\n    \n    # Create a queue for color spreading\n    q = deque()\n\n    # Initialize queue with non-background pixels\n    for color, pixels in objects:\n        if color != background_color:\n            for r, c in pixels:\n                q.append((r,c,color))\n\n    # Breadth-First Search for color propagation\n    visited = np.zeros_like(input_grid, dtype=bool) #reset visited\n    while q:\n      r, c, color = q.popleft()\n      \n      #set this color\n      output_grid[r,c] = color\n\n      #get neighbors for propagation\n      for nr, nc in get_neighbors(input_grid, r, c):\n        if output_grid[nr, nc] == background_color: #only change background\n            if not visited[nr,nc]: # prevent re-queueing\n                visited[nr,nc] = True\n                q.append((nr, nc, color))\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11115,
+    "candidates_token_count": 927,
+    "total_token_count": 12042,
+    "cached_content_token_count": 0
+  },
+  "response_time": 35.679131,
+  "response_file": "006-response.json"
+}

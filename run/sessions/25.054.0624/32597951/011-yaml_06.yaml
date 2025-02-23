@@ -1,0 +1,28 @@
+objects:
+  - id: azure_region
+    color: 8  # Azure
+    type: contiguous_region
+    properties:
+      shape: rectangle  # Can be square or non-square
+      min_row: varies #min row of 8
+      max_row: varies #max row of 8
+      min_col: varies  #min col of 8
+      max_col: varies #max col of 8
+
+  - id: green_cross
+    color: 3  # Green
+    type: pattern
+    properties:
+      shape: cross #cross
+      location: within_azure_region
+      row_rule: center_row #and center_row - 1
+      col_rule: center_col #and center_col - 1
+
+actions:
+  - name: identify_azure_region
+    description: Find the top-left and bottom-right corners of a contiguous region of '8' pixels.
+  - name: create_green_cross
+    description: Change specific '8' pixels within the azure region to '3' to form a plus-shaped pattern.
+    parameters:
+        row: center on the azure object row and the row - 1
+        col: center on the azure object col and the col - 1

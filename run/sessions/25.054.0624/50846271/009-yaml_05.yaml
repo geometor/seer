@@ -1,0 +1,17 @@
+objects:
+  - color: gray # 5
+    type: contiguous_region
+    action: change_color_if_adjacent_to_red
+  - color: red # 2
+    type: contiguous_region
+    action: causes_color_change
+  - color: other
+    type: any
+    action: preserve_color
+
+color_change:
+  - from: gray #5
+    to: azure #8
+  - condition: gray_object_adjacent_to_red_object
+
+adjacency: cardinal

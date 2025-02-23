@@ -1,0 +1,108 @@
+facts:
+  example_1:
+    key_colors: [9, 8] # Maroon, Azure
+    objects_color_9:
+      - type: line_segments
+        orientation: horizontal
+        properties:
+          - coordinates: [(6, 8), (6, 9), (6, 10)]
+          - coordinates: [(7, 7), (7, 8)]
+          - coordinates: [(7, 10), (7, 11)]
+          - coordinates: [(8, 6)]
+          - coordinates: [(8, 12)]
+    objects_color_8:
+      - type: single_pixels
+        properties:
+          - coordinates: [(2, 5)]
+          - coordinates: [(3, 16)]
+          - coordinates: [(4, 3)]
+          - coordinates: [(10, 1), (10, 19)]
+          - coordinates: [(13, 9)]
+          - coordinates: [(18, 15)]
+          - coordinates: [(19, 1)]
+    transformations:
+      - type: horizontal_replication_color_9
+        condition: "azure pixels not vertically aligned with maroon pixels"
+        action: "duplicate maroon pixel to the right"
+      - type: vertical_expansion_color_9
+        condition: "column contains both maroon and azure pixels"
+        action: "fill cells between min and max maroon rows with maroon"
+      - type: replace
+        condition: "azure pixels completely surrounded by maroon pixels"
+        action: replace with maroon pixels
+  example_2:
+    key_colors: [2, 7] # Red, Orange
+    objects_color_2:
+      - type: single_pixels
+        orientation: scattered
+        properties:
+          - coordinates: [(1, 8)]
+          - coordinates: [(2, 2)]
+          - coordinates: [(4, 13), (4, 16)]
+          - coordinates: [(9, 17)]
+          - coordinates: [(10, 1), (10, 9)]
+          - coordinates: [(12, 6)]
+          - coordinates: [(14, 16)]
+          - coordinates: [(17, 14)]
+          - coordinates: [(18, 1)]
+    objects_color_7:
+      - type: line_segment
+        orientation: horizontal
+        properties:
+          - coordinates: [(6,7), (6,8), (6,9)]
+      - type: line_segments
+        orientation: horizontal
+        properties:
+          - coordinates: [(7,5), (7,6)]
+          - coordinates: [(7, 8), (7, 9)]
+      - type: isolated_pixels
+        properties:
+          - coordinates: [(8,4)]
+          - coordinates: [(8, 10)]
+    transformations:
+      - type: horizontal_replication_color_2
+        condition: "orange pixels not vertically aligned with red pixels"
+        action: "duplicate red pixel to the right"
+      - type: vertical_expansion_color_2
+        condition: "column contains both red and orange pixels"
+        action: "fill cells between min and max red rows with red"
+  example_3:
+    key_colors: [3, 4] # Green, Yellow
+    objects_color_3:
+      - type: single_pixels
+        orientation: scattered
+        properties:
+          - coordinates: [(1, 14)]
+          - coordinates: [(2, 5), (2, 10)]
+          - coordinates: [(4, 0)]
+          - coordinates: [(5, 7), (5, 19)]
+          - coordinates: [(7, 4)]
+          - coordinates: [(10,2)]
+          - coordinates: [(12, 0), (12, 13), (12, 19)]
+          - coordinates: [(15, 12)]
+          - coordinates: [(17, 1), (17, 16)]
+          - coordinates: [(18, 7), (18, 13)]
+    objects_color_4:
+        - type: line_segment
+          orientation: horizontal
+          properties:
+            - coordinates: [(5,12), (5, 13), (5,14)]
+        - type: line_segments
+          orientation: horizontal
+          properties:
+            - coordinates: [(6, 11), (6,12)]
+            - coordinates: [(6, 14), (6, 15)]
+        - type: single_pixels
+          properties:
+            - coordinates: [(7,9)]
+            - coordinates: [(7,15)]
+    transformations:
+      - type: horizontal_replication_color_3
+        condition: "yellow pixels not vertically aligned with green pixels"
+        action: "duplicate green pixel to the right"
+      - type: vertical_expansion_color_3
+        condition: "column contains both green and yellow pixels"
+        action: "fill cells between min and max green rows with green"
+      - type: fill
+        condition: "if yellow extends horizontally between two greens"
+        action: insert green

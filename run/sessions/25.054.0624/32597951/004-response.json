@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Region:** Find all pixels with the color azure (8) in the input grid. This contiguous block constitutes the \"azure region.\"\n\n2.  **Determine Vertical Bounds:** Calculate the minimum and maximum row indices occupied by the azure region.\n\n3.  **Conditional Transformation:** Iterate through each pixel in the input grid.\n    *   If a pixel is blue (1):\n        *   Check if it is *adjacent* (horizontally, vertically, or diagonally) to *any* pixel within the azure region.\n        *   Check if the blue pixel's row index falls *within* the vertical bounds (inclusive) of the azure region (min_row <= row <= max_row).\n        * If *both* conditions are true, change the pixel's color to green (3).\n\n4.  **Preservation:** All pixels that do not meet the transformation criteria retain their original color values.\n\"\"\"\n\nimport numpy as np\n\ndef get_azure_region(grid):\n    \"\"\"Finds the coordinates of all azure (8) pixels.\"\"\"\n    return np.argwhere(grid == 8)\n\ndef get_vertical_bounds(azure_region):\n    \"\"\"Determines the minimum and maximum row indices of the azure region.\"\"\"\n    rows = azure_region[:, 0]\n    return np.min(rows), np.max(rows)\n\ndef is_adjacent(coord1, coord2):\n    \"\"\"Checks if two coordinates are adjacent (horizontally, vertically, or diagonally).\"\"\"\n    return abs(coord1[0] - coord2[0]) <= 1 and abs(coord1[1] - coord2[1]) <= 1\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    azure_region = get_azure_region(input_grid)\n    min_row, max_row = get_vertical_bounds(azure_region)\n\n    # Iterate through all pixels\n    for r in range(input_grid.shape[0]):\n        for c in range(input_grid.shape[1]):\n            if input_grid[r, c] == 1:  # Check if it's a blue pixel\n                is_adjacent_to_azure = False\n                for azure_coord in azure_region:\n                    if is_adjacent((r, c), azure_coord): #check adjacent\n                        if min_row <= r <= max_row: # Check within vertical bounds\n                            is_adjacent_to_azure = True\n                            break\n                if is_adjacent_to_azure:\n                    output_grid[r, c] = 3  # Change to green\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8015,
+    "candidates_token_count": 609,
+    "total_token_count": 8624,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.629871,
+  "response_file": "004-response.json"
+}

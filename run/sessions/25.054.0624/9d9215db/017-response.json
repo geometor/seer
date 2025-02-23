@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** The objects are the non-zero pixels in the input grid.\n2.  **Horizontal Extension:** For each non-zero pixel, extend its color horizontally to the left and right.\n3. **Boundaries**: The extension stops when it encounters the edge of the grid\n   or another non-zero pixel (of any color).\n4. **Additive Output**: The output is the sum of the results of each\n   extension. An extension should write over only zeros in the grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_nonzero_pixels(grid):\n    \"\"\"Finds the coordinates and colors of non-zero pixels in a grid.\"\"\"\n    nonzero_pixels = []\n    for r, row in enumerate(grid):\n        for c, value in enumerate(row):\n            if value != 0:\n                nonzero_pixels.append(((r, c), value))\n    return nonzero_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n    output_grid = np.zeros((rows, cols), dtype=int)\n\n    # Get non-zero pixels\n    nonzero_pixels = get_nonzero_pixels(input_grid)\n\n    # Horizontal Extension for each non-zero pixel\n    for (row, col), value in nonzero_pixels:\n        # Extend to the right\n        for c in range(col, cols):\n            if input_grid[row, c] == 0 or c == col:  # only overwrite if it's zero in input or is original position\n                output_grid[row, c] = value\n            else:\n                break # stop if non zero\n\n        # Extend to the left\n        for c in range(col - 1, -1, -1):\n            if input_grid[row, c] == 0:  # only overwrite if zero in input\n                output_grid[row, c] = value\n            else:\n                break\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 16902,
+    "candidates_token_count": 466,
+    "total_token_count": 17368,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.329014,
+  "response_file": "017-response.json"
+}

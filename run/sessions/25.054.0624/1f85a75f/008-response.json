@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Region:** Locate the contiguous block of pixels with the color value 4 (yellow) within the input grid.\n2.  **Determine Boundaries:** Find maximal x and y for color 4 in input.\n3. **Create Output:** create a 3x3 output grid, using x,y coordinate from last step as the top-left corner.\n4. **Fill values:** copy cells from input to output, for cells where x,y is outside of the input grid, use 0.\n\"\"\"\n\nimport numpy as np\n\ndef get_bounding_box(grid, color):\n    # Find coordinates of the specified color\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None, None, None, None\n\n    #find min and max\n    min_y, min_x = coords.min(axis=0)\n    max_y, max_x = coords.max(axis=0)\n\n    return min_x, min_y, max_x, max_y\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # Find the bounding box for color 4 (yellow)\n    min_x, min_y, max_x, max_y = get_bounding_box(input_grid, 4)\n\n    if min_x is not None:\n      #copy values to output\n      for y in range(3):\n        for x in range(3):\n          in_y = min_y + y\n          in_x = min_x + x\n\n          if 0 <= in_y < input_grid.shape[0] and 0 <= in_x < input_grid.shape[1]:\n            output_grid[y,x] = input_grid[in_y, in_x]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3884,
+    "candidates_token_count": 438,
+    "total_token_count": 4322,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.027295,
+  "response_file": "008-response.json"
+}

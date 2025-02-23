@@ -1,0 +1,23 @@
+facts:
+  - object_types:
+    - background:
+      - color: yellow (4)
+      - role: static_context
+    - colored_shapes:
+      - colors: [blue (1), red (2), magenta (6)]
+      - role: dynamic_objects
+      - properties:
+        - shape: irregular, defined by contiguous pixels of the same color
+        - size: variable
+  - actions:
+    - expansion:
+      - description: Colored shapes expand based on adjacency to other shapes.
+      - trigger: contact between different colored shapes
+  - relationships:
+    - adjacency:
+      - description: Determines where expansion occurs.
+      - types:
+        - side-by-side:  Pixels share an edge.
+        - diagonal: Pixels share a corner.
+  - transformation_constraints:
+      - relative_position_preserved: true

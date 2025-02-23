@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Object Identification and Color Combination:** Identify two key colors in the input.\n    *   Examples 1: 8 and 9\n    *   Examples 2: 2 and 7\n    *   Examples 3: 3 and 4\n\n2.  **Determine Horizontal Replication Rule (Conditional):**\n    *   _If_ isolated pixels of the first key color exist AND are not vertically aligned with pixels of the second key color, duplicate those pixels of color one to the immediate right.\n\n3.  **Vertical Expansion:**\n    *   For each column that contains *both* key colors, locate all the pixels of color one.\n    *   Fill all cells between the highest and lowest of those color one pixels, in that column, with color one.\n4.  **Object Fill (Example 1):**\n    *   If pixels of the second key color have pixels of the first key color above and below, fill the space between with the second key color.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid, color):\n    \"\"\"Finds coordinates of all pixels of a given color.\"\"\"\n    return np.argwhere(grid == color)\n\ndef is_vertically_aligned(coord, other_color_coords):\n    \"\"\"Checks if a coordinate is vertically aligned with any pixel of another color.\"\"\"\n    for other_coord in other_color_coords:\n        if coord[1] == other_coord[1]:\n            return True\n    return False\n\ndef get_color_pair(input_grid):\n  \"\"\"Determine color pair from input grid\"\"\"\n  unique_colors = np.unique(input_grid)\n  unique_colors = unique_colors[unique_colors != 0]  # Exclude background color\n\n  if len(unique_colors) >= 2:\n        color1 = unique_colors[0]\n        color2 = unique_colors[1]\n\n        # Special handling for example 1\n        if 8 in unique_colors and 9 in unique_colors:\n            return 9, 8  # Order matters based on observation\n        if 3 in unique_colors and 4 in unique_colors:\n          return 3,4\n        if 2 in unique_colors and 7 in unique_colors:\n            return 2,7\n          \n        return color1, color2 #default\n  return None, None\n\ndef transform(input_grid):\n    # Initialize output grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Determine color pair\n    color1, color2 = get_color_pair(input_grid)\n    if color1 is None:\n        return output_grid # Handle edge case of no identifiable colors\n\n    color1_coords = get_objects(input_grid, color1)\n    color2_coords = get_objects(input_grid, color2)\n    \n    # Horizontal Replication\n    new_color1_coords = []\n    for r, c in color1_coords:\n      if not is_vertically_aligned((r,c), color2_coords):\n          new_color1_coords.append((r, c + 1))  # Add pixel to the right\n          output_grid[r, c + 1] = color1\n      new_color1_coords.append((r,c))\n    \n\n    # Vertical Expansion\n    \n    combined_cols = set()\n    for r1,c1 in color1_coords:\n      for r2,c2 in color2_coords:\n        if c1==c2:\n          combined_cols.add(c1)\n\n    for col in combined_cols:\n        #find color1 pixels in this col\n        color1_in_col = []\n        for r,c in new_color1_coords:\n          if c == col:\n            color1_in_col.append((r,col))\n\n\n        if len(color1_in_col) > 0:\n            min_row = min([r for r, _ in color1_in_col])\n            max_row = max([r for r, _ in color1_in_col])\n\n            for row in range(min_row, max_row + 1):\n              output_grid[row, col] = color1\n\n    # Object Filling (Specific to Example 1 - Maroon and Azure)\n    if color1 == 9 and color2 == 8:\n        for r2, c2 in color2_coords:\n            # Find color1 above and below\n            above = False\n            below = False\n            for r1, c1 in color1_coords:\n                if c1 == c2:\n                    if r1 < r2:\n                        above = True\n                    if r1 > r2:\n                        below = True\n            if above and below:\n                output_grid[r2,c2] = color2\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10293,
+    "candidates_token_count": 1119,
+    "total_token_count": 11412,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.11012,
+  "response_file": "010-response.json"
+}

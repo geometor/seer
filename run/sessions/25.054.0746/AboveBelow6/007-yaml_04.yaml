@@ -1,0 +1,34 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: [9, 14] # 9 rows, 14 columns
+      - colors: [0, 2, 5] # White, Red, Gray
+    elements:
+      - type: pixel
+        properties:
+          - color: int # An integer representing the color value
+          - position: [row, col] # Row and column index
+
+  - type: region
+    properties:
+      - color: 2 # Red
+      - shape: contiguous_block
+      - locations: [[5,2],[5,3],[5,5],[5,6], [7,8],[7,9],[7,11],[7,12]]
+
+actions:
+  - name: move
+    object: region
+    parameters:
+       color: 2
+    preconditions:
+       color: 2
+    results:
+      - change: shiftsome
+
+relationships:
+  - type: spatial
+    relation: adjacent
+    objects: [pixel, pixel]
+  - type: color_grouping
+    relation: same_color
+    objects: [pixel, pixel]

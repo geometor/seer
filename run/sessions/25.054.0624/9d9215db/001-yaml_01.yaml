@@ -1,0 +1,32 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 19x19
+      cell_values: [0, 1, 2, 8]  # white, blue, red, azure
+    description: 2D array of colored pixels
+
+  - type: pixel
+    properties:
+      color:
+        white: 0
+        blue: 1
+        red: 2
+        azure: 8
+      position: [row, column]
+
+actions:
+  - name: replicate
+    description: Create copies of colored pixels (non-white).
+    parameters:
+      pattern: alternating/checkered
+
+  - name: maintain-position
+    description: some original colors and position.
+    parameters:
+       colors: [8,2]
+
+relationships:
+  - type: spatial
+    description: Pixels are arranged in a 2D grid, adjacency matters.
+  - type: transformation
+    description: Input pixels are transformed/replicated to create output.

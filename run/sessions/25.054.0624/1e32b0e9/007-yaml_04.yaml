@@ -1,0 +1,22 @@
+objects:
+  - type: pixel
+    properties:
+      color: [white, blue, red]
+      value: [0, 1, 2]
+      position: (row, column)
+  - type: grid
+    properties:
+      dimensions: (rows, columns)
+      cells: list[pixel]
+
+actions:
+  - name: change_color
+    properties:
+      target: pixel
+      new_color: int
+
+relationships:
+  - type: adjacency
+    properties:
+      pixels: list[pixel]
+      type: [horizontal, vertical, diagonal, knight]

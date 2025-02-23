@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is to identify the top-most contiguous region of any color and shift it upwards by one row, unless it's already at the top edge.\n\"\"\"\n\nimport numpy as np\n\ndef find_topmost_region(grid):\n    \"\"\"Finds the top-most contiguous region in the grid.\"\"\"\n    rows, cols = grid.shape\n    topmost_region = []\n    topmost_row = rows  # Initialize with a value larger than any possible row index\n    \n    # Find the highest row with any non-zero pixels\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                topmost_row = min(topmost_row,r)\n\n    if topmost_row == rows:\n        return []\n    # Find all connected pixels starting from the topmost row\n    first_color = 0\n    for c in range(cols):\n        if grid[topmost_row,c] != 0:\n            first_color = grid[topmost_row,c]\n            break\n\n    visited = set()\n    \n    def is_valid(row, col):\n        return 0 <= row < rows and 0 <= col < cols\n\n    def dfs(row, col):\n        if (row, col) in visited or not is_valid(row, col) or grid[row, col] != first_color:\n            return\n        visited.add((row, col))\n        topmost_region.append((row, col))\n        \n        # Explore adjacent cells (up, down, left, right)\n        dfs(row + 1, col)\n        dfs(row - 1, col)\n        dfs(row, col + 1)\n        dfs(row, col - 1)\n\n    for c in range(cols):\n        if grid[topmost_row,c] == first_color:\n            dfs(topmost_row,c)\n\n    return topmost_region\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by shifting the top-most region up by one row.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the top-most region\n    topmost_region = find_topmost_region(input_grid)\n\n    if not topmost_region:\n        return output_grid\n\n    # Determine the color of the region\n    region_color = input_grid[topmost_region[0]]\n\n    # Clear the original region in the output grid\n    for r, c in topmost_region:\n        output_grid[r, c] = 0\n\n    # Shift the region up by one row, handling boundary conditions\n    for r, c in topmost_region:\n        new_r = r - 1\n        if new_r >= 0:  # Ensure we don't go out of bounds (top edge)\n            output_grid[new_r, c] = region_color\n        else:\n            output_grid[r,c] = region_color #add the original position back\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4141,
+    "candidates_token_count": 714,
+    "total_token_count": 4855,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.32061,
+  "response_file": "010-response.json"
+}

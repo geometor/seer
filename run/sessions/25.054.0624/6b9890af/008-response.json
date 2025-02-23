@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** In the input grid, identify distinct colored regions. In this example, we see a hollow red rectangle (object_1) and a filled blue rectangle (object_2).\n\n2.  **Bounding Box:** Determine the smallest bounding box that can encompass both of the identified colored regions.\n\n3.  **Create Output grid:** Create a 5x5 grid\n\n4.  **Fill Outside with Red:** Fill the perimeter (outermost rows and columns) of this 5 x 5 with Red (2).\n\n5. **Fill Interior with object_2, if present**\n    *  check the object in the input\n    *  If a filled shape of color other than red exists inside of the bounding box, add 2 units of this color inside of the Red border\n    *  These are placed, horizontally centered, at row, column locations: (1,2)(1,3) and (3,2)(3,3)\n\n6.  **Fill remaining with white** Add a White (0) in the one cell inside the Red (2) border and Blue(1) infill\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    # Find distinct colored regions in the grid.\n    objects = {}\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col, color, object_pixels):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        object_pixels.append((row, col))\n        dfs(row + 1, col, color, object_pixels)\n        dfs(row - 1, col, color, object_pixels)\n        dfs(row, col + 1, color, object_pixels)\n        dfs(row, col - 1, color, object_pixels)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col] and grid[row, col] != 0:\n                color = grid[row, col]\n                object_pixels = []\n                dfs(row, col, color, object_pixels)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(object_pixels)\n    return objects\n\ndef bounding_box(objects):\n    # Determine the smallest bounding box encompassing all objects.\n    min_row, min_col = float('inf'), float('inf')\n    max_row, max_col = float('-inf'), float('-inf')\n\n    for color in objects:\n        for obj in objects[color]:\n            for row, col in obj:\n                min_row = min(min_row, row)\n                min_col = min(min_col, col)\n                max_row = max(max_row, row)\n                max_col = max(max_col, col)\n    return min_row, min_col, max_row, max_col\n\n\n\ndef transform(input_grid):\n    # Identify objects\n    objects = find_objects(input_grid)\n\n    # Create a 5x5 output grid\n    output_grid = np.zeros((5, 5), dtype=int)\n\n    # Fill the perimeter with Red (2)\n    output_grid[0, :] = 2\n    output_grid[-1, :] = 2\n    output_grid[:, 0] = 2\n    output_grid[:, -1] = 2\n    \n    # check for blue object\n    if 1 in objects:\n      output_grid[1,2] = 1\n      output_grid[1,3] = 1\n      output_grid[3,2] = 1\n      output_grid[3,3] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 2263,
+            "end_index": 2466,
+            "uri": "https://github.com/waltman/advent-of-code-2022",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3044,
+    "candidates_token_count": 905,
+    "total_token_count": 3949,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.450262,
+  "response_file": "008-response.json"
+}

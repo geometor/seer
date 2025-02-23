@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRemoves the largest contiguous region of white (0) pixels from the input grid\nand replaces it with the most frequent non-white color in the entire input grid.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef find_largest_object(grid, color):\n    \"\"\"\n    Finds the largest connected region of pixels with the given color.\n    Uses Depth First Search (DFS).\n    \"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    max_size = 0\n    largest_object_coords = []\n\n    def dfs(row, col, current_object_coords):\n        \"\"\"\n        Recursive Depth First Search helper function.\n        \"\"\"\n        if (row < 0 or row >= rows or col < 0 or col >= cols or\n                visited[row, col] or grid[row, col] != color):\n            return 0\n\n        visited[row, col] = True\n        current_object_coords.append((row, col))\n        size = 1\n        # Explore adjacent cells (including diagonals)\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                size += dfs(row + dr, col + dc, current_object_coords)\n        return size\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                current_object_coords = []\n                object_size = dfs(r, c, current_object_coords)\n                if object_size > max_size:\n                    max_size = object_size\n                    largest_object_coords = current_object_coords\n\n    return largest_object_coords\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by removing the largest contiguous region of '0' (white) pixels\n    and replacing it with the most frequent non-white color in the input.\n    \"\"\"\n    # Convert to numpy array\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n\n    # Find the coordinates of the largest object with color 0\n    largest_object_coords = find_largest_object(input_grid, 0)\n\n    # Find the most frequent color in the input grid (excluding white)\n    color_counts = Counter(input_grid.flatten())\n    if 0 in color_counts:\n        del color_counts[0]  # Remove white\n    \n    if color_counts:\n      most_frequent_color = color_counts.most_common(1)[0][0]\n    else:\n        return output_grid.tolist() # Return original if no other colors.\n\n\n    # Remove the largest object by setting to most frequent color\n    for row, col in largest_object_coords:\n        output_grid[row, col] = most_frequent_color\n\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 18353,
+    "candidates_token_count": 704,
+    "total_token_count": 19057,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.785627,
+  "response_file": "006-response.json"
+}

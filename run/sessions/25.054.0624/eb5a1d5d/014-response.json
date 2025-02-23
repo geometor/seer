@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation extracts the nested rectangles from the input grid and represents them in a compressed form in the output grid. The output grid has a green border representing the outermost green rectangle, an azure border representing the second rectangle, a red border for the third, and a single blue pixel in the center for the innermost shape.\n\"\"\"\n\nimport numpy as np\n\ndef get_object_bounds(grid, color):\n    # Find the min and max row and col indices for a given color\n    rows, cols = np.where(grid == color)\n    if len(rows) == 0:\n        return None  # Color not found\n    min_row, max_row = np.min(rows), np.max(rows)\n    min_col, max_col = np.min(cols), np.max(cols)\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    # Initialize output_grid as all green (3)\n    output_grid = np.full((7, 7), 3)\n\n    # Get bounds for azure (8) rectangle\n    azure_bounds = get_object_bounds(input_grid, 8)\n    if azure_bounds:\n        min_row, max_row, min_col, max_col = azure_bounds\n        # Represent azure rectangle with a border inside the green\n        output_grid[1:6, 1:6] = 8\n\n    # Get bounds for red (2) rectangle\n    red_bounds = get_object_bounds(input_grid, 2)\n    if red_bounds:\n        min_row, max_row, min_col, max_col = red_bounds\n        #Represent red rectangle with border within the azure.\n        output_grid[2:5, 2:5] = 2\n\n    # get bounds for blue (1) object\n    blue_bounds = get_object_bounds(input_grid, 1)\n    if blue_bounds:\n        # Represent center as single blue pixel\n        output_grid[3, 3] = 1\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3233,
+    "candidates_token_count": 482,
+    "total_token_count": 3715,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.162616,
+  "response_file": "014-response.json"
+}

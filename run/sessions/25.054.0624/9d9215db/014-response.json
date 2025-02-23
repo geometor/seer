@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Identify Non-Zero Pixels:** Locate all pixels in the input grid that have a color value other than 0 (white). These are the \"seed\" pixels.\n\n2. **Horizontal Extension/Repetition:** For each seed pixel:\n    a. Extend the pixel's color horizontally to the left and right. The pattern alternates between the colors in a row.\n    b. The extension length seems to extend to the edges of the input grid, or where the 0 value is encountered.\n    c. A minimum length of one unit to the left and the right\n\n3. **Vertical Extension:** The color '3' green expands to fill the height of the grid in its original column\n\n4. **Result:** The output grid is formed by combining these horizontal and vertical expansions. It is as though the seed pixels' colors have \"bled\" outwards, primarily horizontally but also vertically for color '3'(green).\n\"\"\"\n\nimport numpy as np\n\ndef get_nonzero_pixels(grid):\n    \"\"\"Finds the coordinates and colors of non-zero pixels in a grid.\"\"\"\n    nonzero_pixels = []\n    for r, row in enumerate(grid):\n        for c, value in enumerate(row):\n            if value != 0:\n                nonzero_pixels.append(((r, c), value))\n    return nonzero_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n    output_grid = np.zeros((rows, cols), dtype=int)\n\n    # Get non-zero pixels\n    nonzero_pixels = get_nonzero_pixels(input_grid)\n    \n    # Horizontal and Vertical Extensions\n    for (row, col), value in nonzero_pixels:\n        # Horizontal Extension\n        \n        output_grid[row, :] = input_grid[row,:]\n        \n        \n        left = col - 1\n        right = col + 1\n\n        \n        while left >= 0:\n           output_grid[row, left] = value\n           left -= 1\n\n        while right < cols:\n            output_grid[row, right] = value\n            right += 1\n        \n        # Vertical Extension (only for green color '3')\n\n        if value == 3:\n            output_grid[:, col] = 3\n\n    # replace intermediate zeros\n    for (row, col), value in nonzero_pixels:\n      for c in range(cols):\n        if output_grid[row,c] == 0:\n          if c > 0 and c < cols-1:\n            if output_grid[row,c-1] != 0 and output_grid[row, c+1] != 0:\n              output_grid[row,c] = output_grid[row,c-1]\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3671,
+    "candidates_token_count": 647,
+    "total_token_count": 4318,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.965619,
+  "response_file": "014-response.json"
+}

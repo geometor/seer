@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find the Border:** Scan the input grid to identify a rectangular border. The border is defined as a contiguous region of a single color that completely encloses an inner rectangular area. The border may have different colors on the inner and outer edges, or have more than one row or column making it thicker.\n2.  **Extract Inner Region:** Once the border is identified, extract the rectangular region located *inside* the border. This inner region is the area of interest.\n3.  **Conditional Color Substitution:** Examine the *input* grid. If color 5 is adjacent to the *outer* border color anywhere, replace all instances of color 5 with color 6 *within the extracted inner region*.\n4. **Output:** The transformed \"inner region\" from step 3 becomes the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_border(grid):\n    \"\"\"Finds the rectangular border and returns its boundaries.\"\"\"\n    rows, cols = grid.shape\n    \n    # Find top-left corner of the border\n    for top in range(rows):\n        for left in range(cols):\n            border_color = grid[top, left]\n            \n            # Check for rectangular shape and complete enclosure\n            if is_valid_border(grid, top, left, border_color):\n                bottom, right = find_bottom_right(grid, top, left, border_color)\n                return top, left, bottom, right, border_color\n    return None, None, None, None, None\n\ndef is_valid_border(grid, top, left, border_color):\n    \"\"\"Checks if the border at (top, left) is valid.\"\"\"\n    rows, cols = grid.shape\n\n    # Check for minimum border thickness (at least 1)\n    if top >= rows - 1 or left >= cols - 1:\n        return False\n    \n    #Check to see if there is a bottom right corner\n    bottom, right = find_bottom_right(grid, top, left, border_color)\n    if bottom == -1:\n        return False\n    \n    #check to make sure all pixels are the same color on the border.\n    for row in range(top, bottom + 1):\n        if grid[row, left] != border_color or grid[row, right] != border_color:\n            return False\n    for col in range(left, right+1):\n        if grid[top, col] != border_color or grid[bottom, col] != border_color:\n            return False\n    \n    #now check to make sure there is no border color inside.\n    for row in range(top + 1, bottom):\n        for col in range(left + 1, right):\n            if grid[row, col] == border_color:\n                return False\n    \n    return True\n    \ndef find_bottom_right(grid, top, left, border_color):\n    rows, cols = grid.shape\n\n    # Find bottom-right corner of the border\n    bottom = top\n    while bottom + 1 < rows and grid[bottom + 1, left] == border_color:\n        bottom += 1\n\n    right = left\n    while right + 1 < cols and grid[top, right + 1] == border_color:\n        right += 1\n        \n    #check corner\n    if grid[bottom, right] != border_color:\n        return -1, -1 #invalid corner\n\n    return bottom, right\n\ndef extract_inner_region(grid, top, left, bottom, right):\n    \"\"\"Extracts the inner region of the border.\"\"\"\n    return grid[top+1:bottom, left+1:right]\n\ndef conditional_color_substitution(grid, inner_region, border_color):\n    \"\"\"Performs color substitution if 5 is adjacent to the border.\"\"\"\n    rows, cols = grid.shape\n    \n    # Check for adjacency of 5 to the border_color in the original grid\n    substitution_needed = False\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r,c] == 5:\n                # Check neighbors for border_color\n                neighbors = []\n                if r > 0: neighbors.append(grid[r-1, c])\n                if r < rows - 1: neighbors.append(grid[r+1, c])\n                if c > 0: neighbors.append(grid[r, c-1])\n                if c < cols - 1: neighbors.append(grid[r, c+1])\n                \n                if border_color in neighbors:\n                    substitution_needed = True\n                    break\n        if substitution_needed:\n            break\n            \n    if substitution_needed:\n         return np.where(inner_region == 5, 6, inner_region)\n    else:\n        return inner_region\n\ndef transform(input_grid):\n    # Convert input grid to a NumPy array\n    grid = np.array(input_grid)\n\n    # 1. Find the Border\n    top, left, bottom, right, border_color = find_border(grid)\n    \n    if top is None:  # No border found\n        return None\n\n    # 2. Extract Inner Region\n    inner_region = extract_inner_region(grid, top, left, bottom, right)\n\n    # 3. Conditional Color Substitution\n    transformed_inner_region = conditional_color_substitution(grid, inner_region, border_color)\n    \n    # 4. Output\n    return transformed_inner_region.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7503,
+    "candidates_token_count": 1261,
+    "total_token_count": 8764,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.894882,
+  "response_file": "016-response.json"
+}

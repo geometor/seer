@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Blue Blocks:** Find all contiguous groups of blue (1) pixels in the input grid.\n2.  **Top-Row Blocks (Rows 0 and 1):**\n    *   Iterate through the first two rows (row indices 0 and 1).\n    *   For each blue pixel, check for \"skipped\" blue pixels horizontally. A \"skipped\" blue pixel is defined as another blue pixel two positions away (either left or right) with one pixel (of any color) between them, all within the top two rows.\n    *   If a \"skipped\" blue pixel is found, change the color of the pixel in between to orange (7).\n3. **Check position (1,1):**\n    * If pixel at (1,1) is blue set it to orange.\n4.  **Other Blue Blocks:**\n    *   For blue blocks *not* entirely within the top two rows: If a block contains 3 or more pixels, change all pixels within that block to red (2).\n5.  **White Pixels:** White (0) pixels always remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_blocks(grid, color):\n    \"\"\"Finds contiguous blocks of a specified color in a grid.\"\"\"\n    visited = set()\n    blocks = []\n\n    def dfs(row, col, current_block):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        current_block.append((row, col))\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                dfs(row + dr, col + dc, current_block)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_block = []\n                dfs(row, col, current_block)\n                blocks.append(current_block)\n    return blocks\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n\n    # initialize output_grid\n    output_grid = input_grid.copy()\n\n    # Find all blue blocks\n    blue_blocks = find_contiguous_blocks(input_grid, 1)\n\n    # Top-row transforms (skip transform)\n    for r in range(min(2, output_grid.shape[0])):  # Iterate through the first two rows\n        for c in range(output_grid.shape[1]):\n            if output_grid[r, c] == 1:\n                # Check for skipped pixels to the right\n                if c + 2 < output_grid.shape[1] and output_grid[r, c + 2] == 1:\n                    output_grid[r, c + 1] = 7\n                # Check for skipped pixels to the left\n                if c - 2 >= 0 and output_grid[r, c - 2] == 1:\n                    output_grid[r, c - 1] = 7\n\n    # Check (1,1) and set to orange if blue\n    if output_grid.shape[0] > 1 and output_grid.shape[1] > 1 and output_grid[1,1] == 1:\n        output_grid[1,1] = 7\n                    \n    # Transform other blue blocks to red if size >= 3\n    for block in blue_blocks:\n        is_top_row = False\n        for row, _ in block:\n            if row in (0, 1):\n                is_top_row = True\n                break\n        if not is_top_row and len(block) >= 3:\n            for row, col in block:\n                output_grid[row, col] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9121,
+    "candidates_token_count": 937,
+    "total_token_count": 10058,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.232641,
+  "response_file": "012-response.json"
+}

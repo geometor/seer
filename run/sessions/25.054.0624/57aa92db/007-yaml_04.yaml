@@ -1,0 +1,16 @@
+facts:
+  - type: grid
+    description: 2D array of color values (0-9)
+    dimensions: 16x18 (both input and output)
+  - type: object
+    description: Contiguous block of pixels with the same color.
+    properties:
+      - color: Integer value (0-9)
+      - shape: Can be a single pixel or a larger connected component.
+      - position: Location within the grid (row, column).
+  - type: transformation
+    description: Duplication of original shape into another area of the grid
+    actions:
+      - identify: Find all objects of the same color and relative geometry
+      - copy: Create a copy of the object.
+      - reposition: Place the copy at a new location, relative to the original position, maintaining relative position.

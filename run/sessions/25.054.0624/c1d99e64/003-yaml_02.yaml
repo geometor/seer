@@ -1,0 +1,14 @@
+task: draw_red_cross
+objects:
+  - name: grid
+    properties:
+      - dimensions: variable (rows, cols)
+      - center_row: rows // 2
+      - center_col: cols // 2
+      - cell_values: integers (0-9, representing colors)
+    actions:
+      - change_color:
+          location:
+            - center_row, all columns
+            - all rows, center_col
+          new_color: 2 (red)

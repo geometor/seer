@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies non-blue (not 1) objects in the input grid. It then expands azure (8) colored objects that have adjacent, connected azure objects.\nThe expansion involves filling any adjacent blue (1) pixels with azure (8).\n2x2 azure squares are grown to 4x4.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"Finds contiguous objects (non-background pixels) in a grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, color, obj_pixels):\n        \"\"\"Depth-first search to find contiguous pixels of the same color.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        obj_pixels.append((row, col))\n        dfs(row + 1, col, color, obj_pixels)\n        dfs(row - 1, col, color, obj_pixels)\n        dfs(row, col + 1, color, obj_pixels)\n        dfs(row, col - 1, color, obj_pixels)\n        dfs(row + 1, col + 1, color, obj_pixels)  # Check diagonals\n        dfs(row - 1, col - 1, color, obj_pixels)\n        dfs(row + 1, col - 1, color, obj_pixels)\n        dfs(row - 1, col + 1, color, obj_pixels)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col] and grid[row, col] != 1:\n                obj_pixels = []\n                dfs(row, col, grid[row, col], obj_pixels)\n                objects.append(obj_pixels)\n    return objects\n\ndef is_2x2_square(object_pixels, grid):\n    \"\"\"Checks if an object forms a 2x2 square.\"\"\"\n    if len(object_pixels) != 4:\n        return False\n    rows, cols = zip(*object_pixels)\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n\n    return (max_row - min_row == 1) and (max_col - min_col == 1) and all(grid[r,c] == grid[object_pixels[0]] for r,c in object_pixels)\n\ndef expand_object(grid, object_pixels, new_color):\n    \"\"\"Expands connected azure objects by one layer and expands 2x2 to 4x4.\"\"\"\n    new_grid = np.copy(grid)\n    rows, cols = zip(*object_pixels)\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n\n    if is_2x2_square(object_pixels, grid):\n\n      # Expand to 4x4\n      for r in range(min_row - 1, max_row + 2):\n        for c in range(min_col - 1, max_col + 2):\n          if 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]:\n             new_grid[r,c] = new_color\n\n    for row, col in object_pixels: #grow azure shapes\n      for r in range(row - 1, row + 2):\n        for c in range(col - 1, col + 2):\n          if 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]:\n            if grid[r,c] == 8:\n              new_grid[r,c] = 8\n\n    for row, col in object_pixels: # grow all azure objects\n      for r in range(row - 1, row + 2):\n          for c in range(col - 1, col + 2):\n              if 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1] :\n                  if grid[r, c] == 1:  # Expand onto blue background\n                      new_grid[r, c] = new_color\n    return new_grid\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find objects\n    objects = get_objects(output_grid)\n\n    # Expand azure objects\n    for obj_pixels in objects:\n      first_pixel_row, first_pixel_col = obj_pixels[0]\n      if output_grid[first_pixel_row, first_pixel_col] == 8: #if azure color\n        output_grid = expand_object(output_grid, obj_pixels, 8)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3648,
+    "candidates_token_count": 1191,
+    "total_token_count": 4839,
+    "cached_content_token_count": 0
+  },
+  "response_time": 23.5907,
+  "response_file": "002-response.json"
+}

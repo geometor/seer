@@ -1,0 +1,35 @@
+observations:
+  - object: blue_regions
+    type: list
+    description: List of contiguous blue pixel regions.
+    properties:
+      - property: shape
+        type: rectangle
+        description: All blue regions appear to be generally rectangular.
+      - property: bottom_region
+        type: object
+        description: The blue region with the lowest bottom edge.
+        actions:
+          - action: fill_orange
+            description: Fill the interior of the bottom-most region with orange, excluding a 1-pixel border.
+      - property: other_regions
+        type: list
+        description: all blue regions that are not the bottom most
+        actions:
+          - action: place_red_square
+            description: Place a 2x2 red square centered within each of these regions.
+  - object: red_square
+    type: shape
+    properties:
+      - dimensions: [2, 2]
+      - color: red
+    actions:
+      - placement: center
+        description: placed in the center of top blue regions.
+  - object: orange_fill
+    type: shape_modification
+    properties:
+     - color: orange
+    actions:
+     -  placement: bottom_blue_region
+     -  constraint: exclude border

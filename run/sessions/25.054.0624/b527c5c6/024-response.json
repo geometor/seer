@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Inverse L Shapes:** Find all separate green inverse L-shaped regions in the input grid.\n2.  **Locate Red Pixels:** Identify all red pixels within the green inverse L shapes.\n3.  **Determine Red Bar Height:** Determine the combined height of the inverse L shapes.\n4.  **Create Red Vertical Bar:** Create a red vertical bar. The height is determined by the height of the combined green shapes. The bar's x-coordinate is determined by the red pixel in the top-left most inverse L shape.\n5.  **Connect Green Inverse L shapes.** Combine all green regions. The shapes connect to the red vertical bar.\n\"\"\"\n\nimport numpy as np\n\ndef find_all_objects(grid, color):\n    \"\"\"Finds the coordinates of all disjoint objects of the specified color.\"\"\"\n    objects = []\n    visited = set()\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c):\n        if (r, c) in visited or not is_valid(r, c) or grid[r, c] != color:\n            return []\n        visited.add((r, c))\n        region_coords = [(r, c)]\n        for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:\n            region_coords.extend(dfs(r + dr, c + dc))\n        return region_coords\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color and (r, c) not in visited:\n                objects.append(dfs(r, c))\n    return objects\n\ndef get_top_left_coord(coords):\n  \"\"\"Returns the top-left coordinate from a list of coordinates.\"\"\"\n  if not coords:\n      return None\n  min_row = min(r for r, c in coords)\n  min_col = min(c for r, c in coords if r == min_row) # find min col for min row\n  return (min_row, min_col)\n\ndef get_combined_height(regions):\n  \"\"\"Calculates the combined height of regions\"\"\"\n  if not regions:\n    return 0\n  \n  min_row = min(r for region in regions for r, _ in region)\n  max_row = max(r for region in regions for r, _ in region)\n  return max_row - min_row + 1\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # 1. Identify Green Inverse L Shapes\n    green_regions = find_all_objects(input_grid, 3)\n\n    # Find top-left green region and other green regions\n    top_left_green_region = None\n    other_green_regions = []\n\n    if (len(green_regions) > 0):\n      top_left_green_region = green_regions[0]\n      top_left_most_coord = get_top_left_coord(top_left_green_region)\n\n      for region in green_regions:\n          curr_top_left = get_top_left_coord(region)\n          if curr_top_left[0] < top_left_most_coord[0] or (curr_top_left[0] == top_left_most_coord[0] and curr_top_left[1] < top_left_most_coord[1]):\n              top_left_most_coord = curr_top_left\n              other_green_regions.append(top_left_green_region)\n              top_left_green_region = region\n          else:\n              other_green_regions.append(region)\n    \n    # 2. Identify Red Pixels.\n    red_pixels = []\n    for region in green_regions:\n      for r, c in region:\n        if input_grid[r,c] == 2:\n          red_pixels.append((r,c))\n\n    # 3. Determine Red Bar Height\n    combined_height = get_combined_height(green_regions)\n\n\n    # 4. Create Red Vertical Bar\n    if top_left_green_region and red_pixels:\n      red_pixel_in_top_left = None\n      for r, c in top_left_green_region:\n          if input_grid[r, c] == 2:\n            red_pixel_in_top_left = (r,c)\n            break\n      if red_pixel_in_top_left:\n        red_row, red_col = red_pixel_in_top_left\n        min_row = min(r for region in green_regions for r, _ in region) # find top\n\n        for row in range(min_row, min_row + combined_height):\n          output_grid[row, red_col] = 2\n\n    # 5. Connect Green Inverse L shapes.\n    for region in green_regions:\n        for r, c in region:\n            output_grid[r, c] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11817,
+    "candidates_token_count": 1215,
+    "total_token_count": 13032,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.275952,
+  "response_file": "024-response.json"
+}

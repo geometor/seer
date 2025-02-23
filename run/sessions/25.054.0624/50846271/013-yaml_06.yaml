@@ -1,0 +1,34 @@
+facts:
+  - objects:
+      - type: grid
+        properties:
+          - dimensions: 18x19
+          - colors: [0, 2, 5, 8]
+      - type: pixel
+        properties:
+          - color: 0  # White
+          - role: background
+      - type: pixel
+        properties:
+          - color: 5  # Gray
+          - role: majority
+      - type: pixel
+        properties:
+          - color: 2  # Red
+          - role: minority, target_of_change
+      - type: pixel
+        properties:
+            - color: 8
+            - role: minority, replaces_other_colors
+
+  - actions:
+      - type: replace
+        description: Red pixels and some neighboring gray are replaced by azure.
+        details: >
+            Replacement seems to be local to the red pixels. Some gray are replaced
+
+  - relationships:
+      - type: spatial
+        description: The relative positions of white and most gray pixels remain constant.
+      - type: neighborhood
+        description: Azure pixels appear near or replacing original red pixels.

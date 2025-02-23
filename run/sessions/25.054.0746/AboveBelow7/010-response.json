@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Objects: Find all contiguous regions of azure (8) and red (2) pixels. These are considered distinct objects.\n2. Azure Object Movement: Move all azure objects to the bottom of the grid.\n3. Relative Horizontal Order: Maintain the relative horizontal order of the azure objects. If an azure object was left of another in the input, it should remain left of it in the output.\n4. Vertical Positioning: Place the azure objects as low as possible in the grid, without overlapping any other non-background color (non-zero) objects.\n5.  Red Object Stationary: The red object remains in its original position.\n6. Background: Consider the background (0 color) pixels. The background must be considered and moved when required to allow other operations.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"\n    Finds contiguous regions of a specified color in the grid.\n    Returns a list of object bounding boxes (min_row, min_col, max_row, max_col) and a list of the object coordinates.\n    \"\"\"\n    visited = set()\n    objects = []\n    object_coords = []\n\n    def dfs(row, col, current_object, current_coords):\n        if (row, col) in visited or row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        current_object.append((row, col))\n        current_coords.append((row,col))\n        dfs(row + 1, col, current_object, current_coords)\n        dfs(row - 1, col, current_object, current_coords)\n        dfs(row, col + 1, current_object, current_coords)\n        dfs(row, col - 1, current_object, current_coords)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_object = []\n                current_coords = []\n                dfs(row, col, current_object, current_coords)\n                # calculate bounding box\n                min_row = min(current_object, key=lambda x: x[0])[0]\n                min_col = min(current_object, key=lambda x: x[1])[1]\n                max_row = max(current_object, key=lambda x: x[0])[0]\n                max_col = max(current_object, key=lambda x: x[1])[1]\n                objects.append( (min_row, min_col, max_row, max_col) )\n                object_coords.append(current_coords)\n    return objects, object_coords\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find azure (8) objects\n    azure_objects, azure_coords = find_objects(input_grid, 8)\n\n    # Find red (2) object\n    red_objects, red_coords = find_objects(input_grid, 2) # bounding boxes not currently used\n\n    # Clear initial positions of azure objects in the output grid\n    for obj_coords in azure_coords:\n        for row, col in obj_coords:\n            output_grid[row, col] = 0\n\n    # Sort azure objects by their leftmost coordinate (min_col) to maintain relative order\n    azure_objects_sorted = sorted(zip(azure_objects, azure_coords), key=lambda x: x[0][1])\n\n    # Calculate destination positions for azure objects\n    for (min_row, min_col, max_row, max_col), obj_coords in azure_objects_sorted:\n      obj_height = max_row - min_row + 1\n      obj_width = max_col - min_col + 1\n      dest_row = output_grid.shape[0] - obj_height # start with bottom most\n\n      # check for collisions and adjust dest_row upwards if necessary\n      collision = True\n      while collision and dest_row >= 0:\n        collision = False\n        for r in range(dest_row, dest_row + obj_height):\n          for c in range(min_col, min_col+obj_width): # use the original min_col\n              if r < output_grid.shape[0] and c < output_grid.shape[1] and output_grid[r,c] != 0: # check for collisions\n                collision = True\n                dest_row -= 1 #move up one row\n                break\n          if collision:\n              break\n\n      # move object to the destination row in output, adjusted for x position\n      x_offset = min_col\n      for row,col in obj_coords:\n        output_grid[dest_row + (row - min_row) , x_offset + (col - min_col)] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5183,
+    "candidates_token_count": 1175,
+    "total_token_count": 6358,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.140829,
+  "response_file": "010-response.json"
+}

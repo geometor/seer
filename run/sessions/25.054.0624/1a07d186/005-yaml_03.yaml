@@ -1,0 +1,65 @@
+examples:
+  - example_id: 1
+    objects:
+      - type: line
+        orientation: vertical
+        color: 3  # Green
+        properties:
+          - adjacent_to: 4 #yellow
+            direction: right # right, left
+      - type: line
+        orientation: vertical
+        color: 4  # Yellow
+        properties:
+          - adjacent_to: 3 # green
+            direction: left # right, left
+    transformation:
+      - action: move
+        condition: adjacent
+        direction: left
+        color: [3, 4]
+        amount: 1
+
+  - example_id: 2
+    objects:
+      - type: line
+        orientation: horizontal
+        color: 2  # Red
+        properties: []
+      - type: line
+        orientation: horizontal
+        color: 1  # Blue
+        properties: []
+    transformation:
+      - action: move
+        condition: always
+        direction: up
+        color: 2
+        amount: 1
+      - action: move
+        condition: always
+        direction: down
+        color: 1
+        amount: 1
+
+  - example_id: 3
+    objects:
+      - type: line
+        orientation: horizontal
+        color: 8  # Azure
+        properties:
+          - row_position: top # top, bottom
+      - type: line
+        orientation: horizontal
+        color: 8  # Azure
+        properties:
+          - row_position: bottom
+    transformation:
+      - action: move
+        condition: row_position == top
+        direction: up
+        color: 8
+        amount: 1
+      - action: delete
+        condition: row_position == bottom and other azure exists
+        color: 8

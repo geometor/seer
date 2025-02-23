@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms single colored pixels into vertical or horizontal lines based on their color, with special handling for interactions between Gray/Magenta and Azure/Maroon, and line stopping for other colors.\n\"\"\"\n\nimport numpy as np\n\ndef get_single_pixels(grid):\n    \"\"\"Finds isolated pixels of a given color.\"\"\"\n    single_pixels = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            color = grid[r, c]\n            if color != 0:\n                is_single = True\n                for dr in [-1, 0, 1]:\n                    for dc in [-1, 0, 1]:\n                        if dr == 0 and dc == 0:\n                            continue\n                        nr, nc = r + dr, c + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n                            is_single = False\n                            break\n                    if not is_single:\n                        break\n                if is_single:\n                    single_pixels.append((r, c, color))\n    return single_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    single_pixels = get_single_pixels(input_grid)\n\n    # 1. Single Pixel Transformations\n    for r, c, color in single_pixels:\n        if color in [2, 3, 4, 7]:  # Red, Green, Blue, Orange: Vertical lines\n            for i in range(r, rows):\n                if output_grid[i,c] == 0:\n                    output_grid[i,c] = color\n                else:\n                    break #stop at occupied\n        elif color == 6:  # Magenta: Horizontal lines\n             for j in range(cols):\n                output_grid[r,j] = color\n        elif color == 8: # Azure: Conditional Vertical Line\n            is_adjacent_to_maroon = False\n            for dc in [-1, 1]: # Check left/right\n                nc = c + dc\n                if 0 <= nc < cols and input_grid[r, nc] == 9:\n                    is_adjacent_to_maroon = True\n                    break\n            if not is_adjacent_to_maroon:\n                for i in range(r,rows):\n                    if output_grid[i,c] == 0:\n                        output_grid[i,c] = color\n                    else:\n                        break\n            else:  #Azure-Maroon interaction, horizontal fill until maroon\n                if c < cols -1 and input_grid[r, c+1] == 9:\n                    output_grid[r,c] = 8\n                elif c > 0 and input_grid[r,c-1] == 9:\n                    for j in range(c-1, -1, -1):\n                        if output_grid[r,j] == 9:\n                            break\n                        else:\n                           output_grid[r,j] = 8\n\n    # 2. Handle Gray(5) and Magenta(6) interaction:\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r,c] == 5:\n                if r > 0 and output_grid[r-1,c] == 6: #magenta above\n                    for j in range(cols):\n                        output_grid[r-1,j] = 5 #change whole line to gray\n                if r < rows -1 and output_grid[r+1,c] == 6: #if magenta below\n                    for j in range(cols):\n                        output_grid[r+1,j] = 5 #change whole line to gray\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8810,
+    "candidates_token_count": 897,
+    "total_token_count": 9707,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.408867,
+  "response_file": "006-response.json"
+}

@@ -1,0 +1,22 @@
+task_id: 00d62c1b
+observations:
+  - object: grid
+    description: 2D array of pixels, each with a color value (0-9).
+  - object: pixel
+    properties:
+      color: integer (0-9) representing a color.
+      position: (row, column) coordinates within the grid.
+  - object_types:
+      - name: colored_region
+        description: A contiguous block of one or more pixels of the same non-zero color.
+      - name: white_region
+        description:  A group of connected white pixels.
+      - name: enclosed_white_region
+        description: A white_region fully enclosed by colored regions.
+  - actions:
+    - name: remove_white_pixels
+      description: Change the color value of white pixels to match the expected output.
+      conditions:
+        - The white pixel is part of an `enclosed_white_region`.
+    - name: maintain_other_pixels
+      description: Keep non-white pixels and any white pixels which do not meed the removal condition.

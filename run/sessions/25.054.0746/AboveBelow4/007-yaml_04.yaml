@@ -1,0 +1,28 @@
+objects:
+  - id: grid_input
+    type: grid
+    dimensions: [12, 9]
+    elements: [0, 3, 6]
+
+  - id: grid_output
+    type: grid
+    dimensions: [12, 9]
+    elements: [0, 3, 6]
+
+  - id: green_regions
+    type: object_group
+    color: 3
+    grid: grid_input
+
+  - id: magenta_regions
+      type: object_group
+      color: 6
+      grid: grid_input
+
+relations:
+  - type: same_dimensions
+    objects: [grid_input, grid_output]
+
+  - type: adjacency
+    description: "Magenta (6) is inserted next to green (3) in the output grid."
+    objects: [green_regions]

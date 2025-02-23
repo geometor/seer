@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies a shape made of white (0) pixels within a gray (5) background. \nIt then \"fills\" the gray area adjacent to the shape on the left and bottom sides, \nchanging gray pixels to red (2). The original shape and grid dimensions are preserved.\n\"\"\"\n\nimport numpy as np\n\ndef find_shape(grid, shape_color=0):\n    # Find coordinates of pixels belonging to the shape\n    shape_coords = np.argwhere(grid == shape_color)\n    return shape_coords\n\ndef get_adjacent_pixels(grid, shape_coords, fill_color=5):\n    rows, cols = grid.shape\n    adjacent_coords = set()\n\n    for r, c in shape_coords:\n        # Check left\n        if c > 0 and grid[r, c-1] == fill_color:\n            adjacent_coords.add((r, c-1))\n        # Check bottom\n        if r < rows - 1 and grid[r+1, c] == fill_color:\n            adjacent_coords.add((r+1, c))\n        # Check bottom-left diagonal\n        if r < rows - 1 and c > 0 and grid[r+1, c-1] == fill_color:\n            adjacent_coords.add((r+1, c-1))\n            \n    return list(adjacent_coords)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by filling specific gray areas with red.\n    \"\"\"\n    # Initialize output grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n    \n    # Find the coordinates of the shape (white pixels)\n    shape_coords = find_shape(output_grid, shape_color=0)\n\n    # Get coordinates of gray pixels adjacent to the shape on the left and bottom sides\n    adjacent_to_fill = get_adjacent_pixels(output_grid, shape_coords)\n\n    # Fill the identified adjacent pixels with red (2)\n    for r, c in adjacent_to_fill:\n        output_grid[r, c] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3466,
+    "candidates_token_count": 491,
+    "total_token_count": 3957,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.99457,
+  "response_file": "002-response.json"
+}

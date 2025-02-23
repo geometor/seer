@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Copy Maroon Pixels**: Copy all maroon (9) pixels from the input to the output, maintaining position.\n2.  **Process Orange Pixels**: Find orange (7) pixel clusters.  For each cluster, copy it to the output. Then, for each orange pixel, extend the orange color upwards by up to three pixels *if* there isn't already an orange pixel there.\n3.  **Propagate Red and Green**: After placing orange, find red (2) and green (3) pixels that are *directly* adjacent (up, down, left, or right, but *not* diagonally) to the *original* orange pixels (before extrusion) in the input grid.  For each such red/green pixel, shift it upwards by the same amount the orange pixel directly adjacent to it was extruded.\n4.  **Place Azure Pixels:** Place azure (8) pixels in the output grid.  For every azure pixel in the input, copy it to the output, and also place one azure pixel directly above it (if not in the top row). Azure pixels overwrite any other colors.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all objects of a given color in the grid.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n\n    def dfs(r, c, current_object):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        current_object.append((r, c))\n        dfs(r + 1, c, current_object)\n        dfs(r - 1, c, current_object)\n        dfs(r, c + 1, current_object)\n        dfs(r, c - 1, current_object)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                current_object = []\n                dfs(r, c, current_object)\n                objects.append(current_object)\n    return objects\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Gets the valid neighbors (up, down, left, right) of a cell.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if r > 0:\n        neighbors.append((r - 1, c))\n    if r + 1 < rows:\n        neighbors.append((r + 1, c))\n    if c > 0:\n        neighbors.append((r, c - 1))\n    if c + 1 < cols:\n        neighbors.append((r, c + 1))\n    return neighbors\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n\n    output_grid = np.zeros_like(input_grid)  # Initialize output_grid as all black\n    rows, cols = input_grid.shape\n\n    # 1. Copy Maroon Pixels\n    maroon_pixels = np.where(input_grid == 9)\n    for r, c in zip(maroon_pixels[0], maroon_pixels[1]):\n        output_grid[r, c] = 9\n\n    # 2. Process Orange Pixels\n    orange_objects = find_objects(input_grid, 7)\n    orange_positions = []  # Store original orange positions\n    for obj in orange_objects:\n        for r, c in obj:\n            orange_positions.append((r,c))\n            output_grid[r, c] = 7\n            # Conditional Extrusion\n            for i in range(1, 4):\n                if r - i >= 0 and output_grid[r - i, c] != 7:\n                    output_grid[r - i, c] = 7\n                else:\n                    break # Stop extruding if we hit another orange pixel\n\n\n    # 3. Propagate Red and Green\n    for r_orig, c_orig in orange_positions:  # Iterate through *original* orange positions\n        neighbors = get_neighbors(input_grid, r_orig, c_orig)\n\n        for r_neighbor, c_neighbor in neighbors:\n            if input_grid[r_neighbor,c_neighbor] in (2,3):\n                color = input_grid[r_neighbor, c_neighbor]\n                # find extrusion amount\n                extrusion_amount = 0\n                for i in range(1,4):\n                    if r_orig - i < 0 or input_grid[r_orig -i, c_orig] != 7 :\n                        break\n                    else:\n                        extrusion_amount +=1\n\n                new_r = r_neighbor - extrusion_amount\n                if new_r >= 0:\n\n                  output_grid[new_r, c_neighbor] = color\n\n\n    # 4. Place Azure Pixels (with overwriting)\n    azure_pixels = np.where(input_grid == 8)\n    for r, c in zip(azure_pixels[0], azure_pixels[1]):\n        output_grid[r, c] = 8  # Copy original\n        if r > 0:\n            output_grid[r - 1, c] = 8  # Add above\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 17973,
+    "candidates_token_count": 1247,
+    "total_token_count": 19220,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.961452,
+  "response_file": "006-response.json"
+}

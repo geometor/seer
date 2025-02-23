@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find the Outermost Border:** Scan the input grid to identify the outermost rectangular border. The border is defined as a contiguous region of a single color that completely encloses an inner rectangular area. The border must be the outermost, connected set of pixels of same color.\n2.  **Extract Inner Region:** Once the border is identified, extract the rectangular region located *inside* the border. This inner region is the area of interest.\n3.  **Conditional Color Substitution:** Examine the *extracted inner region*. If color 5 is present within the inner region, replace all instances of color 5 with color 6.\n4. **Output:** The transformed \"inner region\" from step 3 becomes the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_outermost_border(grid):\n    \"\"\"\n    Finds the outermost rectangular border and returns its boundaries and color.\n    Handles borders that are on the edges of the grid.\n    \"\"\"\n    rows, cols = grid.shape\n\n    # Iterate through all possible border colors\n    for border_color in np.unique(grid):\n        # Find top-left corner candidates for this color\n        for top in range(rows):\n            for left in range(cols):\n                if grid[top, left] == border_color:\n                    # Check if this is a valid outermost border\n                    bottom, right = find_bottom_right(grid, top, left, border_color)\n                    if bottom != -1:  # Valid corner found\n                        if is_valid_outermost_border(grid, top, left, bottom, right, border_color):\n                            return top, left, bottom, right, border_color\n    return None, None, None, None, None\n\ndef find_bottom_right(grid, top, left, border_color):\n    \"\"\"Finds the bottom-right corner of a potential border.\"\"\"\n    rows, cols = grid.shape\n\n    # Find bottom edge\n    bottom = top\n    while bottom + 1 < rows and grid[bottom + 1, left] == border_color:\n        bottom += 1\n\n    # Find right edge\n    right = left\n    while right + 1 < cols and grid[top, right + 1] == border_color:\n        right += 1\n\n    # Check if it's a valid corner (rectangle)\n    if grid[bottom, right] != border_color:\n        return -1, -1  # Invalid corner\n\n    return bottom, right\n\ndef is_valid_outermost_border(grid, top, left, bottom, right, border_color):\n    \"\"\"Checks if the identified border is valid and outermost.\"\"\"\n    rows, cols = grid.shape\n\n    # Check border consistency (all sides)\n    for row in range(top, bottom + 1):\n        if grid[row, left] != border_color or grid[row, right] != border_color:\n            return False\n    for col in range(left, right + 1):\n        if grid[top, col] != border_color or grid[bottom, col] != border_color:\n            return False\n\n    # Check for no internal pixels of the same border color (outermost)\n    for row in range(top + 1, bottom):\n        for col in range(left + 1, right):\n            if grid[row, col] == border_color:\n                return False\n\n    return True\n\ndef extract_inner_region(grid, top, left, bottom, right):\n    \"\"\"Extracts the inner region of the border.\"\"\"\n    return grid[top+1:bottom, left+1:right]\n\ndef conditional_color_substitution(inner_region):\n    \"\"\"Replaces all instances of 5 with 6 in the inner region if 5 exists.\"\"\"\n    if 5 in inner_region:\n        return np.where(inner_region == 5, 6, inner_region)\n    else:\n        return inner_region\n    \n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the defined rules.\n    \"\"\"\n    grid = np.array(input_grid)\n\n    # 1. Find the Outermost Border\n    top, left, bottom, right, border_color = find_outermost_border(grid)\n    \n    if top is None:\n        return [] # No border found, return empty grid\n\n    # 2. Extract Inner Region\n    inner_region = extract_inner_region(grid, top, left, bottom, right)\n\n    # 3. Conditional Color Substitution\n    transformed_inner_region = conditional_color_substitution(inner_region)\n\n    # 4. Output the transformed inner region\n    return transformed_inner_region.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 15139,
+    "candidates_token_count": 1061,
+    "total_token_count": 16200,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.209963,
+  "response_file": "018-response.json"
+}

@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Objects:** Find all contiguous regions (objects) of a specific color in the input grid. The target color is the color that forms a closed shape.\n2.  **Identify Interior Colors:** Within each target object's bounding box, check for a specific \"interior\" color. The interior colors are the colors enclosed by the target color shape.\n3.  **Conditional Fill:**\n    *   If a target object contains the specified \"interior\" colors:\n        * Change any pixels matching a third color within the bounding box to that interior color. The third color is *not* the target color, nor the 'background' color in the interior, but another color contained inside.\n\n4. All other objects remain the same.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds contiguous regions of the specified color.\"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def dfs(row, col):\n        \"\"\"Depth-first search to find connected components.\"\"\"\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return []\n\n        visited[row, col] = True\n        region = [(row, col)]\n\n        region.extend(dfs(row + 1, col))\n        region.extend(dfs(row - 1, col))\n        region.extend(dfs(row, col + 1))\n        region.extend(dfs(row, col - 1))\n        return region\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col] and grid[row, col] == color:\n                objects.append(dfs(row, col))\n    return objects\n\ndef get_bounding_box(region):\n    \"\"\"Calculates the bounding box of a region.\"\"\"\n    min_row = min(r for r, c in region)\n    max_row = max(r for r, c in region)\n    min_col = min(c for r, c in region)\n    max_col = max(c for r, c in region)\n    return min_row, max_row, min_col, max_col\n\ndef contains_color(grid, bbox, color):\n    \"\"\"Checks if a bounding box contains a specific color.\"\"\"\n    min_row, max_row, min_col, max_col = bbox\n    for row in range(min_row, max_row + 1):\n        for col in range(min_col, max_col + 1):\n            if grid[row, col] == color:\n                return True\n    return False\n\ndef find_interior_color(grid, bbox, target_color):\n    \"\"\"Find the interior color within a bounding box, excluding the target and a background color.\"\"\"\n    min_row, max_row, min_col, max_col = bbox\n    colors_inside = set()\n    for row in range(min_row, max_row + 1):\n        for col in range(min_col, max_col + 1):\n            if grid[row,col] != target_color:\n                colors_inside.add(grid[row, col])\n\n    if len(colors_inside) > 1: #more than one color\n      # find background color\n      background_color = -1\n      max_count = 0\n      for color in colors_inside:\n          count = 0\n          for row in range(min_row, max_row + 1):\n              for col in range(min_col, max_col + 1):\n                if grid[row,col] == color:\n                    count +=1\n          if count > max_count:\n                max_count = count\n                background_color = color\n      #return a non-background color\n      for color in colors_inside:\n        if color != background_color:\n          return color\n\n    return None  # No distinct interior color found\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Determine the target color and interior color based on the input.\n\n    target_color = None\n    interior_color = None\n\n    # Iterate through all colors to find a potential target\n    for color in np.unique(input_grid):\n        objects = find_objects(input_grid, color)\n        if len(objects) == 0:\n            continue\n\n        for obj in objects:\n          bbox = get_bounding_box(obj)\n          found_interior_color = find_interior_color(input_grid, bbox, color)\n\n          if found_interior_color is not None: #if target object contains interior color\n              target_color = color\n              interior_color = found_interior_color\n              break\n        if target_color is not None:\n          break\n\n    if target_color is None:\n      return output_grid\n\n\n    # Find target objects\n    target_objects = find_objects(input_grid, target_color)\n\n    for target_object in target_objects:\n        bbox = get_bounding_box(target_object)\n        min_row, max_row, min_col, max_col = bbox\n\n        #check if it contains interior color\n        if interior_color is not None:\n            for row in range(min_row, max_row+1):\n                for col in range(min_col, max_col+1):\n                  # Find third color within the bounding box that is not background or target color, to be filled\n                    if grid[row, col] != target_color and grid[row,col] != 0 and contains_color(input_grid, bbox, grid[row,col]) : # there is some third color within\n                        output_grid[row,col] = interior_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 1687,
+            "end_index": 1862,
+            "uri": "https://github.com/MilanRadeta/MusicReader",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 18553,
+    "candidates_token_count": 1367,
+    "total_token_count": 19920,
+    "cached_content_token_count": 0
+  },
+  "response_time": 13.696145,
+  "response_file": "006-response.json"
+}

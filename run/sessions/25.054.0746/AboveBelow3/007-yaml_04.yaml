@@ -1,0 +1,32 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 10x10
+      colors: [0, 2, 6]
+  - type: region
+    properties:
+      color: 2
+      shape: rectangle-like
+      initial_position: top row
+      final_position: third row
+  - type: region
+    properties:
+      color: 6
+      shape: rectangle
+      initial_position: middle rows
+      final_position: middle rows (unchanged)
+  - type: region
+      properties:
+        color: 2
+        shape: partial_rectangle
+        initial_position: bottom_rows and single element in row 8.
+        final_position:  row 8 and row 10
+relationships:
+  - type: spatial
+    description: The magenta (6) rectangle is below the top red (2) region and above the bottom fragmented red region.
+
+actions:
+    - type: vertical_shift
+      object: top_red_region
+      direction: down
+      magnitude: 2 rows

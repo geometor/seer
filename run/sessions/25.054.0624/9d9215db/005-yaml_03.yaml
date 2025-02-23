@@ -1,0 +1,20 @@
+objects:
+  - name: seed_pattern
+    description: The smallest repeating unit in the input grid.
+    properties:
+      - contains: All non-white pixels in a contiguous block.
+      - replication_method: Tiling, both horizontally and vertically.
+      - shape: Variable, defined by the arrangement of non-white pixels.
+      - size: Bounding box of the non-white pixels in seed_pattern.
+  - name: grid
+    description: The entire input/output array.
+    properties:
+      - dimensions: rows x columns
+      - cell_values: Integers representing colors (0-9).
+      - replication: the seed_pattern is repeated within this grid, with rows x columns as boundaries.
+
+actions:
+  - name: identify_seed
+    description: Locate the bounding box of the non-white pixels in the input.
+  - name: replicate_seed
+    description: Copy the seed pattern across the output grid, both horizontally and vertically, filling entire output grid.

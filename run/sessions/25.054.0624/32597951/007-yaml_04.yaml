@@ -1,0 +1,27 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [17, 17]
+      cell_values: [0, 1, 8, 3]
+  - type: region
+    properties:
+      initial_value: 8
+      modified_value: 3
+      shape: irregular  #It is not a regular shape.
+      location: central_left # It is a region in the left-central zone of the input
+    relations:
+      - within: grid
+
+actions:
+  - type: modify_value
+    agent: unknown
+    target: region
+    properties:
+        original: 8
+        new: 3
+        location: specific cells
+  -type: maintain_value
+   agent: unknown
+   target: grid
+   properties:
+        values: [0,1]

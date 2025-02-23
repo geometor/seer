@@ -1,0 +1,28 @@
+objects:
+  - type: rectangle
+    properties:
+      outline_color: blue
+      fill_color:
+        - conditional: top_half
+          color: orange
+        - conditional: bottom_half
+          color: red
+      outline_thickness: 1
+      interior: white # Before transformation
+    constraints:
+      - shape: 4-sided, right angles
+      - adjacency: Only up, down, left, right neighbors considered part of the same object
+
+actions:
+  - name: fill_interior
+    target: rectangle
+    parameter:
+      color:
+        - conditional: top_half  # Based on average row position
+          value: orange
+        - conditional: bottom_half
+          value: red
+
+conditions:
+    top_half: rectangle's average row index < (grid height / 2)
+    bottom_half: rectangle's average row index >= (grid height / 2)

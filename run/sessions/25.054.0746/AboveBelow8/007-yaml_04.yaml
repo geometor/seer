@@ -1,0 +1,26 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      - colors: [3, 2, 7, 9, 1, 8]  # All colors present in the input
+      - dimensions: 11x11  # height x width
+
+  - object: output_grid
+    type: grid
+    properties:
+      - colors: [0, 8]  # Colors present in the output
+      - dimensions: 11x11
+
+  - action: color_filtering
+    description: Isolates a specific color (8) and replaces others with 0.
+    input: input_grid
+    output: output_grid
+    parameters:
+        target_color: 8
+
+  - object: target_color
+    value: 8
+
+  - relationship:
+      type:  color map
+      description: 8 is azure, and other colors are not relevant for the output

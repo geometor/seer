@@ -1,0 +1,53 @@
+examples:
+  - id: 1
+    input_shape: [11, 12]
+    output_shape: [11, 12]
+    match: False
+    pixels_off: 4
+    notes: >
+      The code failed to blank the rows *after* the horizontal line. The 4
+      pixels that don't match are due to keeping rows that should be blanked
+      (specifically, the yellow and black pixels in rows 8-10. Row 3 is
+      correctly kept, and all subsequent rows are incorrectly kept)
+    objects:
+      - type: horizontal_line
+        color: yellow
+        row_index: 2
+      - type: horizontal_line
+        color: red
+        row_index: 6
+      - type: horizontal_line_like
+        color: yellow
+        row_index: 8
+      - type: horizontal_line_like
+        color: yellow
+        row_index: 9
+      - type: horizontal_line_like
+        color: yellow
+        row_index: 10
+
+  - id: 2
+    input_shape: [10, 16]
+    output_shape: [10, 16]
+    match: True
+    pixels_off: 0
+    notes: >
+      The code works correctly because the horizontal line is followed only by
+      rows that are already blank (or should remain blank).
+    objects:
+      - type: horizontal_line
+        color: green
+        row_index: 2
+
+  - id: 3
+    input_shape: [9, 16]
+    output_shape: [9, 16]
+    match: False
+    pixels_off: 8
+    notes: >
+      The horizontal line at row 3 is preserved correctly, but rows after it are not blanked.
+      The pixels on row 4 that should be blanked are not.
+    objects:
+      - type: horizontal_line
+        color: grey
+        row_index: 3

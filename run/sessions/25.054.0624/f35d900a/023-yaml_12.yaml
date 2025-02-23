@@ -1,0 +1,28 @@
+objects:
+  - type: pixel
+    properties:
+      - color: [0-9]  # Color of the pixel
+      - is_single: boolean  # True if the pixel is isolated (surrounded by 0 or boundary)
+  - type: square
+    properties:
+      - color: [0-9] # Color inherited from the single pixel
+      - center_row: int # Row index of the center
+      - center_col: int # Column index of the center
+      - size: 3x3 #fixed size
+  - type: line
+    properties:
+      - color: 5 (gray)
+      - start: [int, int]  # Starting cell coordinates
+      - end: [int, int]    # Ending cell coordinates
+      - orientation: [horizontal, vertical] # Orientation of the line
+
+actions:
+  - name: identify_single_pixels
+    input: input_grid
+    output: list of single pixels
+  - name: expand_to_square
+    input: single pixel
+    output: 3x3 square in output_grid
+  - name: connect_squares
+    input: two squares, input_grid
+    output: gray line between squares in output_grid, based on *input* pixel positions

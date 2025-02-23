@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify and remove a contiguous region of white (0) pixels in the input grid, \neffectively isolating a repeating border pattern.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_region(grid, start_row, start_col, color):\n    \"\"\"\n    Finds a contiguous region of a given color starting from a given point.\n    Uses a breadth-first search (BFS) algorithm.\n    \"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    queue = [(start_row, start_col)]\n    visited[start_row, start_col] = True\n    region = []\n\n    while queue:\n        row, col = queue.pop(0)\n        region.append((row, col))\n\n        # Check neighbors (up, down, left, right)\n        neighbors = []\n        if row > 0:\n            neighbors.append((row - 1, col))\n        if row < rows - 1:\n            neighbors.append((row + 1, col))\n        if col > 0:\n            neighbors.append((row, col - 1))\n        if col < cols - 1:\n            neighbors.append((row, col + 1))\n        \n\n        for n_row, n_col in neighbors:\n            if not visited[n_row, n_col] and grid[n_row, n_col] == color:\n                visited[n_row, n_col] = True\n                queue.append((n_row, n_col))\n\n    return region\n\ndef get_pattern_element(row, col, sequence):\n  \"\"\"Retrieves the color based on a repeating sequence\"\"\"\n  seq_len = len(sequence)\n\n  index = (row % seq_len + (col % seq_len )* 2) %seq_len\n  return sequence[index]\n\ndef transform(input_grid):\n    # Initialize output grid as a copy of the input grid\n    output_grid = input_grid.copy()\n    rows, cols = output_grid.shape\n\n    # Find a good starting point for the background.  Assume it's near the center.\n    center_row, center_col = rows // 2, cols // 2\n    \n    if input_grid[center_row, center_col] == 0:\n\n        # Identify the contiguous white region\n        white_region = find_contiguous_region(input_grid, center_row, center_col, 0)\n\n        # Remove the white region (set to background, which will be overwritten)\n        for row, col in white_region:\n            output_grid[row, col] = 0 # temporarily set to background\n\n\n    # define border pattern\n    sequence = [3,2,3,6, 2,1,2,5, 6,5,6,1]\n    # Fill the removed region and stray 0 pixels, referencing border pattern\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r,c] == 0:\n              output_grid[r,c] = get_pattern_element(r,c, sequence)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 687,
+            "end_index": 972,
+            "uri": "https://github.com/MaksymilianLosinski/minesweeper-solver",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3816,
+    "candidates_token_count": 733,
+    "total_token_count": 4549,
+    "cached_content_token_count": 0
+  },
+  "response_time": 46.74546,
+  "response_file": "014-response.json"
+}

@@ -1,0 +1,28 @@
+objects:
+  - name: red_pixels
+    color: red (2)
+    properties:
+      - dispersed: True  # Initially scattered throughout the grid
+      - connected: False # Can be individual or small groups
+
+  - name: orange_object
+    color: orange (7)
+    properties:
+      - shape: irregular
+      - connected: True # Forms a single, multi-pixel object
+
+  - name: white_background
+    color: white (0)
+    properties:
+      - background: True # Serves as the canvas
+
+actions:
+  - name: replicate_red
+    object: red_pixels
+    description: Red pixels are duplicated horizontally.
+  - name: extend_red_column
+    object: red_pixels
+    description: Red pixels are extended vertically based on existing red and orange objects.
+
+relationships:
+  - red_pixels interact with orange_object: The positions of red pixels and orange pixels influence the generation and location of more red pixels.

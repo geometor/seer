@@ -1,0 +1,25 @@
+objects:
+  - grid:
+      type: 2D array
+      elements: integers (0-9) representing colors
+      properties:
+        height: 18
+        width: 18
+  - block:
+      type: contiguous region within the grid
+      properties:
+        color_variable: true
+        shape: irregular, determined by connectivity
+        removed: true
+  - colors:
+     property: integers from 0 to 7
+
+actions:
+  - removal:
+      target: block
+      condition:  connected component starting within rows 3-8, columns 3-8 and including the color white (0).
+
+relationships:
+  - grid contains block
+  - block is_a contiguous_region
+  - removal affects block

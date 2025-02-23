@@ -1,0 +1,30 @@
+objects:
+  - type: rectangle
+    color: green
+    properties:
+      width: variable
+      height: variable
+      red_pixel:
+        exists: true
+        relative_position: variable # (e.g., "top-left", "center", "bottom-right")
+actions:
+  - name: elongate_horizontally
+    condition: rectangle.width >= rectangle.height
+    steps:
+      - fill_within_rectangle_horizontal: red
+      - extend_to_bottom_edge: red
+  - name: elongate_vertically
+    condition: rectangle.width < rectangle.height
+    steps:
+      - fill_within_rectangle_vertical: red
+      - extend_to_left_edge: red
+  - name: fill_within_rectangle_horizontal
+    color: red
+    direction: horizontal
+  - name: fill_within_rectangle_vertical
+    color: red
+    direction: vertical
+  - name: extend_to_bottom_edge
+     color: red
+  - name: extend_to_left_edge
+     color: red

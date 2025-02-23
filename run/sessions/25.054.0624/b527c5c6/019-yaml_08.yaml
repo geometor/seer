@@ -1,0 +1,52 @@
+objects:
+  - id: grid_in
+    type: grid
+    properties:
+      dimensions: [20, 20]
+      colors: [3, 2, 0] # Green, Red, White
+    regions:
+      - id: green_region_1
+        color: 3
+        shape: rectangle
+        location: top-left
+      - id: white_region_1
+        color: 0
+        shape: rectangle
+        location: bottom-right
+      - id: green_region_2
+        color: 3
+        shape: inverse_L
+      - id: red_pixel_1
+        color: 2
+        shape: single_pixel
+        location: within green_region_1
+
+  - id: grid_out
+    type: grid
+    properties:
+      dimensions: [20, 20]
+      colors: [3, 2, 0]
+    regions:
+      - id: green_region_out_1
+        color: 3
+        shape: similar to grid_in.green_region_1
+      - id: red_region_out_1
+          color: 2
+          shape: vertical_bar
+          location: within former white_region_1
+      - id: white_region_out_1
+          color: 0
+          shape: reduced
+      - id: green_region_out_2
+          color: 3
+      - id: red_pixel_1_out
+        color: 2
+        shape: single_pixel
+        location: within green_region_out_1 and grid_in.red_pixel_1
+
+observations:
+  - The overall grid dimensions remain constant.
+  - The green region in the top-left is largely preserved.
+  - The white region in the bottom right corner seems to have a vertical red bar painted along the green L shape.
+  - The single red pixel within the green shape also persists from the input to output
+  - The single red pixel is replicated downwards.

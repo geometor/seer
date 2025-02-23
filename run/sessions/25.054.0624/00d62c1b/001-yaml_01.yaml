@@ -1,0 +1,32 @@
+objects:
+  - type: grid
+    dimensions: [6, 6]
+    elements: pixels
+    properties:
+      color:
+        mapping:
+          0: white
+          3: green
+          4: yellow
+
+  - type: pixel
+    properties:
+      color: [white, green, yellow]
+      position: [row, column]
+
+actions:
+  - name: change_color
+    agent: unknown
+    target: pixel
+    precondition:
+      color: white
+      adjacent_to: green
+    postcondition:
+      color: yellow
+
+relationships:
+  - type: adjacency
+    between: [pixel, pixel]
+    types:
+      - horizontal
+      - vertical

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies red (2) pixels in the input grid. Changes red pixels that form\na three-pixel L shape to azure (8), but only if the L-shape is not adjacent to a red line\nof length greater than 2. Other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef is_l_shape(grid, row, col):\n    \"\"\"Checks if a red pixel at (row, col) is the center of a 3-pixel L-shape.\"\"\"\n    rows, cols = grid.shape\n    color = grid[row, col]\n    neighbors = 0\n    \n    #check the direct neighbors\n    neighbor_coords = []\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        nr, nc = row + dr, col + dc\n        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n            neighbors += 1\n            neighbor_coords.append((nr,nc))\n\n    if neighbors == 2:\n        #check if the two neighbors create a vertical or horizontal line, if so it's a line and not an L\n        if neighbor_coords[0][0] == neighbor_coords[1][0] or neighbor_coords[0][1] == neighbor_coords[1][1]:\n          return False #it's a line of three, not an L\n        return True\n    \n    return False\n\ndef is_part_of_line(grid, row, col):\n    \"\"\"\n    Checks if a red pixel at (row, col) is part of a horizontal, vertical, or diagonal line\n    of length greater than 2.\n    \"\"\"\n    rows, cols = grid.shape\n    color = grid[row, col]\n\n    # Check in all four directions\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        count = 1  # Count the current pixel\n        # Extend in the positive direction\n        nr, nc = row + dr, col + dc\n        while 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n            count += 1\n            nr, nc = nr + dr, nc + dc\n        # Extend in the negative direction\n        nr, nc = row - dr, col - dc\n        while 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n            count += 1\n            nr, nc = nr - dr, nc - dc\n        if count > 2:\n            return True\n\n    # Check diagonals\n    for dr, dc in [(1, 1), (1, -1), (-1, 1), (-1, -1)]:\n        count = 1\n        nr, nc = row + dr, col + dc\n        while 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n            count += 1\n            nr, nc = nr + dr, nc + dc\n\n        nr, nc = row - dr, col - dc\n        while 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n            count +=1\n            nr, nc = nr - dr, nc - dc\n        if count > 2:\n            return True\n\n    return False\n\ndef is_adjacent_to_line(grid, row, col, l_neighbors):\n    rows, cols = grid.shape\n    for nr, nc in l_neighbors:      \n        if is_part_of_line(grid, nr, nc):\n            return True\n    return False\n    \n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each pixel of the grid\n    for row in range(rows):\n        for col in range(cols):\n            # Check if the pixel is red (2)\n            if input_grid[row, col] == 2:\n                #check if part of line\n                if is_part_of_line(output_grid, row, col):\n                    continue #skip lines\n                \n                # Check if L shape\n                if is_l_shape(output_grid, row, col):\n                    #get the neighbors to check for adjacency\n                    color = grid[row, col]\n                    neighbor_coords = []\n                    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n                        nr, nc = row + dr, col + dc\n                        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == color:\n                            neighbor_coords.append((nr,nc))\n                    #check adjacency to line\n                    if not is_adjacent_to_line(output_grid, row, col, neighbor_coords):\n                        output_grid[row, col] = 8\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10792,
+    "candidates_token_count": 1169,
+    "total_token_count": 11961,
+    "cached_content_token_count": 0
+  },
+  "response_time": 42.91719,
+  "response_file": "006-response.json"
+}

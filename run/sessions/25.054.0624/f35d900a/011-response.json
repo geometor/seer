@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Key Pixels:** Find all pixels in the input grid that are not black (0) and are isolated, i.e., not part of a larger object of the same color.\n2.  **Generate Rectangles:** For each key pixel:\n    *   Create a 3x3 rectangle of the same color in the output grid. The center of this rectangle will be one row *below* the position of the key pixel in the input grid.\n    *   Change the central pixel of each rectangle to color gray (5).\n3. All other pixels should be black.\n\"\"\"\n\nimport numpy as np\n\ndef find_isolated_pixels(grid):\n    \"\"\"Finds isolated pixels of a given color.\"\"\"\n    isolated_pixels = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                neighbors = []\n                # Check adjacent cells (up, down, left, right)\n                if r > 0: neighbors.append(grid[r-1, c])\n                if r < rows - 1: neighbors.append(grid[r+1, c])\n                if c > 0: neighbors.append(grid[r, c-1])\n                if c < cols - 1: neighbors.append(grid[r, c+1])\n\n                if all(neighbor == 0 or neighbor != grid[r,c] for neighbor in neighbors):\n                    isolated_pixels.append(((r, c), grid[r, c]))\n    return isolated_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = np.zeros_like(input_grid)\n    isolated_pixels = find_isolated_pixels(input_grid)\n\n    for (row, col), color in isolated_pixels:\n        # Generate 3x3 rectangle, centered one row below\n        center_row = row + 1\n        center_col = col\n\n        for r in range(center_row - 1, center_row + 2):\n            for c in range(center_col - 1, center_col + 2):\n                if 0 <= r < output_grid.shape[0] and 0 <= c < output_grid.shape[1]:\n                    output_grid[r, c] = color\n\n        # change center to gray\n        if 0 <= center_row < output_grid.shape[0] and 0 <= center_col < output_grid.shape[1]:\n           output_grid[center_row, center_col] = 5\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4894,
+    "candidates_token_count": 606,
+    "total_token_count": 5500,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.205398,
+  "response_file": "011-response.json"
+}

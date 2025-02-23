@@ -1,0 +1,47 @@
+observations:
+  - example_1:
+      input_objects:
+        - shape: rectangle
+          color: green
+          positions: Multiple, scattered, some on top row
+        - shape: rectangle
+          color: yellow
+          positions: Single row
+        - shape: background
+          color: black
+      output_objects:
+        - shape: rectangle
+          color: green
+          positions: only top row is preserved
+        - shape: rectangle
+          color: yellow
+          positions: preserved
+        - shape: background
+           color: black
+      transformation:
+        - action: remove
+          condition: "color is green AND NOT on the top row"
+          object: green pixels
+  - example_2:
+    input_objects:
+      - shape: rectangle
+        color: orange
+        positions: scattered
+      - shape: rectangle
+        color: yellow
+        positions: scattered
+      - shape: background
+        color: black
+    output_objects:
+        - shape: rectangle
+          color: orange
+          positions: scattered
+        - shape: rectangle
+          color: yellow
+          positions: scattered
+        - shape: background
+          color: black
+    transformation:
+      - action: remove
+        condition: color is green and not top row
+        object: green pixels

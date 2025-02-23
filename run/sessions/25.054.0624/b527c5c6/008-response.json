@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Rectangles:** Locate all green (3) rectangles within the input grid.\n2.  **Locate Red Pixels:** Within each identified green rectangle, find the single red (2) pixel.\n3.  **Horizontal Rectangle Transformation**: For the upper horizontal green rectangle copy its red pixel to all of the empty space of the rectangle to the left, keeping its original position, and copy it to the bottom part from end to end of the rectangle..\n4.  **Vertical Rectangle Transformation**: For the vertical green rectangle copy its red pixel. The copy is created above the input red pixel, keeping its original position.\n\"\"\"\n\nimport numpy as np\n\ndef find_rectangles(grid, color):\n    rectangles = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                # Found a potential start of a rectangle, try to expand\n                width = 0\n                while c + width < cols and grid[r, c + width] == color and not visited[r, c + width]:\n                    width += 1\n                height = 0\n                while r + height < rows and all(grid[r + height, c + i] == color for i in range(width)) and not any(visited[r + height, c + i] for i in range(width)):\n                    height += 1\n\n                # Check to make sure no more matching color:\n                good = True\n                if r+height < rows:\n                    for i in range(width):\n                        if grid[r+height,c+i] == color:\n                            good = False\n                            break\n                if c + width < cols:\n                    for i in range(height):\n                        if grid[r+i,c+width] == color:\n                            good = False\n                            break\n\n                if good:\n                    # Mark as visited\n                    for i in range(height):\n                        for j in range(width):\n                            visited[r + i, c + j] = True\n                    rectangles.append((r, c, width, height))\n    return rectangles\n\ndef find_red_pixel(grid, rectangle, red_color=2):\n    r, c, width, height = rectangle\n    for i in range(height):\n        for j in range(width):\n            if grid[r + i, c + j] == red_color:\n                return r + i, c + j\n    return None\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    green_rectangles = find_rectangles(input_grid, 3)\n\n    for rect in green_rectangles:\n        red_pixel_pos = find_red_pixel(input_grid, rect)\n        if red_pixel_pos:\n            red_row, red_col = red_pixel_pos\n            r, c, width, height = rect\n\n            # Horizontal Rectangle (top)\n            if r < input_grid.shape[0] / 2:\n                #copy to the left\n                for i in range(c,red_col):\n                    output_grid[red_row,i] = 2\n\n                # copy to lower section:\n                new_row = r + height -1\n\n                while new_row < input_grid.shape[0] and not np.any(input_grid[new_row,:]==1):\n                    for i in range(width):\n                      output_grid[new_row,r+c+i]=2\n                    if np.any(find_rectangles(output_grid,3)):\n                         break;\n                    new_row +=1\n\n            # Vertical Rectangle. (bottom)\n            else:\n                output_grid[red_row - 1, red_col] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3674,
+    "candidates_token_count": 912,
+    "total_token_count": 4586,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.191166,
+  "response_file": "008-response.json"
+}

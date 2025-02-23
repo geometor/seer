@@ -1,0 +1,16 @@
+observations:
+  - object: contiguous_region
+    color: 8  # azure
+    action: identify_bounds
+    description: A rectangular region of azure pixels is identified.
+  - object: pixels_within_region
+    color: 8  # azure
+    action: transform_color
+    new_color: 3  # green
+    description: >-
+      Some azure pixels within the identified region are changed to green based
+      on their position relative to the bounding box. The pattern appears to be diagonal or related to cross shape.
+  - object: other_pixels
+    color: [0, 1] # white, blue
+    action: preserve
+    description: Pixels of color 0 and 1 are unchanged.

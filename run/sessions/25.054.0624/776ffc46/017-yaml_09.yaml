@@ -1,0 +1,52 @@
+examples:
+  - example_id: 1
+    objects:
+      - color: blue
+        initial_shape: multiple clusters
+        final_shape: multiple clusters, some merged
+        action: color_change_conditional, merge
+      - color: other
+        initial_shape: various
+        final_shape: various
+        action: no_change
+
+  - example_id: 2
+    objects:
+      - color: blue
+        initial_shape: multiple clusters
+        final_shape: multiple clusters, some merged, and changes to green
+        action: color_change_conditional, merge, split
+      - color: green
+        initial_shape: lines
+        final_shape: lines
+        action: become_blue_when_adjacent_to_transformed_blue
+      - color: other
+        initial_shape: various
+        final_shape: various
+        action: no_change
+
+  - example_id: 3
+    objects:
+      - color: blue
+        initial_shape: multiple clusters
+        final_shape: multiple clusters, some merged
+        action: color_change_conditional, merge
+      - color: other
+        initial_shape: various
+        final_shape: various
+        action: no_change
+
+  - example_id: 4
+    objects:
+      - color: blue
+        initial_shape: multiple clusters
+        final_shape: multiple clusters, larger areas, some merged
+        action: color_change_conditional, merge, expand
+       - color: black # from example 4, observing expansion of blue, even when next to black
+        initial_shape: lines/shapes
+        final_shape: reduced in size, some gone
+        action: become_blue_when_adjacent_to_transformed_blue
+      - color: other
+        initial_shape: various
+        final_shape: various
+        action: no_change

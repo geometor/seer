@@ -1,0 +1,35 @@
+objects:
+  - id: 1
+    color: green (3)
+    initial_shape: single pixel
+    initial_position: [4, 4]
+    final_shape: 3x3 square
+    final_position: centered on initial position
+
+  - id: 2
+    color: azure (8)
+    initial_shape: single pixel
+    initial_position: [4, 12]
+    final_shape: 3x3 square
+    final_position: centered on initial position
+
+  - id: 3
+    color: gray(5)
+    initial_shape: none
+    final_shape: lines
+    connections:
+      - between green and azure squares, with a 1-pixel buffer
+
+relationships:
+  - spatial: objects 1 and 2 are initially separated.
+  - transformation:  Each colored pixel expands into a 3x3 square of the same color.
+  - connectivity: Gray lines connect areas around the expanded objects.
+
+actions:
+    - type: expansion
+      target: single-pixel objects (green and azure)
+      result: 3x3 squares
+
+    - type: draw
+      target:  Areas around azure and green
+      result: gray lines in between

@@ -1,0 +1,27 @@
+objects:
+  - type: grid
+    dimensions: 20x20
+    elements: pixels
+  - type: pixel
+    colors:
+      - white (0)
+      - green (3)
+      - yellow (4)
+  - type: shape
+    color: yellow (4)
+    description: A contiguous block of yellow pixels.
+  - type: scattered_pixels
+    color: green (3)
+    description: Individual green pixels not part of any larger shape.
+
+actions:
+  - type: replace
+    target: yellow shape
+    replacement: green pixels
+  - type: fill
+    color: green
+    pattern: all empty cells are filled and existing greens stay
+
+relationships:
+  - yellow_shape: adjacent_to, green_pixels
+  - green_shape: replaces yellow_shape

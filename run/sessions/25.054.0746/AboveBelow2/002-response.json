@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Rectangles:** Locate all rectangular shapes formed by contiguous blocks of pixels of the same color (excluding white/0).\n2.  **Selective Retention:** Retain any Green and yellow rectangles.\n3.  **Removal:** remove red and blue rectangles\n4.  **Output:** Produce a new grid with the selected color areas retained and all others replaced with background (white/0).\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds rectangular objects in the grid.\n    Returns a list of (color, (min_row, max_row, min_col, max_col)) tuples.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, color, min_row, max_row, min_col, max_col):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != color:\n            return min_row, max_row, min_col, max_col\n\n        visited[r, c] = True\n        min_row = min(min_row, r)\n        max_row = max(max_row, r)\n        min_col = min(min_col, c)\n        max_col = max(max_col, c)\n\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            min_row, max_row, min_col, max_col = dfs(r + dr, c + dc, color, min_row, max_row, min_col, max_col)\n        return min_row, max_row, min_col, max_col\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if not visited[r, c] and grid[r, c] != 0:\n                color = grid[r, c]\n                min_row, max_row, min_col, max_col = dfs(r, c, color, r, r, c, c)\n                objects.append((color, (min_row, max_row, min_col, max_col)))\n    return objects\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the rules.\n    \"\"\"\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    # Find all objects\n    objects = find_objects(input_grid)\n    \n    # Iterate over identified objects and selectively retain/remove\n    for color, (min_row, max_row, min_col, max_col) in objects:\n        if color in (3, 4): # Green or Yellow\n            output_grid[min_row:max_row+1, min_col:max_col+1] = color\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3436,
+    "candidates_token_count": 734,
+    "total_token_count": 4170,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.636053,
+  "response_file": "002-response.json"
+}

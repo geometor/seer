@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** all green (3) pixels in the input grid.\n2.  **Locate** all white (0) pixels that are directly adjacent (horizontally or vertically, *but not diagonally*) to any green pixel.\n3.  **Change** the color of *only those* located white pixels to yellow (4).\n4.  **Keep** all other pixels (green, and originally-non-adjacent white pixels, and any other colored pixels) unchanged.\n5.  The output grid retains the same dimensions as the input grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixels_by_color(grid, color):\n    # returns a list of (row, col) tuples for pixels matching the specified color\n    return np.array(np.where(grid == color)).T.tolist()\n\ndef get_adjacent_pixels(grid, position):\n    # returns a list of (row, col) tuples for pixels adjacent (horizontally or vertically) to a given position\n    rows, cols = grid.shape\n    row, col = position\n    adjacent = []\n    if row > 0:\n        adjacent.append([row - 1, col])  # Up\n    if row < rows - 1:\n        adjacent.append([row + 1, col])  # Down\n    if col > 0:\n        adjacent.append([row, col - 1])  # Left\n    if col < cols - 1:\n        adjacent.append([row, col + 1])  # Right\n    return adjacent\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n    \n    # find all green pixels\n    green_pixels = find_pixels_by_color(input_grid, 3)\n    \n    # find white pixels adjacent to green pixels and change their color to yellow\n    for green_pixel in green_pixels:\n        for adj_pixel in get_adjacent_pixels(input_grid, green_pixel):\n            if input_grid[adj_pixel[0], adj_pixel[1]] == 0:\n                output_grid[adj_pixel[0], adj_pixel[1]] = 4\n                \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7214,
+    "candidates_token_count": 516,
+    "total_token_count": 7730,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.065509,
+  "response_file": "004-response.json"
+}

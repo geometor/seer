@@ -1,0 +1,29 @@
+objects:
+  - name: red_pixels
+    color: red  # Value 2
+    initial_positions: [[2, 1], [8, 6]]
+  - name: green_pixels
+    color: green  # Value 3
+    initial_positions: [[2, 6], [8, 1]]
+  - name: gray_pixels
+    color: gray #value 5
+    initial_positions: []
+  - name: white_pixels
+    color: white #value 0
+    initial_positions: "all other cells"
+
+actions:
+  - name: expand
+    description: "Red and green pixels expand into 3x3 blocks."
+  - name: interact
+    description: "Where expanded red and green blocks overlap, gray pixels are created."
+  - name: fill
+    description: "keep the rest as white pixels"
+
+relationships:
+  - type: adjacency
+    description: "Red and green pixels are diagonally adjacent in the input."
+  - type: overlap
+    description: "Expanded regions of red and green pixels overlap to create gray pixels."
+  - type: containment
+    description: "The overall grid dimensions remain unchanged."

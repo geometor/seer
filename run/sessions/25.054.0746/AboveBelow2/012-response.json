@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Regions:** Find all contiguous regions of red (2), green (3), and any other colors present in the grid.\n\n2.  **Check Red and Green Adjacency:** Determine if any red regions are directly adjacent (not diagonally) to any green regions.\n\n3.  **Conditional Removal (Red and Green):** If any red region is directly adjacent to any green region, remove *both* the red and green regions entirely.\n\n4.  **Conditional Removal (Other Colors):** If *no* red regions are directly adjacent to any green regions, remove all regions of colors other than green(3) and black(0).\n\n5.  **Output:** The output grid contains: black (0), the green regions if no red and green are adjacent, and the other regions if red and green are adjacent.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label, find_objects\n\ndef find_regions(grid, color):\n    \"\"\"Finds contiguous regions of a specific color in the grid.\"\"\"\n    mask = (grid == color)\n    labeled_array, num_features = label(mask)\n    return labeled_array, num_features\n\ndef are_adjacent_directly(grid, labeled_array1, region_index1, labeled_array2, region_index2):\n    \"\"\"Checks if two regions in labeled arrays are adjacent (not diagonally).\"\"\"\n    # Expand the first region by one pixel in the cardinal directions\n    region1_mask = (labeled_array1 == region_index1)\n    expanded_region1 = np.zeros_like(region1_mask)\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if region1_mask[r, c]:\n                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # Only cardinal directions\n                    if 0 <= r + dr < rows and 0 <= c + dc < cols:\n                        expanded_region1[r + dr, c + dc] = True\n\n    # Check for overlap with the second region\n    region2_mask = (labeled_array2 == region_index2)\n    return np.any(expanded_region1 & region2_mask)\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    grid = np.array(input_grid)  # work with numpy array\n\n    # Find red and green regions\n    red_labeled_array, red_num = find_regions(grid, 2)\n    green_labeled_array, green_num = find_regions(grid, 3)\n\n    red_green_adjacent = False\n\n    # check for red and green adjacency\n    if red_num > 0 and green_num > 0:\n        for i in range(1, red_num+1):\n            for j in range(1, green_num+1):\n                if are_adjacent_directly(grid, red_labeled_array, i, green_labeled_array, j):\n                    red_green_adjacent = True\n                    break\n            if red_green_adjacent:\n               break\n\n    # Conditional removal based on adjacency\n    if red_green_adjacent:\n       #remove red\n        for i in range(1, red_num + 1):\n          output_grid[red_labeled_array == i] = 0\n\n       #remove green\n        for j in range(1, green_num + 1):\n           output_grid[green_labeled_array == j] = 0\n    else:\n        # Remove all colors other than green and black\n        for color in np.unique(grid):\n            if color != 3 and color !=0:\n                output_grid[grid == color] = 0\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7777,
+    "candidates_token_count": 887,
+    "total_token_count": 8664,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.944604,
+  "response_file": "012-response.json"
+}

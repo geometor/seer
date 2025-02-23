@@ -1,0 +1,25 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - width: 18
+      - height: 18
+      - cells: pixels with integer values 0-9
+
+  - name: pixel
+    type: individual cell
+    properties:
+      - color: integer value (0-9) representing color
+      - position: (row, column) coordinates within the grid
+
+actions:
+  - name: filter
+    description: Remove pixels of a specific color.
+    parameters:
+      - color_to_remove: 0 (white)
+
+relationships:
+  - type: spatial
+    description: Pixels are arranged in a grid structure.
+  - type: transformation
+    description: The output grid is derived from the input grid by filtering.

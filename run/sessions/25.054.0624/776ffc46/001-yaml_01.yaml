@@ -1,0 +1,36 @@
+objects:
+  - id: red_cross
+    type: shape
+    color: red (2)
+    description: Cross-shaped object.
+  - id: blue_l
+    type: shape
+    color: blue (1)
+    description: L-shaped or rectangular object.
+  - id: background
+    type: grid
+    color: white (0) / gray(5)
+    description: Background pixels.
+
+actions:
+  - type: color_swap
+    description: Certain colors in the input are changed in the output.
+
+relationships:
+  - subject: red_cross
+    relation: becomes
+    object: red_cross
+    description: The shape of the cross remains in place.
+  - subject: blue_l
+    relation: becomes
+    object: blue_l
+    description: The shape of the blue L remains in place.
+  - subject: blue_l
+    relation: color_swap_with
+    object: red_cross
+  - subject: background_white
+    relation: becomes
+    object: background_white
+  - subject: background_gray
+    relation: becomes
+    object: background_gray

@@ -1,0 +1,29 @@
+objects:
+  - description: Border
+    color: 2 (red)
+    property: Always present, forms the outer layer of the output.
+    size_relationship:  "output grid is derived from a count of the input non-zero elements"
+
+  - description: Interior
+    color: Varies (depends on input, excluding background and border color).
+    property: Fills the area inside the border.
+    size_relationship: "Inner shape size is derived from a count of one type of non-zero elements in the input"
+    placement: Center of output grid after border
+
+actions:
+  - action: CreateOutputGrid
+    description: Determine the size of the output grid
+    parameters:
+      size_derivation:  The dimension is a square and size is equal to the number of non-zero values in the input
+
+  - action: CreateBorder
+    description: Fill the perimeter of the output grid.
+    parameters:
+      color: 2
+
+  - action: FillInterior
+    description:  Fill inside the output grid
+    parameters:
+        color:  The color of the object to be repeated
+        count: the count of non-zero values in input of color
+        placement: Centered inside output grid, after the border

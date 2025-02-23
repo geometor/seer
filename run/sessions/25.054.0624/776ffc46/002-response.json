@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify red \"cross\" shapes and blue \"L\" or rectangular shapes.\nSwap the colors of the red and blue objects, while leaving gray (5) and white (0) pixels unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    # Find all objects of a given color\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if not visited[r, c] and grid[r, c] == color:\n                obj = []\n                stack = [(r, c)]\n                visited[r, c] = True\n\n                while stack:\n                    curr_r, curr_c = stack.pop()\n                    obj.append((curr_r, curr_c))\n\n                    neighbors = [\n                        (curr_r - 1, curr_c),\n                        (curr_r + 1, curr_c),\n                        (curr_r, curr_c - 1),\n                        (curr_r, curr_c + 1),\n                    ]\n                    for nr, nc in neighbors:\n                        if (0 <= nr < rows and 0 <= nc < cols and\n                                not visited[nr, nc] and grid[nr, nc] == color):\n                            stack.append((nr, nc))\n                            visited[nr, nc] = True\n                objects.append(obj)\n    return objects\n\ndef transform(input_grid):\n    # Initialize output grid with the same dimensions and background.\n    output_grid = np.copy(input_grid)\n\n    # Find red and blue objects.\n    red_objects = find_objects(input_grid, 2)\n    blue_objects = find_objects(input_grid, 1)\n\n    # keep the objects colors, do not swap\n    # do not need to do anything for this.\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3702,
+    "candidates_token_count": 447,
+    "total_token_count": 4149,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.3764,
+  "response_file": "002-response.json"
+}

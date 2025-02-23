@@ -1,0 +1,19 @@
+facts:
+  - type: grid
+    description: Input and output are 2D grids of digits/colors.
+    dimensions: identical for input and output
+  - type: object
+    attribute: color
+    values: [white, green, red, azure, yellow]
+    description: Contiguous blocks of the same color.
+  - type: transformation
+    description: Objects can change in size and extent.
+    details:
+      - type: expansion
+        color: green
+        direction: up and to the left
+      - type: maintain
+        color: azure, red
+      - type: extend_and_fill
+        color: yellow
+        direction: Down and to the left, incorporating adjacent red squares, expanding overall size and merging.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify the Seed Pattern: Find the bounding box enclosing all non-white pixels in the input grid. This rectangular region defines the \"seed pattern.\"\n2. Replicate the Seed: Tile the output grid with the seed pattern. Replicate the seed pattern horizontally and vertically to completely fill output grid, starting from the top-left corner.\n\"\"\"\n\nimport numpy as np\n\ndef get_seed_pattern(grid):\n    \"\"\"\n    Finds the bounding box of non-white pixels and extracts the seed pattern.\n    \"\"\"\n    non_white_pixels = []\n    rows = []\n    cols = []\n    for r_idx, row in enumerate(grid):\n        for c_idx, val in enumerate(row):\n            if val != 0:\n                non_white_pixels.append(((r_idx, c_idx), val))\n                rows.append(r_idx)\n                cols.append(c_idx)\n\n    if not non_white_pixels:\n        return np.array([]), 0, 0\n\n    min_row, max_row = min(rows), max(rows)\n    min_col, max_col = min(cols), max(cols)\n\n    seed_pattern = [row[min_col:max_col+1] for row in grid[min_row:max_row+1]]\n    return np.array(seed_pattern), min_row, min_col\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    # Identify seed pattern.\n    seed_pattern, seed_row_start, seed_col_start = get_seed_pattern(input_grid)\n\n    if seed_pattern.size == 0:  # Handle the edge case of an all-white input.\n      return output_grid.tolist()\n    \n    seed_height, seed_width = seed_pattern.shape\n\n    # Replicate the seed pattern across the output grid.\n    for r_out in range(output_grid.shape[0]):\n        for c_out in range(output_grid.shape[1]):\n            seed_r = (r_out ) % seed_height\n            seed_c = (c_out ) % seed_width\n            output_grid[r_out, c_out] = seed_pattern[seed_r, seed_c]\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9518,
+    "candidates_token_count": 566,
+    "total_token_count": 10084,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.558254,
+  "response_file": "006-response.json"
+}

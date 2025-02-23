@@ -1,0 +1,33 @@
+objects:
+  - name: input_grid
+    type: grid
+    dimensions: [variable, variable] # Ranges from 9x9, to 27 x 27 in the examples.
+    elements: integers (0-9)
+  - name: output_grid
+    type: grid
+    dimensions: [3, 3]
+    elements: integers (0-9)
+  - name: subgrid
+    type: grid
+    dimensions: [3, 3]
+    parent: input_grid
+
+actions:
+  - name: divide
+    agent: system
+    input: input_grid
+    output: list[subgrid]
+    description: Divides the input grid into nine 3x3 subgrids.
+  - name: determine_color
+    agent: system
+    input: subgrid
+    output: integer
+    description: >
+      Determines the color of the corresponding output pixel based on
+      the color value of the center pixel in the input 3x3 section ONLY if it contains a 1, 2, 3, or 6.
+      Otherwise the value is 0.
+  - name: construct
+    agent: system
+    input: list[integer]
+    output: output_grid
+    description: Constructs the 3x3 output grid from the determined colors.

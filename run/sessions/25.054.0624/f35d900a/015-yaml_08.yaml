@@ -1,0 +1,50 @@
+facts:
+  - task_id: "014"
+  - objects:
+      - description: Input grid
+        properties:
+          - contains: "Pixels of various colors (0-9)"
+          - shape: "2D grid"
+      - description: Output grid
+        properties:
+          - contains: "Pixels of various colors (0-9)"
+          - shape: "2D grid, initially all white (0)"
+      - description: Non-white pixels
+        properties:
+          - behavior: "Mirrored across vertical and horizontal centerlines"
+          - constraint: "Placement should not overwrite existing non-white pixels"
+      - description: Red pixels
+        properties:
+          - color: "Red (2)"
+          - behavior: "Expand to adjacent white pixels after mirroring"
+      - description: Yellow pixels
+        properties:
+            - color: 'Yellow(4)'
+            - behavior: "Expand to adjacent white pixels, after initial placement."
+      - description: Green Pixels
+        properties:
+            - color: "Green (3)"
+            - behavior: "Expand to adjacent white pixels after mirroring"
+      - description: Azure pixels
+        properties:
+          - color: "Azure (8)"
+          - behavior: "Expand to adjacent white pixels after mirroring"
+      - description: White pixels
+        properties:
+          - color: "White (0)"
+          - behavior: "Filled with gray (5) if adjacent to at least two different non-white colors"
+      - description: Blue pixels
+        properties:
+            - color: 'Blue(1)'
+
+  - actions:
+      - name: Mirror
+        description: "Place non-white pixels from input grid into output grid, mirrored across vertical and horizontal centerlines."
+        constraints: "Handle overlapping mirrored positions correctly (don't overwrite)."
+      - name: ExpandColors
+        description: "Expand specific colors (red, yellow, green, azure) to adjacent white pixels in the output grid."
+        order: "After mirroring"
+        constraints: "Only expand to white pixels. Don't overwrite other colors."
+      - name: FillGray
+        description: "Fill white pixels with gray if adjacent to at least two different non-white colors."
+        order: "After color expansion"

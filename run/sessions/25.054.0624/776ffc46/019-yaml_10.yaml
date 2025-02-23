@@ -1,0 +1,28 @@
+objects:
+  - name: blue_object_1
+    type: contiguous_region
+    color: 1 (blue)
+    initial_location: [10,10] # approximate centroid or a defining coordinate
+    shape: irregular, L-shaped
+  - name: green_object_1
+    type: contiguous_region
+    color: 3 (green)
+    initial_location: [1,15]
+    shape: irregular, block-shaped
+
+  - name: gray_object
+    type: contiguous_region
+    color: 5 (gray)
+    initial_location: multiple
+    shape: irregular
+
+actions:
+  - type: color_change
+    target: blue_object_1
+    affected_property: a section of the object that is above row 9 and between columns 10 and 14
+    from_color: 1 (blue)
+    to_color: 3 (green)
+
+relationships:
+  - type: spatial
+    description: blue and green object is bounded on all sides by either gray object or white background.

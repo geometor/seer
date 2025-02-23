@@ -1,0 +1,28 @@
+facts:
+  - observation: |
+      The input grid contains multiple colored regions.
+  - objects:
+      - name: red_regions
+        color: red (2)
+        property: Connected pixels of value 2
+      - name: green_region
+        color: green (3)
+        property: Connected pixels of value 3
+      - name: yellow_region
+        color: yellow (4)
+        property: connected pixels of value 4
+      - name: white_background
+        color: white(0)
+        property: fills the rest of the cells
+  - actions:
+      - name: remove_color
+        description: Certain colored regions are removed based on adjacency rules.
+  - relationships:
+      - type: adjacency
+        description: |
+          Objects are considered adjacent if they share a side (not just a corner).
+          This is crucial for determining which objects are removed.
+      - condition: red_green_adjacency
+        description: The output is identical to the input, except the "red" and "green" regions adjacent to each other are removed.
+      - condition: color_removal
+        description: If yellow is adjacent to a color that is removed, yellow is also removed.

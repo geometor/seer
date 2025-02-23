@@ -1,0 +1,21 @@
+objects:
+  - type: pixel
+    properties:
+      color: [red, azure, gray, black]
+      shape: [single, line, L-shape]
+      state: [changed, unchanged]
+  - type: line
+    properties:
+     color: red
+     length: > 2 #lines must be longer than 2
+     orientation: [horizontal, vertical, diagonal]
+
+actions:
+  - name: change_color
+    conditions:
+      - object.type == pixel
+      - object.color == red
+      - object.shape != line #added to exclude lines
+      - "object.shape == L-shape AND not adjacent to line of length >2"  # Refined L-shape condition
+    result:
+      - object.color = azure

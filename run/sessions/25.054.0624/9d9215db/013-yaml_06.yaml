@@ -1,0 +1,28 @@
+objects:
+  - type: pixel
+    properties:
+      color: [0-9]  # Integer representing color
+      position: [row, col] # Row and column index
+  - type: grid
+    properties:
+      dimensions: [height, width] # rows, cols
+      cells: list of pixels
+
+actions:
+  - name: extend_horizontally
+    description:  A colored pixel extends its color to neighboring cells in the same row.
+    parameters:
+      - color: The color of the pixel to extend.
+      - extent: how many times to repeat to left and right
+
+  - name: extend_vertically
+    description: A colored pixel extends its color to neighboring cells in the same col.
+    parameters:
+      - color: The color of the pixel to extend.
+      - extent: how many times to repeat up and down
+
+relationships:
+  - type: adjacency
+    description:  Pixels are adjacent if they share a side or a corner.
+  - type: repetition
+    description: horizontally repeating pattern based on original colored pixels, alternating and stretching

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCombines a large red rectangular outline and a smaller filled yellow rectangle into a new grid. The transformation preserves the large rectangle's outline and places the smaller yellow rectangle just inside the top border of the large shape, while significantly reducing the overall size.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color):\n    # Find coordinates of all pixels of the specified color.\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None\n    return coords\n\ndef find_rectangle_outline(grid, color):\n    #find the object\n    coords = find_object(grid,color)\n    if coords is None:\n      return None\n    # Find the bounding box of the outline.\n    min_y, min_x = np.min(coords, axis=0)\n    max_y, max_x = np.max(coords, axis=0)\n\n    # Create a mask for the outline.\n    mask = (grid[min_y:max_y+1, min_x:max_x+1] == color)\n    outline_coords = []\n    for y in range(mask.shape[0]):\n        for x in range(mask.shape[1]):\n            if mask[y,x]:\n                #check neighbors to determine if outline\n                neighbors = 0\n                if y > 0 and mask[y-1,x]:\n                    neighbors += 1\n                if y < mask.shape[0]-1 and mask[y+1,x]:\n                    neighbors +=1\n                if x > 0 and mask[y, x-1]:\n                    neighbors += 1\n                if x < mask.shape[1] -1 and mask[y, x+1]:\n                    neighbors += 1\n                #if it is a solid shape, neighbor count could be 4\n                if neighbors < 4:\n                    outline_coords.append((min_y + y, min_x + x))\n\n    return outline_coords\n                \n\ndef find_filled_rectangle(grid, color):\n    # Find coordinates of all pixels of the specified color.\n    coords = find_object(grid, color)\n    if coords is None:\n        return None\n\n    # Find the bounding box.\n    min_y, min_x = np.min(coords, axis=0)\n    max_y, max_x = np.max(coords, axis=0)\n    \n    return  coords #return all coords for filled shape\n\n\ndef transform(input_grid):\n    # Find the large red outline.\n    red_outline_coords = find_rectangle_outline(input_grid, 2)\n    if red_outline_coords is None:\n        #if red outline is not present, just return input\n        return input_grid\n    red_outline_coords = np.array(red_outline_coords)  # Convert to numpy array for easier manipulation\n\n    # Find the small yellow filled rectangle.\n    yellow_filled_coords = find_filled_rectangle(input_grid, 4)\n    if yellow_filled_coords is None:\n        #If yellow shape is missing, do not transform\n        return input_grid\n    yellow_filled_coords = np.array(yellow_filled_coords)\n\n\n    # Determine bounding box for the new combined shape.\n    min_red_y, min_red_x = np.min(red_outline_coords, axis=0)\n    max_red_y, max_red_x = np.max(red_outline_coords, axis=0)\n    \n    #output is based on the red outline shape, adjusted by the yellow shape dimensions\n    output_height = max_red_y - min_red_y + 1\n    output_width =  max_red_x - min_red_x + 1\n\n    # Initialize the output grid.\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Draw the red outline.\n    for y, x in red_outline_coords:\n        output_grid[y - min_red_y, x - min_red_x] = 2\n\n    #calculate offset to draw yellow shape inside the red outline\n    yellow_height = np.max(yellow_filled_coords[:,0]) - np.min(yellow_filled_coords[:,0]) + 1\n    yellow_width = np.max(yellow_filled_coords[:,1]) - np.min(yellow_filled_coords[:,1]) + 1\n\n    # Draw the yellow filled rectangle, positioning it inside top of red outline\n    start_y = 1 #place inside top border\n    start_x = 1\n\n    for y, x in yellow_filled_coords:\n      #map to new coord\n      new_y = y - np.min(yellow_filled_coords[:,0]) + start_y\n      new_x = x - np.min(yellow_filled_coords[:,1]) + start_x\n      if new_y < output_height and new_x < output_width:\n        output_grid[new_y,new_x] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3332,
+    "candidates_token_count": 1173,
+    "total_token_count": 4505,
+    "cached_content_token_count": 0
+  },
+  "response_time": 13.254851,
+  "response_file": "014-response.json"
+}

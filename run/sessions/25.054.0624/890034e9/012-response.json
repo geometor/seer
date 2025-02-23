@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all contiguous regions (objects) of yellow (4) and green (3) pixels in the input grid.\n2.  **Iterate Pixels**: Iterate through each pixel of each yellow object.\n3.  **Find Nearest Green:** For each yellow pixel, search for the nearest green pixel. \"Nearest\" is defined by the minimum number of moves (up, down, left, or right) required to reach a position that is adjacent to a green pixel without crossing other objects.\n4. **Move Yellow Pixels:** Move each yellow pixel to an available adjacent cell of the _nearest_ green pixel, if a position is free (value is 0).\n5. **Preserve:** Keep the relative shape of yellow objects intact as much as possible, moving individual pixels rather than entire objects at once.\n6.  **Obstacles:** Azure (8) pixels, red (2) pixels, and other yellow pixels act as obstacles - do not move through them.\n\"\"\"\n\nimport numpy as np\nfrom collections import deque\n\ndef find_objects(grid, color):\n    \"\"\"\n    Find contiguous regions (objects) of a specific color in the grid.\n    \"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, current_object):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef is_valid(grid, row, col):\n    \"\"\"Check if a cell is within grid bounds.\"\"\"\n    return 0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]\n\ndef is_obstacle(grid, row, col):\n  \"\"\"\n  Checks to make sure a cell is not an obstacle, which is any\n  color besides 0 (white).\n  \"\"\"\n  return grid[row,col] != 0\n\ndef find_nearest_green(grid, start_row, start_col):\n    \"\"\"\n    Find the nearest green pixel using Breadth-First Search (BFS).\n    Returns the coordinates of a free adjacent cell, or None if no path is found.\n    \"\"\"\n    queue = deque([(start_row, start_col, [])])  # (row, col, path)\n    visited = np.zeros_like(grid, dtype=bool)\n    visited[start_row, start_col] = True\n\n\n    while queue:\n        row, col, path = queue.popleft()\n\n        # Check neighbors\n        neighbors = [\n            (row - 1, col),\n            (row + 1, col),\n            (row, col - 1),\n            (row, col + 1)\n        ]\n\n        for neighbor_row, neighbor_col in neighbors:\n            if is_valid(grid, neighbor_row, neighbor_col):\n\n                #check if it is green and not blocked\n                if grid[neighbor_row, neighbor_col] == 3:\n                  #now look for adjacent empty cell\n                  adj_neighbors = [\n                    (neighbor_row -1, neighbor_col),\n                    (neighbor_row + 1, neighbor_col),\n                    (neighbor_row, neighbor_col -1),\n                    (neighbor_row, neighbor_col+1)\n                  ]\n                  for adj_row, adj_col in adj_neighbors:\n                    if is_valid(grid, adj_row, adj_col) and not is_obstacle(grid, adj_row, adj_col):\n                      return adj_row, adj_col\n\n                #check if we can traverse\n                elif not visited[neighbor_row, neighbor_col] and not is_obstacle(grid, neighbor_row, neighbor_col):\n\n                    visited[neighbor_row, neighbor_col] = True\n                    new_path = path + [(neighbor_row, neighbor_col)]\n                    queue.append((neighbor_row, neighbor_col, new_path))\n\n    return None  # No green pixel found.\n\ndef transform(input_grid):\n    \"\"\"\n    Moves yellow pixels to the nearest available position adjacent to a green pixel.\n    \"\"\"\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # Find yellow (4) objects\n    yellow_objects = find_objects(output_grid, 4)\n\n    # Flatten the list of yellow objects into a list of yellow pixels\n    yellow_pixels = [pixel for obj in yellow_objects for pixel in obj]\n\n    # Iterate through each yellow pixel\n    for row, col in yellow_pixels:\n        # Find the nearest green pixel and available adjacent cell\n        nearest_green_coords = find_nearest_green(output_grid, row, col)\n\n        # Move the yellow pixel if a path is found\n        if nearest_green_coords:\n            new_row, new_col = nearest_green_coords\n            output_grid[row, col] = input_grid[row,col] #clear original\n            output_grid[new_row, new_col] = 4  # Move yellow pixel\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11482,
+    "candidates_token_count": 1341,
+    "total_token_count": 12823,
+    "cached_content_token_count": 0
+  },
+  "response_time": 13.144799,
+  "response_file": "012-response.json"
+}

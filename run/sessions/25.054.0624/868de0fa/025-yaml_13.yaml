@@ -1,0 +1,31 @@
+objects:
+  - id: shape1
+    type: rectangle
+    outline_color: blue (1)
+    fill_color_input: white (0)
+    fill_color_output: orange (7)
+    position: top_half
+    outline_thickness: 1
+
+  - id: shape2
+    type: rectangle
+    outline_color: blue (1)
+    fill_color_input: white (0)
+    fill_color_output: red (2)
+    position: bottom_half
+    outline_thickness: 1
+
+transformations:
+  - object: shape1
+    action: fill_inside
+    parameter: orange (7)
+
+  - object: shape2
+    action: fill_inside
+    parameter: red (2)
+
+relationships:
+  - type: positional
+    object1: shape1
+    object2: shape2
+    relation: shape1 is above shape2

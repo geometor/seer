@@ -1,0 +1,44 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  Identify Blue Clusters: Locate all contiguous clusters of blue (1) pixels in the input grid.\n\n2.  Conditional Color Change: If a blue cluster is *not* directly adjacent (horizontally or vertically, not diagonally) to any other non-black, non-blue colors, change all pixels in that blue cluster to red (2).\n\n3.  Expansion and Merging near Other Colors: If a blue cluster *is* adjacent to a non-black, non-blue color, the blue color expands. Pixels of other colors adjacent to this originally blue object now become the same color as the transformed object (red, value of 2).\n\n4.  Preserve Other Colors: All pixels that are not part of the identified blue clusters, and not adjacent to changed blue clusters, retain their original colors. The overall grid dimensions remain unchanged.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef find_clusters(grid, color):\n    \"\"\"Finds clusters of a specific color in the grid.\"\"\"\n    colored_pixels = (grid == color)\n    labeled_array, num_features = label(colored_pixels)\n    return labeled_array, num_features\n\ndef get_adjacent_colors(grid, labeled_array, cluster_id):\n    \"\"\"Gets the set of colors adjacent to a specific cluster.\"\"\"\n    cluster_pixels = (labeled_array == cluster_id)\n    rows, cols = grid.shape\n    adjacent_colors = set()\n\n    for r in range(rows):\n        for c in range(cols):\n            if cluster_pixels[r, c]:\n                # Check neighbors (up, down, left, right)\n                neighbors = []\n                if r > 0:\n                    neighbors.append((r - 1, c))\n                if r < rows - 1:\n                    neighbors.append((r + 1, c))\n                if c > 0:\n                    neighbors.append((r, c - 1))\n                if c < cols - 1:\n                    neighbors.append((r, c + 1))\n\n                for nr, nc in neighbors:\n                    if not cluster_pixels[nr, nc]:\n                        adjacent_colors.add(grid[nr, nc])\n    return adjacent_colors\n\ndef expand_cluster(grid, labeled_array, cluster_id, new_color):\n    \"\"\"Expands a cluster to include adjacent pixels of any color\"\"\"\n    output_grid = np.copy(grid)\n    cluster_pixels = (labeled_array == cluster_id)\n    rows, cols = grid.shape\n    \n    for r in range(rows):\n        for c in range(cols):\n            if cluster_pixels[r,c]:\n                #output_grid[r,c] = new_color # set the blue pixel\n                neighbors = []\n                if r > 0:\n                    neighbors.append((r - 1, c))\n                if r < rows - 1:\n                    neighbors.append((r + 1, c))\n                if c > 0:\n                    neighbors.append((r, c - 1))\n                if c < cols - 1:\n                    neighbors.append((r, c + 1))\n                for nr, nc in neighbors:\n                    #if not cluster_pixels[nr, nc]: # do not expand to self\n                    output_grid[nr,nc] = new_color\n    return output_grid\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid based on blue cluster adjacency and expansion.\"\"\"\n    output_grid = np.copy(input_grid)\n    labeled_array, num_blue_clusters = find_clusters(input_grid, 1)  # Find blue clusters\n\n    for cluster_id in range(1, num_blue_clusters + 1):\n        adjacent_colors = get_adjacent_colors(input_grid, labeled_array, cluster_id)\n        cluster_pixels = (labeled_array == cluster_id)\n\n        if any(color not in {0, 1} for color in adjacent_colors):\n             # Expansion and change to red (2)\n            output_grid = expand_cluster(output_grid, labeled_array, cluster_id, 2)\n            # then set ALL blue pixels of this object to 2\n            output_grid[cluster_pixels] = 2\n\n        else:\n            # Simple color change (blue to red)\n           \n            output_grid[cluster_pixels] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 1479,
+            "end_index": 1801,
+            "uri": "https://github.com/Anuj-cs20/IIITDMK_CSE_Coursework",
+            "license_": ""
+          },
+          {
+            "start_index": 2410,
+            "end_index": 2732,
+            "uri": "https://github.com/Anuj-cs20/IIITDMK_CSE_Coursework",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 12765,
+    "candidates_token_count": 1009,
+    "total_token_count": 13774,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.554496,
+  "response_file": "018-response.json"
+}

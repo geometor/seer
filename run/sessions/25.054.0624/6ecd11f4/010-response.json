@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Locate Target Region:** Scan the input grid from the bottom up. Find a rectangular region of non-zero colored pixels. This region is likely bordered by zero-colored pixels, at least above it. The region can vary in size like 3x3 or 4x4.\n2.  **Extract Region:** Once the region defined above is found. Copy all pixels values from the target region cells.\n3.  **Create Output Grid:** Construct an output grid with the same shape and size as the target region.\n4.  **Arrange:** Place the colors in order into the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_target_region(grid):\n    \"\"\"Finds the rectangular region of non-zero pixels at the bottom.\"\"\"\n    rows, cols = grid.shape\n    bottom_row = rows - 1\n\n    # Find the bottom-most non-zero row\n    while bottom_row >= 0 and np.all(grid[bottom_row] == 0):\n        bottom_row -= 1\n\n    if bottom_row < 0:  # No non-zero pixels found\n        return None, None, None, None\n\n    # Find top of the region\n    top_row = bottom_row\n    while top_row >= 0 and np.any(grid[top_row] != 0):\n        top_row -=1\n    top_row += 1 #the previous iteration has all 0\n\n    # Find leftmost and rightmost columns\n    left_col = 0\n    while left_col < cols and np.all(grid[top_row:bottom_row+1,left_col] == 0):\n      left_col +=1\n    right_col = cols -1\n    while right_col > 0 and np.all(grid[top_row:bottom_row+1,right_col] == 0):\n      right_col -= 1\n\n    return top_row, bottom_row, left_col, right_col\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by extracting a multi-colored region at the bottom.\"\"\"\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the target region\n    top_row, bottom_row, left_col, right_col = find_target_region(input_grid)\n\n    if top_row is None:  # Handle case where no region is found\n        return []\n\n    # Extract the region\n    output_grid = input_grid[top_row:bottom_row+1, left_col:right_col+1].copy()\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6323,
+    "candidates_token_count": 603,
+    "total_token_count": 6926,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.192009,
+  "response_file": "010-response.json"
+}

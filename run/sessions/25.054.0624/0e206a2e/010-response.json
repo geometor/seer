@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nColored objects from the input grid are reconstructed in the output grid.\nThe reconstruction maintains the shape, size, and color of each distinct object,\nbut changes their position. Objects are positioned based on their original\ncolor, creating an abstract shape that depends on objects found in the input.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds and returns a dictionary of colored objects in the grid.\n    Each object is a list of (row, col) coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n\n    def dfs(row, col, color, obj):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        obj.append((row, col))\n        dfs(row + 1, col, color, obj)\n        dfs(row - 1, col, color, obj)\n        dfs(row, col + 1, color, obj)\n        dfs(row, col - 1, color, obj)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            color = grid[row, col]\n            if color != 0 and (row, col) not in visited:\n                obj = []\n                dfs(row, col, color, obj)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(obj)\n    return objects\n\ndef transform(input_grid):\n    # Initialize output grid with zeros (white)\n    output_grid = np.zeros_like(input_grid)\n\n    # Find objects in the input grid\n    objects = find_objects(input_grid)\n\n    # Reconstruct objects in output grid\n    for color, object_list in objects.items():\n        for obj in object_list:\n            for r, c in obj:\n                output_grid[r,c] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7665,
+    "candidates_token_count": 482,
+    "total_token_count": 8147,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.614778,
+  "response_file": "010-response.json"
+}

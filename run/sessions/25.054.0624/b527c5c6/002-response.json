@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Green Objects:** Locate all contiguous regions of green (3) pixels. These form the primary objects.\n\n2.  **Vertical Expansion (Green):**  For the leftmost green object, expand the green region downwards. The expansion extends to the bottom of the grid. The width of this object matches the original width, and the y coordinates are maintained.\n\n3.  **Red Replacement:** All red pixels on the left become part of the expanding left green block.\n\n4.  **Red Addition (Right Side):** For the right green object. Add red pixels at the right edge of the expanded shape. It appears this starts at the original red square on the right of the initial shape and continues downwards.\n\n5. **Vertical Expansion (Red):** Expand any new red regions vertically downwards until the bottom of the board.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Find contiguous regions of a specific color.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, current_object):\n        if (row < 0 or row >= grid.shape[0] or col < 0 or col >= grid.shape[1] or\n                visited[row, col] or grid[row, col] != color):\n            return\n        visited[row, col] = True\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and not visited[row, col]:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef get_object_bounds(obj):\n    \"\"\"Get the bounding box of an object.\"\"\"\n    min_row = min(p[0] for p in obj)\n    max_row = max(p[0] for p in obj)\n    min_col = min(p[1] for p in obj)\n    max_col = max(p[1] for p in obj)\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    height, width = input_grid.shape\n\n    # 1. Identify Green Objects\n    green_objects = find_objects(input_grid, 3)\n\n    # Sort green objects by leftmost column\n    green_objects.sort(key=lambda obj: min(p[1] for p in obj))\n    \n    if len(green_objects) >= 1:\n      # 2. Vertical Expansion (Green) - Leftmost object\n      left_green_object = green_objects[0]\n      min_row, max_row, min_col, max_col = get_object_bounds(left_green_object)\n\n      for col in range(min_col, max_col + 1):\n          for row in range(min_row, height):\n              output_grid[row, col] = 3\n\n    if len(green_objects) > 1:\n        right_green_object = green_objects[1]\n        # get right object bounds\n        min_row_r, max_row_r, min_col_r, max_col_r = get_object_bounds(right_green_object)\n        \n        # 3. red additions\n        red_objects = find_objects(input_grid, 2)\n        \n        # find all the existing red pixels that touch the right object\n        for robj in red_objects:\n            for rpix in robj:\n                r,c = rpix\n                if (\n                    (r + 1, c) in right_green_object or\n                    (r - 1, c) in right_green_object or\n                    (r , c + 1) in right_green_object or\n                    (r , c - 1) in right_green_object\n                ):\n                    \n                    # start new red generation downwards\n                    for row in range(r, height):\n                        output_grid[row, max_col_r] = 2\n    # change output pixels\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2502,
+    "candidates_token_count": 1053,
+    "total_token_count": 3555,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.810085,
+  "response_file": "002-response.json"
+}

@@ -1,0 +1,44 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - width: 18
+      - height: 18
+      - cells: pixels (integers 0-9)
+
+  - name: background
+    type: object
+    properties:
+      - color: gray (5)
+
+  - name: shape
+    type: object
+    properties:
+      - color: white (0)
+    
+  - name: added_pixels
+    type: object
+      properties:
+        - color: red (2)
+
+actions:
+  - name: fill
+    agent: system
+    target: background
+    instrument: added_pixels
+    properties:
+      - location: adjacent to shape, primarily on one side
+      - constraints:
+        - maintain grid dimensions
+        - replace gray pixels
+
+relationships:
+  - type: spatial
+    subject: added_pixels
+    object: shape
+    relation: adjacent
+
+  - type: substitution
+    subject: added_pixels
+    object: background
+    relation: replaces

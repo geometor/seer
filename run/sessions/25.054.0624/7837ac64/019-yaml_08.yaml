@@ -1,0 +1,34 @@
+objects:
+  - type: grid
+    description: Large input grid
+    properties:
+      dimensions: 27x27
+      colors: [0, 1, 2, 8]  # white, blue, red, azure
+      patterns:
+        - type: horizontal_lines
+          color: 8
+          description: Regularly spaced horizontal lines of azure pixels
+        - type: vertical_lines
+          color: 8
+          description: Regularly spaced vertical lines of azure pixels forming a grid
+        - type: colored_pixels
+          colors: [1, 2]  # blue, red
+          description: Single pixels within the grid cells
+
+  - type: grid
+    description: Small output grid
+    properties:
+      dimensions: 3x3
+      colors: [0, 1, 2] # white, blue, red
+
+actions:
+    - type: extract_pattern
+      description: identify a small repeating pattern from input grid.
+      agent: SEER
+    - type: represent_pattern
+      description: generate an output grid with a condensed representation.
+      agent: SEER
+
+relationships:
+  - input_grid_contains: colored_pixels
+  - output_grid_represents: colored_pixel_positions_in_input_subpattern

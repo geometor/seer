@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation involves moving the yellow rectangle at the top, one position downwards, keeping the rest.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, color, shape_type=None, size=None):\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                if shape_type == 'rectangle':\n                    width, height = 0, 0\n                    # Check for rectangle\n                    c_temp = c\n                    while c_temp < cols and grid[r, c_temp] == color:\n                        width += 1\n                        c_temp += 1\n                    r_temp = r\n                    while r_temp < rows and grid[r_temp, c] == color:\n                        height += 1\n                        r_temp += 1\n                    \n                    if size is None or (width, height) == size or (height, width) == size:\n                         # Mark as visited\n                        for i in range(r, r + height):\n                            for j in range(c, c+width):\n                                visited[i,j] = True\n                        objects.append(( (r, c), (width, height) ))\n\n\n                elif shape_type == 'square':\n                    size_count = 0\n\n                    #check for square\n\n                    c_temp = c\n                    while c_temp < cols and grid[r, c_temp] == color:\n                        size_count +=1\n                        c_temp += 1\n\n                    r_temp = r\n                    while r_temp < rows and grid[r_temp, c] == color:\n\n                        if size_count != 0 and grid[r_temp,c:c+size_count].tolist() != [color]*size_count:\n                            break\n                        size_count_row = 0\n                        for inner_c in range(c, c+size_count):\n                            if inner_c < cols and grid[r_temp, inner_c] == color :\n                                size_count_row +=1\n                            else:\n                                break\n\n                        if size_count_row != size_count:\n\n                            break;\n                        r_temp+=1\n                    \n                    if size_count_row == size_count:\n\n\n                        if size is None or size_count == size:\n\n                            for i in range(r, r + size_count):\n                                for j in range(c, c+size_count):\n                                    visited[i,j] = True\n                            objects.append(( (r, c), (size_count, size_count) ))\n\n                else:\n                    # No shape specified, just return the coordinate.  Not really an object.\n                    objects.append(((r,c), (1,1)))\n    return objects\n\ndef move_object(grid, start_pos, size, dr, dc):\n    new_grid = np.copy(grid)\n    r, c = start_pos\n    width, height = size\n\n    # Clear old position\n    for i in range(r, min(r + height,new_grid.shape[0])):\n        for j in range(c, min(c+width, new_grid.shape[1])):\n            new_grid[i, j] = 0\n\n    # Set new position\n    new_r, new_c = r + dr, c + dc\n    for i in range(new_r, min(new_r + height, new_grid.shape[0])):\n        for j in range(new_c, min(new_c+width,new_grid.shape[1])):\n            new_grid[i, j] = grid[r,c] #original color\n\n    return new_grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the 1x2 yellow rectangle\n    yellow_rects = find_object(output_grid, 4, 'rectangle', (1,2))\n    yellow_rect = None\n    for rect in yellow_rects:\n      if rect[0][0] < input_grid.shape[0]/2:\n        yellow_rect = rect\n        break\n\n\n    if yellow_rect:\n\n        # Move the yellow rectangle down by one row\n      output_grid = move_object(output_grid, yellow_rect[0], yellow_rect[1], 1, 0)\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2240,
+    "candidates_token_count": 1046,
+    "total_token_count": 3286,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.753154,
+  "response_file": "014-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRed pixels become azure. Gray pixels become azure if they are adjacent to a red/azure pixel AND are part of a continuous gray area that is also adjacent to the azure area.  Isolated gray pixels or those only diagonally adjacent without a connecting gray path do not change.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Returns a list of valid neighbor coordinates.\"\"\"\n    neighbors = []\n    for i in range(max(0, r - 1), min(grid.shape[0], r + 2)):\n        for j in range(max(0, c - 1), min(grid.shape[1], c + 2)):\n            if (i, j) != (r, c):\n                neighbors.append((i, j))\n    return neighbors\n\ndef is_continuous_with_azure(grid, r, c, azure_pixels):\n    \"\"\"\n    Checks if the gray pixel at (r, c) is part of a continuous gray area\n    that is also adjacent to the azure area.\n    \"\"\"\n\n    if grid[r,c] != 5:\n        return False #must start with grey\n    \n    gray_neighbors = []\n    for nr, nc in get_neighbors(grid, r, c):\n        if grid[nr, nc] == 5:\n             gray_neighbors.append((nr,nc))\n\n    for ar, ac in azure_pixels:\n        if (ar,ac) in get_neighbors(grid,r,c):\n          # found adjacent azure, now see if there is gray between\n          # check if this is part of connected extension\n          for gr, gc in gray_neighbors:\n              if (gr,gc) in get_neighbors(grid, ar, ac):\n                return True  # grey neighbor of the grey is also a neighbor of the azure, so connected\n    return False\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by replacing red pixels with azure and conditionally replacing adjacent gray pixels.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    red_pixels = np.argwhere(input_grid == 2)\n    azure_pixels = []\n\n    # First, change all red pixels to azure\n    for r, c in red_pixels:\n        output_grid[r, c] = 8\n        azure_pixels.append((r,c))\n\n    # Then, conditionally change gray pixels\n    for r in range(output_grid.shape[0]):\n        for c in range(output_grid.shape[1]):\n            if output_grid[r, c] == 5:  # Check gray pixels\n                if is_continuous_with_azure(output_grid, r, c, azure_pixels):\n                     output_grid[r,c] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 11292,
+    "candidates_token_count": 642,
+    "total_token_count": 11934,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.770654,
+  "response_file": "018-response.json"
+}

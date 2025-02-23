@@ -1,0 +1,35 @@
+objects:
+  - name: Input Grid
+    properties:
+      - type: 2D array
+      - values: integers (0-9) representing colors
+      - regions:
+        - color: blue (1)
+          shape: irregular, connected
+        - color: white (0)
+          shape: irregular, background
+  - name: Output Grid
+    properties:
+      - type: 2D array
+      - values: integers (0-9) representing colors
+      - regions:
+        - color: blue (1)
+          shape: Similar but potentially modified from input
+        - color: orange(7)
+          shape: occupies a vertical subregion of input's blue(1)
+        - color: white (0)
+        - color: red (2)
+          shape: occupies a subregion of input's blue(1)
+actions:
+  - type: color_change
+    target: region
+    parameters:
+      - original_color: blue (1)
+        new_color: orange (7)
+        condition: "A large vertical part of the blue region"
+      - original_color: blue (1)
+        new_color: red(2)
+        condition: "A small rectangular subregion in the center."
+relationships:
+  - type: spatial
+    description: The orange and red regions are fully contained within the original blue regions of the Input Grid

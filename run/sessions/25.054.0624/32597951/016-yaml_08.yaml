@@ -1,0 +1,112 @@
+observations:
+  - example_1:
+      input:
+        objects:
+          - name: blue_lines
+            type: horizontal_lines
+            color: blue
+            positions: [row_1, row_3, row_5, row_7, row_9, row_11, row_13, row_15]
+          - name: azure_lines
+            type: horizontal_lines
+            color: azure #8
+            positions: [ row_2, row_4, row_6]
+          - name: green_block
+            type: block
+            color: green
+            position: row_3_column_5_to_row_5_column_9
+      output:
+        objects:
+          - name: blue_lines
+            type: horizontal_lines
+            color: blue
+            positions: [ row_1, row_3, row_5, row_7,row_9, row_11, row_13, row_15]
+          - name: azure_lines
+            type: horizontal_lines
+            color: azure #8
+            positions: [ row_2, row_4, row_6]
+          - name: green_block
+            type: block
+            color: green #3
+            positions: [ row_3_column_5_to_row_5_column_9]
+        transformations:
+          - action: change_color
+            target: object_adjacent_to_azure_lines
+            color_from: blue
+            color_to: green
+            conditions:
+              - adjacent_color: azure #8
+              - relative_position: "any"
+  - example_2:
+      input:
+        objects:
+          - name: blue_grid
+            type:  grid
+            color: blue #1
+          - name: azure_green_line
+            type: horizontal_line
+            color: [azure, green]
+            positions: [row_7, row_8, row_9]
+      output:
+        objects:
+          - name: blue_grid
+            type:  grid
+            color: blue
+          - name: azure_green_line
+            type: horizontal_line
+            color: [azure, green]
+            positions: [row_7, row_8, row_9]
+        transformations:
+          - action: change_color
+            target: object_adjacent_to_azure_lines
+            color_from: blue
+            color_to: green
+            conditions:
+              - adjacent_color: azure #8
+              - relative_position: "any"
+  - example_3:
+    input:
+        objects:
+          - name: alternating_blue_lines
+            type: lines
+            color: blue #1
+          - name: azure_green_line
+            type: horizontal_line
+            color: [azure, green] #8, 3
+            positions:
+              - row: 3
+                columns: [4, 5, 6, 7, 8]
+              - row: 4
+                columns: [4, 5, 6, 7]
+              - row: 5
+                columns: [4, 5, 6, 7, 8]
+              - row: 6
+                columns: [4, 5, 6, 7]
+              - row: 7
+                columns: [4, 5, 6, 7, 8]
+    output:
+        objects:
+          - name: alternating_blue_lines
+            type: lines
+            color: blue
+          - name: azure_green_line
+            type: horizontal_line
+            color:  [azure, green]
+            positions:
+              - row: 3
+                columns: [4, 5, 6, 7, 8]
+              - row: 4
+                columns: [4, 5, 6, 7]
+              - row: 5
+                columns: [4, 5, 6, 7, 8]
+              - row: 6
+                columns: [4, 5, 6, 7]
+              - row: 7
+                columns: [4, 5, 6, 7, 8]
+        transformations:
+          - action: change_color
+            target: object_adjacent_to_azure_lines
+            color_from: blue
+            color_to: green
+            conditions:
+              - adjacent_color: azure #8
+              - relative_position: "any"

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation involves expanding colored pixels around a central, unchanged horizontal line of blue pixels. Each non-black pixel expands into a 3x3 square centered on the original pixel's location, except for blue pixels which remain unchanged if forming the central horizontal line. If a non-black pixel isn't part of the central blue line, it is treated according to the expansion rule.\n\n1. **Identify Core:** Locate the horizontal line of blue (1) pixels. This serves as a central structure.\n2. **Expansion:** Expand each non-black pixel (except the blue pixels forming the central horizontal line) into a 3x3 square, centered on the original pixel's location.\n3. **Blue Axis:** The blue pixels forming the central horizontal line remain in their original position.\n\"\"\"\n\nimport numpy as np\n\ndef find_blue_line(grid):\n    # Find coordinates of blue pixels (1)\n    blue_coords = np.argwhere(grid == 1)\n    if len(blue_coords) < 2: # assuming minimum two for it to be a line\n      return None\n\n    # check if contiguous horizontally\n    is_horizontal = all(blue_coords[i][0] == blue_coords[0][0] for i in range(len(blue_coords)))\n    if not is_horizontal:\n        return None\n\n    return blue_coords\n\ndef expand_pixel(grid, r, c, color):\n    # expand a given pixel into a 3x3 square centered at (r, c)\n    rows, cols = grid.shape\n    for i in range(max(0, r - 1), min(rows, r + 2)):\n        for j in range(max(0, c - 1), min(cols, c + 2)):\n            grid[i, j] = color\n    return grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n\n    # Find the blue line\n    blue_line = find_blue_line(input_grid)\n\n    # Copy the blue line first\n    if blue_line is not None:\n        for r, c in blue_line:\n          output_grid[r,c] = 1\n\n\n    # expand other colors, checking that a given pixel is not part of the central blue axis\n    for r in range(input_grid.shape[0]):\n        for c in range(input_grid.shape[1]):\n            color = input_grid[r, c]\n            if color != 0:  # Skip black pixels\n              if blue_line is not None and color == 1 and r == blue_line[0][0] and any(c == col for _, col in blue_line):\n                continue # skip if part of central blue line\n              else:\n                output_grid = expand_pixel(output_grid, r, c, color)\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 18005,
+    "candidates_token_count": 662,
+    "total_token_count": 18667,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.225515,
+  "response_file": "010-response.json"
+}

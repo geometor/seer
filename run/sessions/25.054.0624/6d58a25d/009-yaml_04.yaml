@@ -1,0 +1,41 @@
+examples:
+  - id: 1
+    horizontal_replication:
+      color: 9
+      condition: "isolated, not adjacent to 8"
+      direction: right
+    vertical_expansion:
+      trigger_colors: []
+      fill_color: 8
+      fill_within_object: true
+      object_color: 9
+    notes: >
+      Maroon pixels are replicated. The azure fill appears within the maroon
+      object.
+
+  - id: 2
+    horizontal_replication:
+      color: 2
+      condition: "not vertically aligned with 7"
+      direction: right
+    vertical_expansion:
+      trigger_colors: [2, 7]
+      fill_color: 2
+      fill_within_object: false
+    notes: >
+      Red pixels are replicated horizontally if they are not directly above or
+      below an orange pixel. Vertical filling occurs in columns containing
+      both red and orange.
+
+  - id: 3
+    horizontal_replication:
+      color: null
+      condition: null
+      direction: null
+    vertical_expansion:
+      trigger_colors: [3, 4]
+      fill_color: 3
+      fill_within_object: false
+    notes: >
+      No horizontal replication. Vertical fill happens in columns with both
+      green and yellow pixels using green color.

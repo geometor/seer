@@ -1,0 +1,21 @@
+facts:
+  - object: large_rectangle
+    color: red (2)
+    shape: rectangle
+    attribute: outline
+    relation: surrounds_smaller_shape
+  - object: small_rectangle
+    color: yellow (4)
+    shape: rectangle
+    attribute: filled
+    relation: inside_large_rectangle
+  - action: combine_outlines
+    input_objects: [large_rectangle, small_rectangle]
+    output_object: combined_rectangle
+    description: "Combines relative positions of the rectangles in the input and incorporates parts of their outline and fill"
+  - transformation: size_reduction
+    description: The output grid is smaller than input grid.
+  - transformation: outline_preservation
+    description: "the final red outline shape is preserved"
+  - transformation: relative_position
+    description: "the small yellow shape moves to be just inside the upper border of the large red outline"

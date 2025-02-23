@@ -1,0 +1,14 @@
+objects:
+  - description: Topmost contiguous region of pixels, regardless of color.
+    properties:
+      - topmost: True
+      - contiguous: True
+      - color: any # Can be any color, not restricted to a single color.
+      - shape: variable
+actions:
+  - name: shift_up
+    description: Move the topmost row of the identified object upwards by one row.
+    constraints:
+      - If the object is already at the top edge, do not move.
+      - preserve_pixels: true #all pixels present in the input should also be present in the output
+      - preserve_object: true #all pixels of an object must be moved when an object is moved

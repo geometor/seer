@@ -1,0 +1,27 @@
+facts:
+  - domain: 2D grid
+  - dimensions: 16x16
+  - elements: pixels
+  - attributes:
+      - color: integer (0-9)
+      - position: (row, column)
+  - objects:
+      - name: grid
+        type: collection of pixels
+        properties:
+          - dimensions: 16x16
+      - name: shape_1 # inside shape
+        type: contiguous block of pixels
+        properties:
+          - color: [4] #yellow
+      - name: shape_2 # inside shape
+        type: contiguous block of pixels
+        properties:
+          - color: [1] #blue
+  - actions:
+      - name: remove_shape
+        target: shape_1, shape_2
+        result: "set pixel values of shape_1, shape_2 to color value of surrounding pixels"
+  - relationships:
+      - type: spatial
+        description: shape_1 and shape_2 are enclosed inside and surrounded by other colors

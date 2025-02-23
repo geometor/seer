@@ -1,0 +1,86 @@
+observations:
+  - task_id: 004-py_02
+  - example_1:
+      objects:
+        - color: 1  # Blue
+          type: region
+          initial_state: Scattered regions and lines
+          final_state: Expanded and connected into solid blocks, sometimes
+          notes: Expands to adjacent white (0) pixels, under specific rules, connecting them.
+        - color: 0  # White
+          type: background
+          initial_state: Background and gaps between blue regions
+          final_state: Partially filled by expanding blue regions
+          notes: Acts as a connector between blue regions
+        - color: 2-9 # Other colors
+          type: other
+          initial_state: present
+          final_state: unchanged
+          notes: these pixels never change
+
+      actions:
+        - name: expand_blue
+          description: Blue regions grow by converting adjacent white pixels.
+          conditions: |
+            White pixels are converted to blue if they are adjacent to existing blue pixels,
+             *and* if they connect two blue regions *and* all changed pixels are either blue or
+            white. Other non-blue pixels are unchanged.
+          constraints: |
+            Expansion and connection occur until distinct blue regions form larger, connected shapes.
+            Expansion does not extend beyond filling gaps to join other regions.
+  - example_2:
+      objects:
+        - color: 1  # Blue
+          type: region
+          initial_state: Scattered regions and lines
+          final_state: Expanded regions but not connected, sometimes
+        - color: 0  # White
+          type: background
+          initial_state: Background and gaps between blue regions
+          final_state: Partially filled by expanding blue regions, sometimes.
+        - color: 2-9
+          type: other
+          initial_state: present
+          final_state: unchanged
+
+      actions:
+        - name: expand_blue
+          description: Blue regions grow, but not as aggressively as example 1.
+
+  - example_3:
+       objects:
+        - color: 1  # Blue
+          type: region
+          initial_state: Scattered regions and lines
+          final_state: Expanded regions but not connected, sometimes
+        - color: 0  # White
+          type: background
+          initial_state: Background and gaps between blue regions
+          final_state: Partially filled by expanding blue regions, sometimes.
+        - color: 2-9
+          type: other
+          initial_state: present
+          final_state: unchanged
+
+       actions:
+        - name: expand_blue
+          description: Blue regions grow, but not as aggressively as example 1.
+
+  - example_4:
+       objects:
+        - color: 1  # Blue
+          type: region
+          initial_state: Scattered regions and lines
+          final_state: Expanded regions but not connected, sometimes
+        - color: 0  # White
+          type: background
+          initial_state: Background and gaps between blue regions
+          final_state: Partially filled by expanding blue regions, sometimes.
+        - color: 2-9
+          type: other
+          initial_state: present
+          final_state: unchanged
+
+       actions:
+        - name: expand_blue
+          description: Blue regions grow, but not as aggressively as example 1.

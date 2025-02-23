@@ -1,0 +1,68 @@
+observations:
+  - example: 1
+    input_objects:
+      - object_1:
+        color: 8  # azure
+        shape: rectangle
+        position: (2,6) - (4,8)  # Top-left and bottom-right corners
+      - object_2:
+        color: 2  # red
+        shape: rectangle
+        position: (7,6) - (14,13)
+    output_objects:
+       - object_1:
+          color: 8 # azure
+          shape: rectangle
+          position: (1,2) - (5,5)
+       - object_2:
+         color: 2
+         shape: rectangle
+         position: (0,0) - (7,7)
+    transformations:
+      - type: crop_and_overlay
+        description: Crop the colored rectangles and overlay them onto a new grid, maintaining relative positioning and scaling. The red object forms the background and is overlaid by the azure object.
+  - example: 2
+    input_objects:
+      - object_1:
+        color: 2 # red
+        shape: rectangle
+        position: (2,2) - (6,6)
+      - object_2:
+        color: 1 # blue
+        shape: rectangle
+        position: (9, 10) - (11, 12)
+    output_objects:
+      - object_1:
+         color: 2
+         shape: rectangle
+         position: (0,0) - (4,4)
+      - object_2:
+        color: 1 # blue
+        shape: rectangle
+        position: (1,1) - (3,3)
+    transformations:
+      - type: crop_and_overlay
+        description:  Crop the colored rectangles and overlay them onto a smaller new grid. The red object forms the background and is overlaid by the blue object.
+  - example: 3
+    input_objects:
+      - object_1:
+          color: 2 # red
+          shape: rectangle
+          position: (1,2) - (11,12)
+      - object_2:
+        color: 4 # yellow
+        shape: rectangle
+        position: (15,13) - (17,15)
+    output_objects:
+      - object_1:
+        color: 2
+        shape: rectangle
+        position: (0,0) - (10,10)
+      - object_2:
+          color: 4
+          shape: rectangle
+          position: (1,4) - (9,9)
+
+    transformations:
+       - type: crop_and_overlay
+         description: Crop the colored rectangles and overlay them onto a smaller new grid.  The Red object forms the background and is overlaid by the Yellow object.

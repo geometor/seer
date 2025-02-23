@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies objects of different colors in the input grid. If an object of one color has an adjacent different color, the \"background\" color is changed.\nThe background is defined as color 1 in example 1, color 4 in example 2, and color 8 in example 3.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"Finds contiguous objects (non-background pixels) in a grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    objects = []\n\n    def dfs(row, col, color, obj_pixels):\n        \"\"\"Depth-first search to find contiguous pixels of the same color.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        obj_pixels.append((row, col))\n        dfs(row + 1, col, color, obj_pixels)\n        dfs(row - 1, col, color, obj_pixels)\n        dfs(row, col + 1, color, obj_pixels)\n        dfs(row, col - 1, color, obj_pixels)\n        dfs(row + 1, col + 1, color, obj_pixels)  # Check diagonals\n        dfs(row - 1, col - 1, color, obj_pixels)\n        dfs(row + 1, col - 1, color, obj_pixels)\n        dfs(row - 1, col + 1, color, obj_pixels)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if not visited[row, col]:\n                obj_pixels = []\n                dfs(row, col, grid[row, col], obj_pixels)\n                objects.append((grid[row,col], obj_pixels))\n    return objects\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Get the neighbors of a pixel, including diagonals.\"\"\"\n    neighbors = []\n    for r in range(max(0, row - 1), min(grid.shape[0], row + 2)):\n        for c in range(max(0, col - 1), min(grid.shape[1], col + 2)):\n            if (r, c) != (row, col):\n                neighbors.append(grid[r, c])\n    return neighbors\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find objects and background\n    objects = get_objects(input_grid)\n    background_color = input_grid[0,0] #infer background\n\n    # Create a set of object colors excluding background\n    object_colors = {color for color, _ in objects if color != background_color}\n\n    # Iterate through each pixel\n    for row in range(input_grid.shape[0]):\n      for col in range(input_grid.shape[1]):\n          #check if its background color\n          if input_grid[row,col] == background_color:\n            neighbors = get_neighbors(input_grid, row, col)\n            for neighbor_color in neighbors:\n              if neighbor_color != background_color:\n                # found different neighbor, so change\n                output_grid[row,col] = neighbor_color # take the value\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 18268,
+    "candidates_token_count": 819,
+    "total_token_count": 19087,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.552842,
+  "response_file": "004-response.json"
+}

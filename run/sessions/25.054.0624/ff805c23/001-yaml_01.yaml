@@ -1,0 +1,31 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    dimensions: [24, 26]
+    elements: [0, 1, 2, 3] # Values represent colors
+    properties:
+      - contains_subgrids: True
+
+  - name: output_grid
+    type: 2D array
+    dimensions: [5, 5]
+    elements: [0, 3] # Values represent colors
+    properties:
+      - is_subgrid: True
+      - location: top-left corner of input_grid
+
+relationships:
+  - type: subgrid_of
+    subject: output_grid
+    object: input_grid
+
+actions:
+  - type: extraction
+    description: Extract a sub-grid from the input_grid.
+    parameters:
+      - start_row: 0
+      - end_row: 4
+      - start_col: 0
+      - end_col: 4
+  - type: filter
+    description: filtering colors to only show 0 and 3

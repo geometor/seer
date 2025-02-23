@@ -1,0 +1,31 @@
+objects:
+  - type: grid
+    description: input grid
+    properties:
+      dimensions: 27x21
+      colors: [0, 1, 2, 3, 4, 6, 7, 8, 9]  # All colors present
+  - type: grid
+    description: output grid
+    properties:
+      dimensions: 3x3
+      colors: [0, 3, 6, 7, 8] # Colors from lower region
+
+  - type: region
+    description: blue shape
+    properties:
+      color: 1
+      location: upper-middle
+
+  - type: region
+    description: multicolored shape
+    properties:
+      colors: [2,3,4,6,7,8,9]
+      location: lower-middle
+
+actions:
+  - type: extraction
+    description: Extracting a 3x3 region from the input.
+
+relationships:
+    - The output grid's colors and values correspond to a specific 3x3 region in the input grid.
+    - The 3x3 region to extract does not include any pixels of value 1.

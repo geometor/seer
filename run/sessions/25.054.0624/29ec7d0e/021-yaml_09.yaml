@@ -1,0 +1,78 @@
+observations:
+  - task: 020
+    examples:
+      - example_id: 1
+        input_objects:
+          - description: Full grid
+            shape: (18, 18)
+            colors: [0, 1, 2, 3, 4, 5]
+            white_pixel_count: 32
+            white_pixel_positions: Scattered
+        output_objects:
+          - description: Full grid
+            shape: (18, 18)
+          - description:  Grid after removing 0 value pixels
+            shape: (18, 18) # this is WRONG
+            colors: [1, 2, 3, 4, 5]
+            notes: White pixels removed, other colors maintain relative positions.
+        transformation:
+          - action: Remove white pixels. # keep the shape
+            affects: Grid structure
+            result:  output keeps same shape as input
+
+      - example_id: 2
+        input_objects:
+          - description: Full grid
+            shape: (18, 18)
+            colors: [0, 1, 2, 3, 4, 5, 6]
+            white_pixel_count: 51
+            white_pixel_positions: Horizontal and vertical lines
+        output_objects:
+          - description: Full grid
+            shape: (18, 18)
+          - description: Grid after removing white pixels
+            shape: (18, 18)
+            colors: [1, 2, 3, 4, 5, 6]
+            notes: White pixels removed, structure remains
+        transformation:
+          - action: Remove white pixels and retain structure
+            affects: Grid structure, pixel values
+            result: output keeps same shape as input
+
+      - example_id: 3
+        input_objects:
+          - description: Full grid
+            shape: (18, 18)
+            colors: [0, 1, 2, 3, 4, 5, 6, 7]
+            white_pixel_count: 50
+            white_pixel_positions: Clusters and lines
+        output_objects:
+            - description: Full grid
+              shape: (18, 18)
+            - description: Grid after removing white pixels
+              shape: (18, 18)
+              colors: [1, 2, 3, 4, 5, 6, 7]
+              notes:  White pixels removed, maintaining grid shape.
+        transformation:
+          - action: Remove white pixels, keep the original dimensions
+            affects: Grid structure, pixel values
+            result:  output keeps same shape as input
+
+      - example_id: 4
+        input_objects:
+          - description: Full grid
+            shape: (18, 18)
+            colors: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+            white_pixel_count: 28
+            white_pixel_positions: Lines and isolated pixels
+        output_objects:
+          - description: Full grid
+            shape: (18, 18)
+          - description: Grid after removing 0 pixels.
+            shape: (18, 18)
+            colors: [1, 2, 3, 4, 5, 6, 7, 8]
+            notes: White pixels are removed; structure is kept.
+        transformation:
+          - action: Remove white pixels and keep the rest
+            affects: Pixel values
+            result: output keeps same shape as input

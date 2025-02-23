@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Target Color:** Examine all input/output pairs. The target color is the color that *changes* to blue (1) in the output grids, forming contiguous 1x3 or 3x1 blocks in the *input* grids.\n2.  **Locate Target Blocks:** In the input grid, find all contiguous 1x3 or 3x1 blocks (horizontal or vertical) of the target color.\n3. **Replacement:** If at least three such blocks are found in Step 2, change exactly three of them to blue (color 1). If fewer than three such blocks are found, do not change the input.\n4.  **Preserve Other Pixels:** All other pixels in the grid that are not part of the three replaced blocks remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_target_color(input_grids, output_grids):\n    \"\"\"\n    Identifies the target color based on input/output pairs.\n    \"\"\"\n    for i in range(len(input_grids)):\n        diff = np.where(input_grids[i] != output_grids[i])\n        if len(diff[0]) > 0:  # Check if there are any differences\n            #The color that changes to blue is our target\n            return input_grids[i][diff[0][0], diff[1][0]]\n    return None  # Should never happen if there is a valid transformation\n\ndef find_blocks(grid, target_color):\n    \"\"\"\n    Finds all 1x3 and 3x1 blocks of the target color in the grid.\n    Returns a list of (row, col, is_horizontal) tuples.\n    \"\"\"\n    height, width = grid.shape\n    blocks = []\n    for r in range(height):\n        for c in range(width):\n            # Check for 1x3\n            if (c + 2 < width and\n                grid[r, c] == target_color and\n                grid[r, c+1] == target_color and\n                grid[r, c+2] == target_color):\n                blocks.append((r, c, True))\n            # Check for 3x1\n            if (r + 2 < height and\n                grid[r, c] == target_color and\n                grid[r+1, c] == target_color and\n                grid[r+2, c] == target_color):\n                blocks.append((r, c, False))\n    return blocks\n\ndef transform(input_grid, input_grids=None, output_grids=None):\n\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # find the target color using training examples\n    target_color = find_target_color(input_grids, output_grids)\n    if target_color is None:\n        return output_grid #If target color is not found, return input grid\n    \n    #Locate Target Blocks\n    blocks = find_blocks(input_grid, target_color)\n\n    # Replacement\n    count = 0\n    for r, c, is_horizontal in blocks:\n      if count >= 3:\n          break\n      if is_horizontal:\n        output_grid[r,c:c+3] = 1\n      else:\n        output_grid[r:r+3,c] = 1\n      count += 1\n\n    # return the output_grid\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10282,
+    "candidates_token_count": 788,
+    "total_token_count": 11070,
+    "cached_content_token_count": 0
+  },
+  "response_time": 18.169362,
+  "response_file": "018-response.json"
+}

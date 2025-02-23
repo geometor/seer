@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify single-pixel objects:** Locate all pixels in the input grid that are not white (0) and are surrounded by white pixels (or the edge of the grid).\n2.  **Expand objects:** For each identified single-pixel object, replace it with a 3x3 square of the same color. The original pixel should be the center of the new 3x3 square.\n3. **Connect Objects with Gray Lines:** Find pairs of 3x3 colored squares that are close to each other (in this case, green and azure squares). Draw gray (5) colored one pixel wide horizontal lines between them. The line is drawn such that every other pixel on the input line is mirrored to a corresponding pixel on the output line. The lines should start in the middle row and middle column of each square.\n\"\"\"\n\nimport numpy as np\n\ndef find_single_pixels(grid):\n    # Find single pixels of non-white color\n    single_pixels = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                is_single = True\n                for i in range(-1, 2):\n                    for j in range(-1, 2):\n                        if (i != 0 or j != 0) and 0 <= r + i < rows and 0 <= c + j < cols:\n                            if grid[r + i, c + j] != 0:\n                                is_single = False\n                                break\n                    if not is_single:\n                        break\n                if is_single:\n                    single_pixels.append((r, c, grid[r, c]))\n    return single_pixels\n\ndef expand_to_square(grid, r, c, color):\n    # Expand a single pixel to a 3x3 square\n    for i in range(-1, 2):\n        for j in range(-1, 2):\n            if 0 <= r + i < grid.shape[0] and 0 <= c + j < grid.shape[1]:\n                grid[r + i, c + j] = color\n\ndef connect_with_gray_lines(grid, square1, square2):\n    # Connect two 3x3 squares with gray lines, ensuring 1-pixel gap\n    r1, c1, color1 = square1\n    r2, c2, color2 = square2\n    \n    if c1<c2:\n      start_col = c1+2\n      end_col = c2-2\n      row = r1\n    else:\n      start_col = c2+2\n      end_col = c1-2\n      row=r2\n\n    if 0 <= row < grid.shape[0]:\n        for c in range(start_col, end_col + 1):\n          if (c-start_col)%2==0:\n            if 0 <= c < grid.shape[1]:\n              grid[row,c] = 5\n              \n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n\n    # 1. Find single pixels\n    single_pixels = find_single_pixels(output_grid)\n\n    # 2. Expand single pixels to 3x3 squares\n    squares = []\n    for r, c, color in single_pixels:\n      expand_to_square(output_grid, r, c, color)\n      squares.append((r,c,color))\n    \n\n    # 3. Connect squares with gray lines\n    for i in range(len(squares)):\n        for j in range(i + 1, len(squares)):\n          connect_with_gray_lines(output_grid, squares[i], squares[j])\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3268,
+    "candidates_token_count": 882,
+    "total_token_count": 4150,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.498412,
+  "response_file": "020-response.json"
+}

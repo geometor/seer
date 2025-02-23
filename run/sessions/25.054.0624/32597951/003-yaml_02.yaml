@@ -1,0 +1,36 @@
+objects:
+  - name: azure_region
+    color: 8
+    description: A contiguous block of azure pixels.
+    role: Defines the area of influence for color changes.
+
+  - name: blue_pixels
+    color: 1
+    description: Individual blue pixels.
+    role: Potentially change color based on proximity to the azure_region.
+
+  - name: green_pixels
+    color: 3
+    description: Result of transforming blue pixels.
+    role: Indicate transformed pixels.
+
+actions:
+  - name: identify_region
+    input: input_grid
+    output: azure_region
+    description: Locates the azure region within the grid.
+
+  - name: determine_bounds
+    input: azure_region
+    output: vertical_bounds (min_row, max_row)
+    description: Finds the minimum and maximum row indices of the azure region.
+
+  - name: check_adjacency
+    input: blue_pixel_coordinate, azure_region
+    output: boolean
+    description: Determines if a blue pixel is adjacent to any pixel in the azure region.
+
+  - name: transform_color
+    input: blue_pixel_coordinate, adjacency_status
+    output: green_pixel_coordinate (or original blue if not adjacent)
+    description: Changes a blue pixel to green if adjacent and within vertical bounds.

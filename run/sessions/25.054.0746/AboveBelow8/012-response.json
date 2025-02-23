@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies and preserves azure (8) pixels that form the boundary of azure shapes in the input grid. Other pixels are set to white (0).\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighbors of a cell in a grid.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    if row > 0:\n        neighbors.append((row - 1, col))  # Up\n    if row < rows - 1:\n        neighbors.append((row + 1, col))  # Down\n    if col > 0:\n        neighbors.append((row, col - 1))  # Left\n    if col < cols - 1:\n        neighbors.append((row, col + 1))  # Right\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid, keeping azure pixels that represent borders and setting others to white.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through the input grid\n    for row in range(rows):\n        for col in range(cols):\n            # Check for azure pixels\n            if input_grid[row, col] == 8:\n                is_border = False\n                neighbors = get_neighbors(input_grid, row, col)\n                for r, c in neighbors:\n                    if input_grid[r,c] != 8:\n                      is_border = True\n                      break\n\n                if is_border:\n                  output_grid[row,col] = 8\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 316,
+            "end_index": 608,
+            "uri": "https://github.com/Kaeltherol/Minesweeper",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5038,
+    "candidates_token_count": 397,
+    "total_token_count": 5435,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.550926,
+  "response_file": "012-response.json"
+}

@@ -1,0 +1,27 @@
+objects:
+  - description: Contiguous regions of the same color.
+    properties:
+      - color: integer (0-9)
+      - shape: irregular
+      - border_pixels: list of (row, col) tuples
+        border_definition: horizontal_edges
+
+actions:
+  - name: insert_color
+    trigger:
+      object_property: border_pixels
+      color_to_insert: varies by object and color
+    location:
+      relative_to: border_pixel
+      direction: horizontal
+    constraints:
+        - neighbor_is_not: insert_color
+        - neighbor_is_not: trigger_color
+
+color_mapping:
+    example_1:
+        trigger: 2
+        insert: 4
+    example_2:
+        trigger: 3
+        insert: 6

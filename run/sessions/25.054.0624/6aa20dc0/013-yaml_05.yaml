@@ -1,0 +1,17 @@
+facts:
+  - type: grid
+    description: 2D array of pixels
+    elements: integers (0-9) representing colors
+    background_color: 8 (azure)
+
+  - type: objects
+    description: Clusters of contiguous non-background pixels.
+    properties:
+      - color: Value of the pixel (0-9).
+      - position: (row, column) coordinates.
+
+  - type: transformation
+    description: Replication of existing non-background color pixel clusters.
+    properties:
+       - A color cluster is duplicated to the lower-right and to the right
+       - If the color cluster has a '4' (yellow), that pixel is treated as the origin of a new 3x3 replica

@@ -1,0 +1,32 @@
+examples:
+  - id: 1
+    input_colors: [0, 3, 4, 8]
+    output_colors: [0, 3, 4, 8]
+    solid_lines:
+      - color: 8
+        row: 5
+    shapes_above_line: [3, 4, 8]
+    shapes_below_line: [3, 4, 8, 2]
+    rule: "Preserve solid azure line. Remove non-line azure. Remove blue. Maintain other colors, but only on existing rows."
+
+  - id: 2
+    input_colors: [0, 1, 2, 4]
+    output_colors: [0, 1, 2]
+    solid_lines:
+      - color: 2
+        row: 3
+      - color: 1
+        row: 10
+    shapes_above_line: [2, 4]
+    shapes_below_line: [1, 2]
+    rule: "Remove isolated pixels of all color. Preserve colors of solid lines, remove others unless present as a solid line"
+
+  - id: 3
+    input_colors: [0, 1, 8]
+    output_colors: [0, 8]
+    solid_lines:
+      - color: 8
+        row: 5
+    shapes_above_line: [1, 8]
+    shapes_below_line: [8, 1]
+    rule: "Preserve the solid azure line and remove all other pixels."

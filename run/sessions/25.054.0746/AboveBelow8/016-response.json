@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRetain azure pixels if and only if they belong to a horizontal line of two or more connected, adjacent azure pixels. Otherwise, replace the pixel with white.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid with the same dimensions as the input, filled with white (0).\n    output_grid = np.zeros_like(input_grid)\n\n    # Iterate through the input grid.\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            # If the pixel is azure (8), check its horizontal neighbors.\n            if input_grid[i, j] == 8:\n                # Check for at least one horizontal neighbor (left or right) that is also azure.\n                if (j > 0 and input_grid[i, j - 1] == 8) or \\\n                   (j < input_grid.shape[1] - 1 and input_grid[i, j + 1] == 8):\n                    output_grid[i, j] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4700,
+    "candidates_token_count": 258,
+    "total_token_count": 4958,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.76164,
+  "response_file": "016-response.json"
+}

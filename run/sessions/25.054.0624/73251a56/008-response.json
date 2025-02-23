@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies and removes contiguous regions of black pixels (value 0) in the input grid, replacing them with gray (value 5), while preserving other pixels.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef get_neighboring_color(grid, r, c):\n    \"\"\"\n    Finds the most frequent neighboring color around a given pixel, excluding black (0).\n    \"\"\"\n    neighbors = []\n    rows, cols = grid.shape\n    for i in range(max(0, r - 1), min(rows, r + 2)):\n        for j in range(max(0, c - 1), min(cols, c + 2)):\n            if (i != r or j != c) and grid[i, j] != 0:  # Exclude the pixel itself and black pixels\n                neighbors.append(grid[i, j])\n\n    if not neighbors:\n      return 5\n      \n    # return most common neighbor\n    return max(set(neighbors), key=neighbors.count)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by removing black regions and replacing them with gray (value 5).\n\n    Args:\n        input_grid: A 2D numpy array representing the input grid.\n\n    Returns:\n        A 2D numpy array representing the transformed output grid.\n    \"\"\"\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Identify Black Regions: Use scipy.ndimage.label to find connected components.\n    labeled_grid, num_labels = label(input_grid == 0)\n\n    # 2. & 3. Replace Black Regions with the surrounding color.\n    for r in range(rows):\n        for c in range(cols):\n            if labeled_grid[r, c] != 0:  # If the pixel is part of a black region\n                output_grid[r,c] = get_neighboring_color(input_grid,r,c)\n\n    # 4. Preserve Other Pixels (already handled by initializing output_grid as a copy).\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3772,
+    "candidates_token_count": 509,
+    "total_token_count": 4281,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.880326,
+  "response_file": "008-response.json"
+}

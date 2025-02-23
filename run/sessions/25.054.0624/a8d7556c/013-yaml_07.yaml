@@ -1,0 +1,20 @@
+facts:
+  - object: grid
+    type: 2D array
+    elements: pixels
+    values: [0, 2, 5]  # white, red, gray
+
+  - object: pixel
+    properties:
+      color:
+        white: 0
+        red: 2
+        gray: 5
+      state:
+        changeable: [white] #only the white ones are changed
+        final_state: [red, white] #white can change to red or stay white
+
+  - action: color_change
+    source: white (0)
+    target: red (2)
+    condition: "sparse and selective, occurs only within regions of white pixels and does not affect all white pixels."

@@ -1,0 +1,28 @@
+objects:
+  - description: Input grid
+    properties:
+      type: 2D array
+      colors: [0-9]  # All possible colors
+  - description: Output grid
+    properties:
+      type: 2D array
+      colors: [0-9]  # All possible colors
+  - description: Pixel
+    properties:
+      color: Integer (0-9)
+      row_index: Integer
+      column_index: Integer
+
+actions:
+  - name: Check Row
+    description: Examines a single row for specific color and column conditions.
+  - name: Modify Row
+    description: Changes all white pixels to red in a row if the trigger condition is met.
+  - name: change_color
+    description: change color from white to red
+
+conditions:
+    - name: trigger_column
+      description: if col_index mod 5 == 4 and color is white
+    - name: row_white_pixels
+      description: row has white pixels.

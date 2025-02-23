@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by replacing white (0) pixels that are adjacent to\nany non-white pixel with azure (8). Non-white pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_all_neighbors(grid, row, col):\n    \"\"\"Gets the valid neighboring coordinates of a cell, including diagonals.\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for dr in [-1, 0, 1]:\n        for dc in [-1, 0, 1]:\n            if dr == 0 and dc == 0:\n                continue  # Skip the cell itself\n            new_row, new_col = row + dr, col + dc\n            if 0 <= new_row < rows and 0 <= new_col < cols:\n                neighbors.append((new_row, new_col))\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Find all pixels that are not 0 (white).\n    non_zero_pixels = np.argwhere(input_grid != 0)\n\n    # 2. Iterate through the neighbors of non-zero pixels.\n    for row, col in non_zero_pixels:\n        neighbors = get_all_neighbors(input_grid, row, col)\n        # 3. Check if any neighbor is 0. If so, change it to 8 in the output grid.\n        for nr, nc in neighbors:\n            if input_grid[nr, nc] == 0:  # Only change 0 pixels\n                output_grid[nr, nc] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8222,
+    "candidates_token_count": 403,
+    "total_token_count": 8625,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.07823,
+  "response_file": "006-response.json"
+}

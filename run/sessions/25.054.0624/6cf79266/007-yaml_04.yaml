@@ -1,0 +1,39 @@
+objects:
+  - name: grid
+    type: 2D array
+    dimensions: 20x20
+    elements: pixels
+    properties:
+      - color_values: [0, 1, 3]
+
+  - name: pixel
+    properties:
+      - color:
+          type: integer
+          values:
+            0: white
+            1: blue
+            3: green
+
+  - name: blue_region
+    type: object
+    properties:
+      - shape: square like
+      - size: small
+      - color: blue
+      - location: center-left
+      - composed of : pixels
+
+actions:
+  - name: identify_region
+    description: Locate a specific region based on color and shape.
+  - name: change_color
+    description: Modify the color of pixels within the region.
+
+relationships:
+  - type: spatial
+    description: The grid consists of pixels arranged in rows and columns.
+  - type: containment
+    description: The blue region is contained within the grid.
+  - type: transformation
+    description: input pixels become output pixels. The color remains unchanged except white pixels in a certain area.

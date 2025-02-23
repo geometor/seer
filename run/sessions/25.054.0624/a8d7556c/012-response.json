@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Regions:** Examine the input grid. Find all regions, where a region is a group of orthogonally connected pixels of the same color. Regions are bounded by either the edge of the grid or pixels of color grey (value 5).\n\n2.  **Find First White Region:** Among all regions of color white (value 0), identify the \"first\" white region. The first white region is determined by the following priority:\n    *   The region whose top-most row number is smallest.\n    *   If multiple regions share the same top-most row, select the region whose left-most column number is smallest.\n\n3.  **Fill Region:** Change the color of *all* pixels within the \"first\" white region to red (value 2). This fill operation should be constrained by the boundaries of the region (grey pixels or the edge of the grid).\n\n4.  **Output:** Return the modified grid. The dimensions of the output grid are identical to the input grid. Only the pixels within the identified white region are changed; all other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef get_neighbors(pos, rows, cols):\n    \"\"\"Returns the valid neighbors of a given position.\"\"\"\n    r, c = pos\n    neighbors = []\n    if r > 0:\n        neighbors.append((r - 1, c))\n    if r < rows - 1:\n        neighbors.append((r + 1, c))\n    if c > 0:\n        neighbors.append((r, c - 1))\n    if c < cols - 1:\n        neighbors.append((r, c + 1))\n    return neighbors\n\ndef find_regions(grid, color):\n    \"\"\"Finds all regions of the specified color in the grid.\"\"\"\n    rows, cols = grid.shape\n    visited = set()\n    regions = []\n\n    def dfs(pos, current_region):\n        \"\"\"Depth-first search to find connected regions.\"\"\"\n        if pos in visited or grid[pos] != color:\n            return\n        visited.add(pos)\n        current_region.append(pos)\n        for neighbor in get_neighbors(pos, rows, cols):\n            # Check for boundary (grey pixel or edge)\n            if grid[neighbor] != color and grid[neighbor] !=5:\n                continue\n            dfs(neighbor, current_region)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and (r, c) not in visited:\n                current_region = []\n                dfs((r, c), current_region)\n                regions.append(current_region)\n    return regions\n\ndef find_first_white_region(grid, white_regions):\n    \"\"\"Finds the first white region based on top-most row and then left-most column.\"\"\"\n    if not white_regions:\n        return None\n\n    # Sort regions by top-most row (and then left-most column for ties)\n    sorted_regions = sorted(white_regions, key=lambda region: (min(r for r, _ in region), min(c for _, c in region)))\n    return sorted_regions[0]\n\ndef fill_region(grid, region):\n    \"\"\"\n    Fills the region specified by the provided coordinates with red (2), using flood fill.\n    \"\"\"\n    output_grid = np.copy(grid)\n    rows, cols = grid.shape\n    if not region:\n      return output_grid\n\n    # Use a queue for flood fill (BFS)\n    queue = region.copy()  # Start with all pixels in the region\n    visited = set()\n    \n    while queue:\n        r, c = queue.pop(0)  # Dequeue a pixel\n        if (r,c) in visited:\n           continue\n        \n        visited.add((r,c))\n\n        if output_grid[r,c] == 0: #check its still white\n           output_grid[r, c] = 2    # Fill with red\n        # Add neighbors to the queue if they are within bounds, are white, and haven't been visited\n        for nr, nc in get_neighbors((r,c), rows, cols):\n           if output_grid[nr,nc] == 0 and (nr, nc) not in visited:  # Only add if white\n                if (nr,nc) in region: # Make sure to stay within region!\n                   queue.append((nr, nc))\n    \n    return output_grid\n\n\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    \n    # Identify all white regions\n    white_regions = find_regions(input_grid, 0)\n\n    # Find the first white region\n    first_white_region = find_first_white_region(input_grid, white_regions)\n\n    # Fill the region using flood fill.\n    if first_white_region:\n        output_grid = fill_region(output_grid, first_white_region)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 1165,
+            "end_index": 1423,
+            "uri": "https://github.com/Anuj-cs20/IIITDMK_CSE_Coursework",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9136,
+    "candidates_token_count": 1152,
+    "total_token_count": 10288,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.669388,
+  "response_file": "012-response.json"
+}

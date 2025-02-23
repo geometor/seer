@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify all objects within the input grid. An object is defined as a contiguous region of pixels sharing the same color.\n2. Initialize the output grid to be the same dimensions as the input grid, and set all pixels to white (color 0).\n3. Locate Green Objects: Iterate through all objects found in the input grid. If an object is green (color value 3), copy it to the output grid in the same position.\n4. All non-green objects are removed.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Identifies contiguous objects in a grid.  This version assumes\n    we just need to isolate a specific color, which simplifies it\n    significantly vs. a full object finder.\n    \"\"\"\n    objects = {}\n    visited = np.zeros_like(grid, dtype=bool)\n\n    for row_index, row in enumerate(grid):\n      for col_index, pixel in enumerate(row):\n        if not visited[row_index, col_index]:\n          if pixel not in objects:\n             objects[pixel] = []\n          visited, object_pixels = flood_fill(grid, row_index, col_index, pixel, visited)\n          objects[pixel].append(object_pixels)\n\n    return objects\n\ndef flood_fill(grid, start_row, start_col, target_color, visited):\n    \"\"\"\n    Performs a flood fill algorithm to find contiguous regions of the same color.\n    \"\"\"\n    rows, cols = grid.shape\n    object_pixels = []\n    stack = [(start_row, start_col)]\n\n    while stack:\n        row, col = stack.pop()\n\n        if 0 <= row < rows and 0 <= col < cols and grid[row, col] == target_color and not visited[row, col]:\n            visited[row, col] = True\n            object_pixels.append((row, col))\n\n            stack.append((row + 1, col))\n            stack.append((row - 1, col))\n            stack.append((row, col + 1))\n            stack.append((row, col - 1))\n\n    return visited, object_pixels\n\ndef transform(input_grid):\n    # Initialize the output grid with the same dimensions as the input grid, filled with 0s (white).\n    output_grid = np.zeros_like(input_grid)\n\n    # Find Objects\n    objects = find_objects(input_grid)\n\n    # copy green objects\n    if 3 in objects: #check if green exists\n        for green_object in objects[3]:\n            for row, col in green_object:\n               output_grid[row, col] = 3\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7416,
+    "candidates_token_count": 620,
+    "total_token_count": 8036,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.370222,
+  "response_file": "018-response.json"
+}

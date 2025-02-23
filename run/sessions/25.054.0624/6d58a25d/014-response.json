@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** all pixels.\n2.  **Identify** the contiguous yellow (4) shape.\n3.  **Locate** the position the yellow shape.\n4.  **Replace** the yellow (4) shape with green (3)\n5.  **Fill** all of the empty (white, 0) cells with green (3) pixels.\n6. Existing Green (3) pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_shape(grid, color):\n    \"\"\"Finds the coordinates of a contiguous shape of the given color.\"\"\"\n    rows, cols = grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n    shape_coords = []\n\n    def dfs(r, c):\n        if (r < 0 or r >= rows or c < 0 or c >= cols or\n                visited[r, c] or grid[r, c] != color):\n            return\n        visited[r, c] = True\n        shape_coords.append((r, c))\n        dfs(r + 1, c)\n        dfs(r - 1, c)\n        dfs(r, c + 1)\n        dfs(r, c - 1)\n        # Include diagonals:\n        dfs(r + 1, c + 1)\n        dfs(r + 1, c - 1)\n        dfs(r - 1, c + 1)\n        dfs(r - 1, c - 1)\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == color and not visited[r, c]:\n                dfs(r, c)\n                return shape_coords  # Return after finding the *first* contiguous shape\n    return [] # return empty if no shape found\n\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid\n    output_grid = input_grid.copy()\n    rows, cols = input_grid.shape\n\n    # Find the coordinates of the contiguous yellow shape\n    yellow_shape_coords = find_contiguous_shape(input_grid, 4)\n\n    # Replace the yellow shape with green\n    for r, c in yellow_shape_coords:\n        output_grid[r, c] = 3\n\n    # Fill all empty cells (white, 0) with green (3), keeping existing greens\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 0:\n                output_grid[r, c] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3611,
+    "candidates_token_count": 605,
+    "total_token_count": 4216,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.101076,
+  "response_file": "014-response.json"
+}

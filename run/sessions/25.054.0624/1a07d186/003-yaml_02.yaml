@@ -1,0 +1,52 @@
+examples:
+  - example_id: 1
+    objects:
+      - color: 3  # Green
+        type: line
+        orientation: vertical
+        transfer:
+            direction: left_one
+            adjacent:
+                color: 4
+      - color: 4  # Yellow
+        type: line
+        orientation: vertical
+        transfer:
+            direction: left_one
+            adjacent:
+                color: 3
+    transform_rule: >-
+        Move vertically connected groups of 3's and 4's that are directly
+        adjacent one space to the left if the colors are touching horizontally
+
+  - example_id: 2
+    objects:
+      - color: 2  # Red
+        type: line
+        orientation: horizontal
+        transfer:
+            direction: up_one
+      - color: 1 # Blue
+        type: line
+        orientation: horizontal
+        transfer:
+            direction: down_one
+
+    transform_rule: >-
+      Move horizontal line of 2's up one, and horizontal lines of 1's down one.
+
+  - example_id: 3
+    objects:
+      - color: 8  # Azure
+        type: line
+        orientation: horizontal
+        transfer:
+            direction: up_one
+      - color: 8  # Azure
+        type: line
+        orientation: horizontal
+        transfer:
+            direction: down_two
+    transform_rule: >-
+      Move the horizontal line of 8's up one and move other horizontal line of
+      8's down two.

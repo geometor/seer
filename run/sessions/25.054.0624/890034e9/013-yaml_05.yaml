@@ -1,0 +1,34 @@
+objects:
+  - id: background
+    description: The area of the image not part of the central shape.
+    properties:
+      colors: [0, 2, 3, 1] # White, Red, Green, Blue
+      pattern: noisy, inconsistent
+
+  - id: central_shape
+    description: An irregular circular shape.
+    properties:
+      color: 4  # Yellow
+      size: Varies, but substantial.
+      position: Roughly centered.
+
+  - id: border
+    description: the pixels surrounding the central shape
+    properties:
+      colors: [0,2,3,4]
+
+actions:
+  - name: replace_color_at_border
+    description: colors other than yellow change on the border of the central yellow shape
+    parameters:
+        border_pixel: the location of the pixel surrounding the central shape
+        from_color: [0,2,3]
+        to_color: [0,2,3,4]
+
+relationships:
+  - type: contains
+    from: grid
+    to: [background, central_shape]
+  - type: surrounds
+    from: border
+    to: central_shape

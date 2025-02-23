@@ -1,0 +1,73 @@
+observations:
+  - example: 1
+    input_objects:
+      - color: 8 #azure
+        shape: L-shape
+        position: top-left
+        size: 5 # pixels (estimated)
+      - color: 2 # red
+        shape: rectangle + vertical line
+        position: center-left
+        size: 16 # pixels
+    output_objects:
+      - color: 8
+        shape: 2x2 square inside a frame of 2
+        position: center of 8x8
+        size: 4
+      - color: 2
+        shape: Frame around azure square
+        position: outer edges
+        size: calculated by frame
+    transformation: |
+       The azure L-shape is converted into a 2x2 square and moved.
+       The red object is simplified into a frame around the azure, maintaining its relative position.
+
+  - example: 2
+    input_objects:
+      - color: 2  # red
+        shape: rectangle + vertical line
+        position: top-left
+        size: 11
+      - color: 1 # blue
+        shape: small L
+        position: center
+        size: 3
+    output_objects:
+        - color: 2
+          shape: frame
+          position: outer edges
+          size: calc by frame
+        - color: 1
+          shape: 2 x 2
+          position: center
+    transformation: |
+      The blue L object in the center becomes a 2x2 square.
+      The red object is simplified into a frame, maintaining relative position.
+  - example: 3
+    input_objects:
+      - color: 2 # red
+        shape: rectangle + vertical line
+        position: top-left
+        size: 22 # pixels
+      - color: 4  # Yellow
+        shape: small L
+        position: bottom-right
+        size: 3
+    output_objects:
+      - color: 2
+        shape: frame
+        size: calc by frame
+      - color: 4
+        shape: 3 x 3 cross, center empty, surrounded by 4
+        position: Center
+    transformation: |
+       Yellow L object in bottom right becomes 3x3 cross and moved to center. The cross consists of the center pixel removed, and the remaining pixels surrounded by pixels of the same color.
+       The red object is simplified into a frame, maintaining its position.
+
+general_transformation: |
+  1.  Identify "L-shaped" objects composed of 3 pixels.
+  2.  Transform these L-shapes:
+      a. If Azure, create a 2x2 Azure square in the center.
+      b. If Blue, create a 2x2 Blue square in the center.
+      c. If Yellow, create a 3x3 cross where the center pixel is blank (0), and the remaining cross pixels are surrounded by pixels of the same color.
+  3. Find large shapes on left, convert to a frame.

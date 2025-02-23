@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify diagonal lines in the input grid. A diagonal line is a sequence of one or more pixels of the same color, where each subsequent pixel is one row down and one column to the right of the previous pixel. For each identified diagonal line, extend the line downwards and to the right. Extension Rule: Add pixels of the *same color* as the original diagonal line. Add one pixel below the last pixel of the diagonal, and one to the right. Continue adding pixels one row down, one column right, until the edges of the grid are reached (either the bottom edge or right edge).\n\"\"\"\n\nimport numpy as np\n\ndef find_diagonal_lines(grid):\n    \"\"\"\n    Finds diagonal lines in the grid.\n    \"\"\"\n    rows, cols = grid.shape\n    diagonals = []\n    for r in range(rows):\n        for c in range(cols):\n            if len(diagonals) == 0 or not any((r,c) in d for d in diagonals):\n                color = grid[r, c]\n                if color != 0: #ignore background\n                    diagonal = [(r, c)]\n                    cr, cc = r + 1, c + 1\n                    while cr < rows and cc < cols and grid[cr, cc] == color:\n                        diagonal.append((cr, cc))\n                        cr += 1\n                        cc += 1\n                    if len(diagonal) >= 1: #considering single pixels to be part of diagoal.\n                        diagonals.append(diagonal)\n    return diagonals\n\ndef extend_diagonal_line(grid, diagonal):\n    \"\"\"\n    Extends a diagonal line downwards and to the right.\n    \"\"\"\n    output_grid = np.copy(grid)\n    last_r, last_c = diagonal[-1]\n    color = grid[diagonal[0][0], diagonal[0][1]]\n    r, c = last_r + 1, last_c + 1\n    while r < grid.shape[0] and c < grid.shape[1]:\n        output_grid[r, c] = color\n        r += 1\n        c += 1\n    return output_grid\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by extending diagonal lines.\n    \n    Args:\n        input_grid (list of lists): The input grid.\n    \n    Returns:\n        list of lists: The transformed grid.\n    \"\"\"\n    input_grid = np.array(input_grid)\n    output_grid = np.copy(input_grid)\n    diagonals = find_diagonal_lines(input_grid)\n\n    # Extend each diagonal line\n    for diagonal in diagonals:\n        output_grid = extend_diagonal_line(output_grid, diagonal)\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3940,
+    "candidates_token_count": 635,
+    "total_token_count": 4575,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.304122,
+  "response_file": "010-response.json"
+}

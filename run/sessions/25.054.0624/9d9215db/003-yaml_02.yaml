@@ -1,0 +1,19 @@
+objects:
+  - type: pixel
+    properties:
+      color:
+        - white (0)
+        - blue (1)
+        - red (2)
+        - green (3)
+        - yellow (4)
+        - azure (8)
+      position: [row, column]
+      is_replicated: True # All non-white pixels participate in the pattern.
+
+actions:
+  - name: replicate_pattern
+    description: Creates a checkered pattern based on the initial positions of all non-white pixels.
+    rules:
+      - The blue pixels are replicated in a checkered pattern and determines the output grid size
+      - The positions of other pixels are relative to original blue.

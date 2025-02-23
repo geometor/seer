@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Identify Solid Lines:** Find all horizontal lines that span the entire width of the grid and consist of a single color.\n2. **Preserve Solid Lines:** Keep all pixels on these solid lines unchanged.\n3. **Color Preservation Rule:** Keep pixels that share the same color as the existing rows that are not all one color.\n4. **Remove other pixels.** Remove any pixel not part of a solid line and that doesn't follow the color preservation rule.\n\"\"\"\n\nimport numpy as np\n\ndef find_solid_lines(grid):\n    # Find rows that are entirely of one color.\n    rows, cols = grid.shape\n    solid_lines = []\n    for r in range(rows):\n        unique_colors = np.unique(grid[r, :])\n        if len(unique_colors) == 1:\n            solid_lines.append((r, unique_colors[0]))  # (row_index, color)\n    return solid_lines\n\ndef get_non_solid_rows(grid):\n     # Find rows that are not entirely of one color\n    rows, cols = grid.shape\n    non_solid_row_indices = []\n    for r in range(rows):\n        unique_colors = np.unique(grid[r,:])\n        if len(unique_colors) > 1:\n            non_solid_row_indices.append(r)\n    return non_solid_row_indices\n            \n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find solid lines.\n    solid_lines = find_solid_lines(output_grid)\n    \n    # Find non solid rows\n    non_solid_rows = get_non_solid_rows(output_grid)\n    \n    # Get the colors in the non-solid rows\n    allowed_colors = set()\n    for row_index in non_solid_rows:\n        for color in np.unique(input_grid[row_index,:]):\n            allowed_colors.add(color)\n\n    # Iterate through the grid and apply the rules.\n    for r in range(rows):\n        for c in range(cols):\n            is_solid_line = False\n            for line_row, line_color in solid_lines:\n                if r == line_row:\n                    is_solid_line = True\n                    break\n            if is_solid_line:\n                continue  # Preserve solid lines\n            \n            if output_grid[r,c] not in allowed_colors:\n                output_grid[r,c] = 0\n            elif not (r in [line[0] for line in solid_lines]):\n                # check for solid line colors in non-solid rows, and remove if present\n                solid_line_colors = [line[1] for line in solid_lines]\n                if output_grid[r,c] in solid_line_colors:\n                    output_grid[r,c] = 0\n            \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7651,
+    "candidates_token_count": 711,
+    "total_token_count": 8362,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.122905,
+  "response_file": "016-response.json"
+}

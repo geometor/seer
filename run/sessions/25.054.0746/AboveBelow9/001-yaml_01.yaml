@@ -1,0 +1,35 @@
+objects:
+  - id: grid_input
+    type: grid
+    description: 2D array of integers representing colors
+    dimensions: 10x12
+    elements:
+      - color: white
+        value: 0
+      - color: green
+        value: 3
+      - color: yellow
+        value: 4
+
+  - id: grid_output
+    type: grid
+    description: 2D array of integers representing colors
+    dimensions: 10x12
+    elements:
+      - color: white
+        value: 0
+      - color: yellow
+        value: 4
+
+actions:
+  - name: remove_color
+    description: Remove all pixels of a specific color from the grid.
+    parameters:
+      - color: The color to be removed.
+
+relationships:
+   - subject: grid_output
+     relation: derived_from
+     object: grid_input
+     description:  grid_output is created by modifying grid_input
+     rule: "All green (3) pixels in grid_input are changed to white (0) in grid_output. Yellow (4) stays."

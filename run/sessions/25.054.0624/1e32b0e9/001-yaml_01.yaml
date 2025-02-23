@@ -1,0 +1,28 @@
+objects:
+  - name: red_pixel
+    color: red
+    value: 2
+    properties:
+      - static: true  # Red pixels don't seem to move or change
+
+  - name: azure_pixel
+    color: azure
+    value: 8
+    properties:
+      - dynamic: true # Azure pixels appear to change, possibly growing or with new ones added.
+
+  - name: white_pixel
+    color: white
+    value: 0
+    properties:
+      - static: true   # acts as a background.
+
+actions:
+  - name: azure_expansion
+    description: Azure pixels expand or appear around existing azure and potentially based on red locations.
+
+relationships:
+  - type: adjacency
+    description: The relationship between azure and red, and azure and other azure, seems important. Proximity/adjacency guides the expansion.
+  - type: containment
+    description:  Azure pixels tend to form connected regions or lines.

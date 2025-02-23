@@ -1,0 +1,40 @@
+observations:
+  - example: 1
+    objects:
+      - color: 8  # Azure
+        initial_positions: "Scattered throughout the grid"
+        behavior: "Expands one layer around itself, changes color of adjacent pixels"
+      - color: 2  # Red
+        initial_positions: "Present in the grid"
+        behavior: "Adjacent to azure, causes *all* adjacent pixels to become azure."
+      - color: 0
+        initial_positions: "background"
+        behavior: "changes to azure when next to azure"
+
+  - example: 2
+    objects:
+      - color: 2  # Red
+        initial_positions: "Forms a continuous border and some isolated lines"
+        behavior: "Adjacent to azure, causes *all* adjacent pixels to become azure."
+      - color: 8
+        initial_position: "does not exist"
+        behavior: "appears, one layer surrounding red"
+      - color: 1
+        initial_position: "in grid"
+        behavior: "changed to azure when adjacent to red"
+      - color: 0
+        initial_position: "background"
+        behavior: "changes to azure when next to azure"
+  - example: 3
+      - color: 1  # Blue
+        initial_positions: "Forms a continuous border and some isolated lines"
+        behavior: "Adjacent to azure, causes *all* adjacent pixels to become azure."
+      - color: 8
+        initial_position: "does not exist"
+        behavior: "appears, one layer surrounding blue"
+      - color: 3
+        initial_position: "in grid"
+        behavior: "changed to azure when adjacent to blue"
+      - color: 0
+        initial_position: "background"
+        behavior: "changes to azure when next to blue"

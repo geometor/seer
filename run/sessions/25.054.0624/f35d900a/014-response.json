@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Mirroring and Initial Expansion**: Copy each non-white pixel from the input to the output, then \"expand\" the colors.\n    *   Expand red (2) to all directly adjacent white pixels.\n    *   Expand yellow (4) to all directly adjacent white pixels.\n    *   Mirror the initial colored pixels positions across a vertical and a horizontal axis.\n\n2.  **Adjacency Check and Gray Fill**: For each white (0) pixel in the *output* grid:\n    *   Check if it is adjacent to at least one non-white pixel.\n    *   Check if the adjacent non-white pixels contain at least two different colors.\n    *   If *both conditions are true*, replace the white pixel with gray (5). Otherwise, keep the current value of the pixel.\n3. If the cell is not white and has not been changed to gray, maintain its input color in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_adjacent_pixels(grid, row, col):\n    \"\"\"Gets the values of adjacent pixels (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    adjacent = []\n    if row > 0:\n        adjacent.append(grid[row - 1, col])  # Up\n    if row < rows - 1:\n        adjacent.append(grid[row + 1, col])  # Down\n    if col > 0:\n        adjacent.append(grid[row, col - 1])  # Left\n    if col < cols - 1:\n        adjacent.append(grid[row, col + 1])  # Right\n    return adjacent\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = output_grid.shape\n\n    # Mirror and initial placement\n    for i in range(rows):\n      for j in range(cols):\n        if input_grid[i,j] != 0:\n          output_grid[i,j] = input_grid[i,j]\n          output_grid[i, cols-1-j] = input_grid[i,j]\n          output_grid[rows-1-i, j] = input_grid[i,j]\n          output_grid[rows-1-i, cols-1-j] = input_grid[i,j]\n\n\n    # Expand Colors\n    temp_grid = np.copy(output_grid)\n    for i in range(rows):\n        for j in range(cols):\n            if output_grid[i, j] == 0:  # Only expand onto white pixels\n                adjacent = get_adjacent_pixels(output_grid, i, j)\n                for adj_val in adjacent:\n                  if adj_val == 2:\n                      temp_grid[i,j] = 2\n                  elif adj_val == 4:\n                      temp_grid[i,j] = 4\n\n    output_grid = np.copy(temp_grid)\n\n    # Adjacency check and Gray Fill\n    for i in range(rows):\n        for j in range(cols):\n            if output_grid[i, j] == 0:\n                adjacent = get_adjacent_pixels(output_grid, i, j)\n                adjacent_colors = set(adjacent)\n                adjacent_colors.discard(0)  # Remove white from consideration\n                if len(adjacent_colors) >= 2:\n                    output_grid[i, j] = 5\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3285,
+    "candidates_token_count": 812,
+    "total_token_count": 4097,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.050698,
+  "response_file": "014-response.json"
+}

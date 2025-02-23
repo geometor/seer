@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Barrier Rows:** Examine each row in the input grid. A barrier row is a row where *all* pixels have the *same* color. There should be two barrier rows, and the color of these rows should be present in the example's color palette.\n2. **Barrier Color:** Note the color of the barrier row - this color does not change between input and output.\n3.  **Propagate Color:** For each pixel *not* in a barrier row, check its immediate neighbors (up, down, left, right - not diagonally).\n4. If a pixel is adjacent to *any* pixel that is part of a barrier row, set its\n   color to the color of that barrier row.\n5.  **Barrier Rows Unchanged:** The pixels in the barrier rows do not change their color.\n\"\"\"\n\nimport numpy as np\n\ndef get_adjacent_pixels(grid, row, col):\n    \"\"\"Gets directly adjacent pixels (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    adjacent = []\n    if row > 0:\n        adjacent.append((row - 1, col))  # Up\n    if row < rows - 1:\n        adjacent.append((row + 1, col))  # Down\n    if col > 0:\n        adjacent.append((row, col - 1))  # Left\n    if col < cols - 1:\n        adjacent.append((row, col + 1))  # Right\n    return adjacent\n\ndef find_barrier_rows(grid):\n    \"\"\"Identifies barrier rows based on uniform color.\"\"\"\n    rows, cols = grid.shape\n    barrier_rows = []\n    for r in range(rows):\n        if np.all(grid[r] == grid[r, 0]):  # Check if all pixels in row are the same\n            barrier_rows.append(r)\n    return barrier_rows\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rules.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n    \n    # Identify barrier rows dynamically\n    barrier_rows = find_barrier_rows(input_grid)\n\n    # Iterate through all pixels\n    for r in range(rows):\n        for c in range(cols):\n            # Check if the current pixel is NOT on a barrier row\n            if r not in barrier_rows:\n                # Get adjacent pixels\n                adjacent_pixels = get_adjacent_pixels(input_grid, r, c)\n                # Apply influence from barrier pixels\n                for ar, ac in adjacent_pixels:\n                    if ar in barrier_rows:\n                        barrier_color = input_grid[ar, ac]\n                        output_grid[r, c] = barrier_color\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8263,
+    "candidates_token_count": 638,
+    "total_token_count": 8901,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.751277,
+  "response_file": "012-response.json"
+}

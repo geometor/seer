@@ -1,0 +1,25 @@
+objects:
+  - type: grid
+    dimensions: 18x19
+    elements: pixels
+    
+  - type: pixel
+    values: [0, 2, 3, 4]
+    colors:
+      0: white
+      2: red
+      3: green
+      4: yellow
+
+  - type: line
+    orientation: vertical
+    colors: [green, yellow]
+
+actions:
+  - type: modify
+    description:  Pixels are changed based on their neighbors.
+    
+relationships:
+    - type: adjacency
+      description: Green and yellow lines are next to each other in specific columns.
+      affects: modification

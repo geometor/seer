@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all azure (8) pixels, forming the \"azure cluster.\"  Also, find all isolated blue (1) and red (2) pixels. Identify the yellow (4) pixel near the *original* position of the azure cluster.\n2. **Determine Relative Shift:** Calculate the relative positional change of the azure cluster using the following approach:\n    *  Find the relative vector from the centroid of the azure cluster to the average position of the blue and red pixels.\n3.  **Move Azure Cluster:** Recreate the azure cluster. For each azure pixel in the original position, add the relative vector calculated in the previous step to place the azure cluster.\n4.  **Preserve Other Colors:** Keep all other colors (besides azure and the deleted yellow) in their original positions.\n5.  **Delete Yellow:** Remove the yellow (4) pixel that was adjacent to *any* of the original azure cluster pixels.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixels_by_color(grid, color):\n    \"\"\"Finds the coordinates of all pixels of a specific color.\"\"\"\n    return np.argwhere(grid == color)\n\ndef calculate_centroid(pixels):\n    \"\"\"Calculates the centroid of a set of pixels.\"\"\"\n    if len(pixels) == 0:\n        return np.array([0, 0])\n    return np.mean(pixels, axis=0)\n\ndef find_adjacent_pixels(grid, pixels):\n    \"\"\"finds adjacent pixels of a given color\"\"\"\n    adjacent_pixels = set()\n    for r, c in pixels:\n        for dr in [-1, 0, 1]:\n            for dc in [-1, 0, 1]:\n                if dr == 0 and dc == 0:\n                    continue\n                nr, nc = r + dr, c + dc\n                if 0 <= nr < grid.shape[0] and 0 <= nc < grid.shape[1]:\n                    adjacent_pixels.add((nr, nc))\n    return adjacent_pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find azure pixels.\n    azure_pixels = find_pixels_by_color(input_grid, 8)\n    \n    # Find blue and red pixels\n    blue_pixels = find_pixels_by_color(input_grid, 1)\n    red_pixels = find_pixels_by_color(input_grid, 2)\n\n    # Calculate centroid of azure cluster.\n    azure_centroid = calculate_centroid(azure_pixels)\n\n    # Calculate average position of blue and red pixels.\n    blue_red_avg_pos = calculate_centroid(np.concatenate((blue_pixels, red_pixels)))\n\n\n    # Determine relative shift\n    if len(azure_pixels) >0:\n       relative_shift = blue_red_avg_pos - azure_centroid\n    else:\n       relative_shift = np.array([0,0])\n\n    # Move azure pixels.\n    new_azure_pixels = []\n    for r, c in azure_pixels:\n        output_grid[r, c] = 0  # Remove original azure pixel\n        new_r, new_c = r + relative_shift[0], c + relative_shift[1]\n        new_r = int(round(new_r)) #convert to int\n        new_c = int(round(new_c))\n\n        if 0 <= new_r < output_grid.shape[0] and 0 <= new_c < output_grid.shape[1]:\n            new_azure_pixels.append( (new_r,new_c) )\n            output_grid[new_r, new_c] = 8  # Place new azure pixel\n\n\n    #find yellow to delete\n    adjacent_to_azure = find_adjacent_pixels(input_grid, azure_pixels)\n    for r, c in adjacent_to_azure:\n       if output_grid[r,c] == 4:\n          output_grid[r,c] = 0 #delete yellow\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7250,
+    "candidates_token_count": 936,
+    "total_token_count": 8186,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.843,
+  "response_file": "016-response.json"
+}

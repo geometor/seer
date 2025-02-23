@@ -1,0 +1,25 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    properties:
+      - values: integers (0-9) representing colors
+      - size: large (30x30 in the example)
+      - content: mostly 0 (white), scattered colored pixels
+
+  - object: output_grid
+    type: 2D array
+    properties:
+      - values: integers (0-9), primarily 4 (yellow)
+      - size: small (3x3 in the example)
+      - content:  represents a condensed/cropped section of the input grid
+
+  - relation:
+      - input_grid CONTAINS output_grid_content
+      - description: The output grid's content is derived from a region within the input grid.
+
+  - action: cropping_and_color_filtering
+      - description: The input grid is effectively cropped or a specific area is focused upon.
+      - parameters: The area focused on is the region with color value '4'.
+
+  - action: fill
+    - description: fill the output grid with selected color, empty space with 0

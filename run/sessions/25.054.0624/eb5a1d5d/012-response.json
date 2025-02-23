@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nReduces a large grid to a smaller representation. The output represents the outlines of the nested regions of the input, maintaining their relative positioning and centered. The size of the output grid corresponds to the number of nested regions.\n\"\"\"\n\nimport numpy as np\n\ndef get_border_color(grid):\n    \"\"\"Return color of the top-left pixel. Assumes a filled rectangle.\"\"\"\n    return grid[0, 0]\n\ndef find_nested_regions(grid):\n    \"\"\"\n    Finds the nested regions within the grid, starting from the border.\n    Returns a list of dictionaries, each containing the color and dimensions of a region.\n    \"\"\"\n    regions = []\n    current_grid = grid\n    while True:\n        border_color = get_border_color(current_grid)\n        height, width = current_grid.shape\n        regions.append({'color': border_color, 'height': height, 'width': width})\n\n        # Find the inner region by checking for a different color\n        inner_grid = None\n        for i in range(1, height - 1):\n            for j in range(1, width - 1):\n                if current_grid[i, j] != border_color:\n                    # Extract the inner grid\n                    inner_grid = current_grid[i:, j:]\n\n                    #find end of different colors\n                    end_i = 0\n                    while i + end_i < height and inner_grid[end_i,0] == inner_grid[0,0]:\n                        end_i += 1\n                    end_j = 0\n                    while j + end_j < width and inner_grid[0,end_j] == inner_grid[0,0]:\n                        end_j += 1                   \n                    inner_grid = inner_grid[:end_i, :end_j]\n                    break\n            if inner_grid is not None:\n                break\n        \n        if inner_grid is None:\n          break\n        else:\n            current_grid = inner_grid\n\n    return regions\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid into a smaller grid representing nested regions.\"\"\"\n\n    # Identify nested regions.\n    regions = find_nested_regions(input_grid)\n    num_layers = len(regions)\n\n    # Create an output grid of size L x L, where L is the number of layers.\n    output_grid = np.zeros((num_layers, num_layers), dtype=int)\n\n    # Draw outlines for each layer.\n    for i in range(num_layers):\n        color = regions[i]['color']\n        # Draw top and bottom borders.\n        output_grid[i, i:num_layers-i] = color\n        output_grid[num_layers-1-i, i:num_layers-i] = color\n        # Draw left and right borders (excluding corners already filled).\n        output_grid[i+1:num_layers-1-i, i] = color\n        output_grid[i+1:num_layers-1-i, num_layers-1-i] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10297,
+    "candidates_token_count": 712,
+    "total_token_count": 11009,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.479451,
+  "response_file": "012-response.json"
+}

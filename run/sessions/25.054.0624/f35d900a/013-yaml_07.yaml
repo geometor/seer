@@ -1,0 +1,29 @@
+objects:
+  - type: grid
+    description: 2D array of pixels
+    properties:
+      - width: 16
+      - height: 17
+      - cells: integers (0-9) representing colors
+
+  - type: pixel
+    description: individual cell in the grid
+    properties:
+      - color: integer value (0=white, 2=red, 4=yellow, 5=gray)
+      - position: (row, column) coordinates
+
+actions:
+  - type: mirroring
+    description: The relative position of the original colored pixels is preserved, with the original input mirrored in output.
+  - type: expansion
+    description: Expanding the colored pixels to their adjacent.
+  - type: replacement
+    description: Replacing white pixels with gray based on adjacency to colored pixels
+    parameters:
+      - original_color: 0 (white)
+      - new_color: 5 (gray)
+      - condition: adjacent to two differently colored pixels
+
+relationships:
+  - adjacency: pixels sharing a side (not diagonal)
+  - symmetry: pattern is mirrored across a vertical and horizontal center axes.

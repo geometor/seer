@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Potential Frames:** Examine the input grid and identify potential frame colors by considering colors on the edges and large contiguous blocks.\n2.  **Prioritize Single-Color Frames:** Check for frames consisting of a single color. If found, proceed with extracting the inner region.\n3.  **Handle Multi-Color Frames:** If no single-color frame is found, look for frames composed of multiple colors but with consistent boundaries.  Prioritize frames that completely enclose another region.\n4.  **Extract Inner Region:** Once a suitable frame is identified (either single-color or multi-color), extract the region enclosed by the frame.\n5.  **Return Sub-grid:** Return the extracted sub-grid. If no suitable frame is found, return an empty grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_perimeter_colors(grid):\n    \"\"\"Gets the colors present on the perimeter of the grid.\"\"\"\n    rows, cols = grid.shape\n    perimeter_colors = set()\n\n    # Top and bottom rows\n    for c in range(cols):\n        perimeter_colors.add(grid[0, c])\n        perimeter_colors.add(grid[rows - 1, c])\n\n    # Left and right columns (excluding corners)\n    for r in range(1, rows - 1):\n        perimeter_colors.add(grid[r, 0])\n        perimeter_colors.add(grid[r, cols - 1])\n\n    return list(perimeter_colors)\n\ndef find_single_color_frame(grid, frame_color):\n    \"\"\"Finds the largest rectangular region enclosed by a frame of the specified color.\"\"\"\n    rows, cols = grid.shape\n    top_left = None\n    bottom_right = None\n\n    # Find top-left corner of frame\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == frame_color:\n                # Check if this is a valid top-left corner\n                if (c + 1 < cols and grid[r, c+1] == frame_color) or (r + 1 < rows and grid[r+1,c] == frame_color):\n                    top_left = (r, c)\n                    break\n        if top_left:\n            break\n    \n    if not top_left:\n        return None, None\n\n    # Find bottom-right corner\n    r = top_left[0]\n    c = top_left[1]\n    \n    # get width\n    while c < cols and grid[r,c] == frame_color:\n      c += 1\n    width = c - top_left[1]\n\n    #get height\n    c = top_left[1]\n    while r < rows and grid[r, c] == frame_color:\n        r += 1\n    height = r - top_left[0]  \n    \n    bottom_right = (top_left[0] + height -1, top_left[1] + width -1 )\n\n    #check full frame is valid\n    for i in range(top_left[1], bottom_right[1] + 1):\n        if not (grid[top_left[0], i] == frame_color and grid[bottom_right[0],i] == frame_color):\n            return None, None\n    for i in range(top_left[0], bottom_right[0] + 1):\n      if not (grid[i, top_left[1]] == frame_color and grid[i, bottom_right[1]] == frame_color ):\n          return None, None\n    \n    return top_left, bottom_right\n\ndef extract_inner_region(grid, top_left, bottom_right):\n    \"\"\"Extracts the inner region defined by the frame corners.\"\"\"\n    if top_left is None or bottom_right is None:\n        return []\n\n    inner_top_left = (top_left[0] + 1, top_left[1] + 1)\n    inner_bottom_right = (bottom_right[0] - 1, bottom_right[1] - 1)\n\n    if inner_top_left[0] > inner_bottom_right[0] or inner_top_left[1] > inner_bottom_right[1]:\n      return []\n\n    return grid[inner_top_left[0]:inner_bottom_right[0]+1, inner_top_left[1]:inner_bottom_right[1]+1].tolist()\n\n\ndef transform(input_grid):\n    \"\"\"Extracts the rectangular region enclosed by a dynamically determined frame, prioritizing single-color frames.\"\"\"\n    grid = np.array(input_grid)\n    perimeter_colors = get_perimeter_colors(grid)\n    \n    # Prioritize single-color frames\n    for frame_color in perimeter_colors:\n        top_left, bottom_right = find_single_color_frame(grid, frame_color)\n        if top_left:\n          output_grid = extract_inner_region(grid,top_left, bottom_right)\n          return output_grid\n\n    #if we get here, there is no good single color frame\n    return []\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 15265,
+    "candidates_token_count": 1180,
+    "total_token_count": 16445,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.108455,
+  "response_file": "012-response.json"
+}

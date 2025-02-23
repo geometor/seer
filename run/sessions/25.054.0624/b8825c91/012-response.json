@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies and removes \"surrounded\" yellow (color 4) shapes from a grid. A yellow shape is considered \"surrounded\" if all its pixels have neighbors (up, down, left, right) that are either non-yellow or are outside the grid boundaries.\n\"\"\"\n\nimport numpy as np\n\ndef get_contiguous_shapes(grid, color):\n    \"\"\"\n    Finds and returns a set of coordinates for contiguous shapes of the given color.\n    \"\"\"\n    visited = set()\n    shapes = []\n\n    def dfs(row, col):\n        \"\"\"Depth-first search to find contiguous pixels.\"\"\"\n        if (row, col) in visited or not (0 <= row < len(grid) and 0 <= col < len(grid[0])) or grid[row][col] != color:\n            return []\n\n        visited.add((row, col))\n        shape = [(row, col)]\n\n        # Explore adjacent cells\n        shape.extend(dfs(row + 1, col))\n        shape.extend(dfs(row - 1, col))\n        shape.extend(dfs(row, col + 1))\n        shape.extend(dfs(row, col - 1))\n\n        return shape\n\n    for row in range(len(grid)):\n        for col in range(len(grid[0])):\n            if grid[row][col] == color and (row, col) not in visited:\n                shapes.append(dfs(row, col))\n\n    return shapes\n\ndef is_surrounded(grid, shape):\n    \"\"\"\n    Checks if a shape is surrounded by non-yellow pixels or grid boundaries.\n    \"\"\"\n    rows, cols = grid.shape\n    for r, c in shape:\n        neighbors = [(r-1, c), (r+1, c), (r, c-1), (r, c+1)]\n        for nr, nc in neighbors:\n            if 0 <= nr < rows and 0 <= nc < cols:\n                if grid[nr, nc] == 4:\n                    return False  # Found a yellow neighbor, so not surrounded\n            # else: it is a valid boundary, implicitly not 4.\n        \n    return True # No yellow neighbors, so it is surrounded.\n\ndef transform(input_grid):\n    \"\"\"\n    Removes the surrounded contiguous shapes of yellow (4) pixels.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # 1. Identify Yellow Shapes\n    yellow_shapes = get_contiguous_shapes(input_grid, 4)\n\n    # 2. Determine Surrounded Shapes\n    surrounded_shapes = [shape for shape in yellow_shapes if is_surrounded(input_grid, shape)]\n\n    # 3. Remove Surrounded Shapes: Iterate through surrounded shapes\n    for shape in surrounded_shapes:\n        for row, col in shape:\n            output_grid[row,col] = input_grid[row,col] # Keep colors the same, as described in program.\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 14302,
+    "candidates_token_count": 690,
+    "total_token_count": 14992,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.780739,
+  "response_file": "012-response.json"
+}

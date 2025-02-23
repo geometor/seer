@@ -1,0 +1,18 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      - pixels: integers (0-9) representing colors
+      - regions: contiguous blocks of pixels with the same color
+
+actions:
+  - name: identify_black_regions
+    description: Locate contiguous regions of black (0) pixels.
+    method: connected component labeling
+
+  - name: replace_black_pixels
+    description: Replace each black pixel with the most frequent non-black neighboring color.
+    method:  Iterate through labeled black regions, find neighboring colors, replace with the mode.
+
+  - name: preserve_other_pixels
+    description: Keep non-black pixels unchanged.

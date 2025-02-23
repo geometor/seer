@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation erodes non-blue (non-1) regions adjacent to white (0) regions in the input grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by removing non-blue (non-1) pixels that are adjacent to white (0) pixels.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Iterate through each pixel in the grid\n    for r in range(rows):\n        for c in range(cols):\n            # Check if the current pixel is not blue (1)\n            if input_grid[r, c] != 1:\n                # Check for adjacent white (0) pixels\n                is_adjacent_to_zero = False\n                for i in range(max(0, r - 1), min(rows, r + 2)):\n                    for j in range(max(0, c - 1), min(cols, c + 2)):\n                        if input_grid[i, j] == 0:\n                            is_adjacent_to_zero = True\n                            break\n                    if is_adjacent_to_zero:\n                        break\n                # If adjacent to zero, set the output pixel to blue(1)\n                if is_adjacent_to_zero:\n                    output_grid[r, c] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3361,
+    "candidates_token_count": 324,
+    "total_token_count": 3685,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.248665,
+  "response_file": "002-response.json"
+}

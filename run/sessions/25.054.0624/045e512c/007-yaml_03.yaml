@@ -1,0 +1,43 @@
+objects:
+  - name: blue_pixel
+    color: blue (1)
+    initial_shape: line_segment
+    role: central_axis
+
+  - name: red_pixel
+    color: red (2)
+    initial_shape: single_pixel
+    role: expanding_element
+
+  - name: yellow_pixel
+    color: yellow (4)
+    initial_shape: single_pixel, edge
+    role: expanding_element
+
+  - name: white_pixel
+    color: white (0)
+    initial_shape: background
+    role: background
+
+actions:
+  - name: expand
+    actor: [yellow_pixel, red_pixel]
+    description: The original single pixels become multiple pixels.
+    rules: "yellow triples horizontally, red extends vertically and horizontally, always adjacent to the blue line segment, if present"
+
+  - name: maintain_position
+    actor: blue_pixel
+    description: maintain relative position to each other, change how red relates
+
+relationships:
+  - object1: blue_pixel
+    object2: red_pixel
+    relation: initially adjacent, but then surrounds on two sides
+
+  - object1: blue_pixel
+    object2: yellow_pixel
+    relation: initially, adjacent, but then yellow expands
+
+  - object1: red_pixel
+    object2: yellow_pixel
+    relation: no direct relationship

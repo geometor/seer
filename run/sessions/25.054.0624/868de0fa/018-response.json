@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Blue Regions:** Find all distinct, connected regions of blue (1) pixels. These are the `blue_region` objects.\n2.  **Identify the Boundary:** Find all white pixels(0) which are adjacent to the `blue_region`.\n3. **Define Inner Region 1 (Orange):** For each `blue_region`, identify the blue pixels which are adjacent to the `boundary`. These constitute `inner_region_1`.\n4.  **Define Inner Region 2 (Red):** For each `blue_region`, the remaining blue pixels *not* in `inner_region_1` constitute `inner_region_2`.\n5.  **Color Inner Region 1:** Change the color of all pixels in `inner_region_1` to orange (7).\n6.  **Color Inner Region 2:** Change the color of all pixels in `inner_region_2` to red (2).\n7.  **Preserve Other Colors:** All pixels not part of any `blue_region` keep their original color.\n\"\"\"\n\nimport numpy as np\nfrom scipy.ndimage import label\n\ndef get_neighbors(grid, r, c):\n    \"\"\"Gets the valid neighbors of a cell in a grid (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    neighbors = []\n    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols:\n            neighbors.append((nr, nc))\n    return neighbors\n\ndef find_regions(grid, color):\n    \"\"\"Finds contiguous regions of a specific color in the grid.\"\"\"\n    mask = (grid == color)\n    labeled_array, num_features = label(mask)\n    return labeled_array, num_features\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rules.\"\"\"\n    output_grid = input_grid.copy()\n    rows, cols = input_grid.shape\n\n    # 1. Find Blue Regions\n    blue_regions, num_blue_regions = find_regions(input_grid, 1)\n\n    # Iterate through each blue region\n    for region_id in range(1, num_blue_regions + 1):\n        # Create a mask for the current blue region.\n        current_blue_region_mask = (blue_regions == region_id)\n        \n        # 2. Identify Boundary (white pixels adjacent to blue region)\n        boundary = []\n        for r in range(rows):\n            for c in range(cols):\n                if input_grid[r,c] == 0: #white pixel\n                    neighbors = get_neighbors(input_grid, r, c)\n                    for nr, nc in neighbors:\n                        if current_blue_region_mask[nr,nc]: #if neighbor is in the current blue region\n                            boundary.append((r,c))\n                            break\n\n        # 3. Define Inner Region 1\n        inner_region_1 = []\n        for r in range(rows):\n            for c in range(cols):\n                if current_blue_region_mask[r, c]: #if current pixel in blue region\n                    neighbors = get_neighbors(input_grid, r, c)\n                    for nr, nc in neighbors:\n                        if (nr, nc) in boundary: #if a neighbor is in the boundary\n                            inner_region_1.append((r,c))\n                            break\n\n        # 4. Define Inner Region 2 (remaining blue pixels)\n        inner_region_2 = []\n        inner_region_1_coords = set(inner_region_1)\n        for r in range(rows):\n            for c in range(cols):\n                if current_blue_region_mask[r, c] and (r, c) not in inner_region_1_coords:\n                    inner_region_2.append((r, c))\n\n        # 5. & 6. Color the regions\n        for r, c in inner_region_1:\n            output_grid[r, c] = 7  # Orange\n\n        for r, c in inner_region_2:\n            output_grid[r, c] = 2  # Red\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 9095,
+    "candidates_token_count": 993,
+    "total_token_count": 10088,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.75867,
+  "response_file": "018-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Locate Target Region:** Scan the input grid to identify the smallest rectangular region containing *all* non-zero (non-black) colored pixels. This region is defined by the minimum and maximum row and column indices that contain any non-zero pixel.\n2.  **Extract Region:** Copy the pixel values within the identified rectangular region.\n3.  **Create Output Grid:** Create an output grid with the exact dimensions (height and width) of the extracted region.\n4. **Arrange:** Maintain the position of non-zero pixels from the input and set all other values to zero.\n5.  **Output:** Return the extracted output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_target_region(grid):\n    \"\"\"Finds the smallest rectangular region containing all non-zero pixels.\"\"\"\n    rows, cols = grid.shape\n    non_zero_rows = []\n    non_zero_cols = []\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] != 0:\n                non_zero_rows.append(r)\n                non_zero_cols.append(c)\n\n    if not non_zero_rows:  # No non-zero pixels found\n        return None, None, None, None\n\n    top_row = min(non_zero_rows)\n    bottom_row = max(non_zero_rows)\n    left_col = min(non_zero_cols)\n    right_col = max(non_zero_cols)\n\n    return top_row, bottom_row, left_col, right_col\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by extracting the smallest bounding box of non-zero pixels.\"\"\"\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the target region\n    top_row, bottom_row, left_col, right_col = find_target_region(input_grid)\n\n    if top_row is None:  # Handle case where no region is found\n        return []\n\n    # Extract the region\n    extracted_region = input_grid[top_row:bottom_row+1, left_col:right_col+1]\n    \n    # Create output grid filled with zeros and same shape\n    output_grid = np.zeros_like(extracted_region)\n\n    # Iterate through extract_region\n    rows, cols = extracted_region.shape\n    for r in range(rows):\n      for c in range(cols):\n        # Copy only non-zero\n        if extracted_region[r,c] != 0:\n          output_grid[r,c] = extracted_region[r,c]\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7242,
+    "candidates_token_count": 622,
+    "total_token_count": 7864,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.878965,
+  "response_file": "012-response.json"
+}

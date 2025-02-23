@@ -1,0 +1,27 @@
+examples:
+  - example_id: 1
+    input_size: [24, 25]
+    output_size: [5, 5]
+    output_colors: [0, 3]
+    transformation: "Extract 5x5 subgrid from top-left. Keep white and green."
+    notes: "Original hypothesis, partially correct."
+
+  - example_id: 2
+    input_size: [24, 25]
+    output_size: [5, 5]
+    output_colors: [6]
+    transformation: "Extract 5x5 subgrid. Incorrectly keeps white and green."
+    notes: "Highlights color selection error."
+
+  - example_id: 3
+    input_size: [24, 25]
+    output_size: [5, 5]
+    output_colors: [0, 5]
+    transformation: "Extract 5x5 subgrid. Incorrectly keeps white and green."
+    notes: "Confirms color selection error. Output should be gray and white."
+
+general:
+  - observation: "Output is always a 5x5 subgrid of the input."
+  - observation: "The subgrid is extracted from the top-left corner."
+  - observation: "The colors in the output are a subset of colors present at the top-left corner of the input, but it's NOT always white and green."
+  - hypothesis: "The transformation extracts the 5x5 top-left corner subgrid, but the colors preserved varies between examples, while remaining consistent within each individual input/output mapping"

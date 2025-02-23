@@ -1,0 +1,21 @@
+observations:
+  - object: blue_block
+    description: Contiguous regions of blue (1) pixels.
+    properties:
+      top_row_block: True if any part of the block is in the first two rows (0 and 1), otherwise False.
+      size: The number of pixels in the block.
+    actions:
+      - if: top_row_block is True
+        then: |
+          Check for "skipped" blue pixels.  A skipped blue pixel is one where there's a blue pixel
+          to the left or right (but not diagonally) with exactly one pixel of any color in between within
+          the top two rows.  If a skipped pixel exists, change the in-between pixel to orange (7).
+      - if: top_row_block is False and size >= 3
+        then: Change all pixels in the block to red (2).
+      - if: starts in coordinate (1,1)
+        then: Set the (1,1) color to orange.
+  - object: white_pixel
+    description: Pixels with color white (0).
+    properties: {}
+    actions:
+      - Remain unchanged.

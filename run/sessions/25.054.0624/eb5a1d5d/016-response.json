@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies nested rectangles in the input grid and represents them by their borders in the output grid. The output grid's size and background color are determined by the outermost rectangle found in the input. Inner rectangles are drawn as borders, with their positions and sizes relative to the containing rectangle.\n\"\"\"\n\nimport numpy as np\n\ndef get_object_bounds(grid):\n    # Find all unique colors, excluding white (0)\n    unique_colors = np.unique(grid)\n    unique_colors = unique_colors[unique_colors != 0]\n\n    bounds = {}\n    for color in unique_colors:\n        rows, cols = np.where(grid == color)\n        if len(rows) > 0:\n            min_row, max_row = np.min(rows), np.max(rows)\n            min_col, max_col = np.min(cols), np.max(cols)\n            bounds[color] = (min_row, max_row, min_col, max_col)\n    return bounds\n\ndef find_outermost_rectangle(bounds):\n    # Find the rectangle that encloses all others\n    if not bounds:\n        return None, None\n\n    outermost_color = None\n    outermost_bounds = None\n\n    for color, (min_row, max_row, min_col, max_col) in bounds.items():\n        if outermost_bounds is None:\n            outermost_color = color\n            outermost_bounds = (min_row, max_row, min_col, max_col)\n        else:\n            o_min_row, o_max_row, o_min_col, o_max_col = outermost_bounds\n            if min_row <= o_min_row and max_row >= o_max_row and min_col <= o_min_col and max_col >= o_max_col:\n                outermost_color = color\n                outermost_bounds = (min_row, max_row, min_col, max_col)\n    return outermost_color, outermost_bounds\n\ndef find_contained_rectangles(bounds, outer_bounds):\n   #find rectangles within outer_bounds\n    contained = []\n    if not outer_bounds:\n        return contained\n\n    o_min_row, o_max_row, o_min_col, o_max_col = outer_bounds\n    for color, (min_row, max_row, min_col, max_col) in bounds.items():\n        if (min_row >= o_min_row and max_row <= o_max_row and\n            min_col >= o_min_col and max_col <= o_max_col and\n            (min_row, max_row, min_col, max_col) != outer_bounds):\n            \n            #calculate relative position and size\n            rel_row = min_row - o_min_row\n            rel_col = min_col - o_min_col\n            height = max_row - min_row + 1\n            width = max_col - min_col + 1\n            \n            contained.append((color, (rel_row, rel_col), (height, width)))\n\n    return contained\n            \n\ndef transform(input_grid):\n    # Get bounds for all objects\n    object_bounds = get_object_bounds(input_grid)\n\n    # Find the outermost rectangle\n    outermost_color, outermost_bounds = find_outermost_rectangle(object_bounds)\n    \n    if outermost_bounds is None:\n        return np.array([[]]) #return empty if no objects\n\n    # Determine output grid size\n    o_min_row, o_max_row, o_min_col, o_max_col = outermost_bounds\n    output_height = o_max_row - o_min_row + 1\n    output_width = o_max_col - o_min_col + 1\n    output_grid = np.full((output_height, output_width), outermost_color)\n\n    # Find contained rectangles\n    contained_rectangles = find_contained_rectangles(object_bounds, outermost_bounds)\n    \n    # Draw contained rectangles\n    for color, (rel_row, rel_col), (height, width) in contained_rectangles:\n        output_grid[rel_row:rel_row + height, rel_col:rel_col + width] = outermost_color\n        output_grid[rel_row:rel_row + height, rel_col] = color  # Left border\n        output_grid[rel_row:rel_row + height, rel_col + width - 1] = color  # Right border\n        output_grid[rel_row, rel_col:rel_col + width] = color  # Top border\n        output_grid[rel_row + height - 1, rel_col:rel_col + width] = color  # Bottom border\n        \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6815,
+    "candidates_token_count": 1134,
+    "total_token_count": 7949,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.332542,
+  "response_file": "016-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify all white (0) pixels.\n2. For each white pixel, check for orthogonal adjacency (up, down, left, right) to a gray (5) pixel.\n3. If a white pixel is orthogonally adjacent to a gray pixel, change its color to red (2).\n4. All other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef is_adjacent_to_gray(grid, r, c):\n    \"\"\"\n    Checks if a pixel at (r, c) is orthogonally adjacent to a gray (5) pixel.\n    \"\"\"\n    rows, cols = grid.shape\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols and grid[nr, nc] == 5:\n            return True\n    return False\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by changing white pixels to red if they are adjacent to gray pixels.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through all pixels\n    for r in range(rows):\n        for c in range(cols):\n            # Check if the pixel is white\n            if output_grid[r, c] == 0:\n                # Check for adjacency to gray\n                if is_adjacent_to_gray(output_grid, r, c):\n                    # Change white pixel to red\n                    output_grid[r, c] = 2\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8357,
+    "candidates_token_count": 382,
+    "total_token_count": 8739,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.85757,
+  "response_file": "018-response.json"
+}

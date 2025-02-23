@@ -1,0 +1,23 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: 21x21
+      - elements: pixels
+      - colors: [0, 1, 2, 3, 4, 5, 6]  # Values representing different colors
+  - type: pixel
+    properties:
+      - color: integer (0-9)
+      - position: (row, column)
+
+actions:
+  - name: remove_pixels
+    target: pixels
+    condition:
+      - color: 0 # White
+      - shape: specific_pattern # To be defined more precisely
+
+relationships:
+  - type: adjacency
+    description: Pixels are adjacent horizontally, vertically, and diagonally.
+  - type: containment
+    description: The grid contains pixels.

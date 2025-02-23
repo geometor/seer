@@ -1,0 +1,45 @@
+facts:
+  - observation: |
+      The input grid is a 10x16 matrix of pixels.
+  - observation: |
+      The output grid is the same size as the input grid (10x16).
+  - objects:
+      - name: magenta_region_1
+        type: pixel_region
+        color: magenta (6)
+        location: top_right
+        properties:
+          - contiguous: true
+      - name: magenta_region_2
+        type: pixel_region
+        color: magenta (6)
+        location: top_left
+        properties:
+            - contiguous: true
+      - name: magenta_region_3
+        type: pixel_region
+        color: magenta(6)
+        location: middle_right
+        properties:
+            contiguous: true
+      - name: magenta_region_4
+        type: pixel_region
+        color: magenta(6)
+        location: bottom_left
+        properties:
+            contiguous: true
+      - name: green_line
+        type: pixel_region
+        color: green (3)
+        location: row_3
+        properties:
+          - contiguous: true
+          - shape: horizontal_line
+  - actions:
+      - name: erase_magenta
+        target: magenta_regions
+        condition: "location != top_right and location != top_left"
+        result: set_pixels_to_white(0)
+  - relationships:
+      - type: spatial
+        description: "The magenta regions are distributed across the grid, green region is a horizontal line in the top section"

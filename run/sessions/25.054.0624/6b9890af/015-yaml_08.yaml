@@ -1,0 +1,68 @@
+examples:
+  - example_id: 1
+    input_grid_shape: [19, 21]
+    output_grid_shape: [8, 8]
+    red_outline:
+      present: true
+      is_outline: true
+      color: 2
+      bounding_box: [[7, 6], [14, 13]]  # [top-left, bottom-right]
+    yellow_rectangle:
+      present: true
+      is_outline: false
+      color: 4
+      bounding_box: [[2,6],[4,8]]   # Example values
+    transformation:
+      - action: combine
+      - object1: red_outline
+      - object2: yellow_rectangle
+      - placement_rule: "yellow rectangle placed inside the top border of red outline"
+      - size_change: output size determined by red outline, reduced
+    match: false
+    notes: >
+      The code fails to place the yellow rectangle correctly, draws at input coordinates, and gets output size of the red rectangle correctly.
+      The yellow rectangle is stretched.
+
+  - example_id: 2
+    input_grid_shape: [19, 22]
+    output_grid_shape: [5, 5]
+    red_outline:
+      present: true
+      is_outline: true
+      color: 2
+      bounding_box: [[2, 2], [6, 6]]
+    yellow_rectangle:
+      present: true
+      is_outline: false
+      color: 1
+      bounding_box: [[9,10],[11,12]]
+    transformation:
+      - action: combine
+      - object1: red_outline
+      - object2: yellow_rectangle
+      - placement_rule: "yellow rectangle placed inside the top border of red outline"
+    match: false
+    notes:  The code fails to produce the correct shape and size. The inner shape isn't correctly positioned.
+    size_change: output size determined by red outline, reduced
+
+  - example_id: 3
+    input_grid_shape: [22, 24]
+    output_grid_shape: [11, 11]
+    red_outline:
+      present: true
+      is_outline: true
+      color: 2
+      bounding_box: [[1, 2], [11, 12]]
+    yellow_rectangle:
+      present: true
+      is_outline: false
+      color: 4
+      bounding_box: [[15,12],[17,15]]
+    transformation:
+      - action: combine
+      - object1: red_outline
+      - object2: yellow_rectangle
+      - placement_rule: "yellow rectangle placed inside and stretched across width near top border of the red outline. Height of inner object changes relative to outer."
+    match: false
+    notes: The result draws at red box coordinates, but the inner rectangle is not properly positioned or sized.
+    size_change: output size determined by red outline, reduced

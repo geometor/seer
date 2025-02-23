@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all contiguous regions (objects) of the same color (excluding white/0). An object is any grouping of adjacent pixels, not just rectangles.\n2.  **Selective Retention:** Keep only the green (color 3) objects.\n3.  **Removal:** Remove all other colored objects, replacing their pixels with the background color (white/0).\n4.  **Output:** Create a new grid where only the green objects are present, and everything else is white.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds all contiguous objects in the grid.\n    Returns a list of (color, [(r, c), ...]) tuples.\n    \"\"\"\n    objects = []\n    visited = np.zeros_like(grid, dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < grid.shape[0] and 0 <= c < grid.shape[1]\n\n    def dfs(r, c, color, object_pixels):\n        if not is_valid(r, c) or visited[r, c] or grid[r, c] != color:\n            return\n\n        visited[r, c] = True\n        object_pixels.append((r, c))\n\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            dfs(r + dr, c + dc, color, object_pixels)\n\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if not visited[r, c] and grid[r, c] != 0:\n                color = grid[r, c]\n                object_pixels = []\n                dfs(r, c, color, object_pixels)\n                objects.append((color, object_pixels))\n    return objects\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    # Find all objects\n    objects = find_objects(input_grid)\n\n    # Iterate over identified objects and selectively retain/remove\n    for color, pixels in objects:\n        if color == 3:  # Green\n            for r, c in pixels:\n                output_grid[r, c] = color\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7259,
+    "candidates_token_count": 558,
+    "total_token_count": 7817,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.092177,
+  "response_file": "006-response.json"
+}

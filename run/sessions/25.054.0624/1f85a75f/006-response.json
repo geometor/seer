@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find Core Object:** Search for a contiguous 3x3 block of pixels that all have the same color. This is the \"core object.\" Record the color and top-left coordinates.\n\n2.  **Check for White Border:**\n    *   Examine the rows immediately above and below the core object. If all pixels in those rows, within the same columns as the core object, are white (0), mark it as having a \"full\" border for expansion.\n    *   If only some are, mark it as a partial border\n\n3. **Determine output height:**\n   - If full border, and 3x3 object detected, output size is 5 x 3\n   - If partial border, and 3x3 object, output height is 3, and 3 wide\n\n4.  **Create Output Grid:** Create an output grid of the determined size, initialized with white (0).\n\n5.  **Fill Output Grid:**\n    *   If there's a *full* white border above and below: Fill the entire output grid with the core object's color, then replace the above and below rows, within the columns of the found object, with 0.\n    *   If there is *partial* white border: Fill the output grid according the pattern of the partial border.\n    * If there is no border: Fill the output grid with the color of the target object.\n\n6.  **Return:** Return the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_3x3_square(grid):\n    \"\"\"Finds a 3x3 square of uniform color.\"\"\"\n    rows, cols = grid.shape\n    for r in range(rows - 2):\n        for c in range(cols - 2):\n            color = grid[r, c]\n            if np.all(grid[r:r+3, c:c+3] == color):\n                return r, c, color\n    return None, None, None\n\ndef check_border(input_grid, row, col, color):\n    \"\"\"Checks for full or partial white border above/below 3x3.\"\"\"\n    rows, cols = input_grid.shape\n    full_border = False\n    partial_border = False\n\n    #check above\n    if row > 0 and np.all(input_grid[row-1, col:col+3] == 0):\n      #check below\n      if row + 3 < rows and np.all(input_grid[row+3, col:col+3] == 0):\n        full_border = True\n      else:\n        partial_border = True\n    elif row + 3 < rows and np.all(input_grid[row+3, col:col+3] == 0):\n        partial_border = True\n\n    return full_border, partial_border\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid based on a 3x3 square and border.\"\"\"\n    row, col, color = find_3x3_square(input_grid)\n\n    if row is None:\n        return np.zeros((1, 1), dtype=int)\n\n    full_border, partial_border = check_border(input_grid, row, col, color)\n    \n    if full_border:\n        output_grid = np.full((5, 3), color, dtype=int)\n        output_grid[0, :] = 0  # Top border\n        output_grid[4, :] = 0  # Bottom border\n\n    elif partial_border:\n      output_grid = np.full((3, 3), color, dtype=int)        \n\n    else: #no border\n        output_grid = np.full((3, 3), color, dtype=int)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6775,
+    "candidates_token_count": 853,
+    "total_token_count": 7628,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.482971,
+  "response_file": "006-response.json"
+}

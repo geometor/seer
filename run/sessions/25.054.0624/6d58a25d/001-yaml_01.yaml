@@ -1,0 +1,29 @@
+facts:
+  - observation: |
+      The input and output grids are of the same dimensions (20x20).
+  - object: background
+    color: white (0)
+    property: |
+      Forms the majority of the grid and appears unchanged in most locations
+  - object: azure_pixels
+    color: azure (8)
+    property: |
+      Scattered throughout the grid, seemingly at random positions.
+      Appear to replace some maroon pixels and appear within the cluster of maroon pixels.
+      Seem to connect azure pixels that were not previously connected.
+
+  - object: maroon_pixels
+    color: maroon (9)
+    property: |
+       Form a distinct cluster in the input grid.
+       Some are replaced by azure (8) pixels in output.
+  - relation:
+      type: spatial
+      description: |
+        Azure pixels appear to be inserted within and around the maroon pixel cluster, and in some cases, replacing the maroon color.
+
+  - action: replacement
+    description: |
+        Some maroon pixels are replaced with azure.
+        A single azure pixel is placed above each original azure pixel.
+        If azure would overlay maroon, azure replaces maroon.

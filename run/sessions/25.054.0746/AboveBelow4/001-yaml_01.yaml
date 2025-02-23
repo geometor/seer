@@ -1,0 +1,20 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 10x10
+      cell_values: [0, 2, 4]  # white, red, yellow
+  - type: stripe
+    properties:
+      orientation: [horizontal, vertical]
+      color: [red, yellow]
+      contiguous: true
+relationships:
+  - type: intersection
+    properties:
+      objects: [red stripe, yellow stripe]
+      result: color change (red to yellow)
+actions:
+  - type: replacement
+    properties:
+      source: red pixel at intersection
+      target: yellow pixel

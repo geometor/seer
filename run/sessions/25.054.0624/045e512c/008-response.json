@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation involves expanding yellow and red pixels around a central, unchanged line of blue pixels.\n\n1. **Identify Core:** Locate the horizontal line of blue (1) pixels. This serves as a central structure.\n2. **Yellow Expansion:** Expand the yellow (4) pixels. Each single yellow pixel becomes a horizontal line of three yellow pixels, centered on the original yellow pixel's location.\n3. **Blue Axis:** The position of the blue pixels doesn't change.\n4. **Red Expansion:** Expand the red (2) pixels. The single red pixel expands to become a vertical and a horizontal line, using the original red pixel position as their meeting point, and adjacent to the sides of the original blue pixels.\n\n\"\"\"\n\nimport numpy as np\n\ndef find_blue_line(grid):\n    # Find coordinates of blue pixels (1)\n    blue_coords = np.argwhere(grid == 1)\n    if len(blue_coords) < 2: # assuming minimum two for it to be a line\n      return None\n\n    # check if contiguous horizontally\n    is_horizontal = all(blue_coords[i][0] == blue_coords[0][0] for i in range(len(blue_coords)))\n    if not is_horizontal:\n        return None\n    \n    return blue_coords\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # Find the blue line\n    blue_line = find_blue_line(input_grid)\n\n    # Yellow Expansion\n    yellow_coords = np.argwhere(input_grid == 4)\n    for y, x in yellow_coords:\n        output_grid[y, max(0, x - 1):min(input_grid.shape[1], x + 2)] = 4\n\n    # Red Expansion\n    red_coords = np.argwhere(input_grid == 2)\n    if blue_line is not None:\n      blue_y = blue_line[0][0]\n      for r, c in red_coords:\n        # find nearest blue\n        if blue_line is not None:\n          output_grid[blue_y-1:blue_y+2,c] = 2 # extend vertically, including adjacent, making 3 cells\n          output_grid[blue_y,blue_line[0][1]-1:blue_line[-1][1]+2] = 2 # add horizontal\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3986,
+    "candidates_token_count": 562,
+    "total_token_count": 4548,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.844242,
+  "response_file": "008-response.json"
+}

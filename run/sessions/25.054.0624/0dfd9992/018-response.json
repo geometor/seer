@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nRemoves all pixels with a value of 0 (white) from the input grid, effectively\nshrinking the grid where white pixels existed.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Removes all white (0) pixels from the input grid, altering grid dimensions.\n    \"\"\"\n    # Convert the input grid to a list of lists for easier manipulation.\n    input_list = input_grid.tolist()\n    output_list = []\n\n    # Iterate through rows\n    for row in input_list:\n      # filters through a list comprehension\n      new_row = [pixel for pixel in row if pixel != 0]\n      output_list.append(new_row)\n\n    # Convert the result back to a NumPy array.  Handle cases where rows\n    # might have different lengths after removing 0s.  If rows are of\n    # unequal length, NumPy will create an array of `object` dtype, which\n    # isn't what we intend. So, we convert each sublist back to its own array.\n    output_grid = np.array([np.array(row) for row in output_list], dtype=object)\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 10564,
+    "candidates_token_count": 273,
+    "total_token_count": 10837,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.032726,
+  "response_file": "018-response.json"
+}

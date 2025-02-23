@@ -1,0 +1,16 @@
+facts:
+  - background:
+      color: blue (1)
+      description: Fills most of the grid.
+  - objects:
+      - color: red (2)
+        shape: single pixel, 2x2 square
+      - color: green (3)
+        shape: single pixel, 2x2 square
+      - color: azure (8)
+        shape: L-shape, varies
+  - transformation:
+      - action: extend
+        target: azure (8) objects
+        condition: adjacent to existing azure (8)
+        direction: outward, maintaining connectivity, 2x2 squares are grown to a 4x4 filling existing azure colored neighbors and expanding on to the blue background.

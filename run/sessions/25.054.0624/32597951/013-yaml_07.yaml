@@ -1,0 +1,30 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: 17x17
+      - cell_values: [0, 1, 8, 3]  # Possible colors
+  - type: pixel
+    properties:
+      - color: white
+        value: 0
+      - color: blue
+        value: 1
+      - color: azure
+        value: 8
+      - color: green
+        value: 3
+  - type: cluster
+    properties:
+        - shape: irregular
+        - composition: contiguous pixels of same color
+    
+actions:
+    - name: replace_color
+      input: origin_color, target_color, location_criteria,
+      output: modify the grid
+
+relationships:
+  - type: adjacency
+    description: Pixels can be adjacent horizontally, vertically, or diagonally.
+  - type: containment
+    description: a cluster of the azure pixels can contain a set of adjacent pixels

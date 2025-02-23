@@ -1,0 +1,61 @@
+examples:
+  - example_id: 1
+    objects:
+      - color: azure
+        type: cluster
+        moved: true
+        movement_rule: "relative to average of blue and red pixels"
+      - color: blue
+        type: isolated
+        role: reference
+      - color: red
+        type: isolated
+        role: reference
+      - color: yellow
+        type: isolated
+        removed: true
+      - color: green
+        type: static
+    overall_transformation: "Move azure cluster based on blue/red reference, remove yellow."
+
+  - example_id: 2
+    objects:
+      - color: blue
+        type: isolated
+        moved: true
+        movement_rule: "unknown"
+      - color: red
+        type: isolated
+        moved: true
+        movement_rule: "unknown"
+      - color: yellow
+        type: cluster
+        removed: true
+      - color: green
+        type: cluster
+        moved: false
+    overall_transformation: "Move blue and red, remove yellow, green unchanged."
+
+  - example_id: 3
+    objects:
+     - color: azure
+       type: cluster
+       moved: true
+     - color: blue
+       type: isolated
+       moved: true
+     - color: blue
+       type: 'part of azure'
+       moved: true
+     - color: red
+       type: isolated
+       moved: true
+     - color: red
+       type: 'part of azure'
+       moved: true
+     - color: yellow
+       type: isolated
+       removed: true
+     - color: green
+       type: static
+    overall_transformation: "move groups of blue and red, delete yellow, green is static"
