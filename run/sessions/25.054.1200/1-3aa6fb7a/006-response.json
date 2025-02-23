@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Groups:** In the input grid, locate all azure pixels (value 8). Group them into contiguous horizontal sequences. An isolated azure pixel is its own group.\n2.  **Find Leftmost Azure:** Within each contiguous group of azure pixels, identify the leftmost azure pixel. If a row contains multiple such groups, treat each group separately.\n3. **Change to blue:** The *leftmost* azure of each group in each row is changed to blue.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_groups(grid, color):\n    \"\"\"Finds contiguous horizontal groups of a specified color.\"\"\"\n    groups = []\n    rows, cols = grid.shape\n    for r in range(rows):\n        current_group = []\n        for c in range(cols):\n            if grid[r, c] == color:\n                current_group.append((r, c))\n            else:\n                if current_group:\n                    groups.append(current_group)\n                    current_group = []\n        if current_group:  # Handle groups at the end of a row\n            groups.append(current_group)\n    return groups\n\ndef find_leftmost_in_groups(groups):\n    \"\"\"Identifies the leftmost pixel in each group.\"\"\"\n    leftmost_pixels = []\n    for group in groups:\n        leftmost_pixel = min(group, key=lambda x: x[1])  # min by column index\n        leftmost_pixels.append(leftmost_pixel)\n    return leftmost_pixels\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input\n    output_grid = np.copy(input_grid)\n\n    # Find all contiguous groups of azure pixels\n    azure_groups = find_contiguous_groups(input_grid, 8)\n\n    # Find the leftmost azure pixel in each group\n    leftmost_azures = find_leftmost_in_groups(azure_groups)\n\n    # Change the leftmost azure pixels to blue\n    for r, c in leftmost_azures:\n        output_grid[r, c] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4830,
+    "candidates_token_count": 484,
+    "total_token_count": 5314,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.126078,
+  "response_file": "006-response.json"
+}

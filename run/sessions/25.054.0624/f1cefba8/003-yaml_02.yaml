@@ -1,0 +1,24 @@
+facts:
+  - task: 91714a48
+  - objects_identified:
+      - color: 8  # Azure
+        shape: rectangular_region
+        behavior: preserved # Stays mostly the same
+      - color: 2  # Red
+        shape: rectangular_region
+        behavior: changes, some pixels to white, new pixels at border, alternating pattern
+      - color: 1  # Blue
+        shape: rectangular_region
+        behavior: preserved_inside, border changes
+      - color: 4  # Yellow
+        shape: rectangular_region, appears at border, and alternating
+        behavior: added_at_border, alternating in and out
+      - color: 3  # Green
+        shape: rectangular_region
+        behavior: pixels change, new at border, alternating pattern
+  - spatial_relationships:
+      - alternating_pattern: present in changed color regions
+      - border_changes: color changes often occur at object borders
+  - color_changes:
+    - red_to_white: In some cases, red changes to white.
+    - other_to_border_color: other colors change to a border color

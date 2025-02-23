@@ -1,0 +1,19 @@
+facts:
+  - observation: |
+      Each input grid is transformed into an output grid of the same dimensions.
+  - observation: |
+      The output grid is always filled entirely with a single color.
+  - observation: |
+      The color used to fill the output grid is present within the corresponding input grid.
+  - observation: |
+     The fill color for the output grid is not a constant; it varies between examples.
+  - object: input_grid
+    properties:
+      - dimensions: variable (rows x columns)
+      - elements: integers representing colors (0-9)
+  - object: output_grid
+    properties:
+      - dimensions: same as input_grid
+      - elements: all same integer, representing a single color
+    action: fill
+    description: The output grid is filled with a single color found in the input grid.

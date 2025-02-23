@@ -1,0 +1,38 @@
+facts:
+  - task: "Determine output color based on input grid."
+  - objects:
+    - name: "pixel"
+      properties:
+        - color: "integer value representing a color (0-9)"
+        - position: "[row, column] index within the grid"
+  - actions:
+    - name: "SelectOutputColor"
+      description: "Selects the output color based on frequency and first occurrence."
+      inputs:
+        - object: "input_grid"
+          type: "grid"
+          description: "The input grid of pixels."
+      outputs:
+        - object: "output_color"
+          type: "integer"
+          description: "The selected color for the output grid."
+      logic:
+        - "Count the occurrences of each color in the input grid."
+        - "Order the colors first by most to least, and then by the index of their first occurence"
+        - "Select the color that appears most frequently. In case of ties, select the one that appears first."
+    - name: "CreateOutputGrid"
+      description: "Creates the output grid filled with the selected color."
+      inputs:
+        - object: "output_color"
+          type: "integer"
+          description: "The selected color for the output grid."
+        - object: "input_grid"
+          type: "grid"
+          description: "The input grid, for its dimensions."
+      outputs:
+        - object: "output_grid"
+          type: "grid"
+          description: "The output grid filled with the selected color."
+      logic:
+          - Get dimensions of input grid.
+          - generate a new grid of those dimensions, filled with output_color.

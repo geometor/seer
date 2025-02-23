@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIterate through each row of the input grid. For each row, check the second-to-last column's color. If it's not black (0), replace the rightmost column's color with it. Then, propagate this non-black color from the second-to-last column upwards to other rows if they also had a non-black color in their second-to-last column.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each row.\n    for i in range(rows):\n        # Get the color in the second-to-last column.\n        second_to_last_color = output_grid[i, cols - 2]\n\n        # If the color is not black (0), replace the rightmost column's color.\n        if second_to_last_color != 0:\n            output_grid[i, cols - 1] = second_to_last_color\n\n    # Propagate upwards.\n    for i in range(rows - 2, -1, -1):\n         if output_grid[i, cols-2] != 0:\n            output_grid[i+1, cols-1] = output_grid[i+1, cols-2]\n\n    for i in range(rows):\n        if output_grid[i, cols-2] != 0:\n             output_grid[i, cols-1] =  output_grid[i, cols-2]\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3128,
+    "candidates_token_count": 380,
+    "total_token_count": 3508,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.638191,
+  "response_file": "006-response.json"
+}

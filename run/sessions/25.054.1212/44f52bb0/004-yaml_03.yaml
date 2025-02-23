@@ -1,0 +1,46 @@
+facts:
+  - example_1:
+      input_grid: [[2, 0, 2], [0, 2, 0], [2, 0, 2]]
+      output_grid: [[1]]
+      red_count: 4
+      output_value: 1
+      match: True
+      output_shape: (1, 1)
+  - example_2:
+      input_grid: [[2, 0, 0], [2, 0, 0], [0, 2, 0]]
+      output_grid: [[7]]
+      red_count: 2
+      output_value: 7
+      match: False
+      output_shape: (1, 1)
+  - example_3:
+      input_grid: [[2, 0, 2], [2, 0, 2], [2, 0, 2]]
+      output_grid: [[1]]
+      red_count: 5
+      output_value: 1
+      match: True
+      output_shape: (1, 1)
+  - example_4:
+      input_grid: [[0, 0, 0], [2, 0, 2], [0, 0, 0]]
+      output_grid: [[1]]
+      red_count: 2
+      output_value: 1
+      match: True
+      output_shape: (1, 1)
+  - example_5:
+      input_grid: [[2, 2, 0], [0, 2, 2], [0, 0, 0]]
+      output_grid: [[7]]
+      red_count: 3
+      output_value: 7
+      match: False
+      output_shape: (1, 1)
+  - example_6:
+      input_grid: [[2, 2, 0], [0, 2, 0], [0, 0, 0]]
+      output_grid: [[7]]
+      red_count: 3
+      output_value: 7
+      match: False
+      output_shape: (1, 1)
+  - observation: Output is always a 1x1 grid.
+  - observation: Output color is either 1 (blue) or 7 (orange).
+  - observation: Red pixel count alone doesn't determine output.

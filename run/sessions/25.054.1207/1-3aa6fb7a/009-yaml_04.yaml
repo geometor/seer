@@ -1,0 +1,40 @@
+task: 008b7a3b
+examples:
+  - example_id: 1
+    objects:
+      - type: azure_pixel_group
+        elements: [[1,1], [2,1], [2,2], [3,4], [3,5], [4,5]] # Coordinates of azure pixels
+      - type: blue_pixel
+        added: [[1,2], [4,4]]  # Coordinates where blue pixels *should* be added
+    transformations:
+      - action: add_blue_pixel
+        condition: "specific azure pixel"
+        location: adjacent
+        priority: right, down, up, left # This priority is NOT fully correct
+    notes: >
+      Azure pixels form connected components.  Blue pixels are added *adjacent* to
+      *specific* azure pixels, not all. The current code incorrectly adds to many.
+
+  - example_id: 2
+    objects:
+      - type: azure_pixel_group
+        elements: [[0, 4], [0, 5], [1, 5], [2, 2], [3, 2], [3, 3], [5, 4], [6, 3], [6, 4]]
+      - type: blue_pixel
+        added: [[1,4], [2,3], [5,3]]
+    transformations:
+      - action: add_blue_pixel
+        condition: "specific azure pixel"
+        location: adjacent
+        priority: right, down, up, left # This priority is NOT fully correct
+    notes: >
+      Similar to example 1, blue pixels are selectively added adjacent to azure pixels.
+      The selection rule is not yet clear.
+
+overall_notes: >
+  The core transformation is adding blue pixels adjacent to existing azure pixels.
+  However, the rule is highly selective about *which* azure pixels get a blue
+  neighbor and *where* that neighbor is placed. A simple priority is insufficient.
+  The code needs to determine, probably through some form of relative position
+  or pattern matching, which azure pixels are eligible for a blue neighbor. The rule
+  appears consistent across examples (same relative placement), but our current
+  understanding is too simplistic.

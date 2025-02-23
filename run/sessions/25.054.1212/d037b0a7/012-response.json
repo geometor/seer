@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Downward Propagation:** Iterate through each cell of the grid. If a cell is white (0) and the cell directly above it has a different, non-zero color, set the current cell's color to the color of the cell above it. *Keep track of which cells are modified during this step.*\n\n2.  **Conditional Rightward Fill:** Iterate through each cell of the grid again. If a cell was modified during the downward propagation step, examine the cells to its right. Fill any contiguous white (0) cells to the right with the modified cell's color. Stop filling when a non-white cell is encountered.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    modified_cells = set() # Keep track of modified cells\n\n    # Iterate through each cell of the grid, applying the downward propagation rule.\n    for i in range(rows):\n        for j in range(cols):\n            if output_grid[i, j] == 0:  # If the current pixel is white\n                if i > 0:  # Check if there's a row above\n                    if output_grid[i - 1, j] != 0:  # If the pixel above is not white\n                        output_grid[i, j] = output_grid[i - 1, j]  # Set color to the pixel above\n                        modified_cells.add((i, j))  # Record the modification\n\n\n    # Iterate through the grid again for conditional rightward fill\n    for i in range(rows):\n        for j in range(cols):\n            if (i,j) in modified_cells:\n                for k in range(j+1, cols):\n                    if output_grid[i,k] == 0:\n                        output_grid[i,k] = output_grid[i,j]\n                    else:\n                        break # stop when a non-white is encountered\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3085,
+    "candidates_token_count": 472,
+    "total_token_count": 3557,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.446237,
+  "response_file": "012-response.json"
+}

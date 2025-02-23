@@ -1,0 +1,21 @@
+objects:
+  - type: grid
+    properties:
+      rows: variable
+      columns: variable
+      cells: integers # Representing colors
+  - type: region
+    properties:
+      bounds: tuple (x_start, y_start, width, height)
+      initial_color: integer
+      white_pixels: list of tuples (row, col)
+  - type: pixel
+    properties:
+      color: integer
+      location: tuple (row, col)
+
+actions:
+  - name: define_regions
+    description: Divides the grid into regions based on color changes in the first row.
+  - name: flood_fill
+    description:  Expands from white pixels within a region, replacing connected pixels (including other white pixels) with white, until the region boundary is reached.

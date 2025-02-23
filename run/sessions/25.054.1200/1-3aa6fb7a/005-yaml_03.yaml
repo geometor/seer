@@ -1,0 +1,31 @@
+example_1:
+  input:
+    objects:
+      - color: azure
+        shape: variable
+        positions: [[1,1], [2,1], [2,2], [3,4], [3,5], [4,5]]
+        contiguous:
+          - [1,1], [2,1]
+          - [2,2]
+          - [3,4], [3,5]
+          - [4,5]
+  transformation:
+    action: "change_color"
+    affected_object_criteria: "leftmost azure in a contiguous group, reading row-wise"
+    new_color: "blue"
+example_2:
+    objects:
+      - color: azure
+        shape: variable
+        positions:  [[0, 4], [0, 5], [1, 5], [2, 2], [3, 2], [3, 3], [5, 4], [6, 3], [6, 4]]
+        contiguous:
+          - [0, 4], [0, 5]
+          - [1, 5]
+          - [2, 2]
+          - [3, 2], [3, 3]
+          - [5, 4]
+          - [6, 3], [6, 4]
+    transformation:
+      action: "change_color"
+      affected_object_criteria: "leftmost azure in a contiguous group, reading row-wise"
+      new_color: "blue"

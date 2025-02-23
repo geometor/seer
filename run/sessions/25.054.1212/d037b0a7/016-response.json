@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  Iterate through the input grid to find a yellow pixel (value 4).\n2.  If a yellow pixel is found, copy it to the cell directly below it, *if it exists*. If that cell doesn't exist (at image boundary), do not modify.\n3.  Iterate through the input grid to find a red pixel (value 2).\n4.  If a red pixel is found, copy it to the cell directly below it, *if it exists*. If that cell doesn't exist (at image boundary), do not modify.\n5. All other pixels remain unchanged.\n6. The maximum extent of the rows should not exceed the original number of input grid rows, and each object has a bound equal to the count -1.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel(grid, color_value):\n    \"\"\"Finds the coordinates of a pixel with a specific color value.\"\"\"\n    for r_idx, row in enumerate(grid):\n        for c_idx, pixel in enumerate(row):\n            if pixel == color_value:\n                return r_idx, c_idx\n    return None, None\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rules.\"\"\"\n\n    output_grid = np.copy(input_grid)  # Initialize output_grid as a copy of the input_grid\n    rows, cols = output_grid.shape\n\n    # Find and duplicate yellow pixel\n    yellow_row, yellow_col = find_pixel(input_grid, 4)\n    if yellow_row is not None and yellow_row + 1 < rows:\n        output_grid[yellow_row + 1, yellow_col] = 4\n\n    # Find and duplicate red pixel\n    red_row, red_col = find_pixel(input_grid, 2)\n    if red_row is not None and red_row + 1 < rows:\n        output_grid[red_row + 1, red_col] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2770,
+    "candidates_token_count": 458,
+    "total_token_count": 3228,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.546515,
+  "response_file": "016-response.json"
+}

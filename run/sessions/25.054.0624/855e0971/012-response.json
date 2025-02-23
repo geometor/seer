@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe grid is divided into regions based on color changes in the first row. Within each region, all connected pixels, starting from any white pixel and including other white pixels, are changed to white. The flood fill stops at the region boundaries.\n\"\"\"\n\nimport numpy as np\n\ndef get_regions(grid):\n    # Divide the grid into regions based on the first row's color changes.\n    regions = []\n    start_col = 0\n    current_color = grid[0, 0]\n    for col in range(1, grid.shape[1]):\n        if grid[0, col] != current_color:\n            regions.append(((start_col, 0, col - start_col, grid.shape[0]), current_color))\n            current_color = grid[0, col]\n            start_col = col\n    regions.append(((start_col, 0, grid.shape[1] - start_col, grid.shape[0]), current_color))  # Add the last region\n    return regions\n\ndef flood_fill(grid, start_row, start_col, region_bounds):\n    # Perform a flood fill within the given region, propagating through white pixels.\n    x_start, y_start, width, height = region_bounds\n    queue = [(start_row, start_col)]\n    while queue:\n        row, col = queue.pop(0)\n        if not (x_start <= col < x_start + width and y_start <= row < y_start + height):\n            continue  # Out of bounds\n\n        if grid[row, col] != 0:  #if pixel is not already white\n           grid[row,col] = 0 #change pixel to white\n\n\n        # Check neighbors\n        if row > 0 and grid[row-1,col]!=0:\n                queue.append((row - 1, col))\n        if row < grid.shape[0] - 1 and grid[row+1, col] !=0:\n                queue.append((row + 1, col))\n        if col > 0 and grid[row,col-1] !=0:\n                queue.append((row, col - 1))\n        if col < grid.shape[1] - 1 and grid[row, col+1]!=0:\n                queue.append((row, col + 1))\n        #also add neighbors if they are white to the queue.\n        if row > 0 and grid[row-1,col]==0:\n                queue.append((row - 1, col))\n        if row < grid.shape[0] - 1 and grid[row+1, col] ==0:\n                queue.append((row + 1, col))\n        if col > 0 and grid[row,col-1] ==0:\n                queue.append((row, col - 1))\n        if col < grid.shape[1] - 1 and grid[row, col+1]==0:\n                queue.append((row, col + 1))\n\ndef transform(input_grid):\n    # Initialize output_grid\n    output_grid = np.copy(input_grid)\n    regions = get_regions(input_grid)\n\n    # Change output pixels\n    for region, _ in regions:  # Region color is not needed for the fill itself\n        x_start, y_start, width, height = region\n        for row in range(y_start, y_start + height):\n            for col in range(x_start, x_start + width):\n                if input_grid[row, col] == 0:  # Found a white pixel (seed)\n                    flood_fill(output_grid, row, col, region)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 8431,
+    "candidates_token_count": 854,
+    "total_token_count": 9285,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.862607,
+  "response_file": "012-response.json"
+}

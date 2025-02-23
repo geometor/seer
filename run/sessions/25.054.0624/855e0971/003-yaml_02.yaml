@@ -1,0 +1,27 @@
+facts:
+  - description: "The input grid is divided into horizontal bands of different colors."
+    objects:
+      - name: "Band 1"
+        properties:
+          - color: varies # grey, red, azure
+          - position: top
+      - name: "Band 2"
+        properties:
+          - color: varies #yellow, red, azure, blue
+          - position: middle
+      - name: "Band 3"
+        properties:
+          - color: varies # azure, blue, red, green
+          - position: bottom
+    actions:
+      - name: IdentifyBands
+        description: "Determine the start and end rows of each color band."
+  - description: "White pixels within specific bands trigger replication."
+    objects:
+      - name: "White pixel"
+        properties:
+          - color: white (0)
+          - location: "Within non-grey bands"
+    actions:
+      - name: "ReplicateWhite"
+        description: "For each column containing a white pixel in any non-grey band, set all pixels in that column within those bands to white."

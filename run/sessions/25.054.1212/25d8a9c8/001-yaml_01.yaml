@@ -1,0 +1,34 @@
+facts:
+  - type: grid
+    description: input grid
+    dimensions: 3x3
+    elements:
+      - value: 4
+        color: yellow
+        positions: [(0,0), (0,1), (0,2)]
+      - value: 2
+        color: red
+        positions: [(1,0), (1,2), (2,0)]
+      - value: 3
+        color: green
+        positions: [(1,1), (2,1), (2,2)]
+
+  - type: grid
+    description: output grid
+    dimensions: 3x3
+    elements:
+      - value: 5
+        color: gray
+        positions: [(0,0), (0,1), (0,2)]
+      - value: 0
+        color: white
+        positions: [(1,0), (1,1), (1,2), (2,0), (2,1), (2,2)]
+
+  - type: transformation
+    description: color change
+    input_values: [4, 2, 3]
+    output_values: [5, 0]
+    mapping: |
+      4 -> 5
+      2 -> 0
+      3 -> 0

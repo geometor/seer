@@ -1,0 +1,19 @@
+facts:
+  - task_id: "d5d6de2d"
+  - input_objects:
+      - description: "A 3x3 grid containing a single non-black color."
+        properties:
+          - color: "Varies (blue, red, orange, azure)"
+          - shape: "Irregular, occupies 1 to 4 cells within the 3x3 grid"
+          - count: "Instances of the color within the grid"
+
+  - output_objects:
+    - description: "A 1xN grid, where N is from 1-4, containing only the identified non-black color from the input."
+      properties:
+        - color: "Matches the non-black color in the input grid"
+        - shape: "1 x N rectangle (row)"
+        - count: "Equal to the instances of the color in input."
+  - transformation_rules:
+      - rule_1: "Identify the single non-black color present in the input grid."
+      - rule_2: "Count how many times the color appears"
+      - rule_3: "Create an output grid that is a 1 x N rectangle consisting of the identified color repeated N times."

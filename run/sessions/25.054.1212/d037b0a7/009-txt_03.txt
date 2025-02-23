@@ -1,0 +1,75 @@
+    0 0 6
+    0 4 0
+    3 0 0
+    ```
+*   **Expected Output:**
+    ```
+    0 0 6
+    0 4 6
+    3 4 6
+    ```
+*   **Transformed Output:**
+    ```
+    0 6 6
+    4 4 4
+    3 3 3
+    ```
+*   **Observations:**
+    *   The '6' (magenta) in the top right correctly propagates.
+    *   The '4' (yellow) propagates left and right, but should only replace the white to it's right.
+    *   The '3' should propogate to the right, but it fills both right values.
+    *   The general direction of propagation is incorrect.
+
+**Example 2:**
+
+*   **Input:**
+    ```
+    0 2 0
+    7 0 8
+    0 0 0
+    ```
+*   **Expected Output:**
+    ```
+    0 2 0
+    7 2 8
+    7 2 8
+    ```
+*   **Transformed Output:**
+    ```
+    2 2 2
+    7 8 8
+    0 0 0
+    ```
+*   **Observations:**
+    * The `2` (red) correctly floods horizontally.
+    * The `7` should propogate the 2 above to the cell below.
+    * The `8` should propogate the 2 to the cell below
+    *   Bottom row remains all white (0), when some of it should have changed.
+
+**Example 3:**
+
+*   **Input:**
+    ```
+    4 0 0
+    0 2 0
+    0 0 0
+    ```
+*   **Expected Output:**
+    ```
+    4 0 0
+    4 2 0
+    4 2 0
+    ```
+*   **Transformed Output:**
+    ```
+    4 4 4
+    2 2 2
+    0 0 0
+    ```
+*   **Observations:**
+    *   The `4` (yellow) propagates horizontally.
+    *   The '2' (red) propagates horizontally and replaces all the 0 cells.
+    *  The `4` from the line above should fill the first cell in the second and
+       third row.
+
+**YAML Facts:**

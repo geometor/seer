@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Clusters:** Locate all clusters of '8' (azure) pixels in the input grid.\n2.  **Insert '1':** For some of the '8' pixels, especially at changes of direction of edges. replace with a `1`.\n3. The overall shape of the 8's is preserved.\n\"\"\"\n\nimport numpy as np\n\ndef find_clusters(grid, value):\n    \"\"\"Finds clusters of a specific value in a grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    clusters = []\n\n    def dfs(row, col, current_cluster):\n        \"\"\"Depth-first search to explore a cluster.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != value\n        ):\n            return\n\n        visited[row, col] = True\n        current_cluster.append((row, col))\n\n        dfs(row + 1, col, current_cluster)\n        dfs(row - 1, col, current_cluster)\n        dfs(row, col + 1, current_cluster)\n        dfs(row, col - 1, current_cluster)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == value and not visited[row, col]:\n                current_cluster = []\n                dfs(row, col, current_cluster)\n                clusters.append(current_cluster)\n\n    return clusters\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by inserting '1's near '8' clusters.\"\"\"\n    output_grid = np.copy(input_grid)\n    clusters_of_8 = find_clusters(input_grid, 8)\n\n    # identify corners/ direction changes within the clusters\n    for cluster in clusters_of_8:\n        for r, c in cluster:\n          neighbors = []\n\n          if r > 0:\n            neighbors.append(input_grid[r-1,c])\n          if r < input_grid.shape[0]-1:\n            neighbors.append(input_grid[r+1,c])\n          if c > 0:\n            neighbors.append(input_grid[r,c-1])\n          if c < input_grid.shape[1] -1:\n            neighbors.append(input_grid[r, c+1])\n          \n          num_8_neighbors = neighbors.count(8)\n\n          if num_8_neighbors < 2 and num_8_neighbors > 0:\n              output_grid[r,c] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2127,
+    "candidates_token_count": 643,
+    "total_token_count": 2770,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.852618,
+  "response_file": "008-response.json"
+}

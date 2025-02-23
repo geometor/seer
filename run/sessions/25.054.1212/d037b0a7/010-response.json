@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIf a pixel is white (0), and the pixel directly *above* it has a different, non-zero color, then set the current pixel's color to the color of the pixel above it.\nAfter applying the above rule to all cells, examine each pixel in the grid, row by row, and left to right.\nIf a pixel is not white, and the pixel to it's right is a `0` (white), set all `0` pixels to it's right to match the pixel's color until you encounter a non-white pixel.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each cell of the grid, applying the downward propagation rule.\n    for i in range(rows):\n        for j in range(cols):\n            if output_grid[i, j] == 0:  # If the current pixel is white\n                if i > 0:  # Check if there's a row above\n                    if output_grid[i - 1, j] != 0:  # If the pixel above is not white\n                        output_grid[i, j] = output_grid[i - 1, j]  # Set color to the pixel above\n\n    # Iterate through the grid again to apply fill to the right rule\n    for i in range(rows):\n        for j in range(cols):\n            if output_grid[i,j] != 0:\n                for k in range(j+1, cols):\n                    if output_grid[i,k] == 0:\n                        output_grid[i,k] = output_grid[i,j]\n                    else:\n                        break # stop when a non-white is encountered\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2922,
+    "candidates_token_count": 431,
+    "total_token_count": 3353,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.441207,
+  "response_file": "010-response.json"
+}

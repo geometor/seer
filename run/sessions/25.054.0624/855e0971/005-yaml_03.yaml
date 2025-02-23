@@ -1,0 +1,31 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      rows: variable
+      columns: variable
+      cells: integers (0-9 representing colors)
+  - name: band
+    type: contiguous_rows
+    properties:
+      start_row: integer
+      end_row: integer
+      color_pattern: list of integers
+  - name: white_pixel_column
+    type: column_index
+    properties:
+      column_index: integer
+
+actions:
+  - name: identify_bands
+    input: grid
+    output: list of bands
+    description: Divide the grid into horizontal bands based on color changes.
+  - name: find_white_pixels_in_first_row_of_band
+    input: band
+    output: list of white_pixel_column
+    description: Find columns containing white pixels in the first row of each non-top band.
+  - name: propagate_white_pixels
+    input: band, list of white_pixel_column
+    output: modified band
+    description: Set pixels in specified columns to white, starting from the first row of each non-top band, and continue to the end of each band.

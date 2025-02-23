@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Analyze the Input Grid:** Examine the input grid and count the occurrences of each color (0-9).\n2.  **Determine Output Color**: Select the output color by these rules:\n    - Most frequent color is selected.\n    - Ties are resolved by selecting the color that occurred first in the input.\n3.  **Construct Output Grid:** Create a new grid with the same dimensions as the input grid. Fill every cell of this new grid with the selected output color.\n\"\"\"\n\nimport numpy as np\nfrom collections import Counter\n\ndef get_most_frequent_color(grid):\n    # Count color occurrences\n    counts = Counter(grid.flatten())\n    # Find most frequent colors (could be multiple with same count)\n    max_count = max(counts.values())\n    most_frequent = [color for color, count in counts.items() if count == max_count]\n    # If only one, return it\n    if len(most_frequent) == 1:\n        return most_frequent[0]\n    # Resolve ties by first occurrence\n    else:\n        first_occurrence = {}\n        rows, cols = grid.shape\n        for r in range(rows):\n            for c in range(cols):\n                color = grid[r, c]\n                if color in most_frequent and color not in first_occurrence:\n                    first_occurrence[color] = (r, c)\n        # Find the color among the most frequent that appeared first\n        earliest_color = min(first_occurrence, key=first_occurrence.get)\n        return earliest_color\n        \ndef transform(input_grid):\n    # Convert to numpy array for easier manipulation\n    grid = np.array(input_grid)\n\n    # Determine output color\n    output_color = get_most_frequent_color(grid)\n\n    # Create output grid filled with the selected color\n    output_grid = np.full(grid.shape, output_color)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3412,
+    "candidates_token_count": 453,
+    "total_token_count": 3865,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.740037,
+  "response_file": "011-response.json"
+}

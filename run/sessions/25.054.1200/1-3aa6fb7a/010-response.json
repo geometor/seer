@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Clusters:** Find all connected clusters of '8' (azure) pixels in the input grid. Consider pixels to be connected orthogonally.\n\n2.  **Locate Strategic Points:** Within each '8' cluster, identify \"strategic points\" for inserting '1's. Strategic points are defined as:\n    *   **Endpoints:** An '8' pixel with only one orthogonally adjacent '8' neighbor.\n    *   **Corners:** An '8' pixel where the direction of the cluster changes. This is determined by:\n        *   The '8' has exactly two orthogonally adjacent '8' pixels that are not orthogonally adjacent to *each other*.\n        *   An '8' on a diagonal cluster boundary.\n    * **Inside Bends**: Where the cluster has two adjacent '8' pixels *and* at least one diagonally adjacent '8' pixel\n    *   **Do not place at boundaries that do not contain an '8' pixel:**\n\n3. **Insert '1's:** Replace the '8' pixels at the identified strategic points with '1' (blue) pixels.\n\n4. **Preserve shape:** The new '1' pixels, together with the remaining '8' pixels, preserve the general outline and direction changes.\n\"\"\"\n\nimport numpy as np\n\ndef find_clusters(grid, value):\n    \"\"\"Finds clusters of a specific value in a grid.\"\"\"\n    visited = np.zeros_like(grid, dtype=bool)\n    clusters = []\n\n    def dfs(row, col, current_cluster):\n        \"\"\"Depth-first search to explore a cluster.\"\"\"\n        if (\n            row < 0\n            or row >= grid.shape[0]\n            or col < 0\n            or col >= grid.shape[1]\n            or visited[row, col]\n            or grid[row, col] != value\n        ):\n            return\n\n        visited[row, col] = True\n        current_cluster.append((row, col))\n\n        dfs(row + 1, col, current_cluster)\n        dfs(row - 1, col, current_cluster)\n        dfs(row, col + 1, current_cluster)\n        dfs(row, col - 1, current_cluster)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == value and not visited[row, col]:\n                current_cluster = []\n                dfs(row, col, current_cluster)\n                clusters.append(current_cluster)\n\n    return clusters\n\ndef get_neighbors(grid, r, c, value=None):\n    \"\"\"Gets the orthogonal and diagonal neighbors of a cell, optionally filtering by value.\"\"\"\n    neighbors = []\n    rows, cols = grid.shape\n\n    # Orthogonal neighbors\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        nr, nc = r + dr, c + dc\n        if 0 <= nr < rows and 0 <= nc < cols:\n            if value is None or grid[nr, nc] == value:\n                neighbors.append((nr, nc))\n    return neighbors\n\ndef get_diagonal_neighbors(grid, r, c, value=None):\n    neighbors = []\n    rows, cols = grid.shape\n\n    for dr, dc in [(1,1), (1,-1), (-1, 1), (-1,-1)]:\n        nr, nc = r+dr, c+dc\n        if 0 <= nr < rows and 0 <= nc < cols:\n            if value is None or grid[nr, nc] == value:\n                neighbors.append((nr, nc))\n\n    return neighbors\n\ndef is_endpoint(grid, r, c, cluster):\n    \"\"\"Checks if a cell is an endpoint of a cluster.\"\"\"\n    neighbors = get_neighbors(grid, r, c, value=8)\n    return len(neighbors) == 1\n\ndef is_corner(grid, r, c, cluster):\n    \"\"\"Checks if a cell is a corner of a cluster.\"\"\"\n    neighbors = get_neighbors(grid, r, c, value=8)\n    if len(neighbors) == 2:\n        n1r, n1c = neighbors[0]\n        n2r, n2c = neighbors[1]\n        # Check if neighbors are not orthogonally adjacent\n        if abs(n1r - n2r) + abs(n1c - n2c) > 1:\n            return True\n    \n    return False\n\ndef is_inside_bend(grid, r, c, cluster):\n    neighbors = get_neighbors(grid, r, c, 8)\n    diagonal_neighbors = get_diagonal_neighbors(grid, r, c, 8)\n\n    if len(neighbors) >= 2 and len(diagonal_neighbors) >= 1:\n       return True\n    return False\n    \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by inserting '1's near '8' clusters.\"\"\"\n    output_grid = np.copy(input_grid)\n    clusters_of_8 = find_clusters(input_grid, 8)\n\n    for cluster in clusters_of_8:\n        for r, c in cluster:\n            if is_endpoint(input_grid, r, c, cluster) or is_corner(input_grid, r, c, cluster) or is_inside_bend(input_grid, r, c, cluster):\n                output_grid[r, c] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3661,
+    "candidates_token_count": 1267,
+    "total_token_count": 4928,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.798909,
+  "response_file": "010-response.json"
+}

@@ -1,0 +1,37 @@
+example_1:
+  input_objects:
+    - object_1: [0, 0, 6] # Top row
+    - object_2: [0, 4, 0] # Middle row
+    - object_3: [3, 0, 0] # Bottom Row
+  output_objects:
+    - object_1: [0, 0, 6]
+    - object_2: [0, 4, 6]
+    - object_3: [3, 4, 6]
+  transformations:
+    - The color in the second to last column of each row, if not 0, replaces the color in the last column.
+    - row 3, the value `4` in the last column changes to `6`
+    - row 2, `4` is added to the last column
+
+example_2:
+  input_objects:
+    - object_1: [0, 2, 0]
+    - object_2: [7, 0, 8]
+    - object_3: [0, 0, 0]
+  output_objects:
+    - object_1: [0, 2, 0]
+    - object_2: [7, 2, 8]
+    - object_3: [7, 2, 8]
+  transformations:
+     - The color of the second column propagates to the last two rows if not 0.
+
+example_3:
+    input_objects:
+    - object_1: [4, 0, 0]
+    - object_2: [0, 2, 0]
+    - object_3: [0, 0, 0]
+  output_objects:
+    - object_1: [4, 0, 0]
+    - object_2: [4, 2, 0]
+    - object_3: [4, 2, 0]
+  transformations:
+    - If a row contains color other than 0 in the first and second columns, fill the rest of the row with colors from the first and second, starting from the first.

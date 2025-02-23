@@ -1,0 +1,51 @@
+observations:
+  - example_set: "training"
+    example_number: 1
+    input_grid:
+      dimensions: [3, 3]
+      unique_colors: [blue, green, yellow, gray, azure]
+      color_counts: {blue: 2, gray: 2, azure: 1, green: 1, white: 1}
+    expected_output_grid:
+      dimensions: [3, 3]
+      unique_colors: [blue]
+      color_counts: {blue: 9}
+    transformation_rule: "All pixels are replaced by blue"
+    objects:
+      - description: "The entire grid"
+        properties:
+          - dimensions: [3, 3]
+          - uniform_color: "All cells are the same color"
+
+  - example_set: "training"
+    example_number: 2
+    input_grid:
+      dimensions: [3, 3]
+      unique_colors: [blue, yellow, gray, azure, maroon]
+      color_counts:  {blue: 2, azure: 2, maroon: 3, gray: 1, yellow: 1}
+    expected_output_grid:
+      dimensions: [3, 3]
+      unique_colors: [maroon]
+      color_counts: {maroon: 9}
+    transformation_rule: "All pixels are replaced by maroon."
+    objects:
+       - description: "The entire grid"
+         properties:
+           - dimensions: [3, 3]
+           - uniform_color: "All cells are the same color"
+
+  - example_set: "training"
+    example_number: 3
+    input_grid:
+      dimensions: [3, 3]
+      unique_colors: [blue, yellow, gray, azure, maroon]
+      color_counts: {gray: 2, yellow: 2, azure: 2, maroon: 1, blue: 1}
+    expected_output_grid:
+      dimensions: [3, 3]
+      unique_colors: [gray]
+      color_counts: {gray: 9}
+    transformation_rule: "All pixels are replaced by gray."
+    objects:
+       - description: "The entire grid"
+         properties:
+           - dimensions: [3, 3]
+           - uniform_color: "All cells are the same color"

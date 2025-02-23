@@ -1,0 +1,18 @@
+facts:
+  - object: grid
+    properties:
+      dimensions: 7x7
+      elements: pixels
+      background_color: white (0)
+  - object: pixel
+    properties:
+      possible_values: [0, 1, 8]
+      color_mapping:
+        0: white
+        1: blue
+        8: azure
+  - transformation: color_change
+    input_color: azure (8)
+    output_color: blue (1)
+    condition: "topmost azure pixel in a contiguous azure region"
+  - observation: "contiguous azure regions are vertical or L-shaped"
