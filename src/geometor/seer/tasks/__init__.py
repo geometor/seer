@@ -2,5 +2,5 @@
 tools for testing fundamental transformations
 
 """
-from .tasks import *
-from .grid import *
+#  from geometor.seer.tasks.tasks import Task, Tasks, TaskPair
+#  from geometor.seer.tasks.grid import Grid

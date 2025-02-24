@@ -14,7 +14,8 @@ import re
 import contextlib
 import traceback
 
-from geometor.seer.tasks import Tasks, Task, Grid
+from geometor.seer.tasks.tasks import Tasks, Task
+from geometor.seer.tasks.grid import Grid
 
 from geometor.seer.gemini_client import GeminiClient as Client
 from geometor.seer.exceptions import (
@@ -33,7 +34,6 @@ class Seer:
     def __init__(
         self,
         config: dict,
-        max_iterations: int = 5,
     ):
         self.config = config
 
@@ -82,9 +82,7 @@ class Seer:
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
 
         try:
-            # --- Save task.json and task.png ---
             task_image = task.to_image()
-            #  session.log_prompt_image([task_image], 0, "task")  # Save task image
 
             image_path = self.session.task_dir / "task.png"
             task_image.save(image_path)
@@ -92,7 +90,6 @@ class Seer:
             task_json_str = task.nice_json_layout()
             task_json_file = session.task_dir / "task.json"
             task_json_file.write_text(task_json_str)
-            # --- End of added section ---
 
             self._investigate(task)
         except Exception as e:
@@ -105,13 +102,6 @@ class Seer:
         investigate all training pairs
         """
         self.task_solved = False  # Reset at the start of each task
-
-        # --- Add Task Image Logging ---
-        #  if include_images:
-            #  task_image = task.to_image()
-            #  task_image_filename = self.session.log_prompt_image(
-                #  task_image, 0, "task_overview"  # Use prompt_count 0 for overview
-            #  )
 
         for i, pair in enumerate(task.train, 1):
             # reset history for each pair
@@ -206,6 +196,7 @@ class Seer:
                     self.session.task_dir,
                     base_filename + "-train",
                 )
+                # TODO: save task.to_image with train results AI!
                 train_results.extend(current_train_results)
 
                 all_train_passed = all(
@@ -222,6 +213,7 @@ class Seer:
                         self.session.task_dir,
                         base_filename + "-test",
                     )
+                    # TODO: save task.to_image with test results AI!
                     test_results.extend(current_test_results)
 
                     all_test_passed = all(

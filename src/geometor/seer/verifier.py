@@ -2,7 +2,7 @@ import ast
 import io
 import contextlib
 import numpy as np
-from geometor.seer.tasks import Grid
+from geometor.seer.tasks.grid import Grid
 import json
 from pathlib import Path
 
@@ -62,7 +62,6 @@ def test_code(code, task_dir, task_pairs):
                 test_results_json.append(example_result)
                 continue
 
-            # ADD THESE LINES: Check for None return value and convert to NumPy array
             if transformed_output is None:
                 example_result["match"] = "ERROR: transform function returned None"
                 test_results_json.append(example_result)
@@ -78,11 +77,6 @@ def test_code(code, task_dir, task_pairs):
                 ] = f"ERROR: Could not convert output to NumPy array: {e}"
                 test_results_json.append(example_result)
                 continue
-
-            #  if isinstance(transformed_output, np.ndarray):
-                #  example_result["transformed_output_array"] = transformed_output.tolist()
-            #  else:
-                #  example_result["transformed_output_array"] = transformed_output
 
             example_result["transformed_output"] = Grid(
                 transformed_output, "", "", "", ""

@@ -1,1 +1,0 @@
-        output_grid[y, x] = 4
