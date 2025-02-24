@@ -9,6 +9,7 @@ from pathlib import Path
 from collections import Counter
 from .grid import Grid
 from PIL import Image, ImageDraw
+from geometor.seer import verifier
 
 
 class TaskPair:
@@ -117,10 +118,11 @@ class Task:
 
         return json_str
 
-    def to_image(self, cell_spacing=10):
+    def to_image(self, cell_spacing=10, train_results=None, test_results=None):
         """
         Creates a combined image for all train and test pairs in the task.
         Adds spacing between grids.
+        Optionally includes result grids.
         """
         train_images = []
         for pair in self.train:
@@ -140,33 +142,78 @@ class Task:
             max_width = max(max_width, img.width)
             max_height = max(max_height, img.height)
 
-        # Create combined image for train pairs
+        # --- Train Table ---
         train_table_width = len(self.train) * (max_width + cell_spacing) + cell_spacing
         train_table_height = 2 * (max_height + cell_spacing) + cell_spacing
+
+        # Adjust height if train_results are provided
+        if train_results:
+            num_train_results = len(self.train)  # Number of result rows to add
+            train_table_height += num_train_results * (max_height + cell_spacing)
+
         train_table = Image.new("RGB", (train_table_width, train_table_height), color="black")
         x_offset = cell_spacing
+        y_offset = cell_spacing  # Initialize y_offset
+
+        # Input and Output rows
         for i in range(0, len(train_images), 2):
-            train_table.paste(train_images[i], (x_offset, cell_spacing))
-            train_table.paste(train_images[i + 1], (x_offset, max_height + 2 * cell_spacing))
+            train_table.paste(train_images[i], (x_offset, y_offset))
+            train_table.paste(train_images[i + 1], (x_offset, y_offset + max_height + cell_spacing))
             x_offset += max_width + cell_spacing
 
-        # Create combined image for test pairs
+        # Result rows
+        if train_results:
+            y_offset += 2 * (max_height + cell_spacing) # Move y_offset for result rows
+            for i, result in enumerate(train_results):
+                if "transformed_output" in result:
+                    try:
+                        result_grid_str = result["transformed_output"]
+                        result_grid = verifier.string_to_grid(result_grid_str)
+                        result_image = result_grid.to_image(add_text=False)
+                        x_offset = cell_spacing + i * (max_width + cell_spacing)
+                        train_table.paste(result_image, (x_offset, y_offset))
+                    except Exception as e:
+                        print(f"Error processing train result image: {e}") # Log any errors
+
+        # --- Test Table ---
         test_table_width = len(self.test) * (max_width + cell_spacing) + cell_spacing
         test_table_height = (
             2 * (max_height + cell_spacing) + cell_spacing
             if any(pair.output for pair in self.test)
-            else max_height + 2 * cell_spacing  # Corrected height
+            else max_height + 2 * cell_spacing
         )
+        # Adjust height if test_results are provided
+        if test_results:
+            num_test_results = len(self.test)
+            test_table_height += num_test_results * (max_height + cell_spacing)
+
         test_table = Image.new("RGB", (test_table_width, test_table_height), color="black")
         x_offset = cell_spacing
+        y_offset = cell_spacing  # Initialize y_offset
+
+        # Input and Output rows
         for i in range(0, len(test_images), 2):
-            test_table.paste(test_images[i], (x_offset, cell_spacing))
+            test_table.paste(test_images[i], (x_offset, y_offset))
             # Handle potential missing test outputs
             if i + 1 < len(test_images):
-                test_table.paste(test_images[i + 1], (x_offset, max_height + 2 * cell_spacing))
+                test_table.paste(test_images[i + 1], (x_offset, y_offset + max_height + cell_spacing))
             x_offset += max_width + cell_spacing
 
-        # Combine train and test tables vertically
+        # Result rows
+        if test_results:
+            y_offset += 2 * (max_height + cell_spacing) if any(pair.output for pair in self.test) else (max_height + cell_spacing)
+            for i, result in enumerate(test_results):
+                if "transformed_output" in result:
+                    try:
+                        result_grid_str = result["transformed_output"]
+                        result_grid = verifier.string_to_grid(result_grid_str)
+                        result_image = result_grid.to_image(add_text=False)
+                        x_offset = cell_spacing + i * (max_width + cell_spacing)
+                        test_table.paste(result_image, (x_offset, y_offset))
+                    except Exception as e:
+                        print(f"Error processing test result image: {e}")
+
+        # --- Combine Train and Test Tables ---
         total_width = max(train_table_width, test_table_width)
         total_height = train_table_height + test_table_height
         final_image = Image.new("RGB", (total_width, total_height), color="black")
@@ -179,6 +226,7 @@ class Task:
         final_image.paste(test_table, (test_x_offset, train_table_height))
 
         return final_image
+
 
 
 class Tasks(list):
