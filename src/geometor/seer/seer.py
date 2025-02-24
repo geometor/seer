@@ -157,7 +157,7 @@ class Seer:
                 break  # Exit the loop if solved
 
             # coder prompt
-            instructions = [ self.instructions["investigate_coder"]]
+            instructions = [self.instructions["investigate_coder"]]
             prompt = [""]
             (
                 response,
@@ -175,8 +175,8 @@ class Seer:
             history.extend(response_parts)
 
             self._test_extracted_codelist(extracted_code_list, task)
-            if self.task_solved: # Check if solved
-                break # Exit loop
+            if self.task_solved:  # Check if solved
+                break  # Exit loop
 
     def _test_extracted_codelist(self, extracted_code_list, task):
         # TODO: this function cannot call refine if we are already in a refine loop
@@ -196,8 +196,10 @@ class Seer:
                     self.session.task_dir,
                     base_filename + "-train",
                 )
-                train_image = task.to_image(train_results=current_train_results)
-                train_image_filename = f"{base_filename}-train_with_results.png"
+                train_image = task.to_image(
+                    train_results=current_train_results, show_test=False
+                )
+                train_image_filename = f"{base_filename}-train_results.png"
                 train_image_path = self.session.task_dir / train_image_filename
                 train_image.save(train_image_path)
 
@@ -216,8 +218,11 @@ class Seer:
                         base_filename + "-test",
                     )
 
-                    test_image = task.to_image(test_results=current_test_results)
-                    test_image_filename = f"{base_filename}-test_with_results.png"
+                    test_image = task.to_image(
+                        train_results=current_train_results,
+                        test_results=current_test_results,
+                    )
+                    test_image_filename = f"{base_filename}-test_results.png"
                     test_image_path = self.session.task_dir / test_image_filename
                     test_image.save(test_image_path)
 
@@ -331,7 +336,7 @@ class Seer:
 
         # Construct the dreamer prompt
         dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
-        
+
         dreamer_prompt.append("\nTrain Set Results:\n")
         for i, result in enumerate(train_results):
             dreamer_prompt.append(f"\n## Example {i+1}:\n")
@@ -350,9 +355,12 @@ class Seer:
             dreamer_prompt.append(f"match: {result.get('match')}\n")
             dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
             dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
-            dreamer_prompt.append(f"color_palette_correct: {result.get('color_palette_correct')}\n")
-            dreamer_prompt.append(f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n")
-
+            dreamer_prompt.append(
+                f"color_palette_correct: {result.get('color_palette_correct')}\n"
+            )
+            dreamer_prompt.append(
+                f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
+            )
 
         if test_results:  # Only include if there are test results
             dreamer_prompt.append("\nTest Set Results (if applicable):\n")
@@ -368,12 +376,18 @@ class Seer:
                     )
                     # Add images
                     image_filename = f"{base_filename}-test-example_{i+1}.png"
-                    dreamer_prompt.append(f"!.get(Transformed Image)({image_filename})\n")
+                    dreamer_prompt.append(
+                        f"!.get(Transformed Image)({image_filename})\n"
+                    )
                 dreamer_prompt.append(f"match: {result.get('match')}\n")
                 dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
                 dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
-                dreamer_prompt.append(f"color_palette_correct: {result.get('color_palette_correct')}\n")
-                dreamer_prompt.append(f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n")
+                dreamer_prompt.append(
+                    f"color_palette_correct: {result.get('color_palette_correct')}\n"
+                )
+                dreamer_prompt.append(
+                    f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
+                )
 
         instructions = [self.instructions["refine_dreamer"]]
         (
