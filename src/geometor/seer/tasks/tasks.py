@@ -170,10 +170,12 @@ class Task:
         num_train_rows = 2 + (1 if train_results else 0)
         train_col_widths, train_row_heights = calculate_dimensions(train_images, num_train_cols, num_train_rows)
 
-        train_table_width = sum(train_col_widths) + (num_train_cols -1) * cell_spacing + 2 * outer_border
-        train_table_height = sum(train_row_heights) + (num_train_rows - 1) * cell_spacing + 2 * outer_border
+        # Calculate table dimensions *without* the outer border
+        train_table_width = sum(train_col_widths) + (num_train_cols - 1) * cell_spacing
+        train_table_height = sum(train_row_heights) + (num_train_rows - 1) * cell_spacing
 
-        train_table = Image.new("RGB", (train_table_width, train_table_height), color="black")
+        # Create the table with the adjusted dimensions
+        train_table = Image.new("RGB", (train_table_width + 2 * outer_border, train_table_height + 2 * outer_border), color="black")
 
         x_offset = outer_border
         y_offset = outer_border
@@ -211,10 +213,12 @@ class Task:
             num_test_rows = 1 + (1 if any(pair.output for pair in self.test) else 0) + (1 if test_results else 0)  # Input, Output, Result
             test_col_widths, test_row_heights = calculate_dimensions(test_images, num_test_cols, num_test_rows)
 
-            test_table_width = sum(test_col_widths) + (num_test_cols - 1) * cell_spacing + 2 * outer_border
-            test_table_height = sum(test_row_heights) + (num_test_rows - 1) * cell_spacing + 2 * outer_border
+            # Calculate table dimensions *without* the outer border
+            test_table_width = sum(test_col_widths) + (num_test_cols - 1) * cell_spacing
+            test_table_height = sum(test_row_heights) + (num_test_rows - 1) * cell_spacing
 
-            test_table = Image.new("RGB", (test_table_width, test_table_height), color="black")
+            # Create the table with the adjusted dimensions
+            test_table = Image.new("RGB", (test_table_width + 2 * outer_border, test_table_height + 2 * outer_border), color="black")
 
             x_offset = outer_border
             y_offset = outer_border
@@ -249,20 +253,21 @@ class Task:
                             print(f"Error processing test result image: {e}")
 
             # --- Combine Train and Test Tables ---
-            total_width = max(train_table_width, test_table_width)
-            total_height = train_table_height + test_table_height + outer_border # Add spacing between tables
+            total_width = max(train_table_width, test_table_width) + 2 * outer_border
+            total_height = train_table_height + test_table_height + 3 * outer_border  # Consistent spacing
             final_image = Image.new("RGB", (total_width, total_height), color="black")
 
-            # Center the train and test tables
-            train_x_offset = (total_width - train_table_width) // 2
-            test_x_offset = (total_width - test_table_width) // 2
+            # Center the train and test tables.  Offsets are now relative to the *final_image* size.
+            train_x_offset = (total_width - train_table_width - 2*outer_border) // 2
+            test_x_offset = (total_width - test_table_width - 2*outer_border) // 2
 
-            final_image.paste(train_table, (train_x_offset, outer_border))
-            final_image.paste(test_table, (test_x_offset, train_table_height + outer_border)) # Add spacing
+            final_image.paste(train_table, (train_x_offset , outer_border))
+            final_image.paste(test_table, (test_x_offset, train_table_height + 2*outer_border)) # Consistent spacing
 
         else:  # --- Only Train Table ---
-            final_image = Image.new("RGB", (train_table_width, train_table_height), color="black")
-            final_image.paste(train_table, (outer_border, outer_border))  # Center train table
+            # Adjust final image dimensions as well
+            final_image = Image.new("RGB", (train_table_width + 2 * outer_border, train_table_height + 2 * outer_border), color="black")
+            final_image.paste(train_table, (outer_border, outer_border))
 
         return final_image
 
