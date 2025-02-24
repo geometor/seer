@@ -196,12 +196,14 @@ class Seer:
                     self.session.task_dir,
                     base_filename + "-train",
                 )
-                # TODO: save task.to_image with train results AI!
-                train_results.extend(current_train_results)
+                train_image = task.to_image(train_results=current_train_results)
+                train_image_filename = f"{base_filename}-train_with_results.png"
+                train_image_path = self.session.task_dir / train_image_filename
+                train_image.save(train_image_path)
 
                 all_train_passed = all(
-                    result.get("match") is True for result in train_results
-                )
+                    result.get("match") is True for result in current_train_results
+                )  # Use current_train_results
                 if all_train_passed:
                     current_test_results = verifier.test_code(
                         code,
@@ -213,12 +215,15 @@ class Seer:
                         self.session.task_dir,
                         base_filename + "-test",
                     )
-                    # TODO: save task.to_image with test results AI!
-                    test_results.extend(current_test_results)
+
+                    test_image = task.to_image(test_results=current_test_results)
+                    test_image_filename = f"{base_filename}-test_with_results.png"
+                    test_image_path = self.session.task_dir / test_image_filename
+                    test_image.save(test_image_path)
 
                     all_test_passed = all(
-                        result.get("match") is True for result in test_results
-                    )
+                        result.get("match") is True for result in current_test_results
+                    )  # Use current_test_results
                     if all_test_passed:
                         self.task_solved = True  # Set the flag
                         break  # Exit the loop *after* setting the flag
