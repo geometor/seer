@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nDoubles the dimensions of the input grid. Copies non-zero pixels from the input \ngrid to the output grid at upscaled locations, with a second copy placed two \npositions to the right if the original pixel isn't in the last column. Fills \nempty (zero-valued) cells in the output grid with azure (8) if their row and \ncolumn indices are both even or both odd.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Double the grid size.\n    input_height, input_width = input_grid.shape\n    output_height, output_width = input_height * 2, input_width * 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Iterate through non-zero pixels in the input grid.\n    for r in range(input_height):\n        for c in range(input_width):\n            color = input_grid[r, c]\n            if color != 0:\n                # Upscale and copy the color.\n                out_row = r * 2 + 1\n                out_col = c * 2 + 1\n                output_grid[out_row, out_col] = color\n\n                # Copy to the right if not in the last column.\n                if c < input_width - 1:\n                    output_grid[out_row, out_col + 2] = color\n\n    # Fill with azure based on row and column parity.\n    for r in range(output_height):\n        for c in range(output_width):\n            if output_grid[r, c] == 0:\n                if (r % 2 == 0 and c % 2 == 0) or (r % 2 != 0 and c % 2 != 0) :\n                    output_grid[r, c] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3716,
+    "candidates_token_count": 439,
+    "total_token_count": 4155,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.548686,
+  "response_file": "024-response.json"
+}

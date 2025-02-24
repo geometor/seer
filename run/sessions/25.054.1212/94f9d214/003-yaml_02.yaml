@@ -1,0 +1,26 @@
+facts:
+  - object: green_cluster
+    description: A contiguous region of green (3) pixels.
+    properties:
+      - shape: irregular
+      - color: green (3)
+    interactions:
+      - bounded_by: blue pixels may partially or completely surround some green clusters
+
+  - object: blue_cluster
+    description: A contiguous region of blue (1) pixels.
+    properties:
+      - shape: irregular
+      - color: blue (1)
+
+  - action: identify_green_clusters
+    description: Locate all distinct green clusters within the input grid.
+
+  - action: check_blue_bounds
+    description: Determine blue pixels adjacent to green clusters.
+
+  - action: transform_pixel
+    description: Change a green pixel to red based on a position relative to blue pixels.
+
+  - action: output_grid
+    description: build output by identifying top/left bound of the green/blue complex

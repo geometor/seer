@@ -1,0 +1,15 @@
+task_id: 002
+observations:
+  - object_type: pixel
+    properties:
+      value: [0-9]  # Represents color
+      position: [row, column]
+    behavior:
+      - move_to_bottom: Non-zero pixels move to the lowest available row.
+      - preserve_order_rowwise: Non-zero pixels maintain their original left-to-right order within each row.
+      - fill_with_zeros: Zero-valued pixels remain, or fill empty spaces.
+  - object_type: grid
+    properties:
+      dimensions: [rows, columns] #same for input and output
+    behavior:
+        - transformation: "The grid is transformed based on pixel behaviors"

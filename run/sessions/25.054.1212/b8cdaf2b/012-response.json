@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Source Pixels:** Examine the bottom row of the input grid. Identify the non-zero pixels. Note their positions (row, column) and colors. We will call them \"source pixels\".\n2.  **Selective Replication**: For each *source pixel* check if it is one of the colors: 1, 2, 3, or 4.\n3. **Targeted Placement**: If the source pixel color is 1,2,3,or 4 then place a pixel of that same color two rows above and one column to the left of the source pixel, and two rows above and one column to the right of the source pixel.\n4.  **Boundary Check**: When calculating the positions, skip the replication if the position is beyond the bounds of the input grid.\n5. **Overwrite any existing color**: if a position has a color, overwrite it.\n\"\"\"\n\nimport numpy as np\n\ndef find_source_pixels(grid):\n    \"\"\"Finds the positions and colors of non-zero pixels in the bottom row.\"\"\"\n    bottom_row = grid[-1]\n    pixels = []\n    for col_idx, color in enumerate(bottom_row):\n        if color != 0:\n            pixels.append(((len(grid) - 1, col_idx), color))  # ((row, col), color)\n    return pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    height = len(input_grid)\n    width = len(input_grid[0])\n\n    # find the source pixels on the bottom row\n    source_pixels = find_source_pixels(input_grid)\n\n    # replicate and offset.\n    for (row, col), color in source_pixels:\n        # selective replication based on color\n        if color in [1, 2, 3, 4]:\n            # targeted placement: two rows up, one column left and right\n            offsets = [(-2, -1), (-2, 1)]\n            for row_offset, col_offset in offsets:\n                new_row = row + row_offset\n                new_col = col + col_offset\n\n                # boundary check\n                if 0 <= new_row < height and 0 <= new_col < width:\n                    # Overwrite the existing pixel\n                    output_grid[new_row, new_col] = color\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3747,
+    "candidates_token_count": 549,
+    "total_token_count": 4296,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.74505,
+  "response_file": "012-response.json"
+}

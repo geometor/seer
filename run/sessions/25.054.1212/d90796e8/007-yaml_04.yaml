@@ -1,0 +1,27 @@
+objects:
+  - type: pixel
+    properties:
+      color:
+        - white (0)
+        - gray (5)
+        - green (3)
+        - red (2)
+        - azure (8)
+      position: [row, column]
+      changed: [boolean]
+
+actions:
+  - name: change_color
+    agent: unknown
+    target: pixel
+    precondition:
+      color: [green, red]
+    postcondition:
+      color: azure
+    constraints:
+        adjacency: "only applies to pixels adjacent to 2 and 3 but not to 0"
+
+relationships:
+   - type: adjacency
+     relation: is_adjacent_to
+     between: [pixel, pixel]

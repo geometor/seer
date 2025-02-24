@@ -1,0 +1,30 @@
+observations:
+  - task: "ARC Task"
+  - objects:
+      - name: input_grid
+        type: 2D array
+        properties:
+          - values: integers (0-9) representing colors
+          - shape: varies (but square in these examples)
+
+      - name: output_grid
+        type: 2D array
+        properties:
+          - values: integers (0-9)
+          - shape: same as input_grid
+
+      - name: central_block
+        type: 2x2 subgrid
+        properties:
+          - location: within input_grid
+          - values: non-zero integers
+
+  - actions:
+      - name: identify_central_block
+        description: Locate the 2x2 block of non-zero pixels.
+      - name: extend_top
+        description: Copy the top row of the central block to the top two rows of the output grid, but only within the column range of the central block.
+      - name: extend_bottom
+        description: Copy the bottom row of the central block to the bottom two rows of the output grid, but only within the column range of the central block.
+      - name: preserve_center
+        description: Copy central 2x2 block from the input to the output.

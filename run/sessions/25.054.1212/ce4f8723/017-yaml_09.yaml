@@ -1,0 +1,51 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      colors: [0-9] # All possible colors
+      dimensions: variable
+
+  - name: subgrid
+    type: grid
+    properties:
+      dimensions: 4x4
+      source: top-left corner of input_grid
+
+  - name: blue_pixels
+    type: pixel_set
+    properties:
+      original_color: 1 # Blue
+      new_color: 3 # Green
+      locations: []
+
+  - name: white_pixels
+    type: pixel_set
+    properties:
+      color: 0
+
+  - name: changed_pixels
+    type: pixel_set
+    properties: {}
+
+actions:
+  - name: extract_subgrid
+    input: input_grid
+    output: subgrid
+
+  - name: recolor_blue
+    input: subgrid
+    process:
+      - Find all pixels with color 1 (blue)
+      - Change their color to 3 (green)
+      - Store original locations of these blue pixels
+    output: modified subgrid
+
+  - name: propagate_green
+    input:
+      - modified subgrid
+      - locations of originally blue pixels
+    process:
+      - For each originally blue pixel:
+        - Check its immediate neighbors (up, down, left, right).
+        - If a neighbor is white (0), change it to green (3).
+    output: final_output_grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFinds the '1' pixel in the input grid and replaces all '0' pixels with a checkerboard pattern of '8' and '1' values, radiating outwards from the location of the initial '1' pixel. The '1' pixel's location in the output corresponds directly to its location in the input.  The checkerboard pattern starts with '8' in the top-left corner of the output grid, regardless of where the '1' pixel is located.\n\"\"\"\n\nimport numpy as np\n\ndef find_pixel(grid, value):\n    # Find the coordinates of the pixel with the specified value.\n    for r, row in enumerate(grid):\n        for c, pixel in enumerate(row):\n            if pixel == value:\n                return (r, c)\n    return None\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the coordinates of the '1' pixel.\n    blue_pixel_coords = find_pixel(input_grid, 1)\n    if blue_pixel_coords is None:\n        return output_grid #should not happen based on prior\n\n    # Iterate through the grid and apply the checkerboard pattern, starting from top-left (0,0).\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 0:\n                if (r + c) % 2 == 0:\n                    output_grid[r, c] = 8\n                else:\n                    output_grid[r, c] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3870,
+    "candidates_token_count": 389,
+    "total_token_count": 4259,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.313656,
+  "response_file": "012-response.json"
+}

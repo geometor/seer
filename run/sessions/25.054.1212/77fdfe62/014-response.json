@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule involves extracting the colors from the four corners of a blue (1) frame within the input grid and using these colors to populate a smaller 4x4 output grid. Each corner color of the input's blue frame corresponds to a 2x2 block in the output grid. The remaining cells in the output grid are filled with white (0).\n\"\"\"\n\nimport numpy as np\n\ndef get_frame_corners(grid):\n    # Find the outermost blue (1) frame.  We assume it's a single-pixel wide frame.\n    rows, cols = grid.shape\n    top_left = None\n    top_right = None\n    bottom_left = None\n    bottom_right = None\n\n    # Find top-left\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r,c] == 1:\n                top_left = (r,c)\n                break\n        if top_left:\n            break\n\n    #Find other coners based on knowledge that it is rectangular and 1 pixel wide\n    if top_left:\n      for r in range(rows):\n        for c in range(cols):\n          if grid[r,c] == 1:\n            if r == top_left[0] and c > top_left[1]:\n                top_right = (r,c)\n            if c == top_left[1] and r > top_left[0]:\n                bottom_left = (r, c)\n            if bottom_left and top_right and r > top_left[0] and c > top_left[1] and grid[r, c] ==1:\n                bottom_right = (r, c)\n    return top_left, top_right, bottom_left, bottom_right\n            \n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the defined rule.\"\"\"\n\n    # Get the corner coordinates of the blue frame\n    top_left, top_right, bottom_left, bottom_right = get_frame_corners(input_grid)\n\n    # Extract corner colors from input\n    corner_colors = {\n        'top_left': input_grid[top_left[0]-1, top_left[1]-1],\n        'top_right': input_grid[top_right[0]-1, top_right[1]+1],\n        'bottom_left': input_grid[bottom_left[0]+1, bottom_left[1]-1],\n        'bottom_right': input_grid[bottom_right[0]+1, bottom_right[1]+1]\n    }\n\n\n    # Initialize the output grid (4x4)\n    output_grid = np.zeros((4, 4), dtype=int)\n\n    # Populate the output grid\n    output_grid[0:2, 0:2] = corner_colors['top_left']  # Top-left quadrant\n    output_grid[0:2, 2:4] = corner_colors['top_right'] # Top-right quadrant\n    output_grid[2:4, 0:2] = corner_colors['bottom_left'] # Bottom-left quadrant\n    output_grid[2:4, 2:4] = corner_colors['bottom_right'] # Bottom-right quadrant\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2439,
+    "candidates_token_count": 759,
+    "total_token_count": 3198,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.355372,
+  "response_file": "014-response.json"
+}

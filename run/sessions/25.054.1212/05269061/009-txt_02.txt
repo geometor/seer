@@ -1,0 +1,48 @@
+# Conceptual Code Execution Results (for each example)
+
+## Example 1:
+Input Objects:
+  - Object 1: [2, 8, 3] at (0,0), (0,1), (0,2)
+  - Object 2: [8, 3] at (1,0), (1,1)
+  - Object 3: [3] at (2,0)
+
+Output Objects:
+   -Object 1: [2, 8, 3] at (0,0), (0,1), (0,2) and many others repeating
+   -Object 2: [8, 3] at (1,0), (1,1)
+   -Object 3: [3] at (2,0)
+
+Transformation Analysis:
+    - Non-zero pixel preservation:  Perfect
+    - Zero-fill rule: The pattern of the objects is repeated in every direction
+
+## Example 2:
+Input Objects:
+  - Object 1: [1] at (2,6)
+  - Object 2: [1, 2] at (3, 5), (3, 6)
+  - Object 3: [1, 2, 4] at (4,4), (4,5), (4,6)
+  ...
+
+Output Objects:
+  - Object 1: [1]
+  - Object 2: [1, 2]
+  - Object 3: [1, 2, 4]
+ ...
+
+Transformation Analysis:
+    - Non-zero pixel preservation: Perfect.
+    - Zero-fill rule: The patterns repeats.
+
+## Example 3:
+Input Objects:
+  - Object 1: [8, 3] at (0, 4), (0,5)
+  - Object 2: [8, 3]
+ ...
+
+Output Objects:
+   - Object 1: [8,3]
+  - Object 2: [8, 3]
+ ...
+
+Transformation Analysis:
+    - Non-zero pixel preservation: Perfect.
+    - Zero-fill rule: The pattern repeats

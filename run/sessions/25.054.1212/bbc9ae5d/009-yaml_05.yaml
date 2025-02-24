@@ -1,0 +1,50 @@
+examples:
+  - id: example_1
+    input_grid: "1 1 0 0 0 0"
+    output_grid: "1 1 0 0 0 0\n1 1 1 0 0 0\n1 1 1 1 0 0"
+    transformed_output: "1 0 0 0 0 0\n1 1 0 0 0 0"
+    match: False
+    observations:
+      - The input has two '1's (blue).
+      - The expected output has 3 rows, corresponding to the counts of '1' plus one. It seems to be taking count of 1's and adding a shifted copy in additional row.
+      - The transformed output only created 2 rows. Only a diagonal was filled.
+
+  - id: example_2
+    input_grid: "2 0 0 0 0 0 0 0"
+    output_grid: "2 0 0 0 0 0 0 0\n2 2 0 0 0 0 0 0\n2 2 2 0 0 0 0 0\n2 2 2 2 0 0 0 0"
+    transformed_output: "2 0 0 0 0 0 0 0"
+    match: False
+    observations:
+      - The input has one '2' (red).
+      - The output expands to four rows.
+      - The transformed output only has one row.
+
+  - id: example_3
+    input_grid: "5 5 5 0 0 0 0 0 0 0"
+    output_grid: "5 5 5 0 0 0 0 0 0 0\n5 5 5 5 0 0 0 0 0 0\n5 5 5 5 5 0 0 0 0 0\n5 5 5 5 5 5 0 0 0 0\n5 5 5 5 5 5 5 0 0 0"
+    transformed_output: "5 0 0 0 0 0 0 0 0 0\n5 5 0 0 0 0 0 0 0 0\n5 5 5 0 0 0 0 0 0 0"
+    match: False
+    observations:
+      - Input has three '5's (gray).
+      - Output has five rows.
+      - The transformed output only has three rows.
+
+  - id: example_4
+    input_grid: "8 8 8 8 0 0"
+    output_grid: "8 8 8 8 0 0\n8 8 8 8 8 0\n8 8 8 8 8 8"
+    transformed_output: "8 0 0 0 0 0\n8 8 0 0 0 0\n8 8 8 0 0 0\n8 8 8 8 0 0"
+    match: False
+    observations:
+      - Input has four '8' (azure)
+      - Output has 3 rows.
+      - Transformed output has 4 rows.
+
+  - id: example_5
+    input_grid: "7 0 0 0 0 0"
+    output_grid: "7 0 0 0 0 0\n7 7 0 0 0 0\n7 7 7 0 0 0"
+    transformed_output: "7 0 0 0 0 0"
+    match: False
+    observations:
+        - Input has one '7' (orange).
+        - Output has three rows.
+        - The transformed output has only 1 row.

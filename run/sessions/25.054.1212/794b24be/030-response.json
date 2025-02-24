@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify the smallest rectangle encompassing all blue pixels in the input grid.\nChange all of the original blue pixels within the rectangle to red.\nSet all other non-zero pixels that are not red to zero.\n\"\"\"\n\nimport numpy as np\n\ndef find_bounding_box(grid):\n    \"\"\"Finds the bounding box of blue pixels in the grid.\"\"\"\n    blue_pixels = np.where(grid == 1)\n    if len(blue_pixels[0]) == 0:  # Handle the case with no blue pixels\n        return None  # Or return a default bounding box, e.g., ((0, 0), (0, 0))\n\n    min_row, min_col = np.min(blue_pixels[0]), np.min(blue_pixels[1])\n    max_row, max_col = np.max(blue_pixels[0]), np.max(blue_pixels[1])\n    return (min_row, min_col), (max_row, max_col)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by finding the bounding box of blue pixels,\n    filling the original blue pixel locations with red, and setting other non-zero pixels to zero.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    bounding_box = find_bounding_box(input_grid)\n\n    if bounding_box:\n        (min_row, min_col), (max_row, max_col) = bounding_box\n\n        # change original blue cells to red\n        blue_pixels = np.where(output_grid == 1)\n        output_grid[blue_pixels] = 2\n\n    # Zero out other non-zero pixels.\n    output_grid[(output_grid != 0) & (output_grid != 2)] = 0\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3391,
+    "candidates_token_count": 422,
+    "total_token_count": 3813,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.745025,
+  "response_file": "030-response.json"
+}

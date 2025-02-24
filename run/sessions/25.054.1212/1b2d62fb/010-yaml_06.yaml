@@ -1,0 +1,35 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - colors: [0, 1, 9] # Black, Blue, Maroon
+      - has_blue_stripe: True
+      - height: 5 # Consistent across all examples
+      - width: varies
+
+  - name: blue_stripe
+    type: object
+    properties:
+      - color: 1  # Blue
+      - shape: vertical_line
+      - column_index: 3 (varies - but consistent across examples given)
+
+  - name: output_grid
+    type: grid
+    properties:
+      - colors: [0, 8] # Black, Azure
+      - height: 5 #consistent
+      - width: 3 #consistent
+  - name: azure_pixels
+    type: object
+    properties:
+      - color: 8 # Azure
+      - positions: relative to blue stripe and center of input
+
+actions:
+  - name: find_blue_stripe
+    description: Locate the vertical blue stripe within the input grid.
+  - name: create_output_grid
+    description: Create output grid with all black, determine locations of azure pixels
+  - name: place_azure_pixels
+    description:  Place azure pixels in output grid relative to position of the blue stripe and the vertical center of the input grid.

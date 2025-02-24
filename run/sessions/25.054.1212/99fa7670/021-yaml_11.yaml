@@ -1,0 +1,13 @@
+observations:
+  - object: non_white_pixel
+    properties:
+      color: varies (not 0)
+      location: row, column
+    actions:
+      - expand_right: Fill pixels to the right with the same color until a non-white pixel or the end of the row is reached.
+      - drop_down:  The last expanded pixel should be used to color all cells below in its column to the end of the column.
+  - object: grid
+    properties:
+      shape: rows x columns
+    actions:
+      - transform: Apply the pixel-level actions to create the output grid.

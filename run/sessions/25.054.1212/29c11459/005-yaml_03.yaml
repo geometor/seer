@@ -1,0 +1,42 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 5x11 (rows x columns)
+      cell_values: integers (0-9) representing colors
+
+  - type: color_block
+    properties:
+      color: green (3)
+      start_position: (3, 0) # row, column
+      end_position: null
+
+  - type: color_block
+    properties:
+      color: orange (7)
+      start_position: (3, 10)
+      end_position: null
+
+  - type: color_block
+    properties:
+        color: gray (5)
+        start_position: null
+        end_position: null
+
+actions:
+  - type: expand
+    object: green color_block
+    direction: right
+    extent: "until midway - 1"
+
+  - type: expand
+    object: orange color_block
+    direction: left
+    extent: "until midway"
+  
+  - type: insert
+    object: gray (5)
+    location: middle cell between color blocks
+
+relationships:
+  - spatial: green and orange blocks are on the same row, separated by zeros.
+  - transformation: input row transforms into a filled row with expanded colors and a central separator.

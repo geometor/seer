@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts the inner region of a grid, excluding a single-pixel-wide rectangular frame of a uniform color.\n\"\"\"\n\nimport numpy as np\n\ndef find_frame_color(grid):\n    # Find the color that forms the outermost rectangular frame.\n\n    rows, cols = grid.shape\n    for color in np.unique(grid):\n        if color == 0:\n          continue\n        coords = np.argwhere(grid == color)\n        min_row, min_col = coords.min(axis=0)\n        max_row, max_col = coords.max(axis=0)\n\n        # Check if it forms a rectangle\n        if (max_row - min_row + 1) * (max_col - min_col + 1) == len(coords):\n          \n          # Check it is actually a frame by looking for different values inside\n          is_frame = False\n          for r in range(min_row + 1, max_row):\n            for c in range(min_col + 1, max_col):\n              if grid[r,c] != color:\n                is_frame = True\n                break\n            if is_frame:\n              break\n          \n          if is_frame:\n            return color\n\n    return 0 # should never reach here if there is a valid frame\n\ndef get_bounding_box(grid, color):\n    # Find coordinates of all pixels of the specified color.\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None  # Handle cases where the color doesn't exist\n    min_row, min_col = coords.min(axis=0)\n    max_row, max_col = coords.max(axis=0)\n    return (min_row, min_col, max_row, max_col)\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the inner region of the grid, excluding the frame.\n    \"\"\"\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find the framing color\n    frame_color = find_frame_color(input_grid)\n    if frame_color == 0:\n      return []\n\n    # Get bounding box\n    bounding_box = get_bounding_box(input_grid, frame_color)\n    if bounding_box is None:\n        return []\n    \n    min_row, min_col, max_row, max_col = bounding_box\n\n    # Extract inner region\n    output_grid = input_grid[min_row+1:max_row, min_col+1:max_col]\n    \n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3412,
+    "candidates_token_count": 619,
+    "total_token_count": 4031,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.698935,
+  "response_file": "006-response.json"
+}

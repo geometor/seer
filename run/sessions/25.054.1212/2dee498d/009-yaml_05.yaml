@@ -1,0 +1,21 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - width: variable
+      - height: variable
+      - elements: integers (0-9)
+  - name: output_grid
+    type: grid
+    properties:
+      - width: min(input_width, 4)
+      - height: min(input_height, 4)
+      - elements: integers (0-9)
+actions:
+  - name: extract_subgrid
+    input: input_grid
+    output: output_grid
+    description: Extracts a subgrid from the top-left corner of the input grid.
+    constraints:
+      - output_grid width:  The smaller of the input grid width and 4.
+      - output_grid height: The smaller of the input grid height and 4.

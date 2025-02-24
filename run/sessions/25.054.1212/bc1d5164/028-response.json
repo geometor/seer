@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation identifies the dominant non-zero color in the input grid, then extracts rows and columns that contain this color, forming a smaller output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_dominant_nonzero_color(grid):\n    \"\"\"\n    Finds the most frequent non-zero color in the grid.\n    \"\"\"\n    # Flatten the grid and convert to a list\n    flat_grid = grid.flatten().tolist()\n    # Find unique non-zero colors\n    nonzero_colors = [color for color in set(flat_grid) if color != 0]\n\n    # Handle the edge case of input containing all zeros\n    if not nonzero_colors:\n        return None\n    \n    if len(nonzero_colors) == 1:\n        return nonzero_colors[0]\n\n    # Count occurrences of each non-zero color\n    color_counts = {color: flat_grid.count(color) for color in nonzero_colors}\n    # Return the color with the maximum count\n    dominant_color = max(color_counts, key=color_counts.get)\n    return dominant_color\n\ndef get_rows_with_color(grid, color):\n    \"\"\"\n    Returns a list of row indices that contain the specified color.\n    \"\"\"\n    rows = []\n    for i, row in enumerate(grid):\n        if color in row:\n          if all(c in [0, color] for c in row):\n            rows.append(i)\n    return rows\n\ndef get_cols_with_color(grid, color):\n    \"\"\"\n    Returns a list of column indices that contain the specified color.\n    \"\"\"\n    cols = []\n    for j in range(grid.shape[1]):\n      col = grid[:,j]\n      if color in col:\n        if all(c in [0, color] for c in col):\n          cols.append(j)\n    return cols\n\ndef extract_rows(grid, row_indices):\n    \"\"\"Extracts specific rows from a grid, based on row indices.\"\"\"\n    return grid[row_indices]\n\ndef extract_cols(grid, col_indices):\n    \"\"\"Extracts specific columns from a grid, based on column indices.\"\"\"\n    return grid[:, col_indices]\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by extracting rows and columns that contain the dominant non-zero color.\n    \"\"\"\n    # Convert to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # 1. Identify the dominant non-zero color\n    dominant_color = get_dominant_nonzero_color(input_grid)\n    \n    if dominant_color is None:\n        return []\n\n    # 2. Identify Rows with the dominant color\n    rows_with_color = get_rows_with_color(input_grid, dominant_color)\n\n    # 3. Filter Input by Rows\n    intermediate_grid = extract_rows(input_grid, rows_with_color)\n    \n    # 4. Identify Columns with the dominant color in intermediate\n    cols_with_color = get_cols_with_color(intermediate_grid, dominant_color)\n\n\n    # 5. Filter Intermediate by Columns\n    output_grid = extract_cols(intermediate_grid, cols_with_color)\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3214,
+    "candidates_token_count": 756,
+    "total_token_count": 3970,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.849785,
+  "response_file": "028-response.json"
+}

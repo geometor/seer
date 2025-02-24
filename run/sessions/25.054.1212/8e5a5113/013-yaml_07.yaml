@@ -1,0 +1,32 @@
+facts:
+  - observation: |
+      The input and output grids have the same dimensions (3x11).
+  - observation: |
+      The first four columns of the input and output grids are identical.
+  - observation: |
+      The last three columns of input and output are identical.
+  - observation: |
+    The central 3 columns in output seem to be a combination of mirroring of the left and right sides,
+    in a specific sequence and alternating colors.
+  - object: input_grid
+    type: grid
+    properties:
+      rows: 3
+      columns: 11
+      colors: [red, orange, azure, gray, white]
+  - object: output_grid
+    type: grid
+    properties:
+      rows: 3
+      columns: 11
+      colors: [red, orange, azure, gray, white]
+  - action: copy_columns
+    description: |
+      Columns 0-3 of the input grid are copied to columns 0-3 of the output grid.
+  - action: copy_columns
+    description: |
+      Columns 8-10 of the input are copied to columns 8-10 of the output.
+  - action: sequence
+    description: |
+      Columns 4, 5, and 6, follow a predefined sequence based on column 3 and
+      column 7 reversed.

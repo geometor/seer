@@ -1,0 +1,18 @@
+observations:
+  - task_id: 014
+  - objects:
+    - description: Non-zero pixels in the input grid.
+      properties:
+        - color: Defined by the pixel value (1-9).
+        - original_position: (row, column) coordinates before any transformation.
+  - actions:
+    - name: Horizontal Expansion
+      description:  A non-zero pixel's color replaces all 0 values in its row.
+      scope: Row-level.
+      precedence: Happens before fill-down.
+    - name: Fill Down
+      description: A non-zero pixel's color propagates vertically downwards from its original row.
+      scope:  Column-level, limited to the original column of the non-zero pixel.
+      precedence: Happens after horizontal expansion.
+  - constraints:
+     - Fill-down is constrained to the column of the original non-zero colored pixels.

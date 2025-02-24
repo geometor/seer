@@ -1,0 +1,22 @@
+task_id: 020
+observations:
+  - object_types:
+      - grid: "2D array of pixels"
+      - region: "contiguous block of pixels with the same color"
+      - subgrid: "4x4 section of the grid"
+  - properties:
+      - color: "integer value representing a specific color (0-9)"
+      - size: "dimensions of a grid or region (height, width)"
+      - position: "coordinates of a pixel or the bounding box of a region"
+      - bounding_box: "the smallest rectangle enclosing a region"
+  - actions:
+      - consolidate: "replace multiple colors with a single color (green/3)"
+      - reduce: "create smaller grid"
+      - position: "place the subgrid within the fixed size grid"
+  - input_output_relationship:
+      - size_fixed: "output grid is always 4x4"
+      - color_consolidation: "all non-zero colors in the input, except 0, are replaced by 3 (green) in the output"
+      - position_variable: "the position and arrangement of green blocks in the output is NOT fixed and depends on the input"
+      - zero_regions: "the white (0) pixels act as separators between regions of other colors"
+  - errors:
+      - positioning_logic: "The current code's logic for positioning the green blocks is incorrect; it doesn't adapt to the input structure."

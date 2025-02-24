@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    dimensions: 10x5
+    elements: pixels
+    properties:
+      - color:
+        values: [0, 2, 8]  # white, red, azure
+        mapping:
+          0: white
+          2: red
+          8: azure
+
+  - type: row
+    properties:
+      - color:
+        values: [0,2,8]
+
+actions:
+    - name: reflection # could be mirroring or translation
+    - agent: rows (certain color only)
+    - target: vertical axis (appears to reflect about center)
+
+relationships:
+  - type: spatial
+    description: rows stacked vertically
+
+  - type: transformation
+    desciption: input rows of 8 and 2 are transformed to output rows of 8 and 2, reordered.

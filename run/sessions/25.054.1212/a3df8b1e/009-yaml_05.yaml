@@ -1,0 +1,24 @@
+observations:
+  - object: seed_pixel
+    properties:
+      color: blue
+      role: starting_point
+    description: The initial blue pixel in the input grid.
+
+  - object: output_pattern
+    properties:
+      type: diagonal
+      color: blue
+      wrapping: true
+    description:  A diagonal line of blue pixels extending from the seed pixel. The line wraps around the edges of the grid.
+
+  - object: grid
+    properties:
+      shape: rectangle
+    description: 2D array of pixels, where each pixel has an integer from 0-9
+
+  - actions:
+    - name: find_seed
+      description: Locates the seed pixel (the initial blue pixel) in the input grid.
+    - name: propagate_pattern
+      description:  Extends a diagonal line of blue pixels from the seed, wrapping around the grid edges.

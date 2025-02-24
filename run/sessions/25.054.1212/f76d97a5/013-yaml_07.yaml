@@ -1,0 +1,25 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - values: [9, 5]
+      - dimensions: 5x5
+  - name: output_grid
+    type: 2D array
+    properties:
+      - values: [0, 9]
+      - dimensions: 5x5
+
+actions:
+  - name: replace_color
+    input: 5
+    output: 0
+  - name: check_neighbors
+    input: 9
+    logic: "If the '9' has a neighbor '5' in the down or right, change it to '0'."
+      
+relationships:
+  - type: spatial
+    description: "The output grid maintains the same dimensions as the input grid."
+  - type: transformation
+    description: "Input values are transformed based on certain conditions"

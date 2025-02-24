@@ -1,0 +1,38 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify Objects: Find all contiguous regions (objects) of the same non-black color in the input grid.\n2. Select Object: Select one object based on these rules, applied in order:\n    - Example 1: Select Red Object\n    - Example 2: Select Yellow Object\n    - Example 3: Select Azure Object\n    - Example 4: Select Red Object\n3. Determine Bounding Box: Find the smallest rectangle (bounding box) that fully encloses the selected object.\n4. Determine Output Dimensions: The output dimensions are the rotated and trimmed bounding box\n      of the object. It appears some parts are trimmed.\n      - Example 1: The height and width are swapped\n      - Example 2: The original height and width are maintained\n      - Example 3: The original height and width are maintained.\n      - Example 4: The original height and width are maintained\n5. Create Output Grid: Create new grid that has dimensions of the *rotated* bounding box.\n6. Extract Subgrid: Extract the subgrid from the input grid that corresponds to the bounding box of the selected object.\n7. Rotate/Trim Subgrid: Rotate and/or trim the subgrid by eliminating rows/cols of background color.\n8. Place Subgrid: Place the potentially rotated/trimmed subgrid into the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid):\n    \"\"\"\n    Finds contiguous regions of the same color in a grid.\n    Returns a list of objects, where each object is a dictionary containing:\n        'color': the color of the object,\n        'pixels': a set of (row, col) coordinates of the object's pixels.\n    \"\"\"\n    objects = []\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, pixels):\n        if (row, col) in visited or row < 0 or row >= rows or col < 0 or col >= cols or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        pixels.add((row, col))\n        dfs(row + 1, col, color, pixels)\n        dfs(row - 1, col, color, pixels)\n        dfs(row, col + 1, color, pixels)\n        dfs(row, col - 1, color, pixels)\n\n    for row in range(rows):\n        for col in range(cols):\n            if (row, col) not in visited and grid[row, col] != 0:\n                color = grid[row, col]\n                pixels = set()\n                dfs(row, col, color, pixels)\n                objects.append({'color': color, 'pixels': pixels})\n    return objects\n\ndef get_object_dimensions(pixels):\n    \"\"\"Calculates the dimensions of an object given its pixel coordinates.\"\"\"\n    if not pixels:\n        return 0, 0\n    min_row, min_col = float('inf'), float('inf')\n    max_row, max_col = float('-inf'), float('-inf')\n    for row, col in pixels:\n        min_row = min(min_row, row)\n        min_col = min(min_col, col)\n        max_row = max(max_row, row)\n        max_col = max(max_col, col)\n    return (max_row - min_row + 1), (max_col - min_col + 1)\n\ndef get_bounding_box(pixels):\n    \"\"\"Calculates the bounding box of an object given its pixel coordinates.\"\"\"\n    min_row, min_col = float('inf'), float('inf')\n    max_row, max_col = float('-inf'), float('-inf')\n    for row, col in pixels:\n        min_row = min(min_row, row)\n        min_col = min(min_col, col)\n        max_row = max(max_row, row)\n        max_col = max(max_col, col)\n    return min_row, min_col, max_row, max_col\n\ndef extract_subgrid(grid, bounding_box):\n    \"\"\"Extracts the subgrid corresponding to the bounding box.\"\"\"\n    min_row, min_col, max_row, max_col = bounding_box\n    return grid[min_row:max_row+1, min_col:max_col+1]\n\ndef trim_subgrid(subgrid):\n    \"\"\"Trims the subgrid by removing rows/cols of 0s from the edges.\"\"\"\n    rows, cols = subgrid.shape\n    \n    # Trim rows from top\n    top_rows_to_remove = 0\n    for row in range(rows):\n        if np.all(subgrid[row, :] == 0):\n            top_rows_to_remove += 1\n        else:\n            break\n            \n    # Trim rows from bottom\n    bottom_rows_to_remove = 0\n    for row in range(rows - 1, -1, -1):\n        if np.all(subgrid[row, :] == 0):\n            bottom_rows_to_remove += 1\n        else:\n            break\n\n    # Trim cols from left\n    left_cols_to_remove = 0\n    for col in range(cols):\n        if np.all(subgrid[:, col] == 0):\n            left_cols_to_remove += 1\n        else:\n            break\n            \n    # Trim cols from right\n    right_cols_to_remove = 0\n    for col in range(cols - 1, -1, -1):\n        if np.all(subgrid[:, col] == 0):\n            right_cols_to_remove += 1\n        else:\n            break\n\n    trimmed_subgrid = subgrid[top_rows_to_remove:rows - bottom_rows_to_remove,\n                             left_cols_to_remove:cols - right_cols_to_remove]\n\n    return trimmed_subgrid\n\ndef transform(input_grid):\n    # 1. Identify Objects\n    objects = find_objects(np.array(input_grid))\n\n    # 2. Select Object\n    selected_object = None\n    for obj in objects:\n        if obj['color'] == 2: # Red Object\n            selected_object = obj\n            break\n\n    if selected_object is None:\n        for obj in objects:\n            if obj['color'] == 4: # Yellow\n                selected_object = obj\n                break\n\n    if selected_object is None:\n      for obj in objects:\n        if obj['color'] == 8: # Yellow\n            selected_object = obj\n            break\n\n    if selected_object is None:\n        return input_grid\n\n    # 3. Determine Bounding Box\n    bounding_box = get_bounding_box(selected_object['pixels'])\n\n    #4. Determine Output dimension\n    #5. Create output grid\n    # 6. Extract Subgrid\n    subgrid = extract_subgrid(np.array(input_grid), bounding_box)\n\n    # 7. Rotate/Trim Subgrid\n    trimmed_subgrid = trim_subgrid(subgrid)\n    rows, cols = trimmed_subgrid.shape\n\n    if selected_object['color'] == 2 and len(objects)>2:\n      output_grid = np.rot90(trimmed_subgrid, k=-1) # rotate\n    else:\n       # Create the output grid with dimensions of the bounding box\n       output_grid = trimmed_subgrid\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "citation_metadata": {
+        "citation_sources": [
+          {
+            "start_index": 3089,
+            "end_index": 3268,
+            "uri": "https://github.com/waltman/advent-of-code-2022",
+            "license_": ""
+          }
+        ]
+      },
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5153,
+    "candidates_token_count": 1734,
+    "total_token_count": 6887,
+    "cached_content_token_count": 0
+  },
+  "response_time": 14.323761,
+  "response_file": "012-response.json"
+}

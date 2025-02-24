@@ -1,0 +1,41 @@
+examples:
+  - example_1:
+      input_colors: [4, 0, 3]
+      input_shape: (3, 6)
+      output_colors: [6, 0]
+      output_shape: (3, 3)
+      match: False
+      notes: "Magenta and white output.  The initial program got the size right, but the pixel placement wrong."
+  - example_2:
+      input_colors: [4, 0, 3]
+      input_shape: (3, 6)
+      output_colors: [6, 0]
+      output_shape: (3, 3)
+      match: False
+      notes: "Magenta and white output.  Different input, different output, same size."
+  - example_3:
+      input_colors: [0, 4, 3]
+      input_shape: (3, 6)
+      output_colors: [6, 0]
+      output_shape: (3, 3)
+      match: True
+      notes: "Magenta and white output.  The initial program got this one correct, but by chance."
+  - example_4:
+      input_colors: [4, 0, 3]
+      input_shape: (3, 6)
+      output_colors: [6, 0]
+      output_shape: (3, 3)
+      match: False
+      notes: "Magenta and white output. Another incorrect placement."
+  - example_5:
+      input_colors: [0, 4, 3]
+      input_shape: (3, 6)
+      output_colors: [6, 0]
+      output_shape: (3, 3)
+      match: False
+      notes: "Magenta and white output. Incorrect placement."
+overall:
+    - output_size: "All outputs are 3x3."
+    - output_colors: "All outputs use only magenta (6) and white (0)."
+    - input_colors: "Inputs use colors 0, 3, and 4"
+    - transformation_type: "Likely an encoding of the input data into a fixed-size representation, rather than a direct geometric transformation."

@@ -1,0 +1,32 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      dimensions: 3x3
+      elements: integers (0-9)
+  - name: output_grid
+    type: grid
+    properties:
+      dimensions: 9x9
+      elements: integers (0-9)
+  - name: empty_cell
+    type: cell
+    properties:
+      value: 0
+      color: white
+
+actions:
+  - name: replicate
+    agent: input_grid
+    target: output_grid
+    properties:
+      type: tiling
+      pattern: diagonal
+
+relationships:
+  - subject: input_grid
+    relation: is_replicated_in
+    object: output_grid
+  - subject: empty_cell
+    relation: fills_remaining_space_in
+    object: output_grid

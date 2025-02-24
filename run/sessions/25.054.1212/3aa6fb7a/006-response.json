@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Azure Objects:** Find all distinct, contiguous groups of azure (8) pixels in the input grid.\n\n2.  **Determine Bounding Box:**  Calculate the bounding box for each azure object.\n\n3.  **Blue Pixel Placement:** For each azure object, place a *single* blue (1) pixel adjacent to one of the azure pixels of that object, if possible. Placement follows this logic:\n    - check to see if placing *to the right* of a top-right azure pixel is possible\n    - if not possible, then check to see if placing to the *left* of a bottom-left azure pixel is possible.\n    - if not possible (edge of grid, or non-white adjacent cell), then do not place a blue pixel\n\n4.  **Preservation:** All non-azure pixels in the input, that are not chosen for blue pixel placement, remain unchanged in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_objects(grid, color):\n    \"\"\"Finds all contiguous objects of a given color.\"\"\"\n    visited = set()\n    objects = []\n\n    def dfs(row, col, current_object):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        current_object.append((row, col))\n        dfs(row + 1, col, current_object)\n        dfs(row - 1, col, current_object)\n        dfs(row, col + 1, current_object)\n        dfs(row, col - 1, current_object)\n\n    for row in range(grid.shape[0]):\n        for col in range(grid.shape[1]):\n            if grid[row, col] == color and (row, col) not in visited:\n                current_object = []\n                dfs(row, col, current_object)\n                objects.append(current_object)\n    return objects\n\ndef get_bounding_box(obj):\n    \"\"\"Calculates the bounding box of an object.\"\"\"\n    min_row = min(pixel[0] for pixel in obj)\n    max_row = max(pixel[0] for pixel in obj)\n    min_col = min(pixel[1] for pixel in obj)\n    max_col = max(pixel[1] for pixel in obj)\n    return (min_row, min_col), (max_row, max_col)\n\ndef get_top_right_azure_pixel(obj):\n    \"\"\"Returns the top-right azure pixel within an object\"\"\"\n    top_right = None\n    for r,c in obj:\n        if top_right is None:\n            top_right = (r,c)\n        elif r < top_right[0]: # lower row number is higher\n            top_right = (r,c)\n        elif r == top_right[0] and c > top_right[1]: # rightmost is bigger col\n            top_right = (r,c)\n\n    return top_right\n\ndef get_bottom_left_azure_pixel(obj):\n    \"\"\"Returns the bottom-left azure pixel\"\"\"\n    bottom_left = None\n    for r, c in obj:\n        if bottom_left is None:\n            bottom_left = (r,c)\n        elif r > bottom_left[0]:\n            bottom_left = (r,c)\n        elif r == bottom_left[0] and c < bottom_left[1]:\n            bottom_left = (r,c)\n\n    return bottom_left\n    \ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    azure_objects = find_objects(input_grid, 8)\n\n    # Iterate through azure objects\n    for obj in azure_objects:\n        \n        placed = False\n        # attempt to place to right of top-right azure pixel\n        top_right_azure = get_top_right_azure_pixel(obj)\n        \n        if top_right_azure is not None:\n            tr_row, tr_col = top_right_azure\n            if tr_col + 1 < input_grid.shape[1] and input_grid[tr_row, tr_col + 1] == 0:\n                output_grid[tr_row, tr_col+1] = 1\n                placed = True\n\n        # attempt to place to left of bottom-left azure pixel, if no placement yet\n        if not placed:\n            bottom_left_azure = get_bottom_left_azure_pixel(obj)\n            \n            if bottom_left_azure is not None:\n                bl_row, bl_col = bottom_left_azure\n                if bl_col - 1 >= 0 and input_grid[bl_row, bl_col-1] == 0:\n                   output_grid[bl_row, bl_col - 1] = 1\n                   placed = True # not strictly necessary\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 6207,
+    "candidates_token_count": 1169,
+    "total_token_count": 7376,
+    "cached_content_token_count": 0
+  },
+  "response_time": 10.503062,
+  "response_file": "006-response.json"
+}

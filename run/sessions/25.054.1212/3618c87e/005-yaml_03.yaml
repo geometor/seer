@@ -1,0 +1,13 @@
+task: 004
+objects:
+  - color: blue
+    shape: pixel
+    initial_positions: varies  # Positions vary per example, as noted above
+    behavior: "Moves down one row if a gray pixel is directly below it."
+  - color: gray
+    shape: pixel
+    initial_positions: varies  # Positions vary per example, as noted above.  Crucially, there's a row of gray pixels at the bottom initially.
+    behavior: "Moves up one row if it's directly below a blue pixel."
+transformation_type: swapping
+action: |
+    If a blue pixel has a gray pixel directly below it, they swap positions.  The blue pixel moves down one row, and the gray pixel moves up one row.

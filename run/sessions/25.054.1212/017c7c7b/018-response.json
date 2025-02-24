@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Color Swap:** Scan the input grid. Replace every blue pixel (value 1) with a red pixel (value 2). White pixels (value 0) are unchanged.\n2.  **Extend Grid:** Create a new, empty grid that has the same number of columns as the input grid, but with three additional rows.\n3.  **Copy Original Rows:** Copy all rows of the *original* input grid into the top of the new grid.\n4.  **Replicate Rows:** Copy the first three rows of the *original* input grid into the three newly added rows at the bottom of the output grid, maintaining their original order (row 1 to row `rows`, row 2 to row `rows+1`, and row 3 to row `rows+2`).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Create a copy of the input grid to modify for color replacement\n    modified_grid = np.copy(input_grid)\n\n    # Replace all blue (1) pixels with red (2) pixels\n    modified_grid[modified_grid == 1] = 2\n\n    # Get the dimensions of the original input grid\n    rows, cols = input_grid.shape\n\n    # Create a new, empty grid with 3 extra rows\n    output_grid = np.zeros((rows + 3, cols), dtype=int)\n\n    # Copy the color-modified grid into the new grid\n    output_grid[:rows, :] = modified_grid\n\n    # Replicate the FIRST three rows of the ORIGINAL input grid\n    output_grid[rows:rows + 3, :] = input_grid[:3, :]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3026,
+    "candidates_token_count": 376,
+    "total_token_count": 3402,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.732961,
+  "response_file": "018-response.json"
+}

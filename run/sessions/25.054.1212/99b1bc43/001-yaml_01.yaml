@@ -1,0 +1,66 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - width: 4
+      - height: 9
+      - cell_values: [0, 1, 2, 4]  # Unique color values
+  - name: output_grid
+    type: grid
+    properties:
+      - width: 4
+      - height: 4
+      - cell_values: [0, 3] # Unique color values
+  - name: subgrid_1
+    type: grid
+    parent: input_grid
+    properties:
+      - width: 4
+      - height: 2
+      - location: (0,0)
+      - cell_values: [0, 1]
+  - name: subgrid_2
+     type: grid
+     parent: input_grid
+     properties:
+      - width: 4
+      - height: 2
+      - location: (0,2)
+      - cell_values: [0, 1]
+  - name: subgrid_3
+    type: grid
+    parent: input_grid
+    properties:
+      -width: 4
+      -height: 1
+      -location: (0,4)
+      -cell_values: [4]
+  - name: subgrid_4
+      type: grid
+      parent: input_grid
+      properties:
+        -width: 4
+        -height: 2
+        -location: (0,5)
+        -cell_values: [0, 2]
+  - name: subgrid_5
+      type: grid
+      parent: input_grid
+      properties:
+        -width: 4
+        -height: 2
+        -location: (0,7)
+        -cell_values: [0, 2]
+
+actions:
+  - name: compress
+    input: input_grid
+    output: output_grid
+    description: The input grid is divided into subgrids, which are then represented by a single cell in the output grid.
+    parameters:
+        - name: subgrid_height
+          value: 2
+
+relationships:
+  - type: spatial
+    description: The output grid is a spatially compressed representation of the input grid. input rows are reduced by about half

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-White Pixels:** Iterate through each pixel in the input grid. If a pixel is not white (color code 0), proceed to the next step.\n2.  **Expand to the Right:** For each non-white pixel, change the color of the pixels to its right, in the same row, to be the same color, until the end of the row is reached or another non-white pixel is encountered.\n3.  **Drop Down:** The last pixel filled during step two should then be used as the color for all cells below it, within its column, until the last row is reached.\n4.  **Output:** The resulting grid after applying steps 1-3 is the final output.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # iterate through each pixel in the grid\n    for r in range(rows):\n        for c in range(cols):\n            # Identify Non-White Pixels\n            if output_grid[r, c] != 0:\n                # Expand to the Right\n                current_color = output_grid[r, c]\n                c2_end = cols # init end column\n                for c2 in range(c + 1, cols):\n                    if output_grid[r, c2] == 0:\n                        output_grid[r, c2] = current_color\n                    else:\n                        c2_end = c2\n                        break  # Stop expansion if a non-white pixel is encountered\n                # Drop Down\n                if c2_end == cols:\n                    c2_end -= 1\n                \n                for r2 in range(r + 1, rows):\n                  output_grid[r2,c2_end] = current_color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3225,
+    "candidates_token_count": 432,
+    "total_token_count": 3657,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.301155,
+  "response_file": "022-response.json"
+}

@@ -1,0 +1,30 @@
+task: 016_repeat_rows
+observations:
+  - example_1:
+      input_shape: (8, 3)
+      output_shape: (8, 3)
+      rows_to_repeat: [0, 1]
+      pattern: "Repeat rows 0 and 1 sequentially until the output grid is filled."
+      result: "Incorrect. The transformation only repeats the values of the first row (index 0)."
+  - example_2:
+      input_shape: (10, 4)
+      output_shape: (10, 4)
+      rows_to_repeat: [0, 1]
+      pattern: "Repeat rows 0 and 1 sequentially."
+      result: "Incorrect. Same error as example 1."
+  - example_3:
+      input_shape: (6, 2)
+      output_shape: (6, 2)
+      rows_to_repeat: [0, 1]
+      pattern: "Repeat rows 0 and 1 sequentially."
+      result: "Incorrect. Same error as example 1."
+objects:
+  - type: grid
+    properties:
+      - rows: "Variable, between 1 and 30"
+      - columns: "Variable, between 1 and 30"
+      - cells: "Pixels with integer values 0-9, representing colors."
+    actions:
+      - "Copy input grid to output grid."
+      - "Identify rows with all non-zero pixels before any row that contains a 0."
+      - "Repeat identified rows sequentially to fill output, starting at first row that was all 0s in input."

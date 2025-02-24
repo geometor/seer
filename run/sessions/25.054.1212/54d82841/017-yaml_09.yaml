@@ -1,0 +1,25 @@
+observations:
+  - object: input_grid
+    type: 2D array
+    properties:
+      - colors: [0-9]
+      - rows: variable
+      - columns: variable
+  - object: output_grid
+    type: 2D array
+    properties:
+      - colors: [0-9]
+      - rows: input_grid.rows + 1
+      - columns: input_grid.columns
+  - action: add_row
+    description: A new row is added to the bottom of the input grid.
+  - action: populate_row
+    description: >
+      The new row is populated based on the third-to-last row of the
+      input grid.  For each non-zero, distinct value in the
+      third-to-last row of the input grid, a '4' (yellow) is placed
+      in the corresponding column of the new row. If a cell in
+      the third-to-last row of the input grid is '0' (white),
+      a '0' (white) is placed in the corresponding column of the new row.
+    constraints:
+      - Only one '4' is placed for each distinct non-zero color.

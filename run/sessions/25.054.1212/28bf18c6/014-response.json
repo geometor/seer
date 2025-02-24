@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nDivide the input grid into 2x2 blocks. If a block contains any blue (1) pixels,\nthe corresponding output pixel is blue (1). Otherwise, the output pixel is white (0).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    input_height = len(input_grid)\n    input_width = len(input_grid[0])\n    output_height = input_height // 2\n    output_width = input_width // 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Iterate through 2x2 blocks in the input grid\n    for i in range(0, input_height, 2):\n        for j in range(0, input_width, 2):\n            # Extract the 2x2 block\n            block = [row[j:j+2] for row in input_grid[i:i+2]]\n\n            # Check if any blue pixel exists in the block\n            has_blue = False\n            for row in block:\n                for pixel in row:\n                    if pixel == 1:\n                        has_blue = True\n                        break\n                if has_blue:\n                    break\n\n            # Set the corresponding output pixel\n            output_row = i // 2\n            output_col = j // 2\n            if has_blue:\n                output_grid[output_row][output_col] = 1\n            # else, leave as 0 (initialized to 0)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2254,
+    "candidates_token_count": 352,
+    "total_token_count": 2606,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.94954,
+  "response_file": "014-response.json"
+}

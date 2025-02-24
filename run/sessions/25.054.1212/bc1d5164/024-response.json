@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-White Pixels:** Locate all pixels in the input grid that are not white (color 0).\n2.  **Bounding Box:** Determine the smallest rectangular bounding box that encompasses all identified non-white pixels.\n3.  **Create Output Grid:** Initialize a 3x3 output grid filled with white pixels (0).\n4.  **Proportional Mapping**: For each non-white pixel in the input:\n    *   Calculate its position *relative* to the bounding box's top-left corner, and its width and height. Represent these as normalized row and column values between 0.0 and 1.0. For example, a pixel in the middle of the box will have row and column around 0.5.\n    *   Multiply the normalized row and column by 2.\n    *   Round the results to the *nearest* integer (0, 1, or 2). This gives the target row and column within the 3x3 output grid.\n    *   Place the input pixel's color into the calculated position in the output grid.\n5. **Output:** Return the 3 x 3 output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_pixels(grid):\n    # find coordinates of non-white pixels\n    non_white_pixels = []\n    for row_index, row in enumerate(grid):\n        for col_index, pixel in enumerate(row):\n            if pixel != 0:\n                non_white_pixels.append((row_index, col_index, pixel))\n    return non_white_pixels\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n    \n    # 1. Identify all non-white pixels.\n    non_white_pixels = get_non_white_pixels(input_grid)\n\n    # 2. Determine the bounding box (min/max row/col).\n    if not non_white_pixels:  # Handle the case where there are no non-white pixels\n        return np.zeros((3, 3), dtype=int)\n\n    min_row, min_col, _ = non_white_pixels[0]\n    max_row, max_col, _ = non_white_pixels[0]\n\n    for row, col, _ in non_white_pixels:\n        min_row = min(min_row, row)\n        max_row = max(max_row, row)\n        min_col = min(min_col, col)\n        max_col = max(max_col, col)\n\n    # 3. Create a 3x3 output grid initialized with white (0).\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # 4. Map non-white pixel positions to the output grid proportionally.\n    for row, col, pixel in non_white_pixels:\n        # Normalize row and col positions to the range [0.0, 1.0]\n        norm_row = ((row - min_row) / (max_row - min_row)) if (max_row - min_row) > 0 else 0.0\n        norm_col = ((col - min_col) / (max_col - min_col)) if (max_col - min_col) > 0 else 0.0\n\n        # Multiply by 2 and round to the nearest integer.\n        output_row = round(norm_row * 2)\n        output_col = round(norm_col * 2)\n        \n        # Ensure output row and col are within bounds\n        output_row = max(0, min(output_row, 2))\n        output_col = max(0, min(output_col, 2))\n\n        # Place the pixel in output\n        output_grid[output_row, output_col] = pixel\n\n    # 5. Output grid is already filled with 0s (white) where no colored pixels are mapped.\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4253,
+    "candidates_token_count": 915,
+    "total_token_count": 5168,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.12209,
+  "response_file": "024-response.json"
+}

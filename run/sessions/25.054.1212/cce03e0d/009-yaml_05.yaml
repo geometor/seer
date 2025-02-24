@@ -1,0 +1,57 @@
+examples:
+  - id: 1
+    input_grid_size: 3x3
+    output_grid_size: 9x9
+    input_objects:
+      - object_1:
+        shape: 3x3 grid
+        colors: [0, 1, 2]
+    output_objects:
+      - object_1:
+        shape: 3x3 grid
+        colors: [0,1,2]
+    transformation:
+      type: "replication"
+      pattern_accurate: False
+      details: "The input grid is NOT replicated correctly."
+      error_type: pattern_mismatch
+
+  - id: 2
+    input_grid_size: 3x3
+    output_grid_size: 9x9
+    input_objects:
+      - object_1:
+        shape: 3x3 grid
+        colors: [0, 1, 2]
+    output_objects:
+       - object_1:
+        shape: 3x3 grid
+        colors: [0,1,2]
+    transformation:
+      type: "replication"
+      pattern_accurate: True
+      details: "The input grid is replicated correctly in the top-right and bottom-left corners.  This is accidental success, given errors in other examples."
+      error_type: none
+
+  - id: 3
+    input_grid_size: 3x3
+    output_grid_size: 9x9
+    input_objects:
+      - object_1:
+        shape: 3x3 grid
+        colors: [0, 1, 2]
+    output_objects:
+      - object_1:
+        shape: 3x3 grid
+        colors: [0,1,2]
+    transformation:
+      type: "replication"
+      pattern_accurate: False
+      details: "The input grid is NOT replicated correctly."
+      error_type: pattern_mismatch
+
+general:
+  input_grid_type: "single 3x3 grid"
+  output_grid_type: "single 9x9 grid"
+  transformation_type: "Replication of the input grid within the output grid, with a specific, consistent, but as-yet-incorrectly-identified pattern. The rest of the output grid appears to be filled with 0s (background)."
+  overall_error: "The previous code did not correctly identify the replication rule. It assumed top-right and bottom-left corner placement, which is incorrect."

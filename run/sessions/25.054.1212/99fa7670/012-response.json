@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nFinds all non-black (non-zero) pixels in the input grid. Each non-black pixel\nacts as the top-left corner of a rectangle. The rectangle extends to the right\nand down until another non-black pixel or the edge of the grid is encountered.\n\"\"\"\n\nimport numpy as np\n\ndef find_seed_pixels(grid):\n    # Find the coordinates of all non-black pixels.\n    seed_pixels = []\n    for row_index, row in enumerate(grid):\n        for col_index, pixel in enumerate(row):\n            if pixel != 0:\n                seed_pixels.append((row_index, col_index))\n    return seed_pixels\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    \n    # Find all non-black seed pixels.\n    seed_pixels = find_seed_pixels(input_grid)\n    seed_pixels.sort() #ensure top-left processing\n\n    # Iterate through each seed pixel and propagate its color.\n    for row, col in seed_pixels:\n        color = input_grid[row, col]\n\n        # Propagate to the right, stopping at the next seed pixel or boundary\n        for c in range(col + 1, output_grid.shape[1]):\n            if output_grid[row,c] != 0:\n                break  # Stop at next seed\n            output_grid[row, c] = color\n\n        # Propagate downwards, stopping at the next seed pixel of boundary\n        for r in range(row + 1, output_grid.shape[0]):\n            if output_grid[r,col] != 0:\n                break  #Stop at next seed\n            output_grid[r,col] = color\n            \n        output_grid[row,col] = color # set the seed itself\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3479,
+    "candidates_token_count": 443,
+    "total_token_count": 3922,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.449966,
+  "response_file": "012-response.json"
+}

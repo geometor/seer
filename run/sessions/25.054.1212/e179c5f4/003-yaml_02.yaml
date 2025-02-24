@@ -1,0 +1,22 @@
+observations:
+  - example_1:
+      input: 10x2 grid, mostly black (0), one blue (1) pixel.
+      output: 10x2 grid, alternating azure (8) and blue (1) in a checkerboard pattern.
+      transformation: Simple checkerboard.
+      result: Success
+  - example_2:
+      input: 10x3 grid, mostly black (0), one blue (1) pixel.
+      output: 10x3 grid, complex alternating pattern azure(8) and blue(1) .
+      transformation: Not a simple checkerboard. Adjacent same color pixels.
+      result: Failure (5 pixels off)
+  - example_3:
+      input: 10x4 grid, mostly black (0), one blue (1) pixel.
+      output: 10x4 grid, complex alternating pattern azure(8) and blue(1).
+      transformation: Not a simple checkerboard. Adjacent same color pixels.
+      result: Failure (10 pixels off)
+  general:
+    - output_size: same as input.
+    - colors: azure (8) and blue (1).
+    - input_colors: irrelevant to the transformation, always black or a single
+      blue pixel.
+    - pattern: The provided description is not correct.

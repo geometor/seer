@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Objects:** Find all contiguous blocks of non-black (non-zero) pixels. Consider each block as a single object.\n2.  **Determine Stacking Order:** The objects in the input grid will be stacked at the bottom of the output grid. The order is determined by the original vertical positions of the objects, preserving their relative order from top to bottom in the input.\n3. **Stack Objects:** Place each input object into the output grid, starting at the lowest available row. Maintain the original shape of each object. If an object occupies multiple rows, it should occupy the *lowest* rows it can.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    output_grid = np.zeros_like(input_grid)\n\n    #very simplistic object detection - contiguous same color\n    def get_objects(grid):\n        visited = set()\n        objects = []\n        def dfs(r, c, color, obj):\n            if (r, c) in visited or r < 0 or r >= grid.shape[0] or c < 0 or c >= grid.shape[1] or grid[r,c] != color:\n                return\n            visited.add((r,c))\n            obj.append((r,c))\n            dfs(r+1, c, color, obj)\n            dfs(r-1, c, color, obj)\n            dfs(r, c+1, color, obj)\n            dfs(r, c-1, color, obj)\n\n        for r in range(grid.shape[0]):\n            for c in range(grid.shape[1]):\n                if (r,c) not in visited and grid[r,c]!=0:\n                    obj = []\n                    dfs(r, c, grid[r,c], obj)\n                    objects.append(obj)\n        return objects\n\n    # Get objects and sort them by their top-most row (original vertical position)\n    input_objects = get_objects(input_grid)\n    input_objects.sort(key=lambda obj: min(r for r, c in obj))\n\n    # change output pixels - stack objects\n    for obj in input_objects:\n        # Calculate the height of the object\n        min_row = min(r for r, _ in obj)\n        max_row = max(r for r, _ in obj)\n        obj_height = max_row - min_row + 1\n\n        # Find the lowest available row for this object\n        start_row = output_grid.shape[0] - obj_height\n        while start_row >= 0:\n          #check if space if free - go up one row if not, else break\n          collision = False\n          for r_offset in range(obj_height):\n            for r,c in obj:\n                if r - min_row + start_row < output_grid.shape[0] and output_grid[r - min_row + start_row, c] != 0:\n                  collision = True\n                  break\n            if collision:\n              break\n          if collision:\n            start_row-=1\n          else:\n            break\n\n        if start_row<0:\n           continue #skip this object, no room\n\n        # Place the object in the output grid\n        for r, c in obj:\n            output_grid[r - min_row + start_row, c] = input_grid[r, c]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5872,
+    "candidates_token_count": 803,
+    "total_token_count": 6675,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.365219,
+  "response_file": "017-response.json"
+}

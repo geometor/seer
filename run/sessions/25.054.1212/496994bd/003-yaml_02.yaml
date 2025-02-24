@@ -1,0 +1,17 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    properties:
+      height: variable
+      width: variable
+      colors: [0-9] # Represents color indices
+  - object: output_grid
+    type: 2D array
+    properties:
+      height: variable, greater than or equal to input_grid height
+      width: same as input_grid width
+      colors: same as input_grid colors
+  - action: mirror_top_section
+    description: A section from the top of the input_grid is mirrored (inverted vertically) and appended to the bottom.
+    parameters:
+      rows_to_mirror: output_grid.height - input_grid.height

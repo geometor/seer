@@ -1,0 +1,28 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      shape: 4x7
+      values: integers (0-9)
+  - name: output_grid
+    type: 2D array
+    properties:
+      shape: 4x3
+      values: integers (0, 3)  # Only white and green
+  - name: input_row
+    type: 1D array (sub-component of input_grid)
+    properties:
+        length: 7
+  - name: output_row
+    type: 1D array (sub-component of output_grid)
+    properties:
+      length: 3
+
+transformations:
+    - action: iterate_rows
+      description: Process each row of the input_grid.
+    - action: first_three_columns
+      description: first three columns of each row are the focus.
+    - action: transform based on position and value of first three columns.
+    - action: map_input_output
+      description: map each row based on positions and values, first three only.

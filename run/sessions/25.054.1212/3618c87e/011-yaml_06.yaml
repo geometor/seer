@@ -1,0 +1,94 @@
+observations:
+  - example_1:
+      input_objects:
+        - color: gray (5)
+          shape: row
+          position: bottom
+        - color: blue (1)
+          shape: pixel
+          position: above gray row, column 2
+        - color: white(0)
+          shape: block
+      output_objects:
+        - color: gray (5)
+          shape: row
+          position: bottom (unchanged except column 2)
+        - color: blue (1)
+            shape: pixel
+            position: bottom row, column 2
+        - color: gray (5)
+            shape: pixel
+            position: above bottom row, column 2.
+        - color: white(0)
+              shape: block
+      transformations:
+        - conditional_swap:
+            condition: gray pixel in bottom row
+            action:  if blue above, change to gray.  if gray above change to blue
+            location: columns with bottom row gray
+        - bottom_row_change:
+            condition: column had blue or gray pixels above the bottom row
+            action: bottom row gray changes to blue
+            location: bottom row, same column.
+  - example_2:
+      input_objects:
+        - color: gray (5)
+          shape: row
+          position: bottom
+        - color: blue (1)
+          shape: pixel
+          position: above gray row, column 1, column 3
+        - color: white(0)
+            shape: block
+      output_objects:
+         - color: gray (5)
+           shape: row
+           position: bottom (unchanged except column 1 and 3)
+         - color: blue (1)
+           shape: pixel
+           position: bottom row, column 1, and column 3
+         - color: gray(5)
+           shape: pixel
+           position: above bottom row, column 1, column 3
+         - color: white(0)
+           shape: block
+      transformations:
+        - conditional_swap:
+            condition: gray pixel in bottom row
+            action: if blue above, change to gray. if gray above change to blue
+            location: columns with bottom row gray
+        - bottom_row_change:
+            condition: column had blue or gray pixels above the bottom row
+            action: bottom row gray changes to blue
+            location: bottom row, same column.
+  - example_3:
+      input_objects:
+        - color: gray (5)
+          shape: row
+          position: bottom
+        - color: blue (1)
+          shape: pixel
+          position: above gray row, column 1, column 4
+        - color: white(0)
+            shape: block
+      output_objects:
+         - color: gray (5)
+           shape: row
+           position: bottom (unchanged except column 1 and 4)
+         - color: blue (1)
+           shape: pixel
+           position: bottom row, column 1 and column 4
+         - color: gray(5)
+           shape: pixel
+           position: above bottom row, column 1, column 4
+         - color: white(0)
+           shape: block
+      transformations:
+        - conditional_swap:
+            condition: gray pixel in bottom row
+            action: if blue above, change to gray. if gray above change to blue
+            location: columns with bottom row gray
+        - bottom_row_change:
+            condition: column had blue or gray pixels above the bottom row
+            action: bottom row gray changes to blue
+            location: bottom row, same column.

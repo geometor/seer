@@ -1,0 +1,30 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      rows: variable
+      columns: variable
+      colors: [0-9]
+  - object: azure_column
+    type: column
+    properties:
+      color: 8
+      index: variable
+      left_adjacent_exists: true/false # Dependant on position
+      right_adjacent_exists: true/false # Dependant on position
+
+  - object: output_grid
+    type: grid
+    properties:
+       rows: same as input_grid rows
+       columns: 3 # Always three, left adjacent, azure, and right adjacent
+       colors: derived from input_grid columns
+
+  - action: find_azure_column
+    description: Locates the column index containing azure (8) pixels.
+
+  - action: copy_columns
+    description: Copies columns including those adjacent to the azure column to the output grid.
+
+  - action: copy_all_rows
+    description: The entire height of the input columns are copied to the output grid.

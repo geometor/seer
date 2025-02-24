@@ -1,0 +1,25 @@
+observations:
+  - object: input_grid
+    type: 2D array
+    shape: (9, 4)
+    elements: integers (0-9) representing colors
+    notes: Represents the initial state.
+
+  - object: output_grid
+    type: 2D array
+    shape: (4, 4)
+    elements: integers (0-9) representing colors
+    notes: Represents the transformed state.
+
+  - object: row_sections
+    type: list
+    elements: 2D arrays
+    notes: Input grid is conceptually divided into 2-row sections, plus a single row(row5) section, plus two 2-row section.
+  - action: check_color_uniformity
+    description: Examines color composition within the 2-row input_grid, and output row sections.
+    outcomes:
+        - if all pixels within a row are the same, including when they are all zero.
+        - if there is a mixture of non-zero colors
+        - if an entire sub-grid is a mixture of zeros and ones.
+  - action: set output rows:
+    description: setting the output row with either white, green or another color

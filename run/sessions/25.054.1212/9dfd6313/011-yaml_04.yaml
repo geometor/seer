@@ -1,0 +1,21 @@
+objects:
+  - name: gray_pixels
+    color: 5
+    role: anchor
+    behavior: stationary
+
+  - name: magenta_pixels
+    color: 6
+    behavior: move_to_top_right
+
+  - name: yellow_pixel
+    color: 4
+    behavior: position_relative_to_gray
+
+  - name: other_pixels
+    behavior: position_relative_to_gray_row
+
+rules:
+  - gray_pixels_remain_stationary
+  - output_grid_same_size_as_input_grid
+  - arrange_other_pixels_based_on_gray_in_rows

@@ -1,0 +1,37 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 5x11 (height x width)
+      pixels: [0-9]  # Numerical values representing colors
+  - type: pixel
+    properties:
+      color:
+        mapping:
+          0: white
+          1: blue
+          2: red
+          5: grey
+      position: (row, column)
+
+  - type: horizontal_segment
+    properties:
+        start_pixel:
+            color: blue
+            position: (1,0)
+        end_pixel:
+            color: red
+            position: (1,10)
+        changed: True #flag to check if the horizontal segment has changed from input to output
+actions:
+  - name: fill_between
+    description: Replace white pixels (0) between the blue and red pixels on the same row.
+    parameters:
+      start_color: 1
+      end_color: 2
+      row: 1
+      connect_color: 5
+relationships:
+  - type: adjacency
+    description: Pixels are considered adjacent if they share a side (not diagonally).
+  - type: between
+    description: The set of white pixels horizontally between the blue and red pixels.

@@ -1,0 +1,43 @@
+task_id: 002
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      rows: variable
+      columns: variable
+      colors: [0-9]
+    description: The initial grid of pixels.
+
+  - object: output_grid
+    type: grid
+    properties:
+      rows: variable
+      columns: variable
+      colors: [0-9]
+    description: The transformed grid of pixels.
+
+  - object: pattern_region
+    type: grid
+    properties:
+       rows: m #first m rows of the input
+    description: the first rows of the input grid, copied to the output grid
+
+  - action: copy
+    agent: system
+    input: pattern_region
+    output: output_grid
+    description: copy the pattern region from input to output
+
+  - object: first_row_colors
+    type: list
+    properties:
+      elements: colors
+    description: List of colors present in the first row of the input grid.
+
+  - action: replicate_colors
+    agent: system
+    input: first_row_colors
+    parameters:
+        copies: 2
+    output: output_grid
+    description: Each color from the first row is used to create two new rows in the output grid.

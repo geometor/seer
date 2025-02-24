@@ -1,0 +1,34 @@
+facts:
+  - object: input_grid
+    properties:
+      type: 2D array
+      values: [0, 1, 3]
+      sections:
+          - top_left: [0,0]
+            top_right: [0,3]
+            bottom_left: [3,0]
+            bottom_right: [3,3]
+            values: [0,3]
+          - top_left: [4,0]
+            top_right: [4,3]
+            bottom_left: [7,0]
+            bottom_right: [7,3]
+            values: [0,1]
+
+  - object: output_grid
+    properties:
+      type: 2D array
+      values: [0, 2]
+      size: matches input_grid top section dimensions
+
+  - observation: single_non_zero_output
+    description: The output grid contains only one non-zero value (2).
+
+  - observation: input has two segments
+    description: top segment is 4x4, bottom segment starts on row 5 and is also 4x4
+
+  - relationship: output_size_matches_input_section1
+    description: The dimensions of the output grid are the same as the dimensions of first section of the input grid.
+
+  - relationship: non_zero_position_relates
+    description: position of the `2` is related to a `0` in first section of input that has `3`s surrounding it and a corresponding `1` in that location in the second input section

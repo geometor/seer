@@ -1,0 +1,32 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      rows: variable
+      columns: variable
+      cells: integers (0-9 representing colors)
+
+  - name: pixel
+    type: cell
+    properties:
+      color: integer (0-9)
+      row_index: integer
+      column_index: integer
+
+actions:
+  - name: replace_color
+    description: Change the color of a pixel.
+    preconditions:
+      - pixel.color == 5 #Gray
+    postconditions:
+      - pixel.color == 3 #Green
+
+  - name: identify_gray
+    description: check to see if a cell is value 5
+    precondition:
+      - current_cell is value 5
+
+  - name: identify_replacement
+    description: identify when to replace 5 with 3
+    precondition:
+        - every other time a set of three gray pixels is identified

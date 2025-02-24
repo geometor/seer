@@ -1,0 +1,19 @@
+observations:
+  - object: subgrid
+    type: 2x2 block
+    properties:
+      - contains_orange:
+          description: Whether the subgrid contains the color orange (7).
+          values: [true, false]
+    actions:
+      - replace_with_green:
+          condition: subgrid.contains_orange == true
+          result: If true, a green (3) pixel is placed in the output.
+  - object: output_grid
+    properties:
+        - grid_size:
+            rows: always 4
+            columns: always 4
+    actions:
+      - placement:
+          description: placement rules for green pixel in result

@@ -1,0 +1,29 @@
+facts:
+  - object: input_grid
+    type: grid
+    dimensions: 3x3
+    elements:
+      - color_values: [0, 1, 2]  # white, blue, red
+        positions: [[0,0], [0,1], [0,2], [1,0], [1,1], [1,2], [2,0], [2,1], [2,2]]
+
+  - object: output_grid
+    type: grid
+    dimensions: 9x9
+    elements:
+      - color_values: [0] # predominantly white
+        positions: "most positions"
+      - color_values: "[input grid colors]"
+        positions: "top-right 3x3 block and bottom-left 3x3 block"
+
+  - relation: replication
+    description: "The input grid is replicated in the output grid."
+
+  - relation: positioning
+    description: "The replicated grids are placed in specific locations within the output grid: top-right and bottom-left."
+
+  - action: transformation
+    description: "Transforms a 3x3 input grid into a 9x9 output grid."
+
+  - property: background
+    value: 0 #white
+    description: "The output grid is padded using value 0."

@@ -1,0 +1,47 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - colors: [white, blue, yellow, red]
+      - dimensions: 9x4
+      - values: [0, 1, 2, 4]
+  - name: output_grid
+    type: 2D array
+    properties:
+      - colors: [white, green]
+      - dimensions: 4x4
+      - values: [0, 3]
+  - name: subgrid
+    type: 2D array
+    properties:
+      - parent: input_grid
+      - location: top-left 4x4
+      - values: contains only 0, 1
+
+actions:
+  - name: extract_subgrid
+    agent: system
+    input: input_grid
+    parameters:
+      - row_start: 0
+      - row_end: 4
+      - col_start: 0
+      - col_end: 4
+    output: subgrid
+
+  - name: recolor_subgrid
+    agent: system
+    input: subgrid
+    parameters:
+        - original_color: 1
+        - new_color: 3
+
+relationships:
+  - type: size_reduction
+    from: input_grid
+    to: output_grid
+  - type: color_mapping
+    from: subgrid
+    to: output_grid
+  - type: value_correspondence
+    details: "1 in input maps to 3 in output, 0 remains 0."

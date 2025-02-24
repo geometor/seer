@@ -1,0 +1,23 @@
+objects:
+  - type: grid
+    properties:
+      dimensions:
+        input: [5, 7] # height, width
+        output: [3, 3]
+      elements:
+        - type: pixel
+          properties:
+            color:
+              - 0  # white
+              - 4  # yellow
+            position: [row, column]
+
+actions:
+  - type: transformation
+    description: Extracts a 3x3 subgrid from the input 5x7 grid.
+    logic: |
+       The output grid appears to preserve a specific arrangement of color '4' from the input grid.
+
+relationships:
+- The output grid's yellow pixels (4) correspond to a subset of the yellow pixels in the input grid but the locations have changed.
+- The positioning of the extracted pixels follows a consistent pattern, possibly based on relative positions in the input.

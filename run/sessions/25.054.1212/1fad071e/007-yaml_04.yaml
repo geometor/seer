@@ -1,0 +1,33 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 9x9
+    elements:
+      - value: 0
+        color: white
+      - value: 1
+        color: blue
+      - value: 2
+        color: red
+  - type: grid
+    name: output_grid
+    dimensions: 1x5
+    elements:
+      - value: 0
+        color: white
+      - value: 1
+        color: blue
+
+actions:
+  - type: count
+    target: input_grid
+    feature: color/value
+  - type: select
+    target: input_grid
+  - type: create
+    target: output_grid
+
+relationships:
+    - type: "input_to_output"
+    - from : input_grid
+    - to: output_grid

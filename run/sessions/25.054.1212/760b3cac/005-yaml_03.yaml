@@ -1,0 +1,57 @@
+observations:
+  - example: 1
+    input_objects:
+      - color: azure
+        count: 3
+        positions: [(0,3), (1,4), (2,5)]
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3, 5, 3, 5]
+    output_objects:
+      - color: azure
+        count: 6
+        positions: added to columns left of yellow
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3, 5, 3, 5]  # Unchanged
+    actions:
+      - type: add
+        color: azure
+        location: columns left of yellow region
+        rule: fill_column
+  - example: 2
+    input_objects:
+      - color: azure
+        count: 5
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3,5,5,7]
+    output_objects:
+      - color: azure
+        count: 12
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3,5,5,7]
+    actions:
+      - type: add
+        color: azure
+        location: columns, conditions apply
+        rule: conditional_fill_column based on existing azure
+  - example: 3
+    input_objects:
+      - color: azure
+        count: 3
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3,5,3,5]
+    output_objects:
+      - color: azure
+        count: 6
+      - color: yellow
+        shape: contiguous_region
+        bounding_box: [3,5,3,5]
+    actions:
+        - type: add
+          color: azure
+          location: columns left of yellow region
+          rule: fill_column

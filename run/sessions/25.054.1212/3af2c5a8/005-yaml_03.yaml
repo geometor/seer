@@ -1,0 +1,54 @@
+task: 004bbfb7
+examples:
+  - type: train
+    input_objects:
+      - description: "grid of pixels"
+        properties:
+          shape: [3, 4]
+          colors: [0, 8]
+    output_objects:
+      - description: "scaled grid of pixels"
+        properties:
+          shape: [6, 8]
+          colors: [0, 8]
+    transformation:
+      type: "pixel replication"
+      details: "Each input pixel becomes a 2x2 block in the output, but there is a consistent positional error."
+      errors:
+        - type: "positional"
+          description: "Replicated blocks are offset from the expected location. The generated pixels are too far to the bottom-right."
+
+  - type: train
+    input_objects:
+      - description: "grid of pixels"
+        properties:
+          shape: [3, 4]
+          colors: [0, 3]
+    output_objects:
+      - description: "scaled grid of pixels"
+        properties:
+          shape: [6, 8]
+          colors: [0, 3]
+    transformation:
+      type: "pixel replication"
+      details: "Each input pixel becomes a 2x2 block in the output, but there is a consistent positional error."
+      errors:
+        - type: "positional"
+          description: "Replicated blocks are offset from the expected location. The generated pixels are too far to the bottom-right."
+  - type: train
+    input_objects:
+      - description: "grid of pixels"
+        properties:
+          shape: [3, 4]
+          colors: [0, 3]
+    output_objects:
+      - description: "scaled grid of pixels"
+        properties:
+          shape: [6, 8]
+          colors: [0, 3]
+    transformation:
+      type: "pixel replication"
+      details: "Each input pixel becomes a 2x2 block in the output, but there is a consistent positional error."
+      errors:
+        - type: "positional"
+          description: "Replicated blocks are offset from the expected location. The generated pixels are too far to the bottom-right."

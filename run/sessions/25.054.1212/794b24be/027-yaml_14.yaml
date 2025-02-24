@@ -1,0 +1,27 @@
+observations:
+  - task: 026
+    objects:
+      - id: 1
+        color: blue
+        description: contiguous block of blue pixels
+        behavior: becomes red, maintains shape and size
+      - id: 2
+        color: red
+        description: contiguous block of red pixels
+        behavior: replaces blue, maintains shape and size of original blue block
+
+    transformations:
+      - type: color_change
+        from: blue
+        to: red
+        scope: all blue pixels are transformed to red pixels
+      - type: value_change
+        from: not zero
+        to: zero
+        scope: all non-zero, non-blue pixels in the input go away
+    relationships:
+       - all blue is contiguous
+
+    grid:
+      dimensions: variable, between 1x1 and 30x30
+      background: white (0), black (0)

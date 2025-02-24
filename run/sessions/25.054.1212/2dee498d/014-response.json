@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is compressed by identifying a repeating 2x1 sub-grid pattern and extracting the first occurance.\nThe output grid represents this pattern.\n\"\"\"\n\nimport numpy as np\n\ndef find_repeating_pattern(grid):\n    rows, cols = grid.shape\n    for c in range(1, cols + 1):\n        pattern = grid[:, 0:c]\n        # Check if the pattern repeats throughout the entire grid\n        repeats = True\n        for i in range(c, cols, c):\n            if i + c > cols:\n                if not np.array_equal(pattern[:, :cols-i], grid[:, i:cols]):\n                   repeats = False\n                   break\n\n            elif not np.array_equal(pattern, grid[:, i:i + c]):\n                repeats = False\n                break\n        if repeats:\n            return pattern\n\n    return None\n\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by identifying and extracting a repeating 2x1 subgrid.\n    \"\"\"\n    # Convert to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # Find the smallest repeating sub-grid.\n    pattern = find_repeating_pattern(input_grid)\n    if pattern is not None:\n        output_grid = pattern\n    else:\n        output_grid = input_grid\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2085,
+    "candidates_token_count": 325,
+    "total_token_count": 2410,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.76723,
+  "response_file": "014-response.json"
+}

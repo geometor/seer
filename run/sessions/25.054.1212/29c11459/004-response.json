@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Row:** Examine each row of the input grid. Find a row that contains at least two pixels of different colors, excluding black(0).\n2.  **Locate Distinct-Colored Pixels:** On the identified row, find the two distinct-colored pixels that are furthest apart (i.e., the leftmost and rightmost of different colors on that row).\n3. **Determine center column:** The center column will the x value of `(grid_width - 1) / 2`\n4.  **Connect Left to Center:**  Change all pixels between the leftmost pixel and the center column (exclusive) to the color of the leftmost pixel.\n5.  **Connect Center to Right:** Change all pixels between the center column (exclusive) and the rightmost pixel to the color of the rightmost pixel.\n6.  **Place Gray Pixel:** Place a gray (5) pixel at the center column of the target row.\n7. **Output:** Return the changed grid\n\"\"\"\n\nimport numpy as np\n\ndef find_distinct_colored_pixels(row):\n    \"\"\"Finds the leftmost and rightmost distinct colored (non-zero) pixels in a row.\"\"\"\n    colored_pixels = [(i, color) for i, color in enumerate(row) if color != 0]\n    if len(colored_pixels) < 2:\n        return None, None, None, None  # Not enough distinct colors\n\n    # Sort by color to easily find distinct ones\n    colored_pixels.sort(key=lambda x: x[1])\n\n    leftmost = colored_pixels[0]\n    rightmost = colored_pixels[-1]\n\n    # Ensure they are actually distinct\n    if leftmost[1] == rightmost[1]:\n      distinct = []\n      current_color = leftmost[1]\n      distinct.append(leftmost)\n      for i in range(1,len(colored_pixels)):\n          if colored_pixels[i][1] != current_color:\n            distinct.append(colored_pixels[i])\n            break\n      if (len(distinct) < 2):\n        return None, None, None, None\n      else:\n        leftmost = distinct[0]\n        rightmost = distinct[1]\n        \n    #find the true leftmost and rightmost\n    if (leftmost[0] > rightmost[0]):\n      leftmost, rightmost = rightmost, leftmost\n\n\n    return leftmost[0], leftmost[1], rightmost[0], rightmost[1]\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    center_col = (cols - 1) // 2\n\n    for row_index in range(rows):\n      row = input_grid[row_index]\n      left_col, left_color, right_col, right_color = find_distinct_colored_pixels(row)\n\n      if left_col is not None:\n          # Connect Left to Center\n          for col in range(left_col, center_col):\n              output_grid[row_index, col] = left_color\n\n          # Connect Center to Right\n          for col in range(center_col + 1, right_col + 1):\n              output_grid[row_index, col] = right_color\n\n          # Place Gray Pixel\n          output_grid[row_index, center_col] = 5\n          break  # Stop after the first row with distinct colors is processed\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3427,
+    "candidates_token_count": 801,
+    "total_token_count": 4228,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.92852,
+  "response_file": "004-response.json"
+}

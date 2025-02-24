@@ -1,0 +1,40 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - values: integers (0-9) representing colors
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      - values: integers (0-9) representing colors
+      - dimensions: 4x4
+
+  - name: target_region
+    type: subgrid
+    properties:
+      - dimensions: 4x4
+      - location: top-left corner of input_grid
+
+  - name: zero_pixels
+    type: pixels
+    properties:
+       - color: 0 (white)
+       - location: varies within target_region
+       - behavior: may be preserved or replaced based on position
+
+actions:
+  - name: extract_subgrid
+    input: input_grid
+    output: target_region
+    description: Extracts the 4x4 top-left subgrid.
+
+  - name: transform_pixels
+    input: target_region
+    output: output_grid
+    description:  Fills output_grid with '3' (green), conditionally preserving '0' based on input position.
+
+  - name: conditional_preservation
+     input: target_region, zero_pixel
+     output: output_grid, updated zero_pixel location
+     description: Preserves the color '0' if the input condition is true, otherwise the value is 3.

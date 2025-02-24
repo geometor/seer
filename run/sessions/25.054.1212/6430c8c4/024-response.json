@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find Divider:** Locate the horizontal line of yellow (4) pixels in the input grid.\n2.  **Separate Regions:** Define the \"upper region\" as the area above the divider and the \"lower region\" as the area at and below the divider.\n3.  **Determine Output Size:** The dimensions of the output grid are the same as the dimensions of the *upper region*.\n4.  **Initialize Output:** Create an output grid filled with white (0) pixels, with the size determined in the previous step.\n5.  **Mirror Orange Pixels:** Iterate through each pixel in the *upper region*.\n    *   If a pixel is orange (7):\n        *   Swap its row and column indices (i, j) to get the mirrored position (j, i).\n        *   If the mirrored position is within the bounds of the *upper region*, set the pixel at the mirrored position in the *output grid* to green (3).\n6.  **Ignore Other Pixels:**  Pixels in the upper region that are not orange (7) are not explicitly processed; they remain white (0) in the output because of initialization. The lower region does not affect the output.\n7.  **Output:** Return the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_horizontal_line(grid, color):\n    \"\"\"Finds the row index of a horizontal line of a given color.\"\"\"\n    for i, row in enumerate(grid):\n        if all(pixel == color for pixel in row):\n            return i\n    return -1  # Not found\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n\n    # 1. Find Divider\n    yellow_line_row = find_horizontal_line(input_grid, 4)\n\n    # 2. Separate Regions\n    upper_region = input_grid[:yellow_line_row]\n\n    # 3. Determine Output Size\n    output_height, output_width = upper_region.shape\n\n    # 4. Initialize Output\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # 5. Mirror Orange Pixels\n    for i in range(output_height):\n        for j in range(output_width):\n            if upper_region[i, j] == 7:  # Only mirror orange pixels\n                mirrored_i, mirrored_j = j, i\n                if mirrored_i < output_height and mirrored_j < output_width:  # Boundary Check\n                    output_grid[mirrored_i, mirrored_j] = 3  # Set to green\n\n    # 6. Ignore Other Pixels - handled by initialization\n\n    # 7. Output\n    return output_grid.tolist()\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3570,
+    "candidates_token_count": 633,
+    "total_token_count": 4203,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.754755,
+  "response_file": "024-response.json"
+}

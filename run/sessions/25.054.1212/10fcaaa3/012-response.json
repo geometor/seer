@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Double Dimensions:** Create a new grid (output_grid) with twice the height and width of the original grid (input_grid).\n2.  **Copy and Mirror Horizontally:** Copy every colored pixel (not black or azure) from the input grid to the corresponding location in the *top half* of the new grid, and then mirror the pixel horizontally to the right side *within the top half*.\n3.  **Vertical Azure Highlight:** Add a vertical azure line on each side of the copied colored pixels in the *top half* of the output grid.\n4.  **Horizontal Azure Separation:** Add a horizontal azure line across the entire width of the output grid, positioned at the row index equal to the original input grid's height.\n5.  **Vertical Mirroring:** Mirror the top half of the grid (above the horizontal azure line) to the bottom half of the grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_height, input_width = input_grid.shape\n    output_height = input_height * 2\n    output_width = input_width * 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Copy and Mirror Horizontally (top half only)\n    for i in range(input_height):\n        for j in range(input_width):\n            if input_grid[i, j] != 0 and input_grid[i,j] != 8:  # Not black or azure\n                output_grid[i, j] = input_grid[i, j]\n                output_grid[i, output_width - 1 - j] = input_grid[i, j]\n\n    # Vertical Azure Highlight (top half only)\n    for i in range(input_height):\n        for j in range(output_width):\n            if output_grid[i,j] != 0 and output_grid[i,j] != 8:\n                if j > 0 and output_grid[i,j-1] == 0:\n                    output_grid[i, j - 1] = 8\n                if j < output_width - 1 and output_grid[i,j+1] == 0:\n                    output_grid[i, j + 1] = 8\n\n    # Horizontal Azure Separation\n    output_grid[input_height, :] = 8\n\n    # Vertical Mirroring (top half to bottom half)\n    for i in range(input_height):\n        for j in range(output_width):\n            output_grid[output_height - 1 - i, j] = output_grid[i, j]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4061,
+    "candidates_token_count": 619,
+    "total_token_count": 4680,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.216007,
+  "response_file": "012-response.json"
+}

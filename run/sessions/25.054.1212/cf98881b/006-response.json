@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Target Columns:** Examine the input grid. Identify columns that contain at least one pixel of color 9 (maroon), 4 (yellow), or 1 (blue).\n\n2.  **Determine Column Output Order and Color Priority**:\n    *   Find the *last* occurrence (highest row index) of each of the target colors (9, 4, and 1) within the *entire* input grid.\n    *   Sort the target colors in descending order based on the row index of their last occurrence.\n    * generate a list of target columns - preserving the original order\n    * reorder the target columns based on color priority - if a column contains multiple colors from the target list, use the color with the highest priority.\n\n3.  **Extract Subgrid:** Create a new grid (the \"subgrid\") consisting only of the target columns from the input grid, using the reordered column list from step 2.\n\n4.  **Vertical Reduction:** For *each* column in the subgrid:\n    *   Identify the *first* contiguous block of non-zero pixels.\n    *   Set all other pixels in that column to 0 (white).\n\n5.  **Column Limit:** Keep only the first 4 columns (or fewer, if less then 4 columns are available)\n\n6.  **Output:** The resulting grid is the final output.\n\"\"\"\n\nimport numpy as np\n\ndef get_target_columns(input_grid, target_colors):\n    \"\"\"\n    Identifies columns containing any of the target colors, preserving original order.\n    \"\"\"\n    target_columns = []\n    for j in range(input_grid.shape[1]):\n        for i in range(input_grid.shape[0]):\n            if input_grid[i, j] in target_colors:\n                target_columns.append(j)\n                break  # Move to the next column\n    return target_columns\n\ndef get_last_occurrence(input_grid, target_colors):\n    \"\"\"\n    Finds the last occurrence (highest row index) of each target color.\n    \"\"\"\n    last_occurrence = {}\n    for color in target_colors:\n        last_occurrence[color] = -1  # Initialize to -1\n\n    for i in range(input_grid.shape[0]):\n        for j in range(input_grid.shape[1]):\n            color = input_grid[i, j]\n            if color in target_colors:\n                last_occurrence[color] = i\n\n    return last_occurrence\n\ndef determine_color_priority(last_occurrence):\n    \"\"\"\n    Sorts target colors based on the last occurrence row index (descending).\n    \"\"\"\n    sorted_colors = sorted(last_occurrence.items(), key=lambda item: item[1], reverse=True)\n    return [color for color, _ in sorted_colors]\n\ndef reorder_columns(input_grid, target_columns, color_priority):\n    \"\"\"\n    Reorders target columns based on color priority.\n    \"\"\"\n    reordered_columns = []\n    column_colors = {}\n\n    # determine color of column\n    for col_index in target_columns:\n      column = input_grid[:, col_index]\n      colors_in_col = [c for c in color_priority if c in column]\n      if colors_in_col:\n        column_colors[col_index] = colors_in_col[0]\n\n    for color in color_priority:\n        for col_index in target_columns:\n            if col_index in column_colors and column_colors[col_index] == color:\n                reordered_columns.append(col_index)\n    return reordered_columns\n\ndef extract_subgrid(input_grid, ordered_columns):\n    \"\"\"\n    Extracts a subgrid based on the ordered target columns.\n    \"\"\"\n    subgrid = input_grid[:, ordered_columns]\n    return subgrid\n\ndef reduce_vertically(input_grid):\n    \"\"\"\n    Keeps only the first contiguous block of non-zero pixels in each column.\n    \"\"\"\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    for j in range(cols):\n        first_block_started = False\n        first_block_ended = False\n        for i in range(rows):\n            if not first_block_started:\n                if input_grid[i,j] != 0:\n                    first_block_started = True\n                    output_grid[i,j] = input_grid[i,j]\n            elif not first_block_ended:\n                if input_grid[i,j] == 0:\n                    first_block_ended = True\n                else:\n                    output_grid[i,j] = input_grid[i,j]\n    return output_grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    target_colors = [9, 4, 1]\n\n    # get target columns in original order\n    target_cols = get_target_columns(input_grid, target_colors)\n\n    # get last occurrence of each target color\n    last_occurrence = get_last_occurrence(input_grid, target_colors)\n    \n    # determine color priority\n    color_priority = determine_color_priority(last_occurrence)\n    \n    # reorder the columns by color priority\n    ordered_cols = reorder_columns(input_grid, target_cols, color_priority)\n\n    # extract subgrid based on reordered columns\n    subgrid = extract_subgrid(input_grid, ordered_cols)\n\n    # perform vertical reduction\n    reduced_grid = reduce_vertically(subgrid)\n\n    # limit to at most first 4 columns\n    output_grid = reduced_grid[:, :4]\n    \n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 7773,
+    "candidates_token_count": 1346,
+    "total_token_count": 9119,
+    "cached_content_token_count": 0
+  },
+  "response_time": 12.15629,
+  "response_file": "006-response.json"
+}

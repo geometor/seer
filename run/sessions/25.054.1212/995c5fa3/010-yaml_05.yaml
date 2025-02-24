@@ -1,0 +1,27 @@
+facts:
+  - object: input_grid
+    properties:
+      dimensions: variable
+      colors: [0, 5]
+      rows: contains_pixels
+      columns: contains_pixels
+  - object: output_grid
+    properties:
+      dimensions: [3, 3]
+      colors: variable, depends on input
+  - action: row_mapping
+    description: First three rows of input are mapped to output rows.
+  - action: color_transform
+    description: Colors in the input rows are transformed based on row position.
+  - example_1:
+      input_row_colors: {0: [], 1: [], 2: []}
+      output_row_colors: [2, 8, 3]
+  - example_2:
+      input_row_colors: {0: [], 1: [4], 2: [2]}
+      output_row_colors: [3, 4, 2]
+  - example_3:
+      input_row_colors: {0: [8], 1: [2], 2: [4]}
+      output_row_colors: [8, 2, 4]
+  - example_4:
+      input_row_colors: {0: [2], 1: [4], 2: [2]}
+      output_row_colors: [2, 4, 2]

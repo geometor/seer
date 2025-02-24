@@ -1,0 +1,37 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      colors: [0, 1, 5, 7]  # Values present in the input grids
+      dimensions: variable height, variable width
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      colors: [0, 3]      # Values present in the output grids
+      dimensions: height matches input_grid, width is always 3
+
+  - name: first_column
+    type: column vector
+    source: input_grid, column 0
+
+  - name: fourth_column
+    type: column vector
+    source: input_grid, column 3
+
+  - name: combined_column
+    type: column vector
+    operation: conditional combination of first_column and fourth_column
+
+actions:
+  - name: select_columns
+    description: Select the first (index 0) and fourth (index 3) columns from the input grid.
+
+  - name: combine_conditionally
+    description: >
+       If the first column contains 7 AND the fourth column contains 1 on the same row, the output column at that row is 3.
+       Otherwise, the output is 0
+
+  - name: overwrite_input_colors
+    description: >
+        Any orange(7) or blue(1) are replaced with black(0) in columns one and two of the output

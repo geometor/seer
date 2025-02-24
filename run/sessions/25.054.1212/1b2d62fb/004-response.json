@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find the Vertical Blue Line:** Locate the column index of the vertical line of blue (1) pixels in the input grid.\n\n2.  **Identify Rows with Azure:** Find all rows in the *input* grid that contain one or more azure (8) pixels.\n\n3.  **Determine Output Grid Height:** The output grid's height equals the number of rows identified in step 2, plus additional padding rows as needed.\n\n4.  **Create the Output Grid:** Initialize an output grid of dimensions *height* (from step 3) x 3, filled with white (0) pixels.\n\n5.  **Map Azure Pixels:** For each row in the *input* grid that contains azure pixels:\n    *   Find the horizontal distance (number of columns) between each Azure pixel and the blue line.\n    *   In the corresponding row of the *output grid*, if the azure pixel is to the left of the blue line set a pixel at column 0. if the azure pixel is to the right of the blue line, set column 2. If the azure pixel is at the blue line column: set column 1.\n\n6. **Return Output Grid:** The resulting output grid is the transformed output.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i,j] == color for i in range(rows)):\n            return j\n    return -1\n\ndef find_azure_rows(grid):\n    rows, _ = grid.shape\n    azure_rows = []\n    for i in range(rows):\n        if 8 in grid[i]:\n            azure_rows.append(i)\n    return azure_rows\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the vertical blue line.\n    blue_line_col = find_vertical_line(input_grid, 1)\n\n    # Find rows containing azure pixels.\n    azure_rows = find_azure_rows(input_grid)\n\n    # Determine output grid height.\n    if len(azure_rows)==0:\n        output_height = rows\n    else:\n        output_height = rows #len(azure_rows)\n    # Create the output grid.\n    output_grid = np.zeros((output_height, 3), dtype=int)\n\n    # Map azure pixels to the output grid.\n    if blue_line_col != -1:  # Ensure blue line exists\n       \n        output_row_index = 0\n        for input_row_index in range(rows):\n          if 8 in input_grid[input_row_index]:\n            for col_index in range(cols):\n                if input_grid[input_row_index, col_index] == 8:\n                    if col_index < blue_line_col:\n                        output_grid[input_row_index, 0] = 8\n                    elif col_index > blue_line_col:\n                        output_grid[input_row_index, 2] = 8\n                    else:\n                        output_grid[input_row_index, 1] = 8\n          else:\n            # copy non-azure rows to corresponding output row if blue exists\n            if rows == output_height:\n              if blue_line_col !=-1:\n                output_grid[input_row_index,1] = 8\n                output_grid[input_row_index,2] = 8\n\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4128,
+    "candidates_token_count": 822,
+    "total_token_count": 4950,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.440356,
+  "response_file": "004-response.json"
+}

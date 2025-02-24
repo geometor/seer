@@ -1,0 +1,30 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      rows: variable
+      cols: variable
+      cells: integers (0-9) representing colors
+  - name: pixel
+    type: element
+    properties:
+      color: integer (0-9)
+      row: integer
+      col: integer
+      is_gray: boolean (true if color is 5)
+      is_red: boolean (true if color is 2)
+      is_green: boolean (true if color is 3)
+      is_azure: boolean (true if color is 8)
+      replaced: boolean (initially false, true if part of a replaced pair)
+
+actions:
+  - name: find_pixels
+    description: Locate pixels of a specific color.
+  - name: check_adjacency
+    description: Determine if a red and green pixel are diagonally adjacent (NE or SW).
+  - name: replace_pixels
+    description: Change the color of red and green pixels to azure if they are diagonally adjacent.
+  - name: preserve_gray
+    description: Keep gray pixels unchanged.
+  - name: clear_unrelated
+    description: Change every pixel that doesn't meet any replacement condition to white.

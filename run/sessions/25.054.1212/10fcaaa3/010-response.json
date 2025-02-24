@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Expansion:** Create a new grid with double the height and width of the original grid.\n2.  **Copy and Mirror Horizontally:** Copy every colored pixel (not black or white) from the input grid to the corresponding location in the new grid, and then mirror the pixel horizontally to the right side.\n3.  **Azure Vertical Highlight:** In the top half of the expanded grid, add a vertical azure line on each side of *every* colored (non-black) column.\n4.  **Azure Horizontal Separation:** Add a horizontal line of azure pixels across the entire width of the grid, dividing it exactly in half.\n5.  **Mirror Vertically:** Mirror the top half of the grid (above the horizontal azure line) to the bottom half (below the azure line). The azure line should be at the last row index for the bottom half.\n\"\"\"\n\nimport numpy as np\n\ndef get_colored_columns(grid):\n    \"\"\"Finds the indices of columns containing colored (non-black, non-white) pixels.\"\"\"\n    height, width = grid.shape\n    colored_cols = []\n    for j in range(width):\n        for i in range(height):\n            if grid[i, j] != 0 and grid[i,j] != 8:  # Not black, and not azure\n                colored_cols.append(j)\n                break  # Move to the next column\n    return colored_cols\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_height, input_width = input_grid.shape\n    output_height = input_height * 2\n    output_width = input_width * 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Copy and Mirror Horizontally\n    for i in range(input_height):\n        for j in range(input_width):\n            if input_grid[i, j] != 0:  # Copy all colors except background\n                output_grid[i, j] = input_grid[i, j]\n                output_grid[i, output_width - 1 - j] = input_grid[i, j]\n\n    # Azure Vertical Highlight\n    colored_cols = get_colored_columns(output_grid[:input_height,:])\n\n    for col in colored_cols:\n        if col > 0 :\n          for i in range(input_height):\n            output_grid[i, col - 1] = 8\n        if col < output_width-1:\n          for i in range(input_height):\n            output_grid[i, col + 1] = 8\n\n    # Azure Horizontal Separation\n    output_grid[input_height, :] = 8\n\n    # Mirror Vertically\n    for i in range(input_height):\n        for j in range(output_width):\n            output_grid[output_height - 1 - i, j] = output_grid[i, j]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4456,
+    "candidates_token_count": 681,
+    "total_token_count": 5137,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.387779,
+  "response_file": "010-response.json"
+}

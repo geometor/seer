@@ -1,0 +1,41 @@
+facts:
+  - observation: |
+      Each example has an input grid and a corresponding output grid.
+  - object: input_grid
+    properties:
+      - type: 2D array
+      - description: Contains initial pixel values.
+      - role: source data
+  - object: output_grid
+    properties:
+      - type: 2D array
+      - description: Contains transformed pixel values.
+      - role: transformed data
+  - object: first_row
+    properties:
+      - type: 1D array
+      - description: The first row of the input grid.
+      - role: source of repeated elements
+  - operation: copy
+    description: |
+      The first two rows of the input_grid are copied to the output_grid.
+  - operation: repeat_elements
+    description: |
+      Each element of the first row is repeated individually to create new rows.
+      Each number in the top row is repeated down the grid, creating columns of values
+      equal to the height of the input grid.
+  - example_1:
+      input_shape: (8, 3)
+      output_shape: (8, 3)
+      repetition_pattern: Each element in the first row is repeated to create 6 more rows.
+      element_wise: true
+  - example_2:
+      input_shape: (10, 4)
+      output_shape: (10, 4)
+      repetition_pattern: Each element in the first row is repeated to create 8 more rows.
+      element_wise: true
+  - example_3:
+      input_shape: (6, 2)
+      output_shape: (6, 2)
+      repetition_pattern:  Each element in the first row is repeated to create 4 more rows.
+      element_wise: true

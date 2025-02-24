@@ -1,0 +1,19 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - rows: variable
+      - cols: variable
+      - values: integers (0-9)
+  - name: output_grid
+    type: grid
+    properties:
+      - rows: 2 * input_grid.rows
+      - cols: input_grid.cols
+      - values: integers (0-9)
+
+actions:
+  - name: duplicate_and_stack
+    input: input_grid
+    output: output_grid
+    description: The input grid is duplicated. The order of rows is reversed.  The reversed copy is placed at the top of the output, then the original input is added to the bottom.

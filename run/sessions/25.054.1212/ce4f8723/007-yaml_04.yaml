@@ -1,0 +1,31 @@
+objects:
+  - input_grid:
+      type: grid
+      dimensions: 9x4
+      elements: integers (0-9, representing colors)
+      properties:
+        - contains distinct colored regions
+  - output_grid:
+      type: grid
+      dimensions: 4x4
+      elements: integers (0-9, representing colors)
+      properties:
+        - appears to be derived from a section of the input_grid
+        - predominantly a single color (green/3)
+
+relationships:
+  - output_grid_derives_from_input_grid:
+      type: spatial_subset
+      details: The output grid's content matches a 4x4 region in the upper section of the input grid. The colors in input region are replaced.
+
+actions:
+  - extraction:
+      description: A 4x4 section is extracted from the input.
+      parameters:
+        start_row: 0
+        end_row: 3
+        start_col: 0
+        end_col: 3
+  - color_replacement:
+        blue is changed to green
+        white is white

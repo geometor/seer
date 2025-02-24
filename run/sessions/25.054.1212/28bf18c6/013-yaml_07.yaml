@@ -1,0 +1,24 @@
+objects:
+  - name: input_grid
+    type: grid
+    dimensions: 8x8
+    elements: [0, 1]  # white, blue
+    properties:
+      - sparse_blue: True
+
+  - name: output_grid
+    type: grid
+    dimensions: 3x6
+    elements: [0, 1] # white, blue
+    properties:
+      - checkerboard_pattern: True
+
+actions:
+  - name: transform
+    input: input_grid
+    output: output_grid
+    type: summarization/pattern_extraction #Hypothesized, not definitive
+
+relationships:
+  - input_grid:larger_than:output_grid
+  - input_grid:less_structured_than:output_grid

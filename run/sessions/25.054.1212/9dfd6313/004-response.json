@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms the input grid by placing the first column of the input grid onto the main diagonal of the output grid. \nSubsequent columns are shifted to the left, wrapping around as needed.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rule.\n\n    Args:\n        input_grid (list of lists): The input grid.\n\n    Returns:\n        list of lists: The transformed output grid.\n    \"\"\"\n    rows = len(input_grid)\n    cols = len(input_grid[0])\n    output_grid = [[0] * cols for _ in range(rows)]\n\n    # Place the first column of input_grid onto the main diagonal of output_grid\n    for i in range(min(rows, cols)):\n        output_grid[i][i] = input_grid[i][0]\n\n    # Shift and wrap subsequent columns\n    for j in range(1, cols):\n        for i in range(rows):\n            output_grid[i][(i + j) % cols] = input_grid[i][j]\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2661,
+    "candidates_token_count": 263,
+    "total_token_count": 2924,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.326766,
+  "response_file": "004-response.json"
+}

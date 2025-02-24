@@ -1,0 +1,20 @@
+facts:
+  - object: input_grid
+    type: grid
+    dimensions: 3x3
+    elements: integers (0-9) representing colors
+    properties:
+      - colors: varied
+  - object: output_grid
+    type: grid
+    dimensions: 9x9
+    elements: integers (0-9) representing colors
+    properties:
+      - colors: varied
+  - relationship: replication
+    subject: input_grid
+    object: output_grid
+    description: The input grid is replicated four times within the output grid, at the corners.
+  - relationship: padding
+    subject: output_grid
+    description:  The central 3x3 area and areas around the replicated grids, are padded with zeros (white).

@@ -1,0 +1,40 @@
+objects:
+  - type: grid
+    properties:
+      - name: input_grid
+        dimensions: 9x9
+        elements: integers (0-9)
+      - name: output_grid
+        dimensions: 3x3
+        elements: integers (0-9)
+  - type: color_region
+    properties:
+      - color: red (2)
+        shape: rectangle
+        input_location: top-center
+        output_location: top-center
+      - color: orange (7)
+        shape: rectangle
+        input_location: bottom-center
+        output_location: bottom-center
+      - color: gray (5)
+        shape: scattered
+        input_location: various
+        output_location: none
+      - color: white (0)
+        shape: background
+        input_location: fills_remainder
+        output_location: fills_remainder
+
+actions:
+  - type: reduction
+    description: The input grid is significantly reduced in size to create the output grid.
+  - type: selection
+    description: Specific color regions in the input are chosen, and their central color is placed in the output maintaining relative position.
+  - type: omission
+      description: other colors in the input are omitted.
+
+relationships:
+  - input_grid_contains: color_regions
+  - output_grid_represents: simplified_input_grid
+  - color_regions_position: relatively_maintained_in_output

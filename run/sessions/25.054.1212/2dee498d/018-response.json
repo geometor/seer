@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is compressed by identifying the smallest repeating vertical sub-grid pattern.\nThe output grid represents this smallest repeating pattern.\n\"\"\"\n\nimport numpy as np\n\ndef find_smallest_repeating_pattern(grid):\n    \"\"\"\n    Finds the smallest repeating vertical sub-grid pattern in a grid.\n    \"\"\"\n    rows, cols = grid.shape\n    for width in range(1, cols + 1):\n        if cols % width == 0:  # Check if width is a divisor of total columns\n            pattern = grid[:, :width]\n            repeats = True\n            for i in range(width, cols, width):\n                if not np.array_equal(pattern, grid[:, i:i + width]):\n                    repeats = False\n                    break\n            if repeats:\n                return pattern\n        else: #handle cases where the width is not a divisor\n            pattern = grid[:,:width]\n            repeats = True\n            for i in range(width, cols - width + 1, width):\n                if not np.array_equal(pattern, grid[:, i:i+width]):\n                    repeats = False\n                    break\n            if repeats:\n                return pattern\n\n    return None\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by identifying and extracting the smallest repeating vertical subgrid.\n    \"\"\"\n    # Convert to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # Find the smallest repeating sub-grid.\n    pattern = find_smallest_repeating_pattern(input_grid)\n\n    # If a repeating pattern is found, return it as the output.\n    if pattern is not None:\n        output_grid = pattern\n    else:\n        output_grid = input_grid  # Default to input if no pattern is found.\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4229,
+    "candidates_token_count": 421,
+    "total_token_count": 4650,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.627299,
+  "response_file": "018-response.json"
+}

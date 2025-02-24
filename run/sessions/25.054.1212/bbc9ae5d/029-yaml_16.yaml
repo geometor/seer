@@ -1,0 +1,20 @@
+task: 028
+objects:
+  - description: Input grid pixels
+    properties:
+      value: Integer (0-9) representing color
+      position: (row, column) coordinates
+      is_agent: False
+  - description: expanded blocks
+    properties:
+        color: integer representing color of the input pixel
+        size: dependent on input pixel value (value + 1)
+
+actions:
+  - name: ExpandPixel
+    agent: program
+    input: Single pixel
+    description: >
+      If the pixel value is non-zero, create a square block.
+      The side should be of the length of input pixel's value + 1.
+      The block's color matches the input pixel's color.

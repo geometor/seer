@@ -1,0 +1,18 @@
+facts:
+  - object: input_grid
+    type: grid
+    dimensions: 3x3
+    elements: integers (0-9)
+    property: color_coded
+  - object: output_grid
+    type: grid
+    dimensions: 6x6
+    elements: integers (0-9)
+    property: color_coded
+  - relationship: output_grid_is_scaled_mirror_of_input_grid
+    factor: 2
+    mirroring: horizontal_and_vertical
+  - action: transform
+    input: input_grid
+    output: output_grid
+    operation: scale_and_mirror

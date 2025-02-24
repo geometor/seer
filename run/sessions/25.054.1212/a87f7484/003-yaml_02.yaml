@@ -1,0 +1,49 @@
+examples:
+  - id: 1
+    input_grid_shape: [9, 3]
+    output_grid_shape: [3, 3]
+    objects:
+      - description: 3x3 block of color 6 (magenta)
+        location: top left corner and elsewhere
+      - description: 3x3 block of color 4 (yellow)
+      - description: 3x3 block of color 8 (light blue)
+        location: bottom
+        is_output: True
+    relationships:
+      - type: above
+        object1: block of color 8
+        object2: None # There is nothing below it
+  - id: 2
+    input_grid_shape: [3, 12]
+    output_grid_shape: [3, 3]
+    objects:
+      - description: 3x3 block of color 7 (orange)
+        is_output: True
+    relationships:
+      - type: above
+        object1: block of color 7
+        object2: None
+  - id: 3
+    input_grid_shape: [3, 15]
+    output_grid_shape: [3, 3]
+    objects:
+        - description: 3x3 block of color 4 (yellow)
+          is_output: True
+    relationships:
+      - type: above
+        object1: block of color 4
+        object2: None
+
+  - id: 4
+    input_grid_shape: [12, 3]
+    output_grid_shape: [3, 3]
+    objects:
+      - description: 3x3 block of color 7 (purple)
+        is_output: True
+      - description: 3x3 block of color 3 (green)
+      - description: 3x3 block of color 2 (red)
+      - description: 3x3 block of color 8 (blue)
+    relationships:
+      - type: above
+        object1: block of color 7
+        object2: block of color 3

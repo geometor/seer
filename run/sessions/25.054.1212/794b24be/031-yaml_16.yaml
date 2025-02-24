@@ -1,0 +1,31 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 3x3
+      elements: numerical values (0, 1 in input; 0, 2 in output)
+    description: Represents a 2D array of pixels.
+
+  - type: pixel
+    properties:
+      color:
+        input:
+            0: white
+            1: blue
+        output:
+            0: white
+            2: red
+      position: (row, column)
+    description: An individual cell within the grid.
+
+actions:
+    - name: transform_color
+      input_object: pixel
+      parameters: original_color
+      output_object: pixel with updated color
+
+relationships:
+  - type: spatial
+    description: Pixels are arranged in a grid, with defined row and column positions.
+    elements:
+      - adjacent: Pixels can be adjacent horizontally, vertically, or diagonally.
+      - row_based: changes can relate to a row

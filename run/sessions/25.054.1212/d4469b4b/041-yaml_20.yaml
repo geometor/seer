@@ -1,0 +1,63 @@
+task: 040
+examples:
+  - id: 1
+    input_object:
+      color: 2
+      shape_type: irregular
+      bounding_box: [0:2, 0:4]  # corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 2
+    input_object:
+      color: 1
+      shape_type: irregular
+      bounding_box: [1:4, 2:4]
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 3
+    input_object:
+      color: 3
+      shape_type: irregular
+      bounding_box:  [0:4, 0:4] #corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 4
+    input_object:
+      color: 1
+      shape_type: irregular
+      bounding_box: [0:4, 0:3] # corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 5
+    input_object:
+      color: 2
+      shape_type: irregular
+      bounding_box: [0:4, 0:4]  # corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 6
+    input_object:
+      color: 2
+      shape_type: irregular
+      bounding_box: [0:4, 0:3] # corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+  - id: 7
+    input_object:
+      color: 3
+      shape_type: irregular
+      bounding_box: [0:4, 0:2] #corrected
+    output_object:
+      color: 5
+      shape: 3x3 representation of input object
+transformation_rule: >
+    Find the smallest 3x3 grid that can contain all pixels of the
+    first non-background color. Create an output grid of size 3x3,
+    and color the output grid pixels grey (5) if the input grid
+    pixel is the main color, black (0) otherwise.

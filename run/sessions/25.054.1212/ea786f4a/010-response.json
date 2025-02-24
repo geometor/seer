@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a grid by inverting a frame of pixels around a central pixel, \nkeeping the central pixel unchanged. The inversion changes non-zero pixels\nto zero, but leaves zero pixels unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Identify the center pixel coordinates\n    center_row = rows // 2\n    center_col = cols // 2\n\n    # Iterate through the grid to process the frame\n    for i in range(rows):\n        for j in range(cols):\n            # Check if the pixel is on the frame (outermost rows and columns)\n            if i == 0 or i == rows - 1 or j == 0 or j == cols - 1:\n                # Exclude the center pixel from the inversion\n                if i != center_row or j != center_col:\n                    # Invert frame pixels: non-zero becomes 0, 0 remains 0\n                    if output_grid[i, j] != 0:\n                        output_grid[i, j] = 0\n            # copy non-frame pixels\n            else:\n               output_grid[i,j] = input_grid[i,j]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2898,
+    "candidates_token_count": 315,
+    "total_token_count": 3213,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.270486,
+  "response_file": "010-response.json"
+}

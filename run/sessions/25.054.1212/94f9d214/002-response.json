@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is analyzed to identify the locations of regions bound by green and blue. The green color in the top left corner of those regions is converted to red in the output grid, which has different sizes that the input. All other pixels in output are white.\n\"\"\"\n\nimport numpy as np\n\ndef find_regions(input_grid):\n    \"\"\"Find regions bounded by green (3) and blue (1).\"\"\"\n    regions = []\n    rows, cols = input_grid.shape\n    visited = np.zeros((rows, cols), dtype=bool)\n\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    def dfs(r, c, current_region):\n        if not is_valid(r, c) or visited[r, c] or (input_grid[r, c] != 3 and input_grid[r,c] != 1):\n            return\n\n        visited[r, c] = True\n        current_region.append((r, c))\n\n        # Explore adjacent cells\n        dfs(r + 1, c, current_region)\n        dfs(r - 1, c, current_region)\n        dfs(r, c + 1, current_region)\n        dfs(r, c - 1, current_region)\n\n\n    for r in range(rows):\n        for c in range(cols):\n            if (input_grid[r,c] == 3 or input_grid[r,c] == 1) and not visited[r,c]:\n                current_region = []\n                dfs(r,c, current_region)\n                if len(current_region) > 0:\n                    greens = [pos for pos in current_region if input_grid[pos] == 3]\n                    blues = [pos for pos in current_region if input_grid[pos] == 1]\n\n                    if len(greens) >= 1 and len(blues) >=1:\n\n                      # find top_left of green cluster\n                      min_row = min(pos[0] for pos in greens)\n                      min_col_at_min_row = min(pos[1] for pos in greens if pos[0] == min_row)\n\n                      regions.append((min_row, min_col_at_min_row))\n\n    return regions\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n    regions = find_regions(input_grid)\n    \n    # determine output grid size - max x and y of any identified region\n    max_r = 0\n    max_c = 0\n    for r, c in regions:\n        if r > max_r:\n          max_r = r\n        if c > max_c:\n          max_c = c;\n\n    output_grid = np.zeros((max_r+1, max_c+1), dtype=int)\n\n    # Place red (2) pixels at the top-left corner of each identified green cluster\n    for r, c in regions:\n        output_grid[r, c] = 2\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2272,
+    "candidates_token_count": 735,
+    "total_token_count": 3007,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.251753,
+  "response_file": "002-response.json"
+}

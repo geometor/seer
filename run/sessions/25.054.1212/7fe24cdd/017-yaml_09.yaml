@@ -1,0 +1,27 @@
+facts:
+  - task_id: 016
+  - input_grid_size: 3x3
+  - output_grid_size: 6x6
+  - expansion_factor: 2x  # Each input cell maps to a 2x2 block.
+  - objects:
+      - name: input_cell
+        properties:
+          - type: pixel
+          - location: [row, col]  # In the input grid.
+          - value: integer (0-9)
+      - name: output_block
+        properties:
+          - type: 2x2 block of pixels
+          - location: [2*row, 2*col]  # Top-left corner, based on input cell location.
+  - actions:
+    - description: "The input grid is expanded to an output grid."
+    - details: "Each input cell's value and its neighbors determine the four values within the corresponding 2x2 output block."
+    - sub_actions:
+      - description: "top-left cell is determined by the current cell"
+      - description: "top-right cell determined by the right neighbor (or 0 if on edge)"
+      - description: "bottom-left determined by bottom neighbor (or 0 if on edge)"
+      - description: "bottom-right determined by bottom-right neighbor (or other logic if on edge)"
+  - observations:
+      - "The current logic for determining the bottom right cell is not correct."
+      - "There seems to be some form of shifting of information to the top and right"
+      - "The color usage remains the same between the input and output"

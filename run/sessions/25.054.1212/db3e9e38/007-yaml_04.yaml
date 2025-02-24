@@ -1,0 +1,30 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: 7x8 (rows x columns)
+      - values: integers (0-9) representing colors
+  - object: output_grid
+    type: grid
+    properties:
+      - dimensions: 7x8 (rows x columns)
+      - values: integers (0-9) representing colors
+  - object: orange_line
+    type: line
+    properties:
+      - color: orange (7)
+      - orientation: vertical
+      - position: column 3 in input_grid
+      - length: 5 pixels
+  - object: azure_pixels
+    type: pixel_group
+    properties:
+      - color: azure (8)
+      - pattern: checkerboard, adjacent to orange
+  - action: transformation
+    type: local_expansion
+    description: The orange line expands, adding azure pixels in a specific pattern.
+  - relationship:
+      - type: spatial
+      - description: Azure pixels are placed adjacent to the orange pixels, creating a checkerboard pattern on the top part.
+      - description: The empty area (value 0) under orange line remain unchanged.

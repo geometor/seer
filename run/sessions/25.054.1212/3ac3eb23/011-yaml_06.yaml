@@ -1,0 +1,38 @@
+observations:
+  - example: 1
+    input_objects:
+      - type: pixel
+        color: red
+        position: (0, 1)
+        original_value: 2
+      - type: pixel
+        color: azure
+        position: (0, 5)
+        original_value: 8
+    transformation:
+      - action: find_seed_pixel
+        result: (0, 1)
+      - action: change_seed_pixel
+        color: black
+      - action: preserve_row_pixels
+        row_index: 0
+      - action: draw_vertical_line
+        column_index: 1
+        line_color: inherit from original row values
+
+  - example: 2
+    input_objects:
+      - type: pixel
+        color: yellow
+        position: (0, 1)
+        original_value: 4
+    transformation:
+      - action: find_seed_pixel
+        result: (0, 1)
+      - action: change_seed_pixel
+        color: black
+      - action: preserve_row_pixels
+        row_index: 0
+      - action: draw_vertical_line
+        column_index: 1
+        line_color: inherit from original row values

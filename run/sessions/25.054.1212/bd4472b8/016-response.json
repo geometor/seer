@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Copy Input:** Create a copy of the input grid as the output grid.\n2.  **Preserve Top Rows:** The first two rows of the input grid remain unchanged in the output grid.\n3.  **Iterate through Remaining Rows:** Starting from the third row (index 2), iterate through each subsequent row of the output grid.\n4.  **Cyclic Replacement:** For each pixel in the current row:\n    *   If the pixel value is 0 (white):\n        *   Replace it with the corresponding value from the first row, using a cyclic index. The column index for the first row is calculated as `current_column_index % width_of_first_row`.\n5.  **Repeat Replacement**: Repeat replacing 0 (white) with the cyclic index for the entire input grid.\n6.  **Output:** Return the modified output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Preserve top two rows (already done by copying)\n\n    # Iterate through remaining rows\n    for i in range(2, rows):\n        for j in range(cols):\n            # Cyclic Replacement\n            if output_grid[i, j] == 0:\n                first_row_index = j % cols  # Cyclic index for the first row\n                output_grid[i, j] = input_grid[0, first_row_index]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3128,
+    "candidates_token_count": 344,
+    "total_token_count": 3472,
+    "cached_content_token_count": 0
+  },
+  "response_time": 20.69681,
+  "response_file": "016-response.json"
+}

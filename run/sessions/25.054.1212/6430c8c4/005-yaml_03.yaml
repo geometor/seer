@@ -1,0 +1,28 @@
+task_id: 004-py
+
+observations:
+  - input_grid:
+      size: variable
+      colors: [0, 2, 4, 7]
+  - output_grid:
+      size: 4x4
+      colors: [0, 3]
+  - transformation_rule: |
+      The output grid is a 4x4 representation derived from the top-left 4x4 section of the input grid.
+      Pixels with the color '3' are placed in the output grid at positions where color '7'
+       pixels are NOT present in the corresponding input 4x4 region. All other output pixels are '0'.
+  - objects:
+      - name: input_region
+        type: grid_section
+        location: top-left
+        size: 4x4
+      - name: output_grid
+        type: grid
+        size: 4x4
+  - actions:
+      - type: pixel_replacement
+        condition: input_region pixel != 7
+        output_value: 3
+      - type: background_fill
+        condition: remaining output pixels
+        output_value: 0

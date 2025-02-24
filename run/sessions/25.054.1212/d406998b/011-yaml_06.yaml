@@ -1,0 +1,32 @@
+task: 010
+objects:
+  - id: grid
+    type: 2D array
+    description: Contains pixels of different colors.
+  - id: pixel
+    type: integer
+    description: Represents a color. Values 0-9.
+    values:
+      0: white
+      1: blue
+      2: red
+      3: green
+      4: yellow
+      5: gray
+      6: magenta
+      7: orange
+      8: azure
+      9: maroon
+
+actions:
+  - name: transform_pixel
+    description: Change a gray pixel (5) to a green pixel (3).
+    constraints:
+      - "Row-dependent rules determine which gray pixels are transformed."
+      - "First row: gray pixels are transformed, and at least one position is skipped after an initial change."
+      - "Second row: at most, one gray pixel is changed to green"
+      - "Third row: gray pixels may be changed to green depending on adjacent pixels"
+rules:
+  row_1_strategy: "gray pixels are changed, skipping at least one place between changes"
+  row_2_strategy: "only change one gray, starting at index 0"
+  row_3_strategy: "change based on adjacency, up to three total changes"

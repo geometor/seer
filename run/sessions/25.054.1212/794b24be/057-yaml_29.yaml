@@ -1,0 +1,25 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      rows: 3
+      columns: 3
+      cells: pixels
+      colors: [white, blue, red]
+
+  - name: seed_pixels
+    type: pixels
+    properties:
+      color: blue
+      location: row 1
+
+  - name: red_pixels
+    type: pixels
+    properties:
+      color: red
+
+actions:
+  - name: horizontal_propagation
+    description: Red color fills the top row to the right, starting from any blue pixel on the top row.
+  - name: vertical_propagation
+    description: If a blue pixel on the top row turning to red has a blue pixel directly below, change this pixel to red.

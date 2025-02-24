@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies blue (1) pixels in the input grid. Changes those pixels to red (2)\nin both input and output grids. Propagates the red color horizontally and\nvertically from the original blue pixel locations, replacing white (0) pixels\nwith red (2) until a non-white pixel or grid boundary is reached.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid as a copy of the input grid.\n    output_grid = np.copy(input_grid)\n    input_grid_copy = np.copy(input_grid) # work with a copy\n\n    # Get the dimensions of the grid.\n    rows, cols = output_grid.shape\n\n    # Iterate through each cell of the INPUT grid (important for propagation)\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid_copy[r, c] == 1:  # Found a blue pixel in the *original* input\n                # Change the blue pixel to red in *both* grids\n                output_grid[r, c] = 2\n                input_grid_copy[r,c] = 2\n\n\n                # Propagate Up\n                current_row = r - 1\n                while current_row >= 0 and output_grid[current_row, c] == 0:\n                    output_grid[current_row, c] = 2\n                    current_row -= 1\n\n                # Propagate Down\n                current_row = r + 1\n                while current_row < rows and output_grid[current_row, c] == 0:\n                    output_grid[current_row, c] = 2\n                    current_row += 1\n\n                # Propagate Left\n                current_col = c - 1\n                while current_col >= 0 and output_grid[r, current_col] == 0:\n                    output_grid[r, current_col] = 2\n                    current_col -= 1\n\n                # Propagate Right\n                current_col = c + 1\n                while current_col < cols and output_grid[r, current_col] == 0:\n                    output_grid[r, current_col] = 2\n                    current_col += 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3555,
+    "candidates_token_count": 524,
+    "total_token_count": 4079,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.365341,
+  "response_file": "054-response.json"
+}

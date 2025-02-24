@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Input:** Take the 2D input grid.\n2.  **Rotate:** Rotate the entire input grid 90 degrees clockwise.\n3.  **Output Initialization:** Create a new 3x3 output grid, initially filled entirely with white pixels (0).\n4.  **Conditional Color Mapping:** Examine the top-left 3x3 region of the *rotated* grid.  For each cell within this 3x3 region:\n    *   If the cell in the rotated grid is *not* white (0), set the corresponding cell in the output grid to magenta (6).\n    *   If the cell in the rotated grid *is* white (0), leave the corresponding cell in the output grid as white (0).\n5.  **Output:** Return the 3x3 output grid.\n\"\"\"\n\nimport numpy as np\n\ndef rotate_grid(grid):\n    \"\"\"Rotates a 2D grid 90 degrees clockwise.\"\"\"\n    return np.rot90(grid, k=-1).tolist()\n\ndef transform(input_grid):\n    # Rotate the input grid 90 degrees clockwise\n    rotated_grid = rotate_grid(input_grid)\n\n    # Create a 3x3 output grid initialized with zeros (white)\n    output_grid = [[0] * 3 for _ in range(3)]\n\n    # Iterate through the first 3 rows and columns of the rotated grid\n    for i in range(min(3, len(rotated_grid))):\n        for j in range(min(3, len(rotated_grid[0]))):\n            # If the pixel is not white, map it to 6 in the output grid\n            if rotated_grid[i][j] != 0:\n                output_grid[i][j] = 6\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4623,
+    "candidates_token_count": 408,
+    "total_token_count": 5031,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.079852,
+  "response_file": "030-response.json"
+}

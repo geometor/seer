@@ -1,0 +1,57 @@
+examples:
+  - id: 1
+    input_objects:
+      - color: 2
+        shape: irregular
+        count: 5
+      - color: 7
+        shape: irregular
+        count: 3
+      - color: 6
+        shape: irregular
+        count: 6
+    output_objects:
+      - color: 6
+        shape: rectangle
+        count: 6 # 2x3
+    target_color: 6
+    transformation: extract_subregion
+    notes: "Output is a rectangular subregion of the largest '6' object."
+
+  - id: 2
+    input_objects:
+      - color: 4
+        shape: irregular
+        count: 4
+      - color: 8
+        shape: irregular
+        count: 5
+      - color: 2
+        shape: irregular
+        count: 7
+    output_objects:
+      - color: 4
+        shape: rectangle
+        count: 4 # 2x2
+    target_color: 4
+    transformation: extract_subregion
+    notes: "Output is a rectangular subregion of the '4' object, even if its not the largest"
+
+  - id: 3
+    input_objects:
+      - color: 3
+        shape: irregular
+        count: 3
+      - color: 5
+        shape: irregular
+        count: 5
+      - color: 8
+        shape: irregular
+        count: 7
+    output_objects:
+      - color: 5
+        shape: rectangle
+        count: 8 # 2x4
+    target_color: 5
+    transformation: extract_subregion
+    notes: "Output is a rectangular subregion of the '5' object."

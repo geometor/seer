@@ -1,0 +1,34 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    shape: 4x7
+    elements: integers (0-9 representing colors)
+  - name: output_grid
+    type: 2D array
+    shape: 3x3
+    elements: integers (0-9 representing colors)
+  - name: row
+    type: array
+    elements: integers (pixels)
+  - name: color
+    type: integer
+
+properties:
+  - name: orange
+    value: 7
+  - name: green
+    value: 3
+  - name: white
+      value: 0
+  - input_cols: [0, 1, 2] # First three columns of the input
+  - output_cols: [0, 1, 2] # All three columns of the output
+
+actions:
+  - name: check_row_for_orange
+    description: >
+      Examine the first three columns of a row in the input_grid for the
+      presence of orange (7).
+  - name: transform_row
+    description: >
+      If orange is present in the input columns, generate green and white,
+      else generate a row of white.

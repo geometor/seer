@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by identifying a vertical orange line and creating a checkerboard pattern of orange and azure above it, extending to the edges of the grid. The checkerboard starts one row above the orange line and ends one row above where the orange line ends. The area below the orange line remains unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_orange_line(grid):\n    \"\"\"Finds the vertical orange line in the grid.\"\"\"\n    rows, cols = grid.shape\n    for j in range(cols):\n        for i in range(rows):\n            if grid[i, j] == 7:\n                # Found start of potential line\n                start_row = i\n                end_row = i\n                while end_row + 1 < rows and grid[end_row + 1, j] == 7:\n                    end_row += 1\n                return start_row, end_row, j\n    return None, None, None\n\ndef create_checkerboard(grid, top_row, bottom_row, cols):\n    \"\"\"Creates the checkerboard pattern.\"\"\"\n    output_grid = np.copy(grid)\n    for i in range(top_row, bottom_row):\n        for j in range(cols):\n           if (i + j) % 2 == 0:\n              output_grid[i,j] = 7\n           else:\n              output_grid[i,j] = 8\n    return output_grid\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    # Find the orange line\n    start_row, end_row, col = find_orange_line(input_grid)\n\n    if start_row is None:  # No orange line found\n        return np.copy(input_grid)\n\n    # Define checkerboard boundaries\n    top_row = max(0, start_row - 1)  # One row above start, but not negative\n    bottom_row = end_row # One row above the end of line\n    rows, cols = input_grid.shape\n\n    # Create checkerboard pattern\n    output_grid = create_checkerboard(input_grid, top_row, bottom_row, cols)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3601,
+    "candidates_token_count": 506,
+    "total_token_count": 4107,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.248473,
+  "response_file": "012-response.json"
+}

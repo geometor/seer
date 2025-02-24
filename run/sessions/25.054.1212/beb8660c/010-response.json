@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nShift all contiguous non-zero color blocks down, filling the spaces, but keep the bottom row fixed.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by shifting non-zero color blocks down, keeping the bottom row fixed.\n    \"\"\"\n    grid = np.array(input_grid)\n    rows, cols = grid.shape\n    output_grid = np.zeros_like(grid)\n\n    # 1. Keep the bottom row fixed\n    output_grid[-1, :] = grid[-1, :]\n\n    # 2. Iterate through columns\n    for c in range(cols):\n        # 3. Extract non-zero pixels from the column (excluding the bottom row)\n        column_pixels = []\n        for r in range(rows - 1):\n            if grid[r, c] != 0:\n                column_pixels.append(grid[r, c])\n\n        # 4. Shift pixels down in the column\n        pixel_index = 0\n        for r in range(rows - 2, -1, -1):\n            if pixel_index < len(column_pixels):\n                # check to prevent overwriting the fixed last row.                \n                if output_grid[r+1,c] == 0:                   \n                    output_grid[r + 1, c] = column_pixels[pixel_index]\n                    pixel_index += 1\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4548,
+    "candidates_token_count": 337,
+    "total_token_count": 4885,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.533462,
+  "response_file": "010-response.json"
+}

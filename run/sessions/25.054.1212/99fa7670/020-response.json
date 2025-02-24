@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-White Pixels:** Iterate through each pixel in the input grid. If a pixel is not white (0), proceed to the next step.\n2.  **Expand to the Right:** For each non-white pixel, change the color of the pixels to its right in same row, to the same color, until a the end of row or another non-white pixel is encountered.\n3.  **Output:** The resulting grid is the output.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # iterate through each pixel in the grid\n    for r in range(rows):\n        for c in range(cols):\n            # Identify Non-White Pixels\n            if output_grid[r, c] != 0:\n                # Expand to the Right\n                current_color = output_grid[r, c]\n                for c2 in range(c + 1, cols):\n                    if output_grid[r, c2] == 0:\n                        output_grid[r, c2] = current_color\n                    else:\n                        break  # Stop expansion if a non-white pixel is encountered\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2110,
+    "candidates_token_count": 297,
+    "total_token_count": 2407,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.051198,
+  "response_file": "020-response.json"
+}

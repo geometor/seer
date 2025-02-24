@@ -1,0 +1,16 @@
+facts:
+  - type: grid
+    description: Input grid is 10x10, output grid is 3x3.
+    input_size: [10, 10]
+    output_size: [3, 3]
+  - type: object
+    description: A central, multi-colored object exists within the input grid, surrounded by background.
+    properties:
+      - colors: [7, 6, 8, 4] # Orange, Magenta, Azure, Yellow
+      - shape: Irregular, but contained within a larger rectangular region.
+  - type: transformation
+    description: Extraction of a 3x3 subgrid.
+    operation: Extract subgrid corresponding to top-left portion of the colored object.
+    constraints:
+      - Output grid contains only non-zero pixels from the original.
+      - original color values retained

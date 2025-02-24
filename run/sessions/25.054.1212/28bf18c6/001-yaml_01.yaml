@@ -1,0 +1,23 @@
+facts:
+  - observation: Input is a 2D grid of integers, representing colors.
+  - observation: Output is a 2D grid of integers, representing colors.
+  - observation: Input grid dimensions are 8x8.
+  - observation: Output grid dimensions are 3x6.
+  - observation: Input grid primarily contains '0' (white), with some '8' (azure).
+  - observation: Output grid only contains '0' (white) and '8' (azure).
+  - object: AzurePixelCluster
+    properties:
+      color: 8 (azure)
+      shape: Irregular, but contiguous
+    actions:
+      - Condensed: Transformed into a smaller, denser representation.
+    relations:
+      - input_grid: Located within the input grid.
+      - output_grid: Forms the basis of the output grid.
+  - object: WhiteBackground
+      properties:
+          color: 0 (white)
+      actions:
+          - removed
+      relations:
+          - input_grid: fills most of input grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Background Fill:** Replace all 0s in the input grid with 8s.\n\n2.  **Cross Construction:**\n    *   Locate the single cell with the value of 1 in the input grid\n    *   In the output grid, set this original location to 1.\n    *   From this position extend the value 1 outwards along the row and column to form the four points of the cross.\n\"\"\"\n\nimport numpy as np\n\ndef find_object(grid, value):\n    # finds all instances of value and returns coordinates\n    coords = np.where(grid == value)\n    return list(zip(coords[0], coords[1]))\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.full(input_grid.shape, 8)\n\n    # find the location of the 1\n    one_locations = find_object(input_grid, 1)\n    if not one_locations:  # Handle edge case with no 1 present.\n       return output_grid\n       \n    one_row, one_col = one_locations[0]\n\n    # construct cross\n    output_grid[one_row, :] = 1    # horizontal\n    output_grid[:, one_col] = 1    # vertical\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2255,
+    "candidates_token_count": 302,
+    "total_token_count": 2557,
+    "cached_content_token_count": 0
+  },
+  "response_time": 24.12278,
+  "response_file": "014-response.json"
+}

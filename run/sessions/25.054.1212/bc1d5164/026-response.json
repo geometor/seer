@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation extracts columns and rows from the input grid that contain at least one green (3) cell, discarding others to construct the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_rows_with_value(grid, value):\n    \"\"\"\n    Returns a list of row indices that contain at least one cell with the specified value.\n    \"\"\"\n    rows = []\n    for i, row in enumerate(grid):\n        if value in row:\n            rows.append(i)\n    return rows\n\ndef get_cols_with_value(grid, value):\n    \"\"\"\n    Returns a list of column indices that contain at least one cell with the specified value.\n    \"\"\"\n    return get_rows_with_value(grid.T, value)\n\ndef extract_rows(grid, row_indices):\n    \"\"\"Extracts specific rows from a grid, based on row indices.\"\"\"\n    return grid[row_indices]\n\n\ndef extract_cols(grid, col_indices):\n    \"\"\"Extracts specific columns from a grid, based on column indices.\"\"\"\n\n    return grid[:, col_indices]\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by extracting rows and columns that contain the value '3'.\n    \"\"\"\n    # Convert to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # 1. Identify Columns with '3's\n    cols_with_3 = get_cols_with_value(input_grid, 3)\n\n    # 2. Extract those columns\n    intermediate_grid = extract_cols(input_grid, cols_with_3)\n\n    # 3. Identify rows with '3's in the modified grid\n    rows_with_3 = get_rows_with_value(intermediate_grid, 3)\n\n    # 4. Extract those rows.\n    output_grid = extract_rows(intermediate_grid, rows_with_3)\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2039,
+    "candidates_token_count": 447,
+    "total_token_count": 2486,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.664556,
+  "response_file": "026-response.json"
+}

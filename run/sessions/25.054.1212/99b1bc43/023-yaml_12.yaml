@@ -1,0 +1,23 @@
+task: 022
+examples:
+  - input_objects:
+      - color: "mixed (1-9)"
+        bounding_box: (0, 8, 0, 3)  # All examples have colors across the entire possible input area
+    output_objects:
+      - color: "green (3)"
+        bounding_box: (varies) # Varies per example. Represents a condensed presence.
+        notes: "Represents presence/absence of color in quadrants, but quadrants are not directly mapped."
+    actions:
+      - name: consolidate_colors
+        description: "All non-zero colors in the input are converted to green (3) in the output."
+      - name: reduce_grid
+        description: "The input grid is summarized into a 4x4 output grid."
+      - name: presence_mapping
+        description: "The presence of green (3) in the 4x4 output indicates the presence of color in the corresponding quadrant of the input. Quadrants are *not* fixed but determined by the overall extent of colors."
+
+  - input_size:
+     height: 9
+     width: 4
+    output_size:
+      height: 4
+      width: 4

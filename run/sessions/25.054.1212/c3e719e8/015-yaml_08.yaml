@@ -1,0 +1,44 @@
+task: 014
+objects:
+  - id: input_grid
+    type: grid
+    properties:
+      colors: [0-9]
+      shape: rectangle
+  - id: output_grid
+    type: grid
+    properties:
+      colors: [0, input_grid colors]
+      shape: rectangle
+  - id: replicated_grid_1
+    type: grid
+    properties:
+      source: input_grid
+      location: top-left
+  - id: replicated_grid_2
+    type: grid
+    properties:
+      source: input_grid
+      location: top-right
+  - id: replicated_grid_3
+    type: grid
+    properties:
+      source: input_grid
+      location: bottom-left
+ - id: replicated_grid_4
+    type: grid
+    properties:
+      source: input_grid
+      location: bottom-right
+  - id: padding
+    type: grid_area
+    properties:
+     color: 0
+     location: around replicated grids
+actions:
+  - replicate:
+      source: input_grid
+      targets: [replicated_grid_1, replicated_grid_2, replicated_grid_3, replicated_grid_4]
+  - pad:
+      target: output_grid
+      with: padding

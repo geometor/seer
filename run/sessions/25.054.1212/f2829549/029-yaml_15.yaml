@@ -1,0 +1,26 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - height: variable
+      - width: variable
+      - cell_values: [0-9]
+  - name: output_grid
+    type: grid
+    properties:
+      - height: same as input_grid
+      - width: 3
+      - cell_values: [0, 1, 3]
+
+actions:
+  - name: copy_columns
+    description: Copy the first and second columns of the input grid to the first and second columns of the output grid.
+  - name: conditional_column_creation
+    description: Create a third column in the output grid based on a condition.
+    condition: "If the element in the fourth column of *input grid* is 1(blue), then corresponding output element is 3(green)"
+
+color_mapping:
+    0: black
+    1: blue
+    3: green
+    7: orange

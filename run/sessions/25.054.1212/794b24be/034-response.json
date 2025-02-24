@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Seed Pixels:** Find all blue (value 1) pixels in the first row of the input grid. These are the \"seed\" pixels.\n2.  **Propagate Red:** From each seed pixel, change its color to red (value 2). Then, iteratively change the color of any directly adjacent (up, down, left, or right) blue pixel to red. Continue this propagation until no more connected blue pixels can be found.\n3.  **Handle other Blues:** Iterate through all of the remaining blue pixels. If a pixel is blue and was never changed to red, change it to white.\n4.  **Preserve Other Colors:** All other pixels in the input grid that are not blue retain their original color in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid with the same dimensions as the input_grid.\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Helper function to check if a pixel is within grid bounds.\n    def is_valid(r, c):\n        return 0 <= r < rows and 0 <= c < cols\n\n    # Helper function for Depth-First Search (DFS) propagation.\n    def propagate_red(r, c):\n        if not is_valid(r, c) or output_grid[r, c] != 1:\n            return\n        output_grid[r, c] = 2  # Change to red\n        # Recursively check adjacent pixels\n        propagate_red(r + 1, c)\n        propagate_red(r - 1, c)\n        propagate_red(r, c + 1)\n        propagate_red(r, c - 1)\n\n    # 1. Identify Seed Pixels and start propagation.\n    for j in range(cols):\n        if output_grid[0, j] == 1:\n            propagate_red(0, j)\n\n    # 3. Handle Remaining Blue Pixels (convert to white)\n    for i in range(rows):\n      for j in range(cols):\n        if output_grid[i,j] == 1:\n          output_grid[i,j] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3637,
+    "candidates_token_count": 521,
+    "total_token_count": 4158,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.659854,
+  "response_file": "034-response.json"
+}

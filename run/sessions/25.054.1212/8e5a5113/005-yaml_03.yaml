@@ -1,0 +1,26 @@
+facts:
+  - description: "Input grids are divided into sections by vertical gray columns."
+    objects:
+      - object_1: "Gray columns (value 5)"
+        properties:
+          - "Separator"
+          - "Vertical"
+      - object_2: "Sections"
+        properties:
+          - "Regions between gray columns"
+  - description: "Within each section, white regions act as mirrors for reflection."
+    objects:
+      - object_1: "White regions (value 0)"
+        properties:
+          - "Mirror"
+          - "Horizontal reflection point"
+      - object_2: "Non-white pixels"
+        properties:
+            - subject_to_reflection: True
+  - description: "Reflection occurs horizontally within each row of a section."
+    actions:
+      - action_1: "Horizontal reflection"
+        details: "Pixels on either side of a white region are swapped symmetrically."
+  - description: "Gray columns separator pixels are copied from input to output"
+    action:
+       - action_1: "copy gray column"

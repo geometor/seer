@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies the first \"C\"-shaped object in the input grid, and returns a 2x2 grid of the same color.\n\"\"\"\n\nimport numpy as np\n\ndef get_objects(grid):\n    \"\"\"\n    Find contiguous regions of the same color in the grid (excluding white/0).\n    Returns a dictionary of objects, where keys are colors and values are lists of pixel coordinates.\n    \"\"\"\n    objects = {}\n    visited = set()\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, obj_pixels):\n        if (\n            row < 0\n            or row >= rows\n            or col < 0\n            or col >= cols\n            or (row, col) in visited\n            or grid[row, col] != color\n        ):\n            return\n        visited.add((row, col))\n        obj_pixels.append((row, col))\n        dfs(row + 1, col, color, obj_pixels)\n        dfs(row - 1, col, color, obj_pixels)\n        dfs(row, col + 1, color, obj_pixels)\n        dfs(row, col - 1, color, obj_pixels)\n\n    for r in range(rows):\n        for c in range(cols):\n            color = grid[r, c]\n            if color != 0 and (r, c) not in visited:\n                obj_pixels = []\n                dfs(r, c, color, obj_pixels)\n                if color not in objects:\n                    objects[color] = []\n                objects[color].append(obj_pixels)\n    return objects\n\ndef analyze_object(obj_pixels):\n    \"\"\"\n    Analyzes a single object (list of pixel coordinates) to determine if it's C-shaped.\n    \"\"\"\n    if not obj_pixels:\n        return False\n\n    min_row = min(p[0] for p in obj_pixels)\n    max_row = max(p[0] for p in obj_pixels)\n    min_col = min(p[1] for p in obj_pixels)\n    max_col = max(p[1] for p in obj_pixels)\n\n    width = max_col - min_col + 1\n    height = max_row - min_row + 1\n\n    if width > 2 and height > 2:\n        # Check for a \"C\" shape\n        top_line = all((min_row, c) in obj_pixels for c in range(min_col, max_col + 1))\n        bottom_line = all((max_row, c) in obj_pixels for c in range(min_col, max_col + 1))\n        left_line = all((r, min_col) in obj_pixels for r in range(min_row, max_row + 1))\n        top_right = (min_row, max_col) not in obj_pixels\n        bottom_right = (max_row, max_col) not in obj_pixels\n\n        if top_line and bottom_line and left_line and top_right and bottom_right:\n            return True\n\n    return False\n\ndef transform(input_grid):\n    # Find objects in the input grid.\n    objects = get_objects(input_grid)\n\n    # Find the first C-shaped object and its color.\n    c_shape_color = None\n    for color, obj_list in objects.items():\n        for obj_pixels in obj_list:\n            if analyze_object(obj_pixels):\n                c_shape_color = color\n                break  # Stop after finding the first C-shaped object\n        if c_shape_color is not None:\n            break\n\n    # If no C-shaped object is found, return a minimal empty grid.\n    if c_shape_color is None:\n        return np.array([[0]])\n\n    # Create a 2x2 output grid with the C-shape's color.\n    output_grid = np.full((2, 2), c_shape_color)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5750,
+    "candidates_token_count": 934,
+    "total_token_count": 6684,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.399079,
+  "response_file": "018-response.json"
+}

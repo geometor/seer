@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts a subgrid from the input grid, defined by the outermost azure (8) pixels.\n\"\"\"\n\nimport numpy as np\n\ndef get_bounding_box(grid, color):\n    # Find coordinates of all pixels of the specified color.\n    coords = np.argwhere(grid == color)\n    if coords.size == 0:\n        return None  # Handle cases where the color doesn't exist\n    min_row, min_col = coords.min(axis=0)\n    max_row, max_col = coords.max(axis=0)\n    return (min_row, min_col, max_row, max_col)\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the subgrid defined by azure frame.\n    \"\"\"\n    # Convert input to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # Get the bounding box defined by the azure pixels.\n    bounding_box = get_bounding_box(input_grid, 8)\n    if bounding_box is None:\n      return []\n\n    min_row, min_col, max_row, max_col = bounding_box\n\n    # Extract the subgrid.\n    output_grid = input_grid[min_row:max_row+1, min_col:max_col+1]\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2016,
+    "candidates_token_count": 317,
+    "total_token_count": 2333,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.162824,
+  "response_file": "002-response.json"
+}

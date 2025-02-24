@@ -1,0 +1,24 @@
+facts:
+  - object: azure_line
+    description: A horizontal line of exactly two contiguous azure (8) pixels.
+    properties:
+      length: 2
+      color: azure (8)
+      orientation: horizontal
+  - object: blue_pixel
+    description: A single pixel of blue color (1).
+    properties:
+      color: blue (1)
+  - action: add_blue_pixel
+    description: Add a blue pixel adjacent to the azure line.
+    preconditions:
+      - An azure_line exists.
+      - A white (0) pixel exists adjacent to the azure_line.
+    location_rule: >
+        If there is a choice, a white pixel immediately to the left or right,
+        the side is chosen according to the following rule.
+        Add blue to the right side if
+        - there is no pixel above the left end of the line, or the pixel above is
+          not white
+        - and there *is* a white pixel above the right end of the line
+        Otherwise, if there is a white pixel to the left add to the left side.

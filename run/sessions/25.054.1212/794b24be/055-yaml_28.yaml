@@ -1,0 +1,27 @@
+objects:
+  - type: grid
+    dimensions: 3x3
+    elements: pixels
+    input_values: [0, 1]
+    output_values: [0, 2]
+
+properties:
+  - name: color
+    input_mapping:
+      0: white
+      1: blue
+    output_mapping:
+      0: white
+      2: red
+
+actions:
+  - type: color_change
+    conditions:
+      - if input pixel is blue: change to red
+      - if input pixel is blue and on first row: keep the red
+      - if input pixel is blue and not first row, lower row: change to white if blue
+      - if input pixel is white : it stays white
+
+relationships:
+  - type: spatial
+    description: pixels are arranged in a 2D grid.

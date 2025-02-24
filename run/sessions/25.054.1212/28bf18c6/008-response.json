@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify:** Locate all pixels with a value of '2' (red) in the input grid.\n2.  **Extract and Replicate**: Create copies of red pixels.\n3. **Resize:** create a new blank grid which is height of the bottom three rows of the input and the width that is sum of leftmost and rightmost non zero column indices.\n4.  **Fill**: Fill the new grid: if the input pixel value is '2', place a '2' else place '0'\n5. **Replicate row 1**: copy all values from the first row to complete the new row.\n6.  **Fill Top Row**: Scan across the filled row. Whereever there is a 2, copy to top row.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Create a NumPy array from the input grid\n    input_array = np.array(input_grid)\n\n    # 3. Resize: create a new blank grid which is height of the bottom three rows of the input\n    #    and the width that is sum of leftmost and rightmost non-zero column indices.\n    \n    rows, cols = input_array.shape\n    non_zero_cols = np.where(np.any(input_array != 0, axis=0))[0]\n    if non_zero_cols.size > 0:  # Check if there are any non-zero columns\n        leftmost_col = non_zero_cols[0]\n        rightmost_col = non_zero_cols[-1]\n        new_width = rightmost_col - leftmost_col + 1\n    else:\n      return []\n    \n    output_grid = np.zeros((3, new_width*2), dtype=int) # doubled\n\n\n    # 4. Fill: Fill the new grid: if the input pixel value is '2', place a '2' else place '0'\n    # Copy bottom three rows using slice\n    start_row = rows-3\n    \n    output_grid[0:3, 0:new_width] = input_array[start_row:rows,leftmost_col:rightmost_col+1]\n\n\n    # 5. Replicate row 1: copy all values from the first row to complete the new row.\n    output_grid[0:3,new_width:] = output_grid[0:3, 0:new_width]\n    output_grid[0:3,:] = np.where(output_grid[0:3,:]==2,2,0) #clear zeros\n\n    # 6. Fill Top Row: Scan across the filled row. Wherever there is a 2, copy to top row.\n    # This is done as part of filling above\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2278,
+    "candidates_token_count": 630,
+    "total_token_count": 2908,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.80961,
+  "response_file": "008-response.json"
+}

@@ -1,0 +1,34 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      - dimensions: 7x6 (rows x columns)
+      - values: [0-9] # Representing colors
+      - dominant_color: 1 (blue)
+  - name: internal_region
+    type: subgrid
+    properties:
+      - dimensions: variable
+      - colors: [5 (gray), 6 (magenta)]
+      - location: embedded within input_grid
+  - name: output_grid
+    type: grid
+    properties:
+      - dimensions: 3x2
+      - values: derived from internal_region
+      - colors: [5, 6]
+
+actions:
+  - name: extract_subgrid
+    description: Isolates the internal_region from the input_grid.
+    parameters:
+      - criteria: color difference from dominant_color
+
+relationships:
+  - type: contains
+    from: input_grid
+    to: internal_region
+  - type: corresponds_to
+    from: internal_region
+    to: output_grid
+    transformation: extraction

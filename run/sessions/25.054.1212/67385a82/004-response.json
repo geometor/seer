@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid based on the following rules:\n\n1. Check the entire grid for the presence of green (3) in the bottom row.\n2. Iterate through each pixel:\n   - If the pixel is not green (3), it remains unchanged.\n   - If the pixel is green (3):\n     - If the pixel is in the top two rows (row index 0 or 1) AND there are NO green pixels in the bottom row, change it to azure (8).\n     - Otherwise (pixel is in the bottom row, OR there ARE green pixels in the bottom row), leave it unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef _has_green_in_bottom_row(grid):\n    \"\"\"Checks if the bottom row of a grid contains any green (3) pixels.\"\"\"\n    rows, cols = grid.shape\n    return 3 in grid[rows - 1, :]\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rules.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Check for green in the bottom row (global condition).\n    bottom_row_green = _has_green_in_bottom_row(output_grid)\n\n    # Iterate through the grid and apply the transformation rules.\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 3:  # Check if the cell is green.\n                if r < 2 and not bottom_row_green:  # Top two rows AND no green in bottom row.\n                    output_grid[r, c] = 8  # Change to azure.\n                # Else: Leave green pixel unchanged (already in output_grid).\n            # Non-green pixels are also implicitly unchanged.\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3139,
+    "candidates_token_count": 424,
+    "total_token_count": 3563,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.652106,
+  "response_file": "004-response.json"
+}

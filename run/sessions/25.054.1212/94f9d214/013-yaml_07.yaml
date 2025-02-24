@@ -1,0 +1,22 @@
+facts:
+  - observation: Input grid is 8x4 (height x width).
+  - observation: Output grid is 4x4 (height x width).
+  - observation: Input grid contains colors 0 (white), 1 (blue), and 3 (green).
+  - observation: Output grid contains colors 0 (white) and 2 (red).
+  - object: Input_Grid
+    type: grid
+    properties:
+      height: 8
+      width: 4
+      colors: [0, 1, 3]
+  - object: Output_Grid
+    type: grid
+    properties:
+      height: 4
+      width: 4
+      colors: [0, 2]
+  - action: extract_color_transitions
+    input: Input_Grid
+    description: Identifies positions where the color changes horizontally (left-to-right) from 0 to 3 in the top half and marks corresponding positions with color 2 (red) on the output grid.
+  - relationship: Output_Grid size is a function of Input_Grid top half size. Specifically, height is half of input, width the same.
+  - relationship: Red pixels in Output_Grid corresponds to color change from white to green on the top half of the input.

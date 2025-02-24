@@ -1,0 +1,21 @@
+objects:
+  - type: grid
+    properties:
+      rows: variable
+      columns: variable
+      colors: [white, green, azure, others] # others refers to pixels not changed
+    observations:
+      - bottom_row_contains_green: boolean  # Flag: True if any green in the bottom row.
+
+actions:
+  - name: transform_pixel
+    preconditions:
+      - pixel_color: green
+      - location: [row, col]
+    conditional_actions:
+        - condition: "AND(location.row < 2, NOT(bottom_row_contains_green))"
+          action: "change pixel_color to azure"
+        - condition: "OR(location.row >=2, bottom_row_contains_green)"
+          action: "no change"  # Explicitly stating no change for clarity.
+    constraints:
+        - "pixels of colors other than green remain unchanged"

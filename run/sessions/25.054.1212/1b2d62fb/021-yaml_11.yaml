@@ -1,0 +1,26 @@
+facts:
+  - object: central_column
+    type: vertical_line
+    color: azure (8)
+    property: full_height
+    description: A vertical line of azure pixels extending the full height of the input grid.
+  - object: adjacent_pixels
+    type: pixels
+    color: azure (8)
+    relation: horizontally_adjacent
+    to: central_column
+    description: Pixels to the immediate left or right of the central column.
+  - object: output_grid
+    type: grid
+    size:
+      width: 3
+      height: same as input
+    description: A 3-column grid where the middle column is the central column from the input, and adjacent azure pixels are copied.
+  - action: find_central_column
+    description: Locate the column index of the full-height vertical line of azure pixels.
+  - action: create_output_grid
+    description: Initialize an output grid of the correct dimensions, filled with white (0).
+  - action: copy_central_column
+    description: Copy the identified central column to the middle column of the output grid.
+  - action: copy_adjacent_pixels
+    description: Copy azure pixels horizontally adjacent to the central column to the output grid.

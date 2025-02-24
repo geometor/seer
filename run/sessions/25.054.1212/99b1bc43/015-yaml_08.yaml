@@ -1,0 +1,32 @@
+observations:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: variable
+      - cell_values: integers (0-9) representing colors
+
+  - object: output_grid
+    type: grid
+    properties:
+      - dimensions: derived from input_grid dimensions (floor division by 2)
+      - cell_values: integers (0 or 3)
+
+  - object: block
+    type: 2x2 subgrid
+    properties:
+      - parent: input_grid
+      - action: contains_target_color
+      - target_colors: [1, 2, 4]
+
+  - action: check_block
+    description: Examines each 2x2 block in the input_grid.
+    input: block
+    output: boolean (presence of target colors)
+
+  - action: transform_block
+    description: Transforms the block to output_grid. The whole output image becomes a tessellation of the input 2x2.
+    input: block, contains_target_color_boolean
+    output: cell value for output_grid (0 or 3)
+
+  - action: mirror_pattern
+    description: Creates a 4x4 output based on the 2x2 block pattern.

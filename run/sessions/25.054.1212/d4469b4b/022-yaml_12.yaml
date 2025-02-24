@@ -1,0 +1,21 @@
+task: "ARC-AGI Pattern Extraction"
+examples:
+  - input_shape: [5, 5]
+    output_shape: [3, 3]
+    input_colors: [0, 2]
+    output_color: 5 # Dominant color
+    transformation: "extract_non_zero_border_and_create_border"
+    objects:
+      - name: input_grid
+        type: grid
+        properties:
+          - size: 5x5
+          - colors: [0, x]  # x is a non-zero color
+      - name: output_grid
+        type: grid
+        properties:
+            - size: 3x3
+            - colors: [0, 5]
+    actions:
+      - name: create_output
+        description:  "A 3x3 output grid is created. If an input pixel and its immediate horizontal and vertical neighbors are all 0, then the corresponding center output pixel is 0. Otherwise, the center output pixel and its immediate vertical and horizontal output pixels are 5."

@@ -1,0 +1,28 @@
+objects:
+  - type: pixel
+    properties:
+      color:
+        - white (0)
+        - blue (1)
+        - red (2)
+        - green (3)
+        - yellow (4)
+        - gray (5)
+        - magenta (6)
+        - orange (7)
+        - azure (8)
+        - maroon (9)
+      position: [row, column]
+      adjacent:
+        - [row, column + 1]  # Right
+        - [row, column - 1]  # Left
+        - [row + 1, column]  # Down
+        - [row - 1, column]  # Up
+
+transformations:
+    - description: Change green to azure when green is left to red
+      condition: input_grid[row,col] == 3 and input_grid[row,col+1] == 2
+      action: output_grid[row,col] = 8
+    - description: Change red, green to azure when red is left to green
+      condition: input_grid[row,col] == 2 and input_grid[row,col+1] == 3
+      action: output_grid[row,col] = 8, output_grid[row,col + 1] = 8

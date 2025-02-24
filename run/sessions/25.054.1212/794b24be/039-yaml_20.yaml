@@ -1,0 +1,45 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      colors: [white, blue]
+      size: variable
+      shape: variable
+
+  - name: blue_region
+    type: region
+    properties:
+        defined_by: blue pixels in input_grid
+        shape: rectangle
+
+  - name: output_grid
+    type: grid
+    properties:
+      colors: [white, red]
+      size: 3x3
+      shape: (3,3)
+
+  - name: red_region
+    type: region
+    properties:
+      defined_by: bounding box of blue_region
+      color: red
+      shape: rectangle
+
+actions:
+  - name: find_blue_pixels
+    input: input_grid
+    output: blue_region
+
+  - name: create_bounding_box
+    input: blue_region
+    output: red_region
+    
+  - name: draw_rectangle
+    input: [red_region, output_grid]
+    description: Draw a filled rectangle of red pixels in the output_grid, size and location determined by red_region.
+
+  - name: resize_grid
+    input: input_grid
+    output: output_grid
+    description: Resize the grid to 3x3, filling empty cells with white

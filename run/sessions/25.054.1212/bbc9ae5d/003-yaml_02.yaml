@@ -1,0 +1,12 @@
+facts:
+  - observation: Input grids are single-row.
+  - observation: Output grids have a diagonal rectangular shape of the non-zero color.
+  - observation: Output grid height is variable and related to input.
+  - property: expanding_color:
+      description: The non-zero color in the input grid.
+      values_seen: [blue, red, gray, azure, orange]
+  - property: background_color:
+      description: Always white (0).
+  - action: expansion:
+      description: The expanding_color forms a diagonal rectangle in the output.
+      details: The number of rows in the output is the number of non-white (value 0) pixels, plus one. The added row continues the forward-slash diagonal extension of the non-white pixels.

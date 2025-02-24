@@ -1,0 +1,36 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - columns: [column_4, column_8, column_9]
+      - pixels:  # Pixels with value 0 are considered white
+        - color: white
+          value: 0
+  - name: output_grid
+    type: 2D array (3x3)
+    properties:
+      - rows: [row_0, row_1, row_2]
+      - colors: [azure, red, yellow, black] # Possible output colors, black for no white pixel in the corresponding input column
+
+actions:
+  - name: check_for_white
+    input: [input_grid, column]
+    description: Determines if a specified column in the input grid contains any white pixels.
+  - name: color_output_row
+    input: [output_grid, row_index, color]
+    description: Fills a specified row in the output grid with a given color.
+
+mappings:
+  # this mapping is still not consistent between the examples
+  - input_column: column_4
+    output_row: row_0
+    color_if_white: 8 # azure
+    color_if_not_white: 0  #black
+  - input_column: column_8
+    output_row: row_1
+    color_if_white: 2  # Red
+        color_if_not_white: 0  #black
+  - input_column: column_9
+    output_row: row_2
+    color_if_white: 4  # Yellow
+        color_if_not_white: 0  #black

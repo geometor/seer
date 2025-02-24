@@ -1,0 +1,23 @@
+facts:
+  - type: grid
+    description: input and output are grids of the same dimensions
+    dimensions: 3x14
+  - object: pixel
+    properties:
+      color:
+        - white (0)
+        - gray (5)
+        - green (3)
+    observations:
+      - white pixels remain unchanged
+      - some gray pixels change to green
+      - no new colors are introduced
+  - action: replacement
+    description: gray pixels are replaced by green pixels
+    conditions:
+      - appears to be based on column position and possibly neighboring colors
+  - relation: spatial
+    description: column position is relevant
+    details:
+      - the transformation pattern is not a simple global replacement; some 5s remain 5s
+      - every third 5 in rows is consistantly transformed into a 3.

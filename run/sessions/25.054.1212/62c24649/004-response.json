@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nDuplicate the input grid, doubling its dimensions. Each pixel in the input becomes a 2x2 block in the output.\nAdd a one-pixel border around the duplicated grid, using edge values of the original input, and duplicating border values.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Get input grid dimensions\n    input_height, input_width = input_grid.shape\n\n    # Calculate output grid dimensions (doubled + border)\n    output_height = input_height * 2 + 2\n    output_width = input_width * 2 + 2\n\n    # Initialize output grid with zeros\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Duplicate the input grid into the center of the output grid\n    for i in range(input_height):\n        for j in range(input_width):\n            output_grid[2*i+1, 2*j+1] = input_grid[i, j]\n            output_grid[2*i+1, 2*j+2] = input_grid[i, j]\n            output_grid[2*i+2, 2*j+1] = input_grid[i, j]\n            output_grid[2*i+2, 2*j+2] = input_grid[i, j]\n\n    # Add the border, duplicating border pixels\n    # Top and Bottom\n    for j in range(input_width):\n      output_grid[0, 2*j+1] = input_grid[0,j]\n      output_grid[0, 2*j+2] = input_grid[0,j]\n      output_grid[-1, 2*j+1] = input_grid[-1,j]\n      output_grid[-1, 2*j+2] = input_grid[-1,j]\n    # Left and Right\n    for i in range(input_height):\n      output_grid[2*i+1, 0] = input_grid[i,0]\n      output_grid[2*i+2, 0] = input_grid[i,0]\n      output_grid[2*i+1, -1] = input_grid[i,-1]\n      output_grid[2*i+2, -1] = input_grid[i,-1]\n\n    # Corners - directly set based on input corners\n    output_grid[0, 0] = input_grid[0, 0]\n    output_grid[0, -1] = input_grid[0, -1]\n    output_grid[-1, 0] = input_grid[-1, 0]\n    output_grid[-1, -1] = input_grid[-1, -1]\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3440,
+    "candidates_token_count": 654,
+    "total_token_count": 4094,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.246682,
+  "response_file": "004-response.json"
+}

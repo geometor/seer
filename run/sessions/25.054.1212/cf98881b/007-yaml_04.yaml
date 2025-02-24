@@ -1,0 +1,35 @@
+objects:
+  - grid_input:
+      type: 2D array
+      dimensions: 14x4
+      elements: integers (0-9) representing colors
+      properties:
+        - contains multiple colors
+  - grid_output:
+      type: 2D array
+      dimensions: 4x4
+      elements: integers (0-9) representing colors
+      properties:
+        - contains a subset of input colors
+        - specific spatial arrangement
+
+actions:
+  - crop:
+      description: Selects a sub-region of the input grid.
+      parameters:
+        start_row: unknown
+        start_col: unknown
+        end_row: unknown
+        end_col: unknown
+  - filter_colors:
+    description: removes or substitute colors.
+  - substitute:
+      description: Replaces certain colors with others.
+      parameters:
+        original_color: [2,9]
+        replacement_color: [1,9]
+
+relationships:
+  - grid_output is derived from grid_input
+  - cropping defines the spatial boundaries of the output
+  - filter/substitute defines the color composition of output.

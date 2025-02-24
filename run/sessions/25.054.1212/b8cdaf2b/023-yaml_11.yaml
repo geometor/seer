@@ -1,0 +1,29 @@
+observations:
+  - task_id: 022
+  - objects:
+      - type: grid
+        properties:
+          - contains_rows_of_uniform_color: true
+          - contains_rows_of_multiple_colors: true
+          - boundary_exists: true
+      - type: boundary
+        properties:
+          - defined_by: row_separating_uniform_and_multi_color_rows
+          - location: above_multi_color_row
+      - type: shape
+        properties:
+          - shape_type: L
+          - orientation: varies (normal and mirrored)
+          - color_source: row_below_boundary
+          - position: above_boundary_at_empty_cells
+      - type: color
+        properties:
+          -color_logic: get color from pixel in row below boundary
+
+  - actions:
+      - type: add_shape
+        details: Add "L" shaped objects above the boundary at available positions.
+        conditions:
+          - location_relative_to_boundary: above
+          - color_determined_by: row_below_boundary
+          - shape_determined_by: L_shape composed by two pixels

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a grid by changing specific gray pixels to green based on their position and row, skipping adjacent pixels.\n\nThe transformation follows these rules:\n- Gray pixels (5) are changed to green pixels (3).\n- The transformation occurs row by row.\n- Within each row:\n - If row 1: If a gray pixel changes to green, skip the adjacencies\n - If row 2: Only one gray pixel, if any, changes to green\n - If row 3: If gray pixels change to green, and there are exactly three changes, they can't be adjacent\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through each row\n    for i in range(rows):\n        gray_indices = [j for j in range(cols) if output_grid[i, j] == 5]\n        \n        if i == 0:\n            # First row: alternate gray pixels, skipping adjacencies\n            changed_indices = []\n            for j in gray_indices:\n              if not any(abs(j - k) <= 1 for k in changed_indices):\n                  output_grid[i,j] = 3\n                  changed_indices.append(j)\n\n        elif i == 1:\n            # Second row: change at most one gray pixel to green\n            if gray_indices:\n                output_grid[i, gray_indices[0]] = 3  # Change the first gray pixel\n\n        elif i == 2:\n            # Third row: Change up to three non-adjacent gray pixels\n            changed_count = 0\n            changed_indices = []\n            for j in gray_indices:\n                if changed_count < 3 and not any(abs(j-k) <=1 for k in changed_indices):\n                     output_grid[i,j] = 3\n                     changed_indices.append(j)\n                     changed_count += 1\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3436,
+    "candidates_token_count": 478,
+    "total_token_count": 3914,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.811953,
+  "response_file": "010-response.json"
+}

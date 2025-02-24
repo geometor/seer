@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      rows: variable
+      columns: variable
+      cells: contain color values
+  - type: pixel
+    properties:
+      color:
+        - white (0)
+        - blue (1)
+        - red (2)
+      position: (row, column)
+
+actions:
+  - name: replace_and_fill_upward
+    input: grid
+    output: transformed grid
+    description: >
+      Find all blue (1) pixels.  For each blue pixel, change it to red (2).
+      Then, propagate the red color upwards, changing any white (0) pixels to red (2)
+      until a non-white pixel or the top edge of the grid is reached.

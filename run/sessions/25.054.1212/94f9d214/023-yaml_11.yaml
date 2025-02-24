@@ -1,0 +1,30 @@
+facts:
+  - task_id: '022'
+  - objects:
+    - name: input_grid
+      type: grid
+      properties:
+        - dimensions: variable (rows x cols)
+        - values: integers (0-9)
+    - name: output_grid
+      type: grid
+      properties:
+        - dimensions: determined by input_grid section 1
+        - values: integers (0-9), predominantly 0 and 2
+    - name: section1
+      type: subgrid
+      properties:
+          - source: input_grid
+          - boundary: "rows up to last row starting with value other than 0 or 1"
+    - name: section2
+      type: subgrid
+      properties:
+          - source: input_grid
+          - boundary: "rows below section1"
+  - actions:
+    - name: split_grid
+      description: Divide the input grid into two sections.
+    - name: determine_output_size
+      description: Set the output grid size equal to Section 1 size
+    - name: map_pixels
+      description: "Find 0 cells in Section 2. If corresponding coordinates are within Section 1 bounds, set the cell in output grid to 2."

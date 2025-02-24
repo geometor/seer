@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid of pixels into an output grid, replacing some red pixels (2) with yellow pixels (4) based on adjacency rules. A red pixel is changed to yellow if it has at least one orthogonally adjacent white pixel (0) and one orthogonally adjacent red pixel (2).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the adjacency rules.\n    \"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.copy(input_grid)  # Initialize output grid\n\n    def is_valid(r, c):\n        \"\"\"Checks if the given row and column are within grid bounds.\"\"\"\n        return 0 <= r < rows and 0 <= c < cols\n\n    def get_adjacent_colors(r, c):\n        \"\"\"Gets the colors of orthogonally adjacent cells.\"\"\"\n        adjacent_colors = []\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:  # Right, Left, Down, Up\n            nr, nc = r + dr, c + dc\n            if is_valid(nr, nc):\n                adjacent_colors.append(input_grid[nr, nc])\n        return adjacent_colors\n\n    # Iterate through each cell of the input grid\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] == 2:  # Check if the cell is red\n                adjacent_colors = get_adjacent_colors(r, c)\n                has_white_neighbor = 0 in adjacent_colors\n                has_red_neighbor = 2 in adjacent_colors\n\n                if has_white_neighbor and has_red_neighbor:\n                    output_grid[r, c] = 4  # Change to yellow\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2267,
+    "candidates_token_count": 425,
+    "total_token_count": 2692,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.478761,
+  "response_file": "002-response.json"
+}

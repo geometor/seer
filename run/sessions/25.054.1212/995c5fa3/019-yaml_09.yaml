@@ -1,0 +1,49 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 4x14
+    elements: pixels
+    values: [0, 5]
+  - type: grid
+    name: output_grid
+    dimensions: 3x3
+    elements: pixels
+    values: [2, 4]
+  - type: shape
+    name: vertical_line
+    color: white
+    location:
+      description: "columns 5 and 10"
+  - type: object
+    name: central_square
+    color: white
+    location:
+      description: "center of input grid, spanning rows 3-4, columns 7-8"
+    dimensions: 2x2
+
+relationships:
+  - type: contains
+    from: input_grid
+    to: [vertical_line, central_square]
+  - type: transforms_to
+    from: central_square
+    to: output_grid
+  - type: changes_color #Hypothesized Color relationship
+    details:
+      - original: 0 #white
+        new: 2 #red
+      - original: 0
+        new: 4
+
+actions:
+    - type: extract
+      input:
+        name: input_grid
+        region:
+          description: vertical lines
+      output:  central_square #Hypothesis, the white lines appear important, as does the central square.
+
+    - type: recolor_and_resize
+      input: central_square, vertical_line locations #Hypothesis
+      output: output_grid
+      details: The output grid might derive its dimensions/structure from the location of the extracted central_square relative to the vertical_line

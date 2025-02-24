@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts a 3x3 subgrid from the input grid, starting from the top-left corner of the central non-zero object.\n\"\"\"\n\nimport numpy as np\n\ndef find_top_left_object(grid):\n    \"\"\"Finds the top-left corner coordinates of the non-zero object.\"\"\"\n    rows, cols = np.where(grid != 0)\n    if len(rows) == 0:  # Handle the case where there are no non-zero pixels\n        return None, None\n    top_left_row = np.min(rows)\n    top_left_col = np.min(cols)\n    return top_left_row, top_left_col\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts a 3x3 subgrid representing the top-left of the object.\n    \"\"\"\n    # Convert input_grid to numpy array for easier manipulation\n    input_grid = np.array(input_grid)\n\n    # Find the top-left corner of the central object.\n    start_row, start_col = find_top_left_object(input_grid)\n    \n    if start_row is None or start_col is None:  # No object found\n        return np.zeros((3, 3), dtype=int).tolist() # return blank 3x3 grid.\n\n\n    # Extract the 3x3 subgrid.\n    output_grid = input_grid[start_row:start_row+3, start_col:start_col+3]\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2261,
+    "candidates_token_count": 357,
+    "total_token_count": 2618,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.153748,
+  "response_file": "002-response.json"
+}

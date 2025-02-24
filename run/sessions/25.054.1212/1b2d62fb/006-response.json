@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Input:** Receive a 2D grid (`input_grid`) of integers (0-9).\n2.  **Blue Line Detection:** Find the vertical blue line (all pixels in a column are blue (1)) in the input grid. Note its column index. If no blue line is found, output all 0 grid with the dimensions of the input grid.\n3.  **Output Grid Initialization:** Create an output grid (`output_grid`) with the same number of rows as the input grid and 3 columns, initially filled with zeros (0).\n4.  **Row Iteration:** Iterate through each row of the `input_grid`.\n5.  **Azure Check:** For each row:\n    *   If the row contains *any* azure (8) pixels:\n        *   Iterate through the columns of the current row in the `input_grid`.\n        *   If an azure pixel is found:\n            *   If the azure pixel's column index is *less than* the blue line's column index, place an azure (8) in column 0 of the corresponding row in the `output_grid`.\n            *   If the azure pixel's column index is *greater than* the blue line's column index, place an azure (8) in column 2 of the corresponding row in the `output_grid`.\n            *   If the azure pixel's column index *is equal to* the blue line's column index, place an azure (8) in column 1 of the corresponding row of the output grid.\n    *   If the row does *not* contain any azure (8) pixels, the corresponding row in the `output_grid` remains all zeros (0).\n6.  **Output:** Return the `output_grid`.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i,j] == color for i in range(rows)):\n            return j\n    return -1\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Blue Line Detection\n    blue_line_col = find_vertical_line(input_grid, 1)\n\n    # Output Grid Initialization\n    output_grid = np.zeros((rows, 3), dtype=int)\n\n    if blue_line_col == -1:\n        return output_grid\n\n    # Row Iteration\n    for i in range(rows):\n        # Azure Check\n        if 8 in input_grid[i]:\n            for j in range(cols):\n                if input_grid[i, j] == 8:\n                    if j < blue_line_col:\n                        output_grid[i, 0] = 8\n                    elif j > blue_line_col:\n                        output_grid[i, 2] = 8\n                    else:\n                        output_grid[i, 1] = 8\n        # else:  # Implicitly handled by initialization to zeros\n        #     output_grid[i, :] = 0  # Keep row all zeros\n\n    # Output\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4348,
+    "candidates_token_count": 728,
+    "total_token_count": 5076,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.821886,
+  "response_file": "006-response.json"
+}

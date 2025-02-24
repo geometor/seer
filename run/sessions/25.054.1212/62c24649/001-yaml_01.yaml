@@ -1,0 +1,31 @@
+facts:
+  - type: grid
+    description: input grid
+    dimensions: 3x3
+    elements:
+      - value: 3
+        color: green
+      - value: 0
+        color: white
+      - value: 2
+        color: red
+      - value: 1
+        color: blue
+
+  - type: grid
+    description: output grid
+    dimensions: 6x6
+    elements:
+      - value: derived from input, doubled and with a one pixel border
+        color: various
+  - object: input_grid_pixels
+    properties:
+        shape: dynamic
+        color: dynamic
+  - action: input grid is expanded
+    properties:
+        type: duplication
+        border added: 1 pixel
+
+  - relationship: output grid is a transformed version of the input grid.
+    transformation: expansion and bordering

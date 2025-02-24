@@ -1,0 +1,21 @@
+facts:
+  - observation: |
+      The transformation adds mirrored shapes (single pixels or "L" shapes) to a region in the input grid.
+  - object_identification:
+      - object: Mirrored shapes (L-shapes or single pixels).
+        properties:
+          - color: Varies (determined by other objects).
+          - shape: L-shape or single pixel.
+          - position: Symmetrically placed around a vertical axis.
+  - region_identification:
+      - region: Top region
+        properties:
+            - boundary: Defined by the transition between a multi-colored bottom section and the rest of the grid.
+            - action: Mirrored shapes are added to this region.
+  - actions:
+      - action: Adding mirrored shapes.
+        details: |
+          Shapes are added above the boundary line between rows of uniform color and those of multiple colors.
+  - color_determination:
+      - details: |
+          Color for mirrored shapes is same as the bottom-most color.

@@ -1,0 +1,24 @@
+objects:
+  - name: blue_pixels
+    color: blue
+    value: 1
+    properties:
+      - connected: True  # Indicates connectedness matters
+      - top_row_origin: True # Anchored to the top row
+
+  - name: red_pixels
+    color: red
+    value: 2
+    properties:
+      - derived_from: blue_pixels # Originates from blue pixels
+
+actions:
+  - name: propagate_color
+    subject: blue_pixels
+    start_condition: top_row
+    propagation_rule:  "change all connected blue to red"
+    end_state: red_pixels
+  - name: convert_unconnected
+    subject: blue_pixels
+    condition: not connected to top_row
+    result: white

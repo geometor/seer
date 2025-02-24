@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by extracting a three-column window centered around a blue (color 1) stripe. \nThe blue color within this window is mapped to azure (8), and all other pixels in the window are set to 0.\nIf the blue stripe is on the edge, the window wraps around.\n\"\"\"\n\nimport numpy as np\n\ndef find_blue_stripe_column(grid):\n    \"\"\"Finds the column index of the vertical blue stripe (color 1).\"\"\"\n    for j in range(grid.shape[1]):\n        if np.all(grid[:, j] == 1) or np.all(grid[:,j] == [0,1]) or np.all(grid[:,j] == [1,0]):\n            return j\n    return -1  # Return -1 if no blue stripe is found\n\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the rule.\"\"\"\n    rows = input_grid.shape[0]\n    cols = 3\n    output_grid = np.zeros((rows, cols), dtype=int)\n\n    # Find the blue stripe column\n    blue_stripe_col = find_blue_stripe_column(input_grid)\n\n    if blue_stripe_col == -1:\n        return output_grid  # All 0 if no blue stripe\n\n    # Calculate window column indices with wrapping\n    left_col = (blue_stripe_col - 1) % input_grid.shape[1]\n    center_col = blue_stripe_col\n    right_col = (blue_stripe_col + 1) % input_grid.shape[1]\n\n    # Populate the output grid\n    for i in range(rows):\n        # Left column\n        output_grid[i, 0] = 8 if input_grid[i, left_col] == 1 else 0\n        \n        # Center column\n        output_grid[i, 1] = 8 if input_grid[i, center_col] == 1 else 0\n\n        # Right column\n        output_grid[i, 2] = 8 if input_grid[i, right_col] == 1 else 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4737,
+    "candidates_token_count": 501,
+    "total_token_count": 5238,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.432526,
+  "response_file": "012-response.json"
+}

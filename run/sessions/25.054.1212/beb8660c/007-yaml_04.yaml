@@ -1,0 +1,21 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: 7x4 (rows x columns)
+      - cell_values: [0-9] # Representing colors
+  - type: block
+    properties:
+      - color: [blue, red, green, azure] # Determined by cell_values
+      - shape: contiguous_pixels
+      - movement: downward
+      - constraint: within_grid_boundaries
+
+actions:
+  - name: shift_blocks_down
+    description: Move blocks of pixels downward, filling empty spaces below.
+
+relationships:
+  - type: spatial
+    description: Blocks can be above, below, or adjacent to other blocks or empty spaces.
+  - type: containment
+    description: The grid contains all blocks.

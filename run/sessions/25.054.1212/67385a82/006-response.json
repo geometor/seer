@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid based on the following rule:\n\nGreen pixels in the top two rows (row index 0 or 1) are changed to azure.\nAll other pixels remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the specified rule.\n    \"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Iterate through the grid and apply the transformation rule.\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 3:  # Check if the cell is green.\n                if r < 2:  # Top two rows.\n                    output_grid[r, c] = 8  # Change to azure.\n            # Non-green pixels and green pixels outside top two rows remain unchanged.\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4188,
+    "candidates_token_count": 215,
+    "total_token_count": 4403,
+    "cached_content_token_count": 0
+  },
+  "response_time": 2.606185,
+  "response_file": "006-response.json"
+}

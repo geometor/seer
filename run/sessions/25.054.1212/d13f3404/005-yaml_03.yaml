@@ -1,0 +1,63 @@
+examples:
+  - example_id: 1
+    input_grid:
+      dimensions: [3, 3]
+      objects:
+        - color: 6
+          positions: [[0, 0]]
+        - color: 1
+          positions: [[0, 1]]
+        - color: 3
+          positions: [[1, 0]]
+    output_grid:
+      dimensions: [6, 6]
+      transformation: "Each pixel in the input grid expands to a 2x2 block of the same color in the output grid."
+      object_mapping:
+        - input: [0, 0]
+          output: [[0, 0], [0, 1], [1, 0], [1, 1]]
+        - input: [0, 1]
+          output: [[0, 2], [0, 3], [1, 2], [1, 3]]
+        - input: [1, 0]
+          output: [[2, 0], [2, 1], [3, 0], [3, 1]]
+
+  - example_id: 2
+    input_grid:
+      dimensions: [3, 3]
+      objects:
+        - color: 4
+          positions: [[0, 1]]
+        - color: 8
+          positions: [[1, 1]]
+        - color: 2
+          positions: [[2, 0]]
+    output_grid:
+      dimensions: [6, 6]
+      transformation: "Each pixel in the input grid expands to a 2x2 block of the same color in the output grid."
+      object_mapping:
+        - input: [0, 1]
+          output: [[0, 2], [0, 3], [1, 2], [1, 3]]
+        - input: [1, 1]
+          output: [[2, 2], [2, 3], [3, 2], [3, 3]]
+        - input: [2, 0]
+          output: [[4, 0], [4, 1], [5, 0], [5, 1]]
+
+  - example_id: 3
+    input_grid:
+      dimensions: [3, 3]
+      objects:
+        - color: 6
+          positions: [[0, 2]]
+        - color: 1
+          positions: [[1, 0]]
+        - color: 3
+          positions: [[1, 1]]
+    output_grid:
+      dimensions: [6, 6]
+      transformation: "Each pixel in the input grid expands to a 2x2 block of the same color in the output grid."
+      object_mapping:
+        - input: [0, 2]
+          output: [[0, 4], [0, 5], [1, 4], [1, 5]]
+        - input: [1, 0]
+          output: [[2, 0], [2, 1], [3, 0], [3, 1]]
+        - input: [1, 1]
+          output: [[2, 2], [2, 3], [3, 2], [3, 3]]

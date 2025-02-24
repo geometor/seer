@@ -1,0 +1,26 @@
+task: 016d6104
+objects:
+  input_grid:
+    type: grid
+    properties:
+      shape: variable
+      colors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  output_grid:
+    type: grid
+    properties:
+      shape: [3, 3]
+      colors: [0, 6] # White and Magenta
+
+actions:
+  flatten:
+    input: input_grid
+    description: Convert input_grid to a 1D sequence.
+  filter_zeros:
+    input: flattened input_grid
+    description: Remove all zero values from the sequence.
+  map_to_output:
+    input: filtered sequence, input pixel indices
+    description: Map the non-zero values from the original, flattened input (excluding zeros) to the output grid. The mapping is not a simple sequential fill.  The index in the filtered sequence determines the position in the output. Modulo with output size.
+  fill_remaining:
+      input: output, filtered sequence length
+      description: set remaining cells in output to zero

@@ -1,0 +1,17 @@
+facts:
+  - task_id: "008"
+  - input_grid_size: variable
+  - output_grid_size: 3x3
+  - objects:
+    - type: colored_region
+      shape: 3x3 square
+      property: uniform_color
+      colors: [red, green, azure, orange, magenta]
+  - transformations:
+    - type: position_mapping
+      description: "Central color of each input region maps to a cell in the output grid."
+      rules:
+        - input_regions are scaled down to a single pixel
+        - relative position must be maintained
+  - background:
+      color: white (0)

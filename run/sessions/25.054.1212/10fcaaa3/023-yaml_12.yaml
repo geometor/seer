@@ -1,0 +1,65 @@
+example_1:
+  input_grid:
+    shape: (2, 4)
+    non_zero_pixels:
+      - color: 5
+        count: 1
+        positions: [(1,1)]
+  output_grid:
+    shape: (4, 8)
+    non_zero_pixels:
+        - color: 5
+          count: 2
+          positions: [(1,1), (1,5)] # copied to right if not on the edge
+        - color: 8
+          count: 12
+          positions: even row, even column and odd row, odd column
+example_2:
+  input_grid:
+    shape: (3, 4)
+    non_zero_pixels:
+      - color: 6
+        count: 2
+        positions: [(0,2), (2, 1)]
+  output_grid:
+    shape: (6, 8)
+    non_zero_pixels:
+        - color: 6
+          count: 4
+          positions: [(0, 2), (0, 6), (2, 1), (2, 5)] # copied to right if not on the edge
+        - color: 8
+          count: 20
+          positions: even row, even column and odd row, odd column
+
+example_3:
+  input_grid:
+    shape: (5, 3)
+    non_zero_pixels:
+      - color: 4
+        count: 2
+        positions: [(1, 1), (4, 0)]
+  output_grid:
+    shape: (10, 6)
+    non_zero_pixels:
+        - color: 4
+          count: 4
+          positions: [(1,1), (1, 5), (4, 0), (4, 4)]  # copied to right if not on the edge
+        - color: 8
+          count: 40
+          positions: even row, even column and odd row, odd column
+example_4:
+  input_grid:
+    shape: (4, 4)
+    non_zero_pixels:
+      - color: 2
+        count: 1
+        positions: [(1, 1)]
+  output_grid:
+    shape: (8, 8)
+    non_zero_pixels:
+        - color: 2
+          count: 2
+          positions: [(1,1), (1, 5)]  # copied to right if not on the edge
+        - color: 8
+          count: 28
+          positions: even row, even column and odd row, odd column

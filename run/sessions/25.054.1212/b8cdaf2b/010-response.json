@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Copy Bottom Row:** Preserve the entire bottom row of the input grid in the output grid.\n2.  **Find Bottom Row Non-Zero Pixels**: Identify all colors in the bottom row that are non-zero.\n3. **Replicate and Offset:** For each identified non-zero pixel:\n\n    *   Replicate the colors of the pixels identified in the bottom row.\n    *   Place copies in a cross shape in the rows above with positions offset -1 and +1 from the original columns in the bottom row\n    *  Stop at row 0, so do not extend beyond the size of the input grid\n\"\"\"\n\nimport numpy as np\n\ndef find_bottom_row_nonzero_pixels(grid):\n    \"\"\"Finds the positions and colors of non-zero pixels in the bottom row.\"\"\"\n    bottom_row = grid[-1]\n    pixels = []\n    for col_idx, color in enumerate(bottom_row):\n        if color != 0:\n            pixels.append(((len(grid) - 1, col_idx), color))  # ((row, col), color)\n    return pixels\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    height = len(input_grid)\n\n    # find the non-zero pixels on the bottom row\n    bottom_row_pixels = find_bottom_row_nonzero_pixels(input_grid)\n\n    # replicate and offset.\n    for (row, col), color in bottom_row_pixels:\n\n        #offsets for the cross shape, two rows up\n        offsets = [(-1, -1), (-1, 1), (-2, -1), (-2, 1)]\n\n        for row_offset, col_offset in offsets:\n            new_row = row + row_offset\n            new_col = col + col_offset\n\n            # bounds check, and only modify if the current output is 0\n            if 0 <= new_row < height and 0 <= new_col < len(input_grid[0]):\n                output_grid[new_row, new_col] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4092,
+    "candidates_token_count": 490,
+    "total_token_count": 4582,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.949252,
+  "response_file": "010-response.json"
+}

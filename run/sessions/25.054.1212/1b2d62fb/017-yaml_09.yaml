@@ -1,0 +1,19 @@
+- object: output_grid
+  properties:
+    height: Same as input grid's height.
+    width: Always 3.
+    colors:
+      - 0 # white
+      - 8 # azure
+    pattern: Checkerboard-like alternation of azure (8) based on row index.
+  actions:
+    - create: Initialize with all white (0) pixels.
+    - modify: Set pixel values to azure (8) based on row index (even/odd).
+
+- object: input_grid
+  properties:
+    height: Variable.
+    width: Variable
+    colors: Varies across examples (0, 8, 9 are observed).
+  actions:
+      -  None: The contents of input are irrelevant to transform

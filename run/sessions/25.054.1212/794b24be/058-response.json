@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Seed Pixels:** Find all blue pixels (value 1) on the first row (row index 0) of the input grid.\n2.  **Horizontal Propagation:** If any seed pixels are found, change all pixels on the first row to red (value 2), starting from the leftmost seed pixel position, and filling completely the first row.\n3.  **Vertical Propagation**: If there is any blue pixel directly below blue seed pixel, changed to red.\n4.  **All Other Pixels:** All other pixels that are not transformed to red above remains unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid as a copy of the input grid\n    output_grid = np.copy(input_grid)\n\n    # get dimensions of grid\n    rows, cols = output_grid.shape\n\n    # 1. Identify Seed Pixels\n    seed_pixels = []\n    for j in range(cols):\n        if input_grid[0, j] == 1:\n            seed_pixels.append((0, j))\n\n    # 2. Horizontal Propagation\n    if seed_pixels:\n        for j in range(cols):\n            output_grid[0, j] = 2\n\n    # 3. Vertical Propagation\n        for r, c in seed_pixels:\n           if r+1 < rows and input_grid[r+1,c] == 1:\n               output_grid[r+1,c] = 2\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3934,
+    "candidates_token_count": 345,
+    "total_token_count": 4279,
+    "cached_content_token_count": 0
+  },
+  "response_time": 14.173712,
+  "response_file": "058-response.json"
+}

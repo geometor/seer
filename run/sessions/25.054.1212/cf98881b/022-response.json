@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Transition Columns:** Examine the input grid and identify columns that contain *only* the colors white (0), yellow (4), maroon (9) or blue(1).\n2. **Observe Transitions:** Focus on the *transitions* between colors within each of these identified columns.\n3.  **Select Columns:** Select the transition columns.\n4. **Filter Values:** From the selected columns include only 0, 1, 4 and 9.\n5.  **Output:** Construct the output grid using these selected and filtered columns.\n\"\"\"\n\nimport numpy as np\n\ndef _is_transition_column(column):\n    \"\"\"Checks if a column contains only 0, 1, 4, or 9.\"\"\"\n    unique_values = np.unique(column)\n    return all(value in [0, 1, 4, 9] for value in unique_values)\n\ndef _filter_column(column):\n    \"\"\"Filters a column, keeping only 0, 1, 4, and 9 values.\"\"\"\n    return [value for value in column if value in [0, 1, 4, 9]]\n\ndef transform(input_grid):\n    # Convert input_grid to a NumPy array\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = []\n\n    # 1. & 2. Identify Transition Columns and Observe\n    transition_columns_indices = []\n    for j in range(cols):\n        if _is_transition_column(input_grid[:, j]):\n            transition_columns_indices.append(j)\n\n    # 3. & 4. Select and Filter Columns\n    filtered_columns = []\n    for j in transition_columns_indices:\n        filtered_column = _filter_column(input_grid[:,j])\n        filtered_columns.append(filtered_column)\n\n\n    # 5. Construct Output (Transpose to get correct orientation)\n    # Find maximum length of filtered columns for padding.\n    max_len = max(len(col) for col in filtered_columns) if filtered_columns else 0\n\n    # Pad the columns\n    padded_columns = []\n    for col in filtered_columns:\n         padded_col = col + [0] * (max_len-len(col))\n         padded_columns.append(padded_col)\n    \n    output_grid = np.array(padded_columns)\n\n    if output_grid.size > 0 :\n       output_grid = output_grid.T\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4460,
+    "candidates_token_count": 584,
+    "total_token_count": 5044,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.494018,
+  "response_file": "022-response.json"
+}

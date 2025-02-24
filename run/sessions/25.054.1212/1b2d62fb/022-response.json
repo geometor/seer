@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find the Central Column:** Scan the input grid to find a column where *all* pixels are azure (8). This is the \"central column.\" If no such column is found, return an all white grid that matches the dimensions of the input grid.\n2.  **Create Output Grid:** Create a new grid with the same number of rows as the input grid and 3 columns. Fill this new grid with white (0) pixels.\n3.  **Copy Central Column:** If the central column was found, copy the entire central column from the input grid to the second (middle) column of the output grid.\n4.  **Copy Adjacent Azure Pixels:** Iterate through all rows of the input grid:\n      *   If the found \"central column\" is not at index 0, check the pixel to the *left* of the central column in the input grid. If it's azure (8), copy it to the corresponding position in the *first* column of the output grid.\n      *    If the found \"central column\" is not at the last index, check the pixel to the *right* of the central column in the input grid. If it's azure (8), copy it to the corresponding position in the *third* column of the output grid.\n5. **Return Output Grid** return the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    # Find the column index of the vertical line of the specified color.\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i, j] == color for i in range(rows)):\n            return j\n    return -1  # Return -1 if no such line is found.\n\ndef transform(input_grid):\n    # Convert input grid to a NumPy array\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the column with the vertical line of 8s.\n    center_col = find_vertical_line(input_grid, 8)\n\n    # Initialize the output grid as all zeros (white).\n    output_grid = np.zeros((rows, 3), dtype=int)\n\n    if center_col != -1:\n        # copy central column\n        for i in range(rows):\n            output_grid[i,1] = input_grid[i,center_col]\n\n        # copy horizontally adjancent cells\n        for i in range(rows):\n            if center_col > 0 and input_grid[i,center_col-1] == 8:\n                output_grid[i,0] = 8\n            if center_col < cols-1 and input_grid[i, center_col+1] == 8:\n                output_grid[i,2] = 8\n    else:\n      return np.zeros((rows,cols), dtype=int).tolist()\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3814,
+    "candidates_token_count": 667,
+    "total_token_count": 4481,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.083702,
+  "response_file": "022-response.json"
+}

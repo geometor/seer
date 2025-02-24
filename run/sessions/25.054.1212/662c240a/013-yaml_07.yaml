@@ -1,0 +1,22 @@
+objects:
+  - grid:
+      type: 2D array
+      elements: colored pixels (integers 0-9)
+      properties:
+        - height
+        - width
+
+observations:
+  - input_grid_height: 9
+  - input_grid_width: 3
+  - output_grid_height: 3
+  - output_grid_width: 3
+  - output_grid: bottom section of the input grid
+  - unique_colors_area: The output section contains colors that do not appear in the upper area of the input.
+
+actions:
+    - selection: identify a region based on a property (uniqueness).
+
+relationships:
+  - spatial: output is a sub-region of the input (bottom).
+  - color_based: the selected region's color composition is a unique set.

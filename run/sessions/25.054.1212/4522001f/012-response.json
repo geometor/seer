@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Seed Region:** Find the largest contiguous region of pixels in the input grid. Contiguous means pixels are connected horizontally or vertically (not diagonally). It does *not* depend on a single color; the region can contain multiple colors.\n\n2.  **Determine the Bounding Box:** Calculate the smallest rectangle (bounding box) that completely encloses the seed region. This is defined by the top-left (min_row, min_col) and bottom-right (max_row, max_col) coordinates of the seed region.\n\n3.  **Replicate:** Create a 3x3 grid of copies of this bounding box. The copies are placed without overlap. The output will therefore have 9 times the area of the seed area. The dimensions of the output is three times the height and width of the seed box.\n\n4. **Preserve**: the relative positioning of each pixel within the seed region.\n\"\"\"\n\nimport numpy as np\n\ndef find_largest_contiguous_region(grid):\n    \"\"\"\n    Finds the largest contiguous region in a grid, regardless of color.\n    \"\"\"\n    rows, cols = grid.shape\n    visited = set()\n    largest_region = set()\n\n    def _explore_region(row, col, current_region):\n        if (row, col) in visited or not (0 <= row < rows and 0 <= col < cols):\n            return\n        visited.add((row, col))\n        current_region.add((row, col))\n\n        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n            _explore_region(row + dr, col + dc, current_region)\n\n\n    for r in range(rows):\n        for c in range(cols):\n            if (r, c) not in visited:\n                current_region = set()\n                _explore_region(r, c, current_region)\n                if len(current_region) > len(largest_region):\n                    largest_region = current_region\n    return largest_region\n\ndef find_bounding_box(region):\n    \"\"\"\n    Finds the bounding box of a set of points.\n    \"\"\"\n    if not region:\n        return None\n\n    min_row = min(r for r, _ in region)\n    min_col = min(c for _, c in region)\n    max_row = max(r for r, _ in region)\n    max_col = max(c for _, c in region)\n    return (min_row, min_col), (max_row, max_col)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by finding the largest contiguous region and replicating it 3x3.\n    \"\"\"\n    # 1. Find the largest contiguous region.\n    largest_region = find_largest_contiguous_region(input_grid)\n\n    # 2. Determine the bounding box.\n    if not largest_region:  # Handle empty input grids\n        return np.zeros((1,1), dtype=int) # Return smallest grid\n    (min_row, min_col), (max_row, max_col) = find_bounding_box(largest_region)\n    seed_height = max_row - min_row + 1\n    seed_width = max_col - min_col + 1\n\n    # 3. Create the output grid (3x the size of the seed box).\n    output_grid = np.zeros((seed_height * 3, seed_width * 3), dtype=int)\n\n    # 4. Replicate the seed region into the output grid.\n    for i in range(3):\n        for j in range(3):\n            row_offset = i * seed_height\n            col_offset = j * seed_width\n            for r in range(min_row, max_row + 1):\n                for c in range(min_col, max_col + 1):\n                    output_row = row_offset + (r - min_row)\n                    output_col = col_offset + (c - min_col)\n                    output_grid[output_row, output_col] = input_grid[r, c]\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4388,
+    "candidates_token_count": 962,
+    "total_token_count": 5350,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.062743,
+  "response_file": "012-response.json"
+}

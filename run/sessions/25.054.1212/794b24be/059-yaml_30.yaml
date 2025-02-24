@@ -1,0 +1,28 @@
+objects:
+  - name: grid
+    type: 2D array
+    properties:
+      rows: variable
+      cols: variable
+      cells: integers (0-9 representing colors)
+
+  - name: blue_pixel
+    type: grid_cell
+    properties:
+      color: blue (1)
+      row_index: r
+      col_index: c
+
+  - name: red_pixel
+    type: grid_cell
+    properties:
+      color: red (2)
+
+actions:
+  - name: horizontal_fill
+    description: Change all pixels in the first row to red.
+    trigger: Presence of at least one blue pixel in the input grid.
+
+  - name: vertical_fill
+    description:  Change pixels in the row below a blue pixel from blue to red
+    trigger: Presence of a blue pixel directly below a blue pixel.

@@ -1,0 +1,24 @@
+observations:
+  - object: grid
+    properties:
+      size: 5x5
+      colors: [0, 1, 5]
+  - object: blue_pixels
+    properties:
+      color: 1
+      count: variable  # Could be 1 or 2 in the examples
+      behavior: potentially_swapped
+  - object: gray_pixels
+    properties:
+      color: 5
+      count: variable
+      behavior: potentially_swapped
+  - object: bottom_row
+    properties:
+       colors: mostly 5
+       behavior: receives swapped pixels
+actions:
+  - type: swap
+    condition: "blue pixel directly above gray pixel"
+    affected_objects: [blue_pixels, gray_pixels]
+    propagation: "swapped pixels to bottom row"

@@ -1,0 +1,44 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    elements: integers (0-9) representing colors
+    properties:
+      - width: variable
+      - height: variable
+
+  - name: blue_frame
+    type: rectangle (potentially incomplete)
+    elements: pixels of color blue (1)
+    properties:
+      - top_left_corner: coordinate (row, col)
+      - top_right_corner: coordinate (row, col)
+      - bottom_left_corner: coordinate (row, col)
+      - bottom_right_corner: coordinate (row, col)
+
+  - name: output_grid
+    type: 2D array
+    elements: integers (0-9) representing colors
+    properties:
+      - width: 2
+      - height: 2
+      - top_left_quadrant_color: color derived from input
+      - top_right_quadrant_color: color derived from input
+      - bottom_left_quadrant_color: color derived from input
+      - bottom_right_quadrant_color: color derived from input
+
+actions:
+  - name: find_blue_frame
+    input: input_grid
+    output: blue_frame corner coordinates
+
+  - name: get_adjacent_color
+    input: input_grid, corner coordinate, direction
+    output: color value (integer)
+
+  - name: create_output_grid
+    input: adjacent colors of blue_frame corners
+    output: output_grid (2x2)
+
+  - name: fill_output_quadrants
+    input: output_grid, corner colors
+    output: populated output_grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-zero Pixels:** Locate all pixels in the input grid that have a non-zero value (i.e., not white).\n2.  **Horizontal Expansion:** For each non-zero pixel, extend its color horizontally across its entire row, replacing any 0 values.\n3. **Fill Down:** For each non-zero pixel, starting at their initial location, expand vertically down to the bottom of the grid.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the observed rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Identify non-zero pixels and their positions\n    non_zero_pixels = []\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] != 0:\n                non_zero_pixels.append((r, c, output_grid[r, c]))\n\n    # Horizontal Expansion and fill down\n    for r, c, color in non_zero_pixels:\n        # Horizontal Expansion\n        output_grid[r, :] = color\n        # Fill Down.\n        for i in range(r, rows):\n            output_grid[i,c] = color\n            \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2289,
+    "candidates_token_count": 304,
+    "total_token_count": 2593,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.357076,
+  "response_file": "014-response.json"
+}

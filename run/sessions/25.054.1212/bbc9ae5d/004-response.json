@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify the Expanding Color: Find the color in the input grid that is not white (0). This is the \"expanding color\".\n2. Determine Output Dimensions: Count the number of pixels of the expanding color in the input grid. The output grid will have a height of this count plus the number of rows in the input (which is always 1, so count + 1). The output grid has same number of columns as the input.\n3. Create Diagonal Rectangle:\n    *   The expanding color creates a diagonal rectangle in the output grid.\n    * The height of the rectangle is equal to the count determined before + 1\n4. Fill Background: Fill the remaining cells of the output grid with white (0).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the expanding color (non-zero color)\n    expanding_color = None\n    for color in np.unique(input_grid):\n        if color != 0:\n            expanding_color = color\n            break\n\n    # Count the number of pixels of the expanding color\n    expanding_color_count = np.count_nonzero(input_grid == expanding_color)\n\n    # Determine output dimensions\n    output_rows = expanding_color_count + rows\n    output_cols = cols\n    output_grid = np.zeros((output_rows, output_cols), dtype=int)\n\n    # Create the diagonal rectangle\n    for i in range(output_rows):\n        for j in range(min(output_cols, expanding_color_count + i)):\n            output_grid[i, j] = expanding_color\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3572,
+    "candidates_token_count": 402,
+    "total_token_count": 3974,
+    "cached_content_token_count": 0
+  },
+  "response_time": 15.814006,
+  "response_file": "004-response.json"
+}

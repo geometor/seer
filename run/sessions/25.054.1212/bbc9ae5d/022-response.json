@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentify the sequence of non-zero color pixels in the input row and the sequence of trailing zero pixels.\nDetermine the length of the non-zero sequence and the index of the first zero in this sequence.\nCreate output rows. The number of output rows is equal to the count of non-zero colors in the input.\nExtend For each output row:\n    Copy the initial non-zero color sequence from the input.\n    Extend the sequence by one pixel for each subsequent row, repeating the last color of the sequence.\n    Append the original trailing zeros from the input to maintain their original length.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Identify the sequence of non-zero colors and trailing zeros.\n    input_row = input_grid[0]\n    first_zero_index = -1\n    for i, pixel in enumerate(input_row):\n        if pixel == 0:\n            first_zero_index = i\n            break\n    if first_zero_index == -1:\n        first_zero_index = len(input_row)\n\n    non_zero_length = first_zero_index\n    num_output_rows = non_zero_length\n\n    # Create output rows.\n    output_grid = np.zeros((num_output_rows, len(input_row)), dtype=int)\n\n    # Extend non-zero sequence and append trailing zeros.\n    for i in range(num_output_rows):\n        # Copy and extend non-zero sequence.\n        output_grid[i, :i+1] = input_row[:i+1]\n        if i+1<first_zero_index:\n            output_grid[i,i] = input_row[i]\n        if i+1>0 and i+1 <= first_zero_index:\n            output_grid[i,i] = input_row[i]\n\n        # Append trailing zeros.\n        output_grid[i, first_zero_index:] = input_row[first_zero_index:]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3080,
+    "candidates_token_count": 464,
+    "total_token_count": 3544,
+    "cached_content_token_count": 0
+  },
+  "response_time": 27.450369,
+  "response_file": "022-response.json"
+}

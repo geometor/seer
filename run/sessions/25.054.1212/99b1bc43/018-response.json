@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Divide:** Divide the input grid into non-overlapping 2x2 blocks.  Ignore any leftover rows or columns if the dimensions are odd.\n2.  **Reduce:** Each 2x2 block in the input grid corresponds to *one* pixel in the output grid. The row and column of the output pixel are half the row and column of the 2x2 block's top-left corner (using integer division).\n3.  **Conditional Color Mapping:**\n    *   If the 2x2 input block contains *any* blue (1), red (2), or yellow (4) pixel, the corresponding output pixel is green (3).\n    *   Otherwise, the output pixel is white (0).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_array = np.array(input_grid)\n    input_height, input_width = input_array.shape\n    output_height = input_height // 2\n    output_width = input_width // 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Iterate through 2x2 blocks in the input grid\n    for i in range(output_height):\n        for j in range(output_width):\n            # Extract the 2x2 block\n            block = input_array[i*2:(i+1)*2, j*2:(j+1)*2]\n\n            # change output pixels\n            # Conditional Color Mapping\n            if 1 in block or 2 in block or 4 in block:\n                output_grid[i, j] = 3  # Output green\n            else:\n                output_grid[i, j] = 0  # Output white\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4016,
+    "candidates_token_count": 411,
+    "total_token_count": 4427,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.229817,
+  "response_file": "018-response.json"
+}

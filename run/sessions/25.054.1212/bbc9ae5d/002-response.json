@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid contains a horizontal line of blue and white pixels. The blue region expands downwards and to the right to form a rectangle, while the white region remains unchanged. The output grid always has three rows.\n\"\"\"\n\nimport numpy as np\n\ndef find_regions(grid):\n    # Find contiguous regions of the same color.\n    regions = []\n    visited = np.zeros_like(grid, dtype=bool)\n    rows, cols = grid.shape\n\n    def dfs(row, col, color, current_region):\n        if (\n            row < 0\n            or row >= rows\n            or col < 0\n            or col >= cols\n            or visited[row, col]\n            or grid[row, col] != color\n        ):\n            return\n        visited[row, col] = True\n        current_region.append((row, col))\n        dfs(row + 1, col, color, current_region)\n        dfs(row - 1, col, color, current_region)\n        dfs(row, col + 1, color, current_region)\n        dfs(row, col - 1, color, current_region)\n\n    for row in range(rows):\n        for col in range(cols):\n            if not visited[row, col]:\n                current_region = []\n                dfs(row, col, grid[row, col], current_region)\n                regions.append((grid[row, col], current_region))\n    return regions\n\ndef transform(input_grid):\n    # Convert input to numpy array\n    input_grid = np.array(input_grid)\n\n    # Find regions in the input grid\n    regions = find_regions(input_grid)\n\n    # Determine the number of blue and white columns\n    blue_cols = 0\n    white_cols = 0\n\n    for color, pixels in regions:\n      if color == 1:\n        blue_cols = len(pixels)\n      elif color == 0:\n        white_cols = len(pixels)\n\n\n    # Initialize the output grid (3 rows, same number of columns as input)\n    output_grid = np.zeros((3, input_grid.shape[1]), dtype=int)\n\n    # Expand the blue region\n    for r in range(3):\n      for c in range(blue_cols + r):\n        output_grid[r,c] = 1\n\n    # fill white regions\n    for r in range(3):\n      for c in range(blue_cols + r, input_grid.shape[1]):\n        output_grid[r,c] = 0\n        \n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2146,
+    "candidates_token_count": 605,
+    "total_token_count": 2751,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.786244,
+  "response_file": "002-response.json"
+}

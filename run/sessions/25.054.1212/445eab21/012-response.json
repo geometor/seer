@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify 2x2 Squares:** Examine the input grid and identify if there are any 2x2 squares present, for any colors.\n2.  **Prioritize Colors:** If one or more 2x2 squares are present, select the first square encountered, moving row-by-row from the top left. If there is a 2x2 square of color 8, output a 2x2 square of color 8. If there isn't one, but there is a 2x2 square of color 7, output it, etc.\n3.  **Output:** Create a 2x2 output grid. Fill the output grid with the color of the selected 2x2 square.\n\"\"\"\n\nimport numpy as np\n\ndef extract_2x2_square(grid):\n    \"\"\"\n    Extracts the first 2x2 square of any color.\n    Returns coordinates of the 2x2 square as a list of tuples and the color.\n    \"\"\"\n    for r in range(grid.shape[0] - 1):\n        for c in range(grid.shape[1] - 1):\n            color = grid[r,c]\n            if (grid[r + 1, c] == color and\n                grid[r, c + 1] == color and\n                grid[r + 1, c + 1] == color):\n                return [[r, c], [r + 1, c], [r, c + 1], [r + 1, c + 1]], color\n    return [], None\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rules.\n    \"\"\"\n    # initialize output_grid\n    output_grid = np.full((2, 2), 0, dtype=int)\n\n    # Find the first 2x2 square\n    square_coords, color = extract_2x2_square(input_grid)\n\n    # If a square is found, fill the output grid with its color\n    if square_coords:\n        output_grid[:] = color\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5401,
+    "candidates_token_count": 476,
+    "total_token_count": 5877,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.414153,
+  "response_file": "012-response.json"
+}

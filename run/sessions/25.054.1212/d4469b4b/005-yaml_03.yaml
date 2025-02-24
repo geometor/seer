@@ -1,0 +1,33 @@
+task: 004b73b7
+input_grid_size: 5x5
+output_grid_size: 3x3
+color_palette: [0, 1, 2, 3, 5] # white, blue, red, green, gray
+objects:
+  - type: pixel
+    properties:
+      - color: white (0) # most common, considered background
+      - color: non-white (1, 2, 3) # trigger change to gray, based on region
+      - color: gray (5)  # produced in output
+  - type: region
+    properties:
+      - size: 3x3
+      - overlap: True
+      - count: 9 # total regions considered
+      - role: determines output pixel value
+transformations:
+  - name: determine_output_pixel
+    description: |
+            The output is calculated by examining 9 overlapping
+            3x3 regions of the input grid. If ANY of the pixels
+            in a region are non-white (color other than 0), the
+            corresponding output pixel transitions from white (0)
+            to gray (5) under specific conditions.  If all pixels
+            within a region are white (color 0), then the
+            corresponding output pixel remains white (0).  The
+            specific locations where the output transitions is
+            not consistent with the rule as stated.  If all pixels
+            are white, the output pixel is white.
+    inputs:
+      - 3x3 region
+    outputs:
+      - single pixel value

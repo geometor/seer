@@ -1,0 +1,34 @@
+observations:
+  - example_1:
+      input_objects:
+        - color: red
+          positions: [(0, 1)]
+          shape: single pixel
+        - color: azure
+          positions: [(0, 5)]
+          shape: single pixel
+      output_objects:
+        - color: red
+          positions: [(0, 1), (1, 0), (2,1), (3,0), (4,1), (5,0)]
+          shape: vertical line of alternating pixels
+        - color: azure
+          positions: [(0, 5), (1,4), (2,5), (3,4), (4,5), (5,4)]
+          shape: vertical line of alternating pixels
+      transformation:  Copy existing pixels, then iteratively add a pixel of the same color directly below each colored pixel, until no new pixels are added.
+
+  - example_2:
+      input_objects:
+        - color: yellow
+          positions: [(0, 1)]
+          shape: single pixel
+      output_objects:
+        - color: yellow
+          positions: [(0, 1), (1, 0), (2,1), (3,0), (4,1), (5,0)]
+          shape:  vertical line of alternating pixels
+      transformation: Copy existing pixels, then iteratively add a pixel of the same color directly below each colored pixel, until no new pixels are added.
+
+general_transformation:
+  rule: >
+     All non-background color pixels in the input grid trigger the creation of a new pixel
+     of the same color directly below them.  This process repeats for any newly created
+     pixels until no more pixels can be added. The background is copied.

@@ -1,0 +1,30 @@
+objects:
+  - type: grid
+    properties:
+      rows: 5
+      columns: 5
+      cells:
+        - value: 0 (white)
+        - value: 1 (blue)
+        - value: 5 (gray)
+
+  - type: pixel
+    properties:
+      color:
+        - white
+        - blue
+        - gray
+      position: (row, column)
+
+actions:
+  - type: swap
+    properties:
+      affected_colors: [blue, gray]
+      affected_rows: [4, 5] # 0 indexed
+      affected_columns: conditional, mirrored
+
+relationships:
+  - type: positional
+    description: "Pixels are arranged in a 2D grid."
+  - type: conditional_swap
+    description: "blue and grey swap based on row index and symmetry."

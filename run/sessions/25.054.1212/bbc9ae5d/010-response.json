@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a single-row grid into a multi-row grid where the most frequent non-zero color is replicated diagonally downwards and to the right.\n\"\"\"\n\nimport numpy as np\n\ndef get_most_frequent_non_zero_color(grid):\n    \"\"\"Finds the most frequent non-zero color in a grid.\"\"\"\n    non_zero_elements = grid[grid != 0]\n    if non_zero_elements.size == 0:\n        return 0\n    counts = np.bincount(non_zero_elements)\n    return np.argmax(counts)\n\ndef transform(input_grid):\n    # Identify the most frequent non-zero color\n    most_frequent_color = get_most_frequent_non_zero_color(input_grid)\n\n    # Count occurrences of the most frequent color\n    count = np.count_nonzero(input_grid == most_frequent_color)\n\n    # Determine output dimensions\n    num_rows = 2 * count -1 if count > 0 else 1 # handles edge case when entire input is zeros\n    num_cols = input_grid.shape[1]\n    output_grid = np.zeros((num_rows, num_cols), dtype=int)\n\n    # Populate output grid\n    for r in range(num_rows):\n      if most_frequent_color != 0:\n        output_grid[r, :min(r + 1, num_cols)] = most_frequent_color #min added to fix possible index error.\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3781,
+    "candidates_token_count": 354,
+    "total_token_count": 4135,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.205756,
+  "response_file": "010-response.json"
+}

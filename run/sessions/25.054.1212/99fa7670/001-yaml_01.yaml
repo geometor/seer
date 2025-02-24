@@ -1,0 +1,17 @@
+objects:
+  - type: pixel
+    properties:
+      color: [white, red, green]
+      value: [0, 2, 3]
+      position: [row, column] # (x, y) coordinates
+  - type: grid
+    properties:
+      dimensions: [6, 6] # height, width
+
+actions:
+  - name: expand_right
+    description:  A colored pixel's value propagates to the right, filling cells until the edge of the grid or another non-white pixel is encountered, based on its row.
+
+relationships:
+  - type: spatial
+    description:  Pixels occupy positions within the grid. The red and green pixel initiate and their location determine the rows that fill.

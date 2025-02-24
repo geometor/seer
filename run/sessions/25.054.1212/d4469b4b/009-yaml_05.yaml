@@ -1,0 +1,25 @@
+facts:
+  - observation: |
+      The input grid is always 5x5. The output grid is always 3x3.
+  - object: input_grid
+    type: grid
+    dimensions: 5x5
+    elements: integers (0-9) representing colors
+  - object: output_grid
+    type: grid
+    dimensions: 3x3
+    elements: integers (0-9) representing colors
+  - action: subgrid_extraction
+    description: |
+      A 3x3 subgrid is extracted from the center of the input grid.
+    input: input_grid
+    output: subgrid
+  - action: color_mapping
+    description: |
+       The central element in the input array becomes the central element
+       of the output. The first and last rows/cols become 5 in the second row/col
+       of the ouput respectively, if they are not zero.
+
+  - action: transformation
+    description: |
+      The transformation combines subgrid extraction and color mapping to produce the output.

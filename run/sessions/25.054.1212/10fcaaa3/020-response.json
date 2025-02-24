@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExpands the input grid to double its size, replicates the red pixel, and fills \nalternating pixels with azure in a checkerboard pattern, leaving the rest white.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Initialize the output grid with double the dimensions of the input grid.\n    input_height, input_width = input_grid.shape\n    output_height, output_width = input_height * 2, input_width * 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Find the red pixel in the input grid.\n    red_pixels = np.argwhere(input_grid == 2)\n\n    # Replicate red pixels.\n    for red_pixel in red_pixels:\n      row, col = red_pixel\n      output_grid[row*2+1, col*2+1] = 2  # original location in the upscaled output\n      output_grid[row*2+1, (col+2)*2+1] = 2  # copy at the upscaled x-coordinate +4 to its right\n      output_grid[(row+2)*2+1, col*2+1] = 2\n      output_grid[(row+2)*2+1, (col+2)*2+1] = 2\n\n    # Fill alternating pixels with azure (8).\n    for i in range(output_height):\n        for j in range(output_width):\n            if (i + j) % 2 == 0:\n                output_grid[i, j] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2302,
+    "candidates_token_count": 376,
+    "total_token_count": 2678,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.065766,
+  "response_file": "020-response.json"
+}

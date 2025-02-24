@@ -1,0 +1,24 @@
+facts:
+  - input_grid:
+      dimensions: 5x5
+      colors: [0, 3]  # white, green
+      objects:
+        - color: 3 # green
+          type: contiguous_blocks
+          positions: [[0,1], [0,3], [1,0], [1,1], [2,1], [3,2], [4,0], [4,1], [4,2]]
+  - output_grid:
+      dimensions: 3x3
+      colors: [0, 5] # white, gray
+      objects:
+       - color: 5
+         type: condensed_blocks
+         positions: [[0,2],[1,2],[2,0],[2,1],[2,2]]
+
+  - transformation:
+      type: condensation_and_recoloring
+      mapping:
+        3: 5 # green becomes grey
+        0: 0 # White stays white
+
+  - spatial_relationship:
+      description: output blocks correspond to the arrangement of the contiguous green blocks in the input grid

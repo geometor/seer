@@ -1,0 +1,29 @@
+task_id: 010
+objects:
+  - name: grid
+    description: A 2D array of pixels.
+    properties:
+      - rows: Variable (number of rows)
+      - columns: Variable (number of columns)
+      - bottom_row: The last row of the grid, which remains fixed.
+  - name: pixel
+    description: A single cell in the grid, represented by a color value.
+    properties:
+      - color: Integer (0-9) representing a color.
+      - position: (row, column) coordinates within the grid.
+
+actions:
+  - name: shift_down
+    description: Moves non-zero pixels down within their respective columns.
+    preconditions:
+      - pixel: Must be non-zero.
+      - column: Must have empty (zero-valued) cells below the pixel, *above* the bottom row.
+    postconditions:
+      - pixel: Occupies the lowest available empty cell in its column (above the bottom row).
+      - relative_order: The order of non-zero pixels within a column is preserved.
+  - name: fix_bottom_row
+    description: Keeps the bottom row of the input grid unchanged.
+    preconditions:
+        - None
+    postconditions:
+      - The bottom row of the output grid is identical to the bottom row of the input grid.

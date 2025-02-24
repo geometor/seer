@@ -1,0 +1,52 @@
+task: 008_replication_and_mirroring
+input_shape: (3, 3)
+output_shape: (6, 6)
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      shape: (3, 3)
+      colors: [0, 2, 3, 5, 6, 8]
+  - name: output_grid
+    type: grid
+    properties:
+      shape: (6, 6)
+      colors: [0, 2, 3, 5, 6, 8]
+  - name: top_left_quadrant
+    type: grid_region
+    properties:
+      parent: output_grid
+      position: top_left
+      transformation: direct_copy
+  - name: top_right_quadrant
+    type: grid_region
+    properties:
+      parent: output_grid
+      position: top_right
+      transformation: horizontal_mirror # Corrected
+  - name: bottom_left_quadrant
+    type: grid_region
+    properties:
+      parent: output_grid
+      position: bottom_left
+      transformation: vertical_mirror # Corrected
+  - name: bottom_right_quadrant
+    type: grid_region
+    properties:
+      parent: output_grid
+      position: bottom_right
+      transformation: double_mirror # Needs verification, possibly rotation.
+actions:
+  - type: replicate
+    agent: input_grid
+    target: output_grid
+    details: "Creates a 2x2 grid of input grid copies/transformations."
+  - type: mirror_horizontal
+    agent: input_grid
+    target: top_right_quadrant
+  - type: mirror_vertical
+    agent: input_grid
+    target: bottom_left_quadrant
+  - type: mirror_both # Or rotate_180
+    agent: input_grid
+    target: bottom_right_quadrant

@@ -1,0 +1,59 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      shape: variable (rows, cols)
+      elements: integers (0-9) representing colors
+
+  - name: white_lines
+    type: lines
+    properties:
+      orientation: vertical
+      color: 0 (white)
+      positions: list of column indices
+
+  - name: central_white_square
+    type: square
+    properties:
+      size: 2x2
+      color: 0 (white)
+      top_left_corner: (row, col)
+
+  - name: output_grid
+    type: grid
+    properties:
+      shape: (3, 3)
+      elements: integers representing colors
+
+  - name: top_row
+    type: row
+    properties:
+      output_grid_row: 0
+      color: int
+
+  - name: middle_row
+      type: row
+      properties:
+          output_grid_row: 1
+          color: int
+
+  - name: bottom_row
+      type: row
+      properties:
+        output_grid_row: 2
+        color: int
+
+actions:
+  - find_vertical_lines:
+    input: input_grid, color (white)
+    output: list of column indices
+  - find_central_square:
+    input: input_grid, color (white)
+    output: (row, col) of top-left corner
+  - get_surrounding_colors_row:
+      input: input grid, row index
+      output: color
+
+  - create_output_grid:
+    input:
+    output: 3x3 grid filled according to rows.

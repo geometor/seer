@@ -1,0 +1,19 @@
+facts:
+  - observation: Each input grid contains a rectangular frame of a single color.
+  - observation: The framing color varies across examples (azure, red, yellow, green).
+  - observation: The output grid is a subgrid extracted from the input, bounded by the frame.
+  - observation: The frame encloses a rectangular region within the grid.
+  - observation: The code must not assume a fixed frame color.
+  - object: input_grid
+    properties:
+      - type: 2D array
+      - contains: frame
+  - object: frame
+    properties:
+      - type: rectangular border
+      - color: varies
+      - location: outermost contiguous pixels of same color
+  - object: output_grid
+    properties:
+      - type: 2D array
+      - relationship: subgrid of input_grid, bounded by frame

@@ -1,0 +1,18 @@
+observations:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: variable
+      - values: integers (0-9) representing colors
+    transformations:
+      - type: expansion
+        properties:
+          - output_dimensions: calculated, not simply doubled
+          - value_replication: patterned, not direct offset
+          - filler_value: 8 (azure)
+          - filler_pattern: alternating with original values, potentially based on adjacency or row/column parity
+  - object: output_grid
+    type: grid
+    properties:
+     - dimensions: derived from input and expansion rule
+     - values: combination of replicated input values and filler value (8)

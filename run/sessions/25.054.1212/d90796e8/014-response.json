@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify** all red (2), green (3), and gray (5) pixels in the input grid.\n2.  **Preserve** gray (5) pixels; they remain unchanged in the output.\n2.  **Preserve** one of the red(2) pixels; they remain unchanged in the output.\n3.  **Locate** instances where a red (2) pixel and a green (3) are in specific positions, the red being to the SW and NE of a green.\n4.  **Replace** these green and red by the colour azure (8).\n5. **Preserve** the location of green pixels.\n6.  All other cells remain white (0).\n\"\"\"\n\nimport numpy as np\n\ndef find_pixels_by_color(grid, color):\n    \"\"\"Finds the coordinates of all pixels of a specific color.\"\"\"\n    return np.argwhere(grid == color).tolist()\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    input_grid_rows, input_grid_cols = input_grid.shape\n    output_grid_rows, output_grid_cols = output_grid.shape\n    \n    # Find the locations of all relevant colors.\n    red_pixels = find_pixels_by_color(input_grid, 2)\n    green_pixels = find_pixels_by_color(input_grid, 3)\n    gray_pixels = find_pixels_by_color(input_grid, 5)\n\n    # Preserve gray pixels.\n    #for row, col in gray_pixels:\n    #    output_grid[row, col] = 5\n\n    # Preserve green pixels\n    #for row, col in green_pixels:\n    #    output_grid[row, col] = 3\n        \n    # Preserve one red pixel.\n    #if len(red_pixels)>1:\n    #   output_grid[red_pixels[0][0], red_pixels[0][1]] = 2\n\n    # Check for the red-green relationship and replace with azure.\n    for r_row, r_col in red_pixels:\n        for g_row, g_col in green_pixels:\n            if (r_row == g_row + 1 and r_col == g_col - 1) or \\\n               (r_row == g_row - 1 and r_col == g_col + 1) :\n                output_grid[r_row, r_col] = 8\n                output_grid[g_row, g_col] = 8\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2258,
+    "candidates_token_count": 608,
+    "total_token_count": 2866,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.707081,
+  "response_file": "014-response.json"
+}

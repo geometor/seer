@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies the \"main color\" object in the input grid (the first non-background color encountered),\ndetermines its bounding box, calculates the relative positions of the main color pixels within the bounding box,\nand creates a 3x3 output grid. The output grid contains gray (5) pixels at locations corresponding to\nthe relative positions of the main color pixels within their original bounding box, and black (0) pixels elsewhere.\n\"\"\"\n\nimport numpy as np\n\ndef get_object_indices(grid, color):\n    \"\"\"\n    Find the indices of an object in a grid given its color.\n    \"\"\"\n    return np.argwhere(grid == color)\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid according to the described rules.\n    \"\"\"\n    # Convert input to numpy array\n    input_grid_np = np.array(input_grid)\n\n    # 1. Identify the \"main color\" (first non-background color)\n    non_bg_colors = input_grid_np[input_grid_np != 0]\n    main_color = non_bg_colors[0] if non_bg_colors.size > 0 else 0\n\n    # 2. Find indices of the main color object\n    main_indices = get_object_indices(input_grid_np, main_color)\n\n    # 3. Determine the bounding box\n    if len(main_indices) > 0:\n        min_row, min_col = np.min(main_indices, axis=0)\n    else:\n        min_row, min_col = 0, 0  # Default values if no object is found\n\n    # 4. Create 3x3 output grid, initialized to black (0)\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # 5. Populate the output grid based on relative positions\n    for r, c in main_indices:\n        relative_row = r - min_row\n        relative_col = c - min_col\n\n        # Check if relative position is within the 3x3 output grid\n        if 0 <= relative_row < 3 and 0 <= relative_col < 3:\n            output_grid[relative_row, relative_col] = 5  # Set to gray (5)\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4319,
+    "candidates_token_count": 535,
+    "total_token_count": 4854,
+    "cached_content_token_count": 0
+  },
+  "response_time": 39.351039,
+  "response_file": "040-response.json"
+}

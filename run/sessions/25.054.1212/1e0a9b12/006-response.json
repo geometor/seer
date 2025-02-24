@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-zero Pixels:** Find all pixels in the input grid that are not zero. Note their color, original row, and original column.\n2.  **Process Input Rows Sequentially:** Iterate through each row of the *input* grid, starting from the top row (row 0) and going down.\n3.  **Preserve Intra-Row Order:** For each input row, process the non-zero pixels found in that row from left to right (original column order).\n4.  **Place at lowest available position:** For each non-zero pixel:\n    -   start at the *bottom* row of the output grid in the pixel's original column.\n    -   If the cell at that location in the output grid is empty (value 0), place the pixel there.\n    -   If the cell is occupied, move up one row at a time in the *same column* until you find an empty cell.  Place the pixel in that empty cell.\n5.  **Implicit Zero Filling:** The output grid is implicitly filled with zeros as any remaining empty spaces will naturally contain zeros.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero pixels to the bottom,\n    preserving their original row-wise order.\n    \"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n\n    # Iterate through input rows (top to bottom)\n    for r in range(rows):\n        # Process non-zero pixels in the current row (left to right)\n        for c in range(cols):\n            pixel_value = input_grid[r, c]\n            if pixel_value != 0:\n                # Find the lowest available position in the output grid\n                output_row = rows - 1\n                while output_row >= 0 and output_grid[output_row, c] != 0:\n                    output_row -= 1\n\n                # Place the pixel in the found position\n                if output_row >= 0:\n                    output_grid[output_row, c] = pixel_value\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3705,
+    "candidates_token_count": 488,
+    "total_token_count": 4193,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.090097,
+  "response_file": "006-response.json"
+}

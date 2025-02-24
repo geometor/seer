@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies horizontal lines of exactly two contiguous azure (8) pixels and adds a\nblue (1) pixel to the immediate left or right of the line, replacing a white (0)\npixel, if one exists.\n\"\"\"\n\nimport numpy as np\n\ndef find_two_azure_lines(grid):\n    # type: (np.ndarray) -> list\n    \"\"\"Finds all horizontal lines of exactly two contiguous azure (8) pixels.\"\"\"\n    rows, cols = grid.shape\n    two_azure_lines = []\n    for row in range(rows):\n        for col in range(cols - 1):  # Iterate up to the second-to-last column\n            if grid[row, col] == 8 and grid[row, col + 1] == 8:\n                #check that there are no other azure pixels next to this line\n                is_two_pixel_line = True\n                if col > 0: #check left\n                    if grid[row, col-1] == 8:\n                        is_two_pixel_line = False\n                if col < cols - 2:\n                    if grid[row, col+2] == 8:\n                        is_two_pixel_line = False\n                if is_two_pixel_line:\n                    two_azure_lines.append((row, col, row, col + 1))  # Store start and end coordinates\n    return two_azure_lines\n\ndef transform(input_grid):\n    # type: (np.ndarray) -> np.ndarray\n    \"\"\"Transforms the input grid by adding blue pixels to the left or right of two-pixel azure lines.\"\"\"\n\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find all two-pixel azure lines\n    azure_lines = find_two_azure_lines(input_grid)\n\n    # Iterate through each identified line\n    for line in azure_lines:\n        row_start, col_start, row_end, col_end = line\n\n        # Check for white pixel to the left\n        if col_start > 0 and output_grid[row_start, col_start - 1] == 0:\n            output_grid[row_start, col_start - 1] = 1\n\n        # Check for white pixel to the right\n        if col_end < cols - 1 and output_grid[row_end, col_end + 1] == 0:\n            output_grid[row_end, col_end + 1] = 1\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3301,
+    "candidates_token_count": 584,
+    "total_token_count": 3885,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.428416,
+  "response_file": "010-response.json"
+}

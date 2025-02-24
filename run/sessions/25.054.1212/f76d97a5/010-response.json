@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Initial Scan:** Find all gray (5) pixels.\n2.  **Corner Replacement:**  If a gray (5) pixel is at any corner of the grid, change it to white (0).\n3.  **Non-Corner Replacement:**  If a gray (5) pixel is *not* at a corner, change it to the color of another pixel in the input grid.\n4.  **Adjacent Replacement:** After steps 2 and 3, find *all* the pixels that are the *same* color of other pixels that are directly adjacent (up, down, left, or right, but not diagonally) to a newly-white (0) pixel (created in step 2).  Change these adjacent pixels to white (0) as well.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n    \n    # Find non-gray colors\n    other_colors = [color for color in np.unique(input_grid) if color != 5]\n    if len(other_colors) == 0: # Handle edge case where input is all gray.\n        other_color = 0\n    else:\n        other_color = other_colors[0]\n\n    # Corner and Non-Corner Replacement of Gray (5)\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r, c] == 5:\n                if (r == 0 and c == 0) or \\\n                   (r == 0 and c == cols - 1) or \\\n                   (r == rows - 1 and c == 0) or \\\n                   (r == rows - 1 and c == cols - 1):\n                    output_grid[r, c] = 0  # Corner replacement\n                else:\n                    output_grid[r, c] = other_color # Non-corner replacement\n\n    # Adjacent Replacement (create a copy to avoid modifying during iteration)\n    new_output_grid = np.copy(output_grid)\n    for r in range(rows):\n        for c in range(cols):\n            if output_grid[r,c] == 0: #check neighbors\n                if r > 0 and output_grid[r-1,c] == other_color: #up\n                    new_output_grid[r-1,c] = 0\n                if r < rows-1 and output_grid[r+1,c] == other_color: #down\n                    new_output_grid[r+1,c] = 0\n                if c > 0 and output_grid[r,c-1] == other_color: #left\n                    new_output_grid[r,c-1] = 0\n                if c < cols-1 and output_grid[r,c+1] == other_color: #right\n                    new_output_grid[r,c+1] = 0\n    \n    return new_output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3451,
+    "candidates_token_count": 701,
+    "total_token_count": 4152,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.817685,
+  "response_file": "010-response.json"
+}

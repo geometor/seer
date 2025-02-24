@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Input:** Receive a 2D grid of color values.\n2.  **Rotation**: Rotate the grid 90 degrees clockwise.\n3.  **Identify Non-White:** Locate all pixels in the rotated input grid that are not white (0).\n4.  **Create Output Grid:** Create a 3x3 output grid initialized with all zeros (white).\n5.  **Map Colors:** For the first 3 rows and 3 columns of the rotated input, map any non-white pixel to the value 6 (magenta) in the corresponding location in the output grid.\n6.  **Output:** Return the 3x3 output grid.\n\"\"\"\n\nimport numpy as np\n\ndef rotate_grid(grid):\n    \"\"\"Rotates a 2D grid 90 degrees clockwise.\"\"\"\n    return np.rot90(grid, k=-1).tolist()\n\n\ndef transform(input_grid):\n    # Rotate the input grid 90 degrees clockwise\n    rotated_grid = rotate_grid(input_grid)\n    \n    # Create a 3x3 output grid initialized with zeros\n    output_grid = [[0] * 3 for _ in range(3)]\n\n    # Iterate through the first 3 rows and columns of the rotated grid\n    for i in range(min(3, len(rotated_grid))):\n        for j in range(min(3, len(rotated_grid[0]))):\n            # If the pixel is not white, map it to 6 in the output grid\n            if rotated_grid[i][j] != 0:\n                output_grid[i][j] = 6\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3434,
+    "candidates_token_count": 374,
+    "total_token_count": 3808,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.522865,
+  "response_file": "028-response.json"
+}

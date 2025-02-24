@@ -1,0 +1,35 @@
+objects:
+  - name: green_pixels
+    type: cluster
+    color: green
+    elements: List[Tuple[int, int]]  # List of (row, col) coordinates
+
+  - name: blue_pixels
+    type: cluster
+    color: blue
+    elements: List[Tuple[int, int]] # List of (row, col) coordinates
+
+  - name: red_pixels
+    type: cluster
+    color: red
+    elements: List[Tuple[int, int]] # List of (row, col) coordinates, derived from green_pixels and blue_pixels
+
+  - name: output_grid
+    type: grid
+    dimensions: [output_rows, output_cols]
+
+actions:
+  - name: find_adjacent_pixels
+    input: [green_pixels, blue_pixels]
+    output: red_pixels
+    description: Identify green pixels that are directly adjacent (up, down, left, or right) to blue pixels.
+
+  - name: create_bounding_box
+    input: [green_pixels, blue_pixels]
+    output: output_grid
+    description: Determine the smallest rectangular region that encompasses all green and blue pixels.
+
+  - name: place_red_pixels
+    input: [red_pixels, output_grid]
+    output: output_grid
+    description: Place red pixels within the bounding box at the locations identified in 'find_adjacent_pixels'. Fill other cells with white.

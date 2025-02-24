@@ -1,0 +1,22 @@
+facts:
+  - observation: Each input grid is 3x3.
+  - observation: Each output grid is 6x6.
+  - observation: Each cell in the input grid appears to map to a 2x2 block in the output grid.
+  - observation: The transformation involves an expansion of the input grid by a factor of 2 in both dimensions.
+  - observation: The output grid appears to be generated based on a combination of the input cell's value and its neighbors.
+  - observation: The corners have some sort of mirroring or reflection.
+  - observation: The output cells have a pinwheel appearance.
+  - object: input_grid
+    type: 2D array
+    size: 3x3
+    elements: Integers 0-9
+  - object: output_grid
+    type: 2D array
+    size: 6x6
+    elements: Integers 0-9
+  - action: expansion
+    description: Each input cell expands into a 2x2 block in the output.
+  - action: neighbor_interaction
+    description: The values in the 2x2 output block are influenced by the input cell and its immediate neighbors.
+  - action: zero_padding
+    description: when operating on the boundaries, cells are zero padded

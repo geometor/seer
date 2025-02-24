@@ -1,0 +1,23 @@
+task: 016_replication_and_padding
+objects:
+  - type: input_grid
+    properties:
+      - size: variable (3x3 in examples)
+      - content: 2D array of color values (0-9)
+  - type: output_grid
+    properties:
+      - size: fixed (9x9)
+      - content: 2D array of color values (0-9)
+      - structure: contains replications of the input_grid
+actions:
+  - name: replicate
+    agent: input_grid
+    target: output_grid
+    properties:
+      - location: corners, with offsets
+      - count: four
+  - name: pad
+    agent: output_grid
+    properties:
+      - value: 0 (white)
+      - location: surrounding replicated grids and center

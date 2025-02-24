@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nExtracts the colors from the four corners of the input grid (excluding a uniform colored border) and places those colors in the corresponding corners of a smaller output grid. The output grid dimensions are half that of the input grid after removing the border, rounded down. If the inner grid has dimensions greater than 2x2, the corner colors are replicated to form 2x2 blocks in the output.\n\"\"\"\n\nimport numpy as np\n\ndef get_inner_grid(input_grid):\n    \"\"\"\n    Removes the outer border of the input grid, assuming it's a uniform color.\n    \"\"\"\n    rows, cols = input_grid.shape\n    border_color = input_grid[0, 0]\n\n    # Find the inner boundaries by checking for the border color.\n    top = 0\n    while top < rows and all(input_grid[top, :] == border_color):\n        top += 1\n    bottom = rows - 1\n    while bottom >= 0 and all(input_grid[bottom, :] == border_color):\n        bottom -= 1\n    left = 0\n    while left < cols and all(input_grid[:, left] == border_color):\n        left += 1\n    right = cols - 1\n    while right >= 0 and all(input_grid[:, right] == border_color):\n        right -= 1\n        \n    # Ensure that the indices define a valid inner grid\n    if top > bottom or left > right:\n      return np.array([])\n\n    return input_grid[top:bottom+1, left:right+1]\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid to the output grid based on corner color extraction,\n    border removal, and conditional replication.\n    \"\"\"\n\n    # Remove the border to get the inner grid.\n    inner_grid = get_inner_grid(input_grid)\n    if inner_grid.size == 0:\n      return np.zeros((0,0), dtype=int)\n      \n\n    # Get the dimensions of the inner grid.\n    inner_rows, inner_cols = inner_grid.shape\n\n    # Determine output grid dimensions.\n    output_rows = inner_rows // 2\n    output_cols = inner_cols // 2\n    output_grid = np.zeros((output_rows, output_cols), dtype=int)\n\n    # Extract the colors from the four corners of the inner grid.\n    top_left_corner = inner_grid[0, 0]\n    top_right_corner = inner_grid[0, inner_cols - 1]\n    bottom_left_corner = inner_grid[inner_rows - 1, 0]\n    bottom_right_corner = inner_grid[inner_rows - 1, inner_cols - 1]\n\n    # Populate the corresponding corners of the output grid.\n    output_grid[0, 0] = top_left_corner\n    output_grid[0, output_cols - 1] = top_right_corner\n    output_grid[output_rows - 1, 0] = bottom_left_corner\n    output_grid[output_rows - 1, output_cols - 1] = bottom_right_corner\n\n    # Replicate corner colors if the inner grid is larger than 2x2.\n    if inner_rows > 2 and inner_cols > 2:\n        if output_rows > 1:\n            output_grid[1, 0] = top_left_corner\n        if output_cols > 1:\n            output_grid[0, 1] = top_left_corner\n        if output_rows > 1 and output_cols > 1:    \n            output_grid[1, 1] = top_left_corner\n\n        if (output_rows-2) >=0 and (output_cols -1) >=0:\n          output_grid[output_rows-2, output_cols - 1] = top_right_corner\n        if (output_rows-1) >=0 and (output_cols -2) >=0:\n          output_grid[output_rows - 1, output_cols - 2] = bottom_right_corner\n\n        if (output_rows-2) >=0 and (output_cols -2) >=0:\n          output_grid[output_rows-2, output_cols-2] = bottom_right_corner\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4326,
+    "candidates_token_count": 1010,
+    "total_token_count": 5336,
+    "cached_content_token_count": 0
+  },
+  "response_time": 9.952421,
+  "response_file": "006-response.json"
+}

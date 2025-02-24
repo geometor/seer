@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Determine Target Color: Examine the expected output grid. The target color is the color present in the output.\n2. Locate Bounding Box in Input: Find the smallest rectangular region within the *input* grid that contains all pixels of the target color determined in Step 1.\n3. Extract the Region: Create a new grid containing only the pixels within the bounding box from the input grid. This extracted region is the output.\n\"\"\"\n\nimport numpy as np\n\ndef find_bounding_box(grid, target_color):\n    \"\"\"\n    Finds the bounding box of a target color in a grid.\n    Returns (min_row, min_col, max_row, max_col)\n    \"\"\"\n    rows, cols = np.where(grid == target_color)\n    if len(rows) == 0:\n        return None  # Target color not found\n    min_row, min_col = np.min(rows), np.min(cols)\n    max_row, max_col = np.max(rows), np.max(cols)\n    return min_row, min_col, max_row, max_col\n\ndef get_target_color(output_grid):\n    \"\"\"\n    Determines the target color from the output grid.\n    Assumes a non-empty output grid.  Handles edge cases and invalid inputs.\n    \"\"\"\n    output_grid = np.array(output_grid)\n    if output_grid.size == 0: # Handle empty output grid case.\n       return None\n\n    unique_colors = np.unique(output_grid)\n    if len(unique_colors) == 1:\n        return unique_colors[0]\n    # fallback for when not a single color\n    return unique_colors[0]\n\ndef transform(input_grid, output_grid):\n    \"\"\"\n    Extracts a rectangular region of a specific color from the input grid.\n    \"\"\"\n    input_grid = np.array(input_grid)  # Ensure input is a NumPy array.\n    output_grid = np.array(output_grid)\n\n    # Determine the target color from the output grid.\n    target_color = get_target_color(output_grid)\n    if target_color is None:\n        return [[]]\n\n    # Find the bounding box of the target color in the input grid.\n    bounding_box = find_bounding_box(input_grid, target_color)\n    if bounding_box is None:\n        return [[]] # Return empty grid if target color not found in input.\n\n    min_row, min_col, max_row, max_col = bounding_box\n\n    # Extract the region.\n    extracted_region = input_grid[min_row:max_row+1, min_col:max_col+1]\n\n    return extracted_region.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3358,
+    "candidates_token_count": 642,
+    "total_token_count": 4000,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.819855,
+  "response_file": "004-response.json"
+}

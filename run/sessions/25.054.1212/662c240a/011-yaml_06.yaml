@@ -1,0 +1,24 @@
+facts:
+  - task: 010
+  - input_type: 2D grid
+  - output_type: 2D grid
+  - output_size: 3x3
+  - transformation_type: subgrid_extraction
+  - subgrid_selection_criteria: exact_match
+  - subgrid_selection_priority: top_left
+  - objects:
+      - type: grid
+        properties:
+          - dimensions: variable
+          - elements: integers (0-9, representing colors)
+      - type: subgrid
+        properties:
+          - dimensions: 3x3
+          - elements: integers (matching input grid)
+  - actions:
+      - name: find_subgrid
+        description: Locates a 3x3 subgrid within the input grid.
+      - name: compare_subgrid
+        description: Compares a subgrid to the expected output for an exact match.
+      - name: select_subgrid
+        description: Selects the top-leftmost subgrid that matches the expected output.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies a contiguous object and a single isolated pixel in the input grid. Replaces the contiguous object with the color of the single isolated pixel and removes the original isolated pixel.\n\"\"\"\n\nimport numpy as np\n\ndef find_contiguous_object(grid):\n    \"\"\"Finds a contiguous object in the grid.\"\"\"\n    visited = set()\n    object_coords = []\n\n    def dfs(row, col, color):\n        if (row, col) in visited or not (0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]) or grid[row, col] != color:\n            return\n        visited.add((row, col))\n        object_coords.append((row, col))\n        dfs(row + 1, col, color)\n        dfs(row - 1, col, color)\n        dfs(row, col + 1, color)\n        dfs(row, col - 1, color)\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r,c] != 0 and (r,c) not in visited:\n                color = grid[r, c]\n                dfs(r, c, color)\n                if len(object_coords) > 1: # ensure that it is more than a single pixel\n                    return object_coords\n                else:\n                    object_coords = [] # reset if it is a single pixel\n\n    return None\n\ndef find_single_pixel(grid):\n    \"\"\"Finds a single isolated pixel of any color.\"\"\"\n    counts = {}\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            color = grid[r,c]\n            if color != 0:\n              if color not in counts:\n                counts[color] = 0\n              counts[color] += 1\n\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            color = grid[r,c]\n            if color != 0 and counts[color] == 1:\n              return (r, c), color\n    return None, None\n    \n\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid.\n    output_grid = np.copy(input_grid)\n\n    # Find the contiguous object.\n    object_coords = find_contiguous_object(input_grid)\n\n    # Find the single isolated pixel and its color.\n    pixel_coord, replacement_color = find_single_pixel(input_grid)\n\n    # Change the color of the object to the replacement color in the output_grid.\n    if object_coords and replacement_color is not None:\n        for row, col in object_coords:\n            output_grid[row, col] = replacement_color\n\n    # Remove the original isolated pixel.\n    if pixel_coord:\n      output_grid[pixel_coord[0], pixel_coord[1]] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2916,
+    "candidates_token_count": 699,
+    "total_token_count": 3615,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.909019,
+  "response_file": "004-response.json"
+}

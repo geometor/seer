@@ -1,0 +1,31 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    properties:
+      rows: variable (1-30)
+      columns: variable (1-30)
+      cells: integers (0-9)
+  - object: output_grid
+    type: 2D array
+    properties:
+      rows: floor(input_rows / 2)
+      columns: floor(input_cols / 2)
+      cells: integers (0-9)
+  - object: 2x2_block
+    type: subgrid
+    properties:
+      origin: top-left corner of a 2x2 section of input_grid
+      cells: integers (0-9)
+  - action: divide_into_blocks
+    input: input_grid
+    process: Divide the input grid into non-overlapping 2x2 blocks.
+  - action: transform_block
+    input: 2x2_block
+    process:  Map the 2x2 block from the input grid to a single pixel in the output grid based on color presence.
+  - action: set_output_pixel
+    input: transformed_block_value
+    process: Place the transformed value in the corresponding output grid cell.
+  - rule: color_transformation
+    condition: If a 2x2 block contains the color blue (1), red (2), or yellow (4)
+    action: Output pixel is green (3)
+    else: Output pixel is 0.

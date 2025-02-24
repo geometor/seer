@@ -1,0 +1,18 @@
+facts:
+  - object: grid
+    type: 2D array
+    dimensions: 3x3
+  - object: cell
+    type: pixel
+    values:
+      input: [0, 1]
+      output: [0, 2]
+  - observation: spatial_layout_of_zeros_preserved: true
+  - action: value_replacement
+    condition: input_cell_value == 1
+    result: output_cell_value == 2
+  - relationship:
+      input_grid:
+        contains: [cell_0, cell_1]
+      output_grid:
+        contains: [cell_0, cell_2]

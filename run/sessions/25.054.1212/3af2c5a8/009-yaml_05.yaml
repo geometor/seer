@@ -1,0 +1,16 @@
+task_id: 008-py_04
+objects:
+  - description: Input grid
+    properties:
+      shape: Variable (3x4 in examples)
+      content: 2D array of color values (0-9)
+
+  - description: Output grid
+    properties:
+      shape: Double the dimensions of the input grid (6x8 in examples)
+      content: 2D array of color values, a mirrored version of the input
+
+actions:
+  - type: Mirroring
+    description: The input grid is mirrored both horizontally and vertically to produce the output grid.
+    details: Each pixel at (i, j) in the input corresponds to four pixels in the output: at (i,j) (2*i, 2*j), across x axis(i, inputcolumns -j), across y axis(inputrows, j), corner(inputrows - i, inputcols -j).

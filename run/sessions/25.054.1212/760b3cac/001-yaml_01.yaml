@@ -1,0 +1,26 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [6, 9] # 6 rows, 9 columns
+      elements:  # Represents cell values and their colors
+        0: white
+        4: yellow
+        8: azure
+  - type: object_group
+    properties:
+      color: azure
+      initial_positions: [[0, 3], [0, 5], [1, 4], [1, 5], [2, 5]]
+      transformed_positions: [[0, 0], [0, 2], [0, 3], [1, 0], [1, 1], [1,4], [1,5], [2,0], [2, 5]]
+  - type: object_group
+    properties:
+      color: yellow
+      positions: [[3, 3], [4, 3], [4, 4], [4, 5], [5, 4]]  # Remains unchanged
+      
+actions:
+  - type: transformation
+    description:  Azure (8) pixels are moved/added while respecting some relative positions.
+    target: object_group (azure)
+
+relationships:
+  - type: spatial
+    description:  The position of the azure pixels is changed. The position of the yellow pixels is invariant.

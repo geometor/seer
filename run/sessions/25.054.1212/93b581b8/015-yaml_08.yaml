@@ -1,0 +1,22 @@
+objects:
+  - name: central_block
+    type: rectangle
+    dimensions: 2x2
+    properties:
+      colors: variable # Colors present within the central block
+      location: center # Determined dynamically
+  - name: mirrored_block
+    type: rectangle
+    dimensions: 2x2
+    properties:
+      color: same_as_central_block_cell # Inherits color from a corresponding cell in the central block
+      location: corner # One of the four corners of the grid
+
+actions:
+  - name: identify_central_block
+    description: Find the largest 2x2 block of non-zero pixels.
+  - name: mirror_color
+    description: Create a 2x2 block in a corner with the same color as a cell in the central block.
+    parameters:
+        source_cell: row, col #relative location inside the central block
+        destination_corner: row, col #corner index derived from the original relative position

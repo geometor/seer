@@ -1,0 +1,24 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - colors: [0, 1, 2]  # white, blue, red
+      - shape: 9x9
+  - name: output_grid
+    type: 2D array
+    properties:
+      - colors: [0, 1] # white, blue
+      - shape: 1x5
+  - name: color_blue
+    value: 1
+  - name: color_white
+    value: 0
+
+actions:
+  - name: summarize_columns
+    input: input_grid
+    output: output_grid
+    description: Counts the presence/absence of blue color in pre-defined regions of input
+
+relationships:
+   - input_grid contains output_grid information in summarized format

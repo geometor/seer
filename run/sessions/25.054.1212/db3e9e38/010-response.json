@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms an input grid by expanding a vertical orange line into a checkerboard pattern of orange and azure, leaving the area below the line unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_orange_line(grid):\n    \"\"\"Finds the vertical orange line in the grid.\"\"\"\n    rows, cols = grid.shape\n    for j in range(cols):\n        for i in range(rows):\n            if grid[i, j] == 7:\n                # Found start of potential line\n                start_row = i\n                end_row = i\n                while end_row + 1 < rows and grid[end_row + 1, j] == 7:\n                    end_row += 1\n                return start_row, end_row, j\n    return None, None, None\n\ndef expand_to_checkerboard(grid, start_row, end_row, col):\n    \"\"\"Expands the orange line to a checkerboard.\"\"\"\n    output_grid = np.copy(grid)\n    rows, cols = grid.shape\n\n    # Determine top row and fill with orange, working out from the line.\n    top_row = start_row -1\n    if top_row >= 0:\n       if grid[top_row, col] == 0:\n          output_grid[top_row,col] = 7\n       #fill left\n       for j in range(col - 1, -1, -1):\n           if grid[top_row, j] == 0:\n               output_grid[top_row, j] = 7\n           else:\n               break\n       #fill right\n       for j in range(col + 1, cols):\n           if grid[top_row, j] == 0:\n              output_grid[top_row, j] = 7\n           else:\n              break\n    \n    # Checkerboard expansion from top_row down to end_row (exclusive)\n    for i in range(top_row, end_row):  # Iterate *down* to end_row\n        for j in range(cols):\n            if output_grid[i, j] == 7:  # Check if the current cell is part of the line\n                # Fill to the right\n                for k in range(j + 1, cols):\n                    if output_grid[i, k] == 0:\n                        if output_grid[i,k-1] == 7:\n                           output_grid[i, k] = 8\n                        else:\n                           output_grid[i,k] = 7\n                    else:\n                        break  # Stop at non-white\n                #Fill to the Left\n                for k in range(j-1, -1,-1):\n                    if output_grid[i, k] == 0:\n                        if output_grid[i,k+1] == 7:\n                           output_grid[i,k] = 8\n                        else:\n                           output_grid[i,k] = 7\n                    else:\n                       break\n    return output_grid\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    start_row, end_row, col = find_orange_line(input_grid)\n\n    if start_row is None:  # No orange line found\n        return np.copy(input_grid)\n\n    output_grid = expand_to_checkerboard(input_grid, start_row, end_row, col)\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3428,
+    "candidates_token_count": 799,
+    "total_token_count": 4227,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.001735,
+  "response_file": "010-response.json"
+}

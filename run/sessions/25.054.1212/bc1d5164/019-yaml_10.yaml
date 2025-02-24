@@ -1,0 +1,19 @@
+objects:
+  - type: grid
+    properties:
+      dimensions:
+        input: [5, 7]  # height, width
+        output: [3, 3]
+      pixels:
+        - color: yellow
+          value: 4
+        - color: white
+          value: 0
+actions:
+  - type: compress
+    description: Reduce the grid dimensions while preserving the relative positions of the yellow pixels.
+relationships:
+  - type: spatial
+    description: Yellow pixels maintain their relative positions (top-left, top-right, bottom-left, bottom-middle, bottom-right) in both input and output.
+  - type: contains
+    description: Input and output contain grids.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Cluster:** Find the smallest contiguous block (cluster) of non-black (non-zero) pixels in the input grid.\n2.  **Determine Bounding Box:** Calculate the bounding box (min/max rows and columns) of this cluster.\n3.  **Calculate Output Dimensions:**\n    *   The output grid always has 3 rows.\n    *   The output grid's width is twice the width of the cluster's bounding box.\n4.  **Create Output Grid:** Initialize an output grid filled with black (0) pixels, with the calculated dimensions.\n5.  **Populate Output Grid with Alternating Pattern:**\n      Iterate through each *row* of the **cluster within the input grid**.\n      *   For each row in the cluster:\n          *    Copy that row from the input grid into the output grid.\n          * Insert one black column after each original column of the cluster\n\n6.  **Return:** the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef find_cluster(grid):\n    # Find coordinates of all non-zero pixels.\n    coords = np.argwhere(grid != 0)\n    if coords.size == 0:\n        return None, None, None, None  # No cluster found\n    min_row = np.min(coords[:, 0])\n    max_row = np.max(coords[:, 0])\n    min_col = np.min(coords[:, 1])\n    max_col = np.max(coords[:, 1])\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    input_grid = np.array(input_grid)\n    # Find the bounding box of the non-zero cluster.\n    min_row, max_row, min_col, max_col = find_cluster(input_grid)\n    \n    if min_row is None:  # Handle cases where no cluster is found\n       return [[0]] # Return a 1x1 grid with a black pixel\n\n    # Calculate output dimensions.\n    output_rows = 3\n    output_cols = (max_col - min_col + 1) * 2\n    output_grid = np.zeros((output_rows, output_cols), dtype=int)\n\n    # construct output - iterate through cluster rows, not input grid\n    for i in range(min_row, min_row + output_rows):\n        output_col_index = 0\n\n        # check for the valid range\n        if i <= max_row:\n            for j in range(min_col, max_col + 1):\n                output_grid[i-min_row, output_col_index] = input_grid[i, j]\n                output_col_index += 1\n                output_grid[i-min_row, output_col_index] = 0  # black pixel\n                output_col_index += 1\n        else:\n            # if out of the range of the input, fill with background\n             for j in range(output_cols):\n                output_grid[i-min_row, j]=0\n\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3539,
+    "candidates_token_count": 723,
+    "total_token_count": 4262,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.882982,
+  "response_file": "006-response.json"
+}

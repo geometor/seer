@@ -1,0 +1,24 @@
+facts:
+  - object: input_grid
+    type: 2D array
+    properties:
+      dimensions: 4 x 15
+      elements: integers (0-9) representing colors
+      colors_present: [0, 1, 2, 4, 9]
+
+  - object: output_grid
+    type: 2D array
+    properties:
+      dimensions: 4 x 4
+      elements: integers (0-9) representing colors
+      colors_present: [0,1,4,9]
+
+  - observation: color_selection
+    description: Only specific colors from the input grid appear in the output grid.
+    selected_colors: [1, 4, 9]
+
+  - observation: spatial_relationship
+    description: The relative positions of some colors are maintained, but the overall structure is compressed. The output appears to be a cropped selection. The columns in input that contain [4,4,4,4] appear important
+
+  - observation: cropping
+    description: columns with any of [1,4,9]

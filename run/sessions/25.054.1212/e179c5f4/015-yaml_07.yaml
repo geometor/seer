@@ -1,0 +1,34 @@
+task: 014
+objects:
+  - id: background
+    color: 0 (white)
+    role: initial state
+  - id: cross_center
+    color: 1 (blue)
+    role: seed for transformation
+  - id: cross_arms
+    color: [1, 8]
+    role: extend from center, alternating colors
+    pattern: alternating
+    axis_x: start:8
+    axis_y: start:1
+
+actions:
+  - name: locate_center
+    input: background
+    find: cross_center
+    description: Find the single pixel with value 1.
+
+  - name: fill_background
+    input: background
+    replace: 0
+    with: 8
+
+  - name: create_cross
+    seed: cross_center
+    direction: both
+    pattern:
+      - axis: x
+        values: [8,1]
+      - axis: y
+        values: [1,8]

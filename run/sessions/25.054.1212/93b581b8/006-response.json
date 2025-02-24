@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Find Central Block:** Locate the 2x2 block of non-zero pixels within the input grid.\n2.  **Top Extension:** Copy the top row of the central 2x2 block to the top two rows of the output grid, spanning *only* the columns occupied by the central block.\n3.  **Bottom Extension:** Copy the bottom row of the central 2x2 block to the bottom two rows of the output grid, spanning *only* the columns occupied by the central block.\n4.  **Preserve Center:** The central 2x2 block from input is copied to same place in output.\n5. **Zero Fill:** Fill other areas with zero.\n\"\"\"\n\nimport numpy as np\n\ndef find_central_block(grid):\n    # Find the bounding box of non-zero elements\n    rows, cols = np.where(grid != 0)\n    if len(rows) == 0:  # Handle empty grid case\n        return None\n    min_row, max_row = np.min(rows), np.max(rows)\n    min_col, max_col = np.min(cols), np.max(cols)\n\n    # Check if it's a 2x2 block\n    if max_row - min_row == 1 and max_col - min_col == 1:\n        return (min_row, min_col, max_row, max_col)\n    else:\n        return None\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.zeros_like(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the central 2x2 block\n    central_block_coords = find_central_block(input_grid)\n    if central_block_coords is None:\n        return output_grid # Return original grid if central block not present\n\n    min_row, min_col, max_row, max_col = central_block_coords\n\n    # Top Extension: Copy top row of central block to first two rows of output, within central block columns\n    output_grid[0:2, min_col:max_col+1] = input_grid[min_row, min_col:max_col+1]\n\n    # Bottom Extension: Copy bottom row of central block to last two rows of output, within central block columns\n    output_grid[rows-2:rows, min_col:max_col+1] = input_grid[max_row, min_col:max_col+1]\n\n    # Preserve Center: Copy central block\n    output_grid[min_row:max_row+1, min_col:max_col+1] = input_grid[min_row:max_row+1, min_col:max_col+1]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3488,
+    "candidates_token_count": 643,
+    "total_token_count": 4131,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.839653,
+  "response_file": "006-response.json"
+}

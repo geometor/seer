@@ -1,0 +1,32 @@
+task: 9f274a85
+summary: |
+    The task involves reducing an input grid to create output grid of half the width and half the height by consolidating 2x2 sections.
+    Red (2) regions depends on the presence of Green (3) or Blue(1) inside input sub-grids.
+    If Green or Blue are present, under certain condition a red pixel is placed in the corresponding output coordinate.
+
+objects:
+  - name: input_grid
+    type: 2D array
+    description: The initial grid of varying size, containing pixels of different colors.
+  - name: output_grid
+    type: 2D array
+    description: The transformed grid, half the height and width of the input grid, containing mostly white and some red pixels.
+  - name: sub_grid
+    type: 2D array
+    description: 2x2 regions of input_grid considered during transformation.
+
+colors:
+  - 0: white
+  - 1: blue
+  - 2: red
+  - 3: green
+
+transformations:
+  - name: reduce_and_create_red
+    type: reduction and conditional replacement
+    description: >
+      The input grid is processed in 2x2 subgrids.
+      The output grid is created with dimensions (height/2, width/2).
+      If a subgrid contains a green (3) pixel, the corresponding output pixel is red (2).
+      If no green pixel, but a blue (1) exists, the output pixel is red (2).
+      Otherwise, the output pixel is white (0).

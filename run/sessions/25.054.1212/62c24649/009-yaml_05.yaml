@@ -1,0 +1,29 @@
+task_id: "008"
+objects:
+  - id: input_grid
+    type: grid
+    properties:
+      dimensions: variable  # Varies between examples (3x3)
+      elements: integers # 0-9 representing colors
+
+  - id: output_grid
+    type: grid
+    properties:
+      dimensions: double_input # Always twice the input dimensions
+      elements: integers # 0-9, same color palette as input
+      structure: mirrored_input # Contains a mirrored and scaled version of the input
+
+actions:
+  - name: scale_up
+    input: input_grid
+    output: intermediate_grid # grid after initial expansion
+    description: Each pixel in input_grid is expanded to a 2x2 block in the output_grid.
+
+  - name: mirror_horizontal
+    input: intermediate_grid
+    output: output_grid
+    description: The intermediate grid will be reflected on the x axis.
+
+  - name: mirror_vertical
+    input: intermediate_grid, output_grid
+    description: The intermediate_grid will be reflected on the y axis.

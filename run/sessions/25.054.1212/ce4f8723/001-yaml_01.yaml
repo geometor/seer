@@ -1,0 +1,27 @@
+facts:
+  - type: grid
+    description: input grid
+    properties:
+      - dimensions: 9x4 (rows x columns)
+      - colors: [blue, white, yellow, red]
+      - values: [1, 0, 4, 2]
+
+  - type: grid
+    description: output grid
+    properties:
+      - dimensions: 4x4
+      - colors: [green, white]
+      - values: [3, 0]
+
+  - observation:
+    description: size reduction
+    details: The output grid is smaller than the input grid. Input rows are more than output rows, while input and output columns are the same.
+
+  - observation:
+      description: upper left corner input
+      details: the upper left 4x4 subgrid of the input becomes the output
+
+  - observation:
+    description: color mapping
+    details: |
+      All colors other than white (0) become green (3) in the output, and all whites remain white.

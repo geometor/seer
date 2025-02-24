@@ -1,0 +1,62 @@
+examples:
+  - example_id: 1
+    input_objects:
+      - color: 6 #magenta
+        positions: [(0, 0)]
+      - color: 4 #yellow
+        positions: [(0, 1)]
+      - color: 3 #green
+        positions: [(1, 1)]
+      - color: 9 #maroon
+        positions: [(1, 2)]
+      - color: 1 #blue
+        positions: [(2, 0)]
+    output_objects:
+      - color: 4 #yellow
+        positions: [(0, 1)]
+      - color: 3 #green
+        positions: [(1, 1)]
+    transformations:
+      - remove: [6, 9, 1] # magenta, maroon, blue
+  - example_id: 2
+    input_objects:
+      - color: 8 #azure
+        positions: [(0, 0), (1, 0)]
+      - color: 3 #green
+        positions: [(0, 2), (2, 0), (2,2)]
+      - color: 6 #magenta
+        positions: [(1, 1), (2, 1)]
+      - color: 5 #gray
+        positions: [(1, 2), (3, 3), (4, 0)]
+      - color: 9 #maroon
+        positions: [(3, 4), (4, 2)]
+    output_objects:
+      - color: 3 #green
+        positions: [(0, 2), (2, 2)]
+      - color: 5 #gray
+        positions: [(1, 2)]
+      - color: 9 #maroon
+        positions: [(4, 2)]
+    transformations:
+       - remove: [8, 6, 0]
+  - example_id: 3
+    input_objects:
+      - color: 3 #green
+        positions: [(0, 0), (1, 0)]
+      - color: 4 #yellow
+        positions: [(0, 2), (1, 2)]
+      - color: 7 #orange
+        positions: [(1, 3), (2, 3)]
+      - color: 6 #magenta
+        positions: [(2, 1)]
+      - color: 8 #azure
+        positions: [(3, 2), (4, 1)]
+      - color: 2 #red
+        positions: [(4,3), (4,4)]
+    output_objects:
+      - color: 4 #yellow
+        positions: [(0, 2), (1, 2)]
+      - color: 8 #azure
+        positions: [(3, 2)]
+    transformations:
+      - remove: [3, 7, 6, 2, 0] # remove green, orange, magenta, red, white

@@ -1,0 +1,27 @@
+objects:
+  - type: pixel
+    properties:
+      color:
+        - azure (8)
+        - green (3)
+        - white (0)
+      position: (row, column)
+  - type: contiguous_block
+    properties:
+       color:
+          - azure
+          - green
+       pixels: list of pixel objects
+
+actions:
+  - type: color_change
+    properties:
+      original_color: azure (8)
+      new_color: azure (8)
+      target: specific azure pixels
+
+relationships:
+  - type: adjacency
+    description: Pixels are considered adjacent if they share a side (not diagonal).
+  - type: containment
+    description: Contiguous blocks contain multiple pixels of the same color.

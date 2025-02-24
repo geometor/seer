@@ -1,0 +1,20 @@
+objects:
+  - name: contiguous_white_block
+    description: One or more consecutive rows containing only white (0) pixels.
+    properties:
+      start_row: Row index where the block begins.
+      end_row: Row index where the block ends.
+      block_size: Number of rows in the block (end_row - start_row + 1).
+
+actions:
+  - name: modify_outer_pixels
+    description: Change the color of the outer pixels of specific rows within a contiguous white block.
+    parameters:
+      row_index_within_block:  The index of the row *within* the block (0-based).
+      block_size: The number of rows in the block
+    conditions:
+      - if row_index_within_block == 0: change outer pixels to yellow (4)
+      - if row_index_within_block == 1: change outer pixels to green (3)
+      - if row_index_within_block == 2: change outer pixels to blue (1)
+      - else: do nothing
+    scope: contiguous_white_block

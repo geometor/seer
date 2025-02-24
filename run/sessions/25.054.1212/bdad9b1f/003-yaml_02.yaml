@@ -1,0 +1,64 @@
+example_1:
+  objects:
+    - type: row
+      color: red
+      index: 2
+      properties:
+        - contiguous
+    - type: column
+      color: azure
+      index: 4
+      properties:
+        - contiguous
+    - type: cell
+      location: [2, 4]
+      original_color: white
+      transformed_color: yellow
+  actions:
+    - type: color_change
+      target: cell[2,4]
+      new_color: yellow
+    - type: extend_color
+      direction: right
+      color: red
+      row: 2
+      stop_column: 4
+      start_column: 0
+    - type: extend_color_vertically
+      direction: up_and_down
+      color: azure
+      column: 4
+      start_row: 0
+      end_row: 2
+example_2:
+  objects:
+    - type: row
+      color: red
+      index: 3
+      properties:
+        - contiguous
+    - type: column
+      color: azure
+      index: 1
+      properties:
+        - contiguous
+    - type: cell
+      location: [3, 1]
+      original_color: white
+      transformed_color: yellow
+  actions:
+    - type: color_change
+      target: cell[3,1]
+      new_color: yellow
+    - type: extend_color
+      direction: right
+      color: red
+      row: 3
+      stop_column: 5
+      start_column: 0
+    - type: extend_color_vertically
+      direction: up
+      color: azure
+      column: 1
+      start_row: 0
+      end_row: 3

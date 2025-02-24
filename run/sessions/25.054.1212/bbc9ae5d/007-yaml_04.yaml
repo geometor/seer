@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [rows, columns]
+      elements: pixels
+      pixel_values: [0, 2]  # 0: white, 2: red
+  - type: pixel
+    properties:
+      color:
+        value: integer
+        mapping: {0: white, 2: red}
+
+actions:
+  - name: expand_grid
+    description: Creates a new grid with increased dimensions.
+  - name: replicate_pixel
+    description: Copies a pixel's value to other locations in the grid.
+
+relationships:
+  - subject: input_grid
+    relation: transforms_to
+    object: output_grid
+  - subject: red_pixel
+    relation: replicates_along
+    object: diagonal
+  - subject: red_pixel_count
+    relation: determines
+    object: output_rows #hypothesis - verification needed.

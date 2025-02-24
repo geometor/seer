@@ -1,0 +1,21 @@
+objects:
+  - name: input_grid
+    type: 2D array
+    properties:
+      - elements: single-digit integers (0-9)
+      - size: variable (e.g., 3x3)
+      - colors: represent color according to COLOR_MAP
+
+  - name: output_grid
+    type: 2D array
+    properties:
+      - elements: single-digit integers (0-9)
+      - size: input_grid size * 3 (e.g., 9x9)
+      - colors: represent color according to COLOR_MAP
+
+actions:
+  - name: replicate_pixel
+    description: Each pixel in the input_grid is expanded into a 3x3 block of the same pixel value in the output_grid.
+
+relationships:
+  - input_grid elements map directly to output_grid elements, with each input pixel corresponding to a 3x3 block in the output.

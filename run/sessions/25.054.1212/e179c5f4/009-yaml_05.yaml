@@ -1,0 +1,19 @@
+facts:
+  - object: grid
+    properties:
+      - contains_pixels: true
+      - colors: [white, blue, azure]
+  - object: blue_pixel
+    properties:
+      - color: blue
+      - value: 1
+      - role: origin_of_checkerboard
+  - object: checkerboard_pattern
+    properties:
+      - colors: [blue, azure]
+      - values: [1, 8]
+      - origin: blue_pixel_location
+    actions:
+      - replace:
+          - original: white_pixels
+          - replacement: checkerboard_pattern

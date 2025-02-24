@@ -1,0 +1,22 @@
+observations:
+  - object: input_grid
+    type: grid
+    properties:
+      - dimensions: 1 x variable
+      - contains: single row of pixels, some colored, some white
+
+  - object: output_grid
+    type: grid
+    properties:
+      - dimensions: variable x variable
+      - relationship_to_input:
+        - rows: input_rows + count_of_non_white_pixels
+        - cols: same as input
+        - color:  non-white pixels from input are replicated in a triangle shape
+      - contains: expanding color and white background
+
+  - action: expansion
+    description: The non-white color in the input grid expands into a triangle-like shape in the output grid.
+    details:
+      - shape:  The number of pixels of the non-white color in the input determines additional rows of output.  The shape formed is triangular.
+      - background: Remaining pixels are filled with white.

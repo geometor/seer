@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies horizontal runs of contiguous green pixels. If a run has length 2 or more,\nchange all pixels in that run to azure. If a run has length 1, and is adjacent to\nany pixel that has already been changed to azure, change to azure. Adjacency is checked\niteratively until no more changes can be made.\n\"\"\"\n\nimport numpy as np\n\ndef get_runs(grid):\n    \"\"\"Helper function to extract horizontal runs of green pixels.\"\"\"\n    runs = []\n    rows = len(grid)\n    cols = len(grid[0]) if rows > 0 else 0\n    for r in range(rows):\n        start_col = -1\n        for c in range(cols):\n            if grid[r][c] == 3:\n                if start_col == -1:\n                    start_col = c\n            elif start_col != -1:\n                runs.append((r, start_col, c - 1))\n                start_col = -1\n        if start_col != -1:  # Handle runs that extend to the end of the row\n            runs.append((r, start_col, cols - 1))\n    return runs\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by changing horizontally contiguous green pixels to azure based on run length and adjacency.\n    \"\"\"\n    output_grid = [row[:] for row in input_grid]  # Create a copy\n    rows = len(input_grid)\n    cols = len(input_grid[0]) if rows > 0 else 0\n\n    # 1. Identify and Measure Horizontal Runs\n    runs = get_runs(output_grid)\n\n\n    # 2. Change pixels based on run length (>= 2)\n    for r, start_c, end_c in runs:\n        if end_c - start_c + 1 >= 2:\n            for c in range(start_c, end_c + 1):\n                output_grid[r][c] = 8\n\n    # 3. Iteratively apply adjacency rule for single-pixel runs.\n    while True:\n        changed = False\n        runs = get_runs(output_grid) # get runs from output_grid\n        for r, start_c, end_c in runs:\n            if end_c - start_c + 1 == 1:\n                if start_c > 0 and output_grid[r][start_c - 1] == 8:\n                    output_grid[r][start_c] = 8\n                    changed = True\n                elif end_c < cols - 1 and output_grid[r][end_c + 1] == 8:\n                    output_grid[r][end_c] = 8\n                    changed = True\n        if not changed:\n            break  # Exit loop if no changes were made in this iteration\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3380,
+    "candidates_token_count": 662,
+    "total_token_count": 4042,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.463961,
+  "response_file": "012-response.json"
+}

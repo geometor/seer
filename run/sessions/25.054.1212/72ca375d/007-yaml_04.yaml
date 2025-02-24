@@ -1,0 +1,33 @@
+objects:
+  - type: grid
+    properties:
+      rows: 10
+      columns: 10
+      elements: integers (0-9) representing colors
+    role: input
+
+  - type: grid
+    properties:
+      rows: 2
+      columns: 2
+      elements: integers (0-9) representing colors
+    role: output
+  - type: object
+    properties:
+       color: 4 # yellow
+       shape: rectangle
+       location:
+          start: [1,2] #row, col
+          end: [2,3]
+    role: selected_object
+
+relationships:
+   -  type: contains
+      from: input
+      to: selected_object
+
+actions:
+  - type: select
+    agent: implicit
+    target: object of color 4
+    description: The 2x2 yellow rectangle at the top-left of input

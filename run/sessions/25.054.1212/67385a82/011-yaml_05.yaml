@@ -1,0 +1,32 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Represents a grid of pixels with color values.
+  - name: pixel
+    type: cell
+    properties:
+      color: [white, blue, red, green, yellow, gray, magenta, orange, azure, maroon]
+      value: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      position: (row, column)
+  - name: run
+    type: contiguous_pixels
+    properties:
+      color: green
+      direction: horizontal
+      length: int
+      start_position: (row, column)
+      end_position: (row, column)
+
+actions:
+  - name: identify_runs
+    description: Find all horizontal runs of green pixels.
+  - name: change_color
+    description: Change the color of pixels in a run to azure.
+    conditions:
+      - if run_length >= 2
+      - if run_length == 1 and adjacent to azure pixel (after initial transformation)
+
+rules:
+  - "Runs of green pixels with length 2 or more are changed to azure."
+  - "After changing runs of length >=2, single green pixels adjacent to azure pixels *horizontally* are also changed to azure."
+  - adjacency_rule: "check left, and right."

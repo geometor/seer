@@ -1,0 +1,25 @@
+observations:
+  - object: green_pixel
+    locations:
+      - top_row:
+        description: Pixels in the first row (row index 0).
+        transformation:
+          condition: pixel_below_exists
+          action: change_pixel_below_to_azure
+      - bottom_left_corner:
+        description: Pixel at the intersection of the last row and first column (row index rows-1, column index 0).
+        transformation:
+          condition: 'if pixel above or below is not azure'
+          action: change_to_azure
+      - bottom_row:
+        description: Pixels in the last row (row index rows-1)
+        transformation:
+          condition: 'if green and at last row, check pixel above, if not azure, become azure.'
+          action: change_to_azure, if not azure above.
+    properties:
+      color: 3  # Green
+    interactions:
+      - affects_adjacent:
+          direction: below
+          top_row_condition: 'if green on top row, the cell below becomes azure.'
+          bottom_row_condition: Check pixel above. if not azure, change self to azure

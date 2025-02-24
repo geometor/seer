@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Identify non-zero pixels: Find all pixels in the input grid with values other than 0.\n2. Preserve Order: Maintain the original order of these non-zero pixels as they appear from left-to-right, top-to-bottom in the input.\n3. Move to Bottom: Move the identified non-zero pixels to the bottom-most available rows of the output grid. Fill the rows from left to right.\n4. Fill Remaining: All other cells in output grid, not occupied are filled with 0.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero pixels to the bottom,\n    preserving their original order, and filling the remaining cells with zeros.\n    \"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n    non_zero_pixels = []\n\n    # 1. Identify and store non-zero pixels with their original positions.\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                non_zero_pixels.append((input_grid[r, c], r, c))\n\n    # 2. (Order is implicitly preserved as we iterate row-by-row, then column by column)\n\n    # 3. Move to the bottom.\n    num_non_zero = len(non_zero_pixels)\n    output_row = rows - 1\n    output_col = 0\n    for pixel_value, _, _ in non_zero_pixels:\n        output_grid[output_row, output_col] = pixel_value\n        output_col += 1\n        if output_col == cols:\n            output_col = 0\n            output_row -= 1\n            if output_row < 0:  # added to prevent going beyond boundary if there are many non-zero pixels\n                break\n\n    # 4. Fill the remaining (already done by initializing output_grid with zeros).\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2117,
+    "candidates_token_count": 473,
+    "total_token_count": 2590,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.503143,
+  "response_file": "002-response.json"
+}

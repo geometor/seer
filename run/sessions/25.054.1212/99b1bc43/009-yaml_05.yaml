@@ -1,0 +1,14 @@
+task_id: 008
+facts:
+  - observation: "Input grids are divided into four quadrants."
+  - observation: "Output grids are always 4x4."
+  - observation: "Output grids condense information from the input grids."
+  - property: "Output grid pixels are either black (0) or green (3)."
+  - property: "Input grid pixels can be any color from the standard palette (0-9)."
+  - action: "Non-zero, non-white pixels at input quadrant corners *influence* corresponding corner pixels in the output."
+  - action: "Input Quadrant 1 (top-left) influences output position [0,0]."
+  - action: "Input Quadrant 2 (top-right) influences output position [0,3]."
+  - action: "Input Quadrant 3 (bottom-left) influences output position [3,0]."
+  - action: "Input Quadrant 4 (bottom-right) influences output position [3,3]."
+  - constraint: "Output pixels are set to green (3) based on some criteria related to non-zero input pixels, not just direct correspondence."
+  - hypothesis: "The green pixels in the output may represent a simplified outline or summary of the shapes formed by non-zero pixels in the input, *not* a direct copy of the corners."

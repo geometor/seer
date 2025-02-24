@@ -1,0 +1,25 @@
+observations:
+  - task_id: 016
+  - general:
+    - The input and output grids always have the same width.
+    - The output grid is always a sub-region (contiguous rows) of the input grid.
+    - The output grid's rows are always in the same order as they appear in the input grid.
+    -  The height of output grid is always less than or equal to input
+  - example_1:
+    - result: "success"
+    - output_block_location: bottom
+    - output_block_context: "different colors above"
+  - example_2:
+    - result: "failure"
+    - output_block_location: "middle"
+    - output_block_context: "different colors above and below"
+  - example_3:
+    - result: "success"
+    - output_block_location: bottom
+    - output_block_context: "different colors above"
+  - example_4:
+    - result: "failure"
+    - output_block_location: top
+    - output_block_context: "different colors below"
+  - block_selection:
+      - description: The output block appears to be the topmost block of rows that, when compared to the block *below*, exhibits a complete difference in colors across all columns in adjacent rows.

@@ -1,0 +1,60 @@
+observations:
+  - example: 1
+    input_objects:
+      - color: 5  # Gray
+        count: 1
+        original_positions: [(1, 1)]
+    output_objects:
+      - color: 5  # Gray
+        count: 2 # Duplicated
+        positions: [(1,1), (1,5)]
+      - color: 8
+        count: 16
+        positions: "alternating around positions of color 5"
+    size_change: doubled
+    transformation: "Gray pixel duplicated.  Zero pixels replaced conditionally with azure."
+
+  - example: 2
+    input_objects:
+      - color: 6  # Magenta
+        count: 2
+        original_positions: [(0, 2), (2, 1)]
+    output_objects:
+      - color: 6  # Magenta
+        count: 4  # Duplicated
+        positions: [(0,2), (0,6), (2,2), (4,2)]
+      - color: 8
+        count: 28
+        positions: "alternating around positions of color 6"
+    size_change: doubled
+    transformation: "Magenta pixels duplicated. Zero pixels replaced conditionally with azure."
+
+  - example: 3
+    input_objects:
+      - color: 4  # Yellow
+        count: 2
+        original_positions: [(1, 1), (4, 0)]
+    output_objects:
+      - color: 4
+        count: 4
+        positions: [(1,1), (1,4), (4,1), (4,4)]
+      - color: 8
+        count: 26
+        positions: "alternating around positions of color 4"
+    size_change:  rows * 2, cols * 2
+    transformation: "Yellow pixels are duplicated. Zero pixels replaced conditionally with azure. One row inserted with azure between the original yellow rows, and one row added after."
+
+  - example: 4
+    input_objects:
+      - color: 2  # Red
+        count: 1
+        original_positions: [(1, 1)]
+    output_objects:
+      - color: 2
+        count: 2
+        positions: [(1,1), (1,5)]
+      - color: 8
+        count: 24
+        positions: "alternating around positions of color 2"
+    size_change: doubled
+    transformation: "Red pixel is duplicated. Zero pixels replaced conditionally with azure. One row inserted with azure *between* the rows with original color, and one row added at the end. One col added *between* the cols of original, and two added at end."

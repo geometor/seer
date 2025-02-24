@@ -1,0 +1,19 @@
+objects:
+  - type: grid
+    properties:
+      - dimensions: variable
+      - elements: integers (representing colors)
+    relationships:
+      - input_grid: contains output_grid (as a sub-region)
+  - type: pixel
+    properties:
+      - color: integer (0-9)
+      - position: (row, column)
+    relationships:
+      - part_of: grid
+
+actions:
+  - type: extraction
+    description: Selects a sub-region from the input grid.
+    parameters:
+      - region: central 3x3 area

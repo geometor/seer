@@ -1,0 +1,28 @@
+objects:
+  - type: grid
+    properties:
+      rows: 8
+      columns: 8
+      cell_values: [0-9] # Representing colors
+    elements:
+      - type: pixel
+        properties:
+          color:
+            - white # 0
+            - magenta # 6
+            - yellow # 4
+          position: [row, column] # (x,y) coordinates
+
+actions:
+  - type: replace_color
+    description: "Change color of specific pixels"
+    parameters:
+        original_color: 0 #white
+        new_color: 4 #yellow
+        locations: [[7,2],[7,6]]
+
+relationships:
+  - type: spatial
+    description: "Pixels are arranged in a 2D grid."
+  - type: conditional_change
+    description: "Specific white pixels at certain bottom row locations are transformed to yellow, the rest is unchanged"

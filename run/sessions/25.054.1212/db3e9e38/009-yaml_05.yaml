@@ -1,0 +1,35 @@
+objects:
+  - name: orange_line
+    type: vertical_line
+    color: orange
+    properties:
+      start_row: int  # Row index where the line begins
+      end_row: int    # Row index where the line ends
+      column: int     # Column index where the line is located
+
+  - name: checkerboard_area
+    type: region
+    properties:
+      top_row: int      # define the upper bound of the effect
+      bottom_row: int   # define the lower bound of the effect.  The bottom of the orange line
+      left_column: int
+      right_column: int
+    pattern:
+      - color: orange
+      - color: azure
+
+actions:
+  - name: find_orange_line
+    description: Locates the vertical orange line within the grid.
+    input: grid
+    output: [start_row, end_row, column]
+
+  - name: expand_to_checkerboard
+    description: Creates a checkerboard pattern of orange and azure, bounded by the orange line, and any other non-white pixels.
+    input:
+      grid: array
+      orange_line_start_row: int
+      orange_line_end_row: int
+      orange_line_column: int
+
+    output: modified_grid

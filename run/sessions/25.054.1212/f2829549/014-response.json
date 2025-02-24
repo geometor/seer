@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule works as follows:\n\n1.  **Identify Key Feature:** Locate the vertical blue (1) line in the input grid.\n2.  **Reduce Columns:** Condense each set of columns into 1.\n3.  **Determine New Value:**\n      *   If an entire column in original is white, it maps to white (0).\n      *   If a column to left of blue contains orange or to right contains grey, then it maps green.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    \"\"\"Finds the column index of a full-height vertical line of the specified color.\"\"\"\n    rows, cols = grid.shape\n    for j in range(cols):\n        if all(grid[i, j] == color for i in range(rows)):\n            return j\n    return -1  # Return -1 if no such line is found\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rules.\"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows, 3), dtype=int)\n    blue_line_col = find_vertical_line(input_grid, 1)\n\n    # Iterate through input columns in groups\n    col_groups = [(0, 1, 2), (blue_line_col,), (5, 6)] # split in the groups\n    \n    for i, group in enumerate(col_groups) :\n        for row in range(rows) :\n            if i == 1 : # blue\n                output_grid[row, 1] = 0 # all white\n            else:\n                is_all_white = True\n                for col in group :\n                    if input_grid[row, col] != 0:\n                        is_all_white = False\n                        break\n                if is_all_white:\n                    output_grid[row, i] = 0\n                else:\n                     output_grid[row,i] = 3\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2122,
+    "candidates_token_count": 463,
+    "total_token_count": 2585,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.778553,
+  "response_file": "014-response.json"
+}

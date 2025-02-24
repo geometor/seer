@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. Double Dimensions: The output grid's height and width are each twice the corresponding dimensions of the input grid.\n2. Pixel Replication: Each pixel in the input grid is represented by a 2x2 block of pixels in the output grid.\n3. Color Preservation: The color of the 2x2 block in the output grid matches the color of the corresponding pixel in the input grid.\n4. Block Placement: The top-left pixel of each 2x2 output block corresponds to the `[row * 2, column * 2]` position in the output grid, if `row` and `column` are the coordinates in the input grid. The whole block should match the original input pixel.\n5. Iteration: The process is applied systematically, moving across each row of the input from left to right and then down the rows (top to bottom).\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    # Double Dimensions: Get input dimensions and calculate output dimensions.\n    input_height, input_width = input_grid.shape\n    output_height = input_height * 2\n    output_width = input_width * 2\n\n    # Initialize Output Grid: Create an output grid filled with zeros.\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Pixel Replication and Color Matching: Iterate through input and create 2x2 blocks.\n    for i in range(input_height):\n        for j in range(input_width):\n            # Get the color of the current input pixel.\n            color = input_grid[i, j]\n\n            # Create the 2x2 block in the output grid, correctly positioned.\n            output_grid[i*2, j*2] = color         # Top-left\n            output_grid[i*2 + 1, j*2] = color     # Bottom-left\n            output_grid[i*2, j*2 + 1] = color     # Top-right\n            output_grid[i*2 + 1, j*2 + 1] = color # Bottom-right\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3560,
+    "candidates_token_count": 479,
+    "total_token_count": 4039,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.603897,
+  "response_file": "006-response.json"
+}

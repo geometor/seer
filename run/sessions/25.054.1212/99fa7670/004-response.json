@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies non-white pixels in the input grid and expands them to the right and down, filling their respective rows and columns in the output grid.\n\"\"\"\n\nimport numpy as np\n\ndef get_non_white_pixels(grid):\n    \"\"\"Finds coordinates of all non-white pixels in the grid.\"\"\"\n    non_white_pixels = []\n    for row_index, row in enumerate(grid):\n        for col_index, pixel_value in enumerate(row):\n            if pixel_value != 0:\n                non_white_pixels.append((row_index, col_index, pixel_value))\n    return non_white_pixels\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid by expanding non-white pixels to the right and down.\"\"\"\n    # Initialize output_grid as all white with the same dimensions as input\n    output_grid = np.zeros_like(input_grid)\n    \n    # Get non-white pixels and their locations\n    non_white_pixels = get_non_white_pixels(input_grid)\n    \n    # Iterate through the non-white pixels\n    for row, col, value in non_white_pixels:\n        # Fill the row to the right with the pixel's value\n        output_grid[row, col:] = value\n        # Fill the columns down with the pixel's value\n        output_grid[row:, col:] = value\n    \n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3212,
+    "candidates_token_count": 328,
+    "total_token_count": 3540,
+    "cached_content_token_count": 0
+  },
+  "response_time": 3.323522,
+  "response_file": "004-response.json"
+}

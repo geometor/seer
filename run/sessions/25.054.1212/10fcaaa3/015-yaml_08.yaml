@@ -1,0 +1,24 @@
+observations:
+  - object: input_grid
+    properties:
+      shape: variable # Rows x Columns
+      elements: integers_0-9 # Representing colors
+
+  - object: output_grid
+    properties:
+      shape: derived_from_input # (2 * input_rows) x (2 * input_cols)
+      elements: integers_0-9
+    relationships:
+      - input_grid_duplicates: 2x2_grid # Input grid appears duplicated in a 2x2 pattern.
+      - eight_fills: connects_boxes
+
+  - action: copy_and_repeat
+    description: The input grid is copied and repeated to form a 2x2 grid of the original pattern.
+    parameters:
+      rows: input_rows * 2
+      cols: input_cols * 2
+
+  - action: fill_with_eights
+    description: Fill the empty cells with 8's to connect all the inner boxes to each other.
+    parameters:
+      color: 8 # Azure

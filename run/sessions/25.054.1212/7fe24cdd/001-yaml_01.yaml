@@ -1,0 +1,18 @@
+facts:
+  - object: input_grid
+    type: grid
+    dimensions: 3x3
+    elements: integers (0-9, representing colors)
+  - object: output_grid
+    type: grid
+    dimensions: 6x6
+    elements: integers (0-9, representing colors)
+  - relationship: expansion
+    from: input_grid
+    to: output_grid
+    factor: 2
+    method: pixel_replication
+  - action: replication
+    description: Each pixel in the input_grid is transformed into a 2x2 block of the same color in the output_grid.
+  - object: pixel
+      type: grid_element

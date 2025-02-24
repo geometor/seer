@@ -1,0 +1,30 @@
+task: 010
+objects:
+  - description: input_grid
+    type: 2D array
+    properties:
+      rows: variable
+      columns: variable
+      elements: integers (0-9) representing colors
+
+  - description: output_grid
+    type: 2D array
+    properties:
+      rows: equal to input_grid rows
+      columns: equal to input_grid columns
+      elements: integers (0-9) representing colors
+
+  - description: first_row
+    type: 1D array
+    properties:
+      elements: elements from the first row of the input_grid
+
+transformations:
+  - action: copy
+    source: first two rows of input_grid
+    destination: first two rows of output_grid
+
+  - action: repeat_element_vertically
+    source: each element in first_row
+    destination: create columns in output_grid, starting from row 3
+    repetition_count: input_grid height minus two, multiplied by two

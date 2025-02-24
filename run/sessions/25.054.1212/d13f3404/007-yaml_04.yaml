@@ -1,0 +1,24 @@
+objects:
+  - type: grid
+    name: input_grid
+    dimensions: 3x3
+    elements: integers (0-9)
+  - type: grid
+    name: output_grid
+    dimensions: 6x6
+    elements: integers (0-9)
+  - type: cell
+    properties:
+      color: integer (0-9)
+      position: (row, column)
+
+actions:
+  - name: replicate
+    description: Copy elements from input_grid to output_grid.
+  - name: shift_diagonal
+    description: Position replicated elements diagonally down and to the right.
+
+relationships:
+  - input_grid elements are replicated and shifted diagonally in output_grid.
+  - Non-zero elements in input_grid dictate the pattern in output_grid.
+  - output_grid is twice the dimensions of input_grid

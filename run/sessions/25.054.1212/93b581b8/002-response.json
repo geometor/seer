@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Central Block:** Locate the 2x2 block of non-zero pixels in the center of the input grid.\n2.  **Top Extension**: Copy/mirror pixels `[2,1]` and `[2,0]` and `[3,1]` and `[3,0]`(using 0-indexed based row and column) of the input to the top two rows of the entire grid\n3. **Bottom Extension**: Copy pixels `[3,1]` and `[3,0]` and `[2,1]` and `[2,0]` to the bottom two rows of the grid.\n4.  **Preserve Center:** The original 2x2 central block remains unchanged in its original position.\n\"\"\"\n\nimport numpy as np\n\ndef find_central_block(grid):\n    # Find the bounding box of non-zero elements\n    rows, cols = np.where(grid != 0)\n    if len(rows) == 0:  # Handle empty grid case\n        return None\n    min_row, max_row = np.min(rows), np.max(rows)\n    min_col, max_col = np.min(cols), np.max(cols)\n\n    # Check if it's a 2x2 block\n    if max_row - min_row == 1 and max_col - min_col == 1:\n        return (min_row, min_col, max_row, max_col)\n    else:\n        return None\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = input_grid.shape\n\n    # Find the central 2x2 block\n    central_block_coords = find_central_block(input_grid)\n    if central_block_coords is None:\n        return output_grid # Return original grid if central block not present\n\n    min_row, min_col, max_row, max_col = central_block_coords\n\n\n    # Top Extension:\n    output_grid[0:2, 0:2] = input_grid[max_row,max_col] # azure\n    output_grid[0:2, cols-2:cols] = input_grid[max_row,min_col] # orange\n\n    # Bottom Extension:\n    output_grid[rows-2:rows, 0:2] = input_grid[min_row, max_col] # green\n    output_grid[rows-2:rows, cols-2:cols] = input_grid[min_row,min_col] # maroon\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2333,
+    "candidates_token_count": 605,
+    "total_token_count": 2938,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.352491,
+  "response_file": "002-response.json"
+}

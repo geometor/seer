@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Individual Azure Pixels:** Locate all pixels with the value azure (8) in the input grid.\n\n2.  **Iterative Horizontal Expansion:** For each azure pixel:\n    *   Expand one pixel to the left. If the pixel to the left is white (0), change it to azure (8). Continue expanding left, one pixel at a time, as long as the encountered pixel is white (0). Stop when a non-white pixel or the left edge of the grid is reached.\n    *   Expand one pixel to the right. If the pixel to the right is white (0), change it to azure (8). Continue expanding right, one pixel at a time, as long as the encountered pixel is white (0). Stop when a non-white pixel or the right edge of the grid is reached.\n\n3.  **Preservation:** Pixels that are not azure (8) in the original input grid remain unchanged.\n\n4. **Row Constraint**: Azure pixels will only appear on output rows that had one or more azure pixels on the same row of the input.\n\"\"\"\n\nimport numpy as np\n\ndef get_azure_pixels(grid):\n    \"\"\"\n    Locates all azure (8) pixels in the grid.\n    Returns a list of (row, col) tuples.\n    \"\"\"\n    rows, cols = grid.shape\n    azure_pixels = []\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 8:\n                azure_pixels.append((r, c))\n    return azure_pixels\n\ndef expand_pixel_horizontally(grid, row, col):\n    \"\"\"\n    Expands a single azure pixel horizontally, filling white (0) pixels,\n    until blocked by other colors or grid edges.\n    \"\"\"\n    output_grid = np.copy(grid)\n    rows, cols = output_grid.shape\n\n    # Expand left\n    c = col - 1\n    while c >= 0 and output_grid[row, c] == 0:\n        output_grid[row, c] = 8\n        c -= 1\n\n    # Expand Right\n    c = col + 1\n    while c < cols and output_grid[row, c] == 0:\n        output_grid[row, c] = 8\n        c += 1\n\n    return output_grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n\n    # get azure pixels\n    azure_pixels = get_azure_pixels(input_grid)\n\n    # expand each pixel horizontally\n    for r, c in azure_pixels:\n        output_grid = expand_pixel_horizontally(output_grid, r, c)\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 5895,
+    "candidates_token_count": 628,
+    "total_token_count": 6523,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.146327,
+  "response_file": "012-response.json"
+}

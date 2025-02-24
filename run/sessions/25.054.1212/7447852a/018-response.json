@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nCopies the input grid and changes the color of red pixels to yellow if they are not part of any 3x3 square's corners, where a square is defined by having red or yellow corners.\n\"\"\"\n\nimport numpy as np\n\ndef is_valid_square(grid, r, c):\n    \"\"\"Checks if a 3x3 square centered at (r, c) has red or yellow corners.\"\"\"\n    height, width = grid.shape\n    corners = [\n        (r - 1, c - 1), (r - 1, c + 1),\n        (r + 1, c - 1), (r + 1, c + 1)\n    ]\n    for cr, cc in corners:\n        if not (0 <= cr < height and 0 <= cc < width):\n            return False  # Out of bounds\n        if grid[cr, cc] not in (2, 4):\n            return False  # Not a red or yellow corner\n    return True\n\ndef is_corner_of_square(grid, r, c):\n    \"\"\"Checks if the pixel at (r,c) is a corner of ANY valid 3x3 squares.\"\"\"\n    height, width = grid.shape\n\n    # Check all possible 3x3 squares that could have (r,c) as a corner\n    for center_r in range(r - 1, r + 2):\n        for center_c in range(c - 1, c + 2):\n            if is_valid_square(grid, center_r, center_c):\n                return True # Found square\n    return False\n\ndef transform(input_grid):\n    # Create a copy of the input grid to serve as the output grid.\n    output_grid = np.copy(input_grid)\n    height, width = input_grid.shape\n\n    red_pixels_to_change = []\n\n    for r in range(height):\n        for c in range(width):\n            if input_grid[r, c] == 2:\n                # Check if it's part of any 3x3 square's corner\n                if not is_corner_of_square(input_grid, r, c):\n                    red_pixels_to_change.append((r, c))\n\n    # Change color to the identified red pixels.\n    for r, c in red_pixels_to_change:\n        output_grid[r, c] = 4\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3959,
+    "candidates_token_count": 561,
+    "total_token_count": 4520,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.295374,
+  "response_file": "018-response.json"
+}

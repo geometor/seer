@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is to \"crop\" the input grid by removing the outer \"frame\" of the dominant color. The frame consists of contiguous blocks of the dominant color starting from the edges and extending inwards until a different color is encountered.\n\"\"\"\n\nimport numpy as np\n\ndef get_dominant_border_color(grid):\n    \"\"\"Finds the most frequent color on the border of the grid.\"\"\"\n    border_pixels = np.concatenate([\n        grid[0, :], grid[-1, :], grid[:, 0], grid[:, -1]\n    ])\n    unique, counts = np.unique(border_pixels, return_counts=True)\n    dominant_color = unique[np.argmax(counts)]\n    return dominant_color\n\ndef find_inner_region_bounds(grid, dominant_color):\n    \"\"\"Finds the row and column indices that define the inner region after removing the border frame.\"\"\"\n    rows, cols = grid.shape\n\n    min_row, max_row = 0, rows - 1\n    min_col, max_col = 0, cols - 1\n\n    # Find top boundary\n    for r in range(rows):\n        if any(grid[r, :] != dominant_color):\n            min_row = r\n            break\n\n    # Find bottom boundary\n    for r in range(rows - 1, -1, -1):\n        if any(grid[r, :] != dominant_color):\n            max_row = r\n            break\n\n    # Find left boundary\n    for c in range(cols):\n        if any(grid[:, c] != dominant_color):\n            min_col = c\n            break\n\n    # Find right boundary\n    for c in range(cols - 1, -1, -1):\n        if any(grid[:, c] != dominant_color):\n            max_col = c\n            break\n\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    \"\"\"\n    Extracts the internal region of the input grid by removing the border of the dominant color.\n    The border is defined as contiguous blocks of the dominant color starting from edges.\n    \"\"\"\n    # Convert input_grid to numpy array\n    grid = np.array(input_grid)\n\n    # Find the dominant color on the border\n    dominant_color = get_dominant_border_color(grid)\n\n    # Find the bounding box of the internal region\n    min_row, max_row, min_col, max_col = find_inner_region_bounds(grid, dominant_color)\n\n    # Extract the internal region\n    output_grid = grid[min_row:max_row+1, min_col:max_col+1]\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3380,
+    "candidates_token_count": 626,
+    "total_token_count": 4006,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.031573,
+  "response_file": "016-response.json"
+}

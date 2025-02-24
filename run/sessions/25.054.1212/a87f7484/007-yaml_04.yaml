@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: [12, 3]  # Input grid dimensions
+      elements: integers #representing colors
+  - type: grid
+    properties:
+      dimensions: [3, 3]   # Output grid dimensions
+      elements: integers
+
+colors_present:
+  input: [0, 1, 2, 3, 7] #white, blue, red, green, orange
+  output: [0, 7] # white, orange
+
+actions:
+    - select:
+        color: 7 #orange
+        logic: unknown #positional, relational, etc.
+
+    - create_grid:
+        dimensions: [3,3]
+        elements_from_selection: true

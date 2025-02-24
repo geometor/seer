@@ -1,0 +1,47 @@
+task: 026
+examples:
+  - input_shape: [1, 6]
+    output_shape: [3, 6]
+    transformations:
+      - object: input pixel with value 1
+        action: "expand into two horizontal pixels"
+        height_multiplier: 3
+        width_expansion: [1, 1]
+
+  - input_shape: [1, 8]
+    output_shape: [4, 8]
+    transformations:
+      - object: input pixel with value 2
+        action: "expand into three horizontal pixels"
+        height_multiplier: 4
+        width_expansion: [2, 2, 2]
+
+  - input_shape: [1, 10]
+    output_shape: [6, 10]
+    transformations:
+      - object: input pixel with value 5
+        action: "expand into six horizontal pixels"
+        height_multiplier: 6
+        width_expansion: [5,5,5,5,5,5]
+  - input_shape: [1, 6]
+    output_shape: [9, 6]
+    transformations:
+      - object: input pixel with value 8
+        action: expand into nine horizontal pixels
+        height_multiplier: 9
+        width_expansion: [8,8,8,8,8,8,8,8,8]
+
+  - input_shape: [1, 6]
+    output_shape: [8, 6]
+    transformations:
+      - object: input pixel with value 7
+        action: expand into eight horizontal pixels.
+        height_multiplier: 8
+        width_expansion: [7,7,7,7,7,7,7,7]
+
+general_rule:
+  - For each non-zero pixel in the input grid:
+    - Determine its value (V).
+    - The output grid's height will be (V+1) times the original height.
+    - Replicate the non-zero pixel horizontally (V+1) times, at each corresponding vertical level.
+    - Preserve 0 value pixels.

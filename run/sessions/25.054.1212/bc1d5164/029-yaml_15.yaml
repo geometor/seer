@@ -1,0 +1,30 @@
+observations:
+  - object: input_grid
+    type: 2D array
+    properties:
+      - contains: integers 0-9 (representing colors)
+      - dominant_color: most frequent non-zero color
+
+  - object: output_grid
+    type: 2D array
+    properties:
+      - derived_from: input_grid
+      - contains: subset of input_grid colors
+      - size: determined by rows and columns containing dominant_color
+
+  - action: find_dominant_color
+    description: Identifies the most frequent non-zero color in the input grid.
+
+  - action: select_rows
+    description: Selects rows from the input grid that contain the dominant color.
+    criteria: Row must contain at least one instance of the dominant color.
+
+  - action: select_columns
+    description: Selects columns from the input grid that contain the dominant color.
+    criteria: Column must contain at least one instance of the dominant color.
+    
+  - action: create_output
+    description: creates the final output by including cells at the intersection of the selected rows and columns
+    constraints:
+      - row_index must be in selected_rows
+      - col_index must be in selected_cols

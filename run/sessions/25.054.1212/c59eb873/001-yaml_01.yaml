@@ -1,0 +1,20 @@
+objects:
+  - type: grid
+    dimensions:
+      input: 3x3
+      output: 6x6
+    elements: pixels
+    properties:
+      values: integers (0-9)
+      mapping: color_map
+
+actions:
+  - name: duplicate
+    type: spatial
+    description: Each pixel in the input grid is expanded into a 2x2 block of the same color in the output grid.
+
+relationships:
+  - type: one-to-many
+    description: One input pixel corresponds to four output pixels.
+  - type: spatial_adjacency
+    description: Adjacency relationships between pixels in input are preserved (scaled up) between blocks of pixels in the output.

@@ -1,0 +1,20 @@
+task: 008_recolor_subgrid
+observations:
+  - description: "The transformation extracts the top-left 4x4 subgrid from the input."
+    type: subgrid_extraction
+    coordinates: [[0, 0], [3, 3]]
+  - description: "Within the 4x4 subgrid, blue pixels (1) are transformed to green (3)."
+    type: color_transformation
+    from_color: 1  # Blue
+    to_color: 3    # Green
+  - description: "Within the 4x4 subgrid, white pixels (0) remain white (0)."
+    type: color_transformation
+    from_color: 0
+    to_color: 0
+  - description: "The output size is always 4x4"
+    type: size_constraint
+  - description: "All blue pixels (1) in the 4x4 subgrid become green (3) in the output"
+    type: color_transformation
+  - description: "All white pixels (0) in the extracted 4x4 region of the input grid remain white (0) in the output grid."
+    type: color_preservation
+  

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Yellow Region:** Find the contiguous region of yellow (4) pixels and determine its bounding box. This region remains unchanged in the output.\n\n2.  **Process Columns Individually:** For each column in the grid, do the following:\n\n    * If any existing azure pixels exist to the right of the right most yellow pixel, fill entire column with azure pixels.\n    * If the column is to the left of the left most yellow pixel, and no existing azure exists to the right of yellow, fill entire column with azure.\n    *   Otherwise, the column remains unchanged.\n\n3. Preserve the yellow region.\n\"\"\"\n\nimport numpy as np\n\ndef find_yellow_region(grid):\n    \"\"\"Finds the bounding box of the connected yellow region.\"\"\"\n    rows, cols = grid.shape\n    min_row, max_row = rows, -1\n    min_col, max_col = cols, -1\n\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r, c] == 4:\n                min_row = min(min_row, r)\n                max_row = max(max_row, r)\n                min_col = min(min_col, c)\n                max_col = max(max_col, c)\n\n    return min_row, max_row, min_col, max_col\n\ndef transform(input_grid):\n    # initialize output_grid\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((rows, cols), dtype=int)\n\n    # 1. Identify and preserve the yellow region.\n    min_yellow_row, max_yellow_row, min_yellow_col, max_yellow_col = find_yellow_region(input_grid)\n\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r,c] == 4:\n                output_grid[r,c] = 4\n\n\n    # 2. Process Columns Individually\n    for c in range(cols):\n        # Check for azure to the right of yellow\n        azure_right = False\n        for r in range(rows):\n            for col_check in range(max_yellow_col + 1, cols):\n                if input_grid[r,col_check] == 8:\n                    azure_right = True\n                    break\n            if azure_right:\n                break\n\n        # Fill based on the conditions\n        if azure_right and c > max_yellow_col:\n              for r in range(rows):\n                  output_grid[r,c] = 8\n        elif not azure_right and c < min_yellow_col :\n            for r in range(rows):\n                output_grid[r,c] = 8\n        elif input_grid[r,c] != 4: #Preserve yellow, otherwise don't change\n            output_grid[r,c] = input_grid[r,c] # Transfer the original pixel\n        \n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3823,
+    "candidates_token_count": 695,
+    "total_token_count": 4518,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.91078,
+  "response_file": "006-response.json"
+}

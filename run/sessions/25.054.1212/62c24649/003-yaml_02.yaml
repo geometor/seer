@@ -1,0 +1,28 @@
+task: 002
+objects:
+  - type: grid
+    properties:
+      dimensions:
+        - height: variable
+          width: variable
+      elements:
+        - type: pixel
+          properties:
+            color: integer (0-9)
+            position: (row, column)
+
+actions:
+  - name: DuplicatePixels
+    description: Each pixel in the input grid is expanded to a 2x2 block of the same color in the output grid.
+    input: single pixel
+    output: 2x2 block of pixels
+
+  - name: AddBorder
+    description: A one-pixel border is added around the expanded grid.
+    input: original input grid, expanded output grid
+    output: expanded output grid with border
+
+  - name: CopyEdgePixels
+    description: The border pixels are copied from the corresponding edge pixels of the original input grid.
+    input: original input grid edge pixels, expanded output grid border pixels
+    output:  expanded output grid border pixels with correct color

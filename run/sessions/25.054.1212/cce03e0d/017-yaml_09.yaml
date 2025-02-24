@@ -1,0 +1,22 @@
+task_id: 016
+objects:
+  - id: input_grid
+    type: grid
+    dimensions: 3x3
+    properties:
+      colors: [0, 1, 2] # Extracted from examples
+  - id: output_grid
+    type: grid
+    dimensions: 9x9
+    properties:
+      colors: [0, 1, 2] # Extracted from examples
+actions:
+  - name: replicate
+    input: input_grid
+    output: output_grid
+    rule: "The input grid is replicated in specific locations within the output grid."
+  - name: zero_fill
+    input: output_grid
+    rule: "Certain cells in the output grid are filled with zeros based on a defined pattern."
+relationships:
+   - input grid is tiled into the output grid

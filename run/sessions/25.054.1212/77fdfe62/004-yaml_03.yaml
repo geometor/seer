@@ -1,0 +1,76 @@
+examples:
+  - example_1:
+      input:
+        objects:
+          - color: 1 # Blue
+            shape: line
+            count: 16 # Number of blue pixels
+            note: horizontal lines and fills most of columns 2 and 7
+          - color: 0 # Black/background
+            shape: scattered
+            count: 23
+          - color: 8 # light blue
+            shape: L-shapes in a cross
+            count: 6
+          - colors: [2,3,4,6] # Red, Green, Yellow, Magenta - single pixels, at the four corners
+            shape: single_pixel
+            count: 1 each
+            positions: [top-left, top-right, bottom-left, bottom-right]
+      expected:
+        objects:
+          - color: 0  # Black
+            shape: background
+            count: 7
+          - color: [2,3,4,6] #corner colors from input, forming 2x2 squares
+            shape: merged_pixels
+            positions_new: [top-left, top-right, bottom-left, bottom-right]
+
+  - example_2:
+      input:
+        objects:
+         - color: 1
+           shape: line
+           count: 12
+           note: horizontal lines and fills most of columns 2 and 5
+         - color: 0
+           shape: scattered
+           count: 11
+         - color: 8
+           shape: L-shapes
+           count: 3
+         - color: [9,4,2,3]
+           shape: single_pixel
+           count: 1 each
+           positions: [top-left, top-right, bottom-left, bottom-right]
+      expected:
+        objects:
+          - color: [9,4,2,0] #corner colors from input - 9,4 at top, 2,0 on bottom
+            shape: single_pixel
+            count: 1 each
+            positions_new:  [top-left, top-right, bottom-left, bottom-right]
+
+  - example_3:
+      input:
+        objects:
+          - color: 1 # Blue
+            shape: line
+            count: 16
+            note: horizontal lines and fills most of columns 2 and 7
+          - color: 0
+            shape: scattered
+            count: 23
+          - color: 8
+            shape: L-shapes in a cross
+            count: 9
+          - color: [6,2,7,4] #corner colors from input
+            shape: single_pixel
+            count: 1
+            positions: [top-left, top-right, bottom-left, bottom-right]
+      expected:
+        objects:
+          - color: 0 # Black
+            shape: background
+            count: 7
+          - color: [6,2,7,4] #corner colors from input, forming 2x2 squares
+            shape: merged_pixels
+            positions_new:  [top-left, top-right, bottom-left, bottom-right]

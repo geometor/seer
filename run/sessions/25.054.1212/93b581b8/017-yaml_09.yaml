@@ -1,0 +1,28 @@
+task: 016_mirror_central_block
+objects:
+  - type: grid
+    properties:
+      dimensions: variable  # Rows and columns can vary.
+      elements: integers (0-9) representing colors
+      central_block:
+        type: subgrid
+        properties:
+          dimensions: 2x2
+          elements: non-zero integers
+          location: varies, but contains a 2x2 block of non-zero integers.
+      corner_blocks:
+        type: subgrid
+        properties:
+            dimensions: 2x2
+            elements: integers, correspond with element in Central Block.
+            location: Each corner of the overall grid.
+actions:
+  - name: find_central_block
+    input: grid
+    output: coordinates (row, column) of the top-left corner of central block
+  - name: mirror_color
+    input: color_value, grid_dimensions
+    output: corner_coordinates (row, col) where a block of 'color' is mirrored.
+  - name: create_mirrored_block
+    input: color, corner_coordinates, grid
+    output: updated grid

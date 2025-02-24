@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nIdentifies all red pixels (value '2') in the input grid and changes all adjacent white pixels (value '0') to blue (value '1').\nThe red pixels themselves, and pixels of any color other than white, remain unchanged.\n\"\"\"\n\nimport numpy as np\n\ndef find_all_pixels_by_color(grid, color):\n    \"\"\"Finds the coordinates of all pixels of the specified color.\"\"\"\n    pixels = []\n    for r in range(grid.shape[0]):\n        for c in range(grid.shape[1]):\n            if grid[r, c] == color:\n                pixels.append((r, c))\n    return pixels\n\ndef get_neighbors(row, col, grid_shape):\n    \"\"\"Gets the coordinates of all eight neighbors of a pixel.\"\"\"\n    neighbors = []\n    for dr in [-1, 0, 1]:\n        for dc in [-1, 0, 1]:\n            if dr == 0 and dc == 0:\n                continue  # Skip the cell itself\n            new_row, new_col = row + dr, col + dc\n            if 0 <= new_row < grid_shape[0] and 0 <= new_col < grid_shape[1]:\n                neighbors.append((new_row, new_col))\n    return neighbors\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the specified rule.\"\"\"\n    output_grid = np.copy(input_grid)\n    red_pixels = find_all_pixels_by_color(input_grid, 2)\n\n    for row, col in red_pixels:\n        neighbors = get_neighbors(row, col, input_grid.shape)\n        for neighbor_row, neighbor_col in neighbors:\n            if output_grid[neighbor_row, neighbor_col] == 0:\n                output_grid[neighbor_row, neighbor_col] = 1\n\n    return output_grid\n```\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4303,
+    "candidates_token_count": 442,
+    "total_token_count": 4745,
+    "cached_content_token_count": 0
+  },
+  "response_time": 4.34001,
+  "response_file": "018-response.json"
+}

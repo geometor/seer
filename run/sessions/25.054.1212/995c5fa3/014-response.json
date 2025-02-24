@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Scan the Input:** Examine the input grid and identify the columns that contain white (0) pixels.\n2. **Column-to-Row Mapping:**  For each identified column containing white, map it to a corresponding row in the output grid:\n    - The first column with a white pixel corresponds to output row 1.\n    - The second column with a white pixel corresponds to output row 2.\n    - The third column with a white pixel corresponds to output row 3.\n3. **Assign Colors:** Assign a specific color to each output row based on a predefined mapping:\n    - Row 1: Azure (8)\n    - Row 2: Red (2)\n    - Row 3: Yellow (4)\n4. **Create Output:** Construct a 3x3 output grid. Fill all cells in each row of output with mapped color.\n\"\"\"\n\nimport numpy as np\n\ndef get_white_columns(grid):\n    # Find columns containing white (0) pixels\n    white_columns = []\n    for x in range(grid.shape[1]):\n        if 0 in grid[:, x]:\n            white_columns.append(x)\n    return white_columns\n\ndef transform(input_grid):\n    # Initialize output grid as 3x3 numpy array\n    output_grid = np.zeros((3, 3), dtype=int)\n\n    # Get the columns containing white pixels\n    white_cols = get_white_columns(input_grid)\n\n    # Define the color mapping\n    color_map = {\n        0: 8,  # First white column -> Row 1: Azure (8)\n        1: 2,  # Second white column -> Row 2: Red (2)\n        2: 4   # Third white column -> Row 3: Yellow (4)\n    }\n\n    # Map white columns to output rows and colors\n    for i, col in enumerate(white_cols):\n        if i < 3: # important - stop after finding at most 3 columns\n            output_grid[i, :] = color_map[i]\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2294,
+    "candidates_token_count": 476,
+    "total_token_count": 2770,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.676466,
+  "response_file": "014-response.json"
+}

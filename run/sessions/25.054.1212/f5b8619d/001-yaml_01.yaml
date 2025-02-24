@@ -1,0 +1,25 @@
+objects:
+  - type: grid
+    dimensions:
+      input: 3x3
+      output: 6x6
+    elements: pixels
+    properties:
+      color:
+        mapping:
+          0: white
+          2: red
+          8: azure
+
+actions:
+  - type: expansion
+    description: The input grid is expanded into a larger output grid.
+  - type: replication
+    description: elements/patterns of the input appear repeatedly in output.
+    details: values seem to maintain relative position.
+  - type: insertion
+    description: introduction of new value (8) bordering original values
+
+relationships:
+  - input_to_output:  The output grid is derived from the input grid through a series of transformations.
+  - pixel_to_pixel: Individual pixels in the input grid relate to specific groups of pixels in the output grid. Specifically we can say original values are surrounded, bordered, or framed by new value 8.

@@ -1,0 +1,43 @@
+objects:
+  - id: background
+    color: blue (1)
+    shape: rectangle (7x7)
+    role: static
+
+  - id: green_region
+    color: green (3)
+    shape: rectangle (2x1)
+    position:
+      top_left: [1, 2] # row, column (0-indexed)
+
+  - id: red_region
+    color: red (2)
+    shape: rectangle (2x1)
+    position:
+      top_left: [1, 4]
+
+  - id: output_grid
+    color: mixed (3, 0, 2)
+    shape: rectangle (2x3)
+    role: result
+
+relationships:
+  - type: contains
+    subject: background
+    objects: [green_region, red_region]
+
+  - type: represents
+    subject: output_grid
+    objects: [green_region, red_region]
+    transformation: extract_and_arrange
+
+actions:
+ - name: extract_distinct_colors
+   input_object: background
+   output: [3, 2] # the distinct colors
+   description: Identifies the non-background colors
+
+ - name: arrange_output
+   input: [3,2]
+   output_object: output_grid
+   description: arranges the colors and inserts '0' between.

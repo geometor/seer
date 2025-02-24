@@ -1,0 +1,27 @@
+facts:
+  - task_type: "region_extraction"
+  - objects:
+    - name: "input_grid"
+      type: "2D_array"
+      properties:
+        - contains_multiple_colors: true
+    - name: "output_grid"
+      type: "2D_array"
+      properties:
+        - contains_single_color_region: true # Typically a single color, or a very small number of colors
+        - defines_target_color: true
+    - name: "bounding_box"
+      type: "region"
+      properties:
+        - defined_by: "target_color"
+        - location: "within_input_grid"
+  - actions:
+    - name: "determine_target_color"
+      input: "output_grid"
+      output: "target_color"
+    - name: "find_bounding_box"
+      input: ["input_grid", "target_color"]
+      output: "bounding_box_coordinates"
+    - name: "extract_region"
+      input: ["input_grid", "bounding_box_coordinates"]
+      output: "output_grid"

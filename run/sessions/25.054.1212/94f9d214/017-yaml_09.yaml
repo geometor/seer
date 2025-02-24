@@ -1,0 +1,26 @@
+facts:
+  - object: input_grid
+    type: grid
+    properties:
+      height: [8]
+      width: [4]
+      colors: [0, 1, 2, 3]
+  - object: output_grid
+    type: grid
+    properties:
+      height: input_grid.height / 2
+      width: input_grid.width
+      colors: [0, 2]  # Only white and red
+  - object: transition
+    type: horizontal_color_change
+    properties:
+      from_color: 0  # White
+      to_color: 3  # Green
+      input_row_range:  [0, input_grid.height / 2 - 1] # Top half of the input grid
+  - action: mark_transition
+    description: Place a red pixel in the output grid based on a white-to-green transition in the input grid.
+    input: transition
+    parameters:
+      output_x: transition.white_pixel_x  # X-coordinate of the white pixel
+      output_y: transition.white_pixel_y # Y-coordinate calculated by relative transition location
+    output: output_grid

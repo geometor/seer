@@ -1,0 +1,24 @@
+observations:
+  - object: blue_pixel
+    property: location # (row, column)
+    description: The single blue pixel in the input grid. Its location determines the center of the transformation.
+  - object: output_grid
+    property: size
+    description: Same dimensions as the input grid.
+  - object: transformed_pixels
+    property: color
+    value: blue
+    description: Pixels in the output grid that change color based on the blue_pixel location.
+  - object: transformation_pattern
+    property: shape
+    value: cross_alternate
+    description: Alternating blue pixels along the row and column of the input blue pixel.
+  - action: find_blue_pixel
+    description: Locates the (row, col) of the single blue pixel in the input.
+  - action: transform_row_and_column
+    description: Changes the color of specific pixels in the row and column intersecting at the blue pixel location to blue, skipping the center.
+  - constraint: output_size
+    description: The output grid maintains the same dimensions as the input grid.
+  - constraint: alternating_pixels
+    description: Starting at the position of the initial blue square, blue
+      pixels are placed in an alternating fashion along its row and column.

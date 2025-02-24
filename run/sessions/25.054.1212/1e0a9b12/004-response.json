@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Non-zero Pixels:** Locate all pixels within the input grid that have a value other than 0.\n2.  **Preserve Row-wise Order:** Maintain the original left-to-right order of these non-zero pixels *as they appear within each row*.\n3.  **Move to Bottom:** Move the identified non-zero pixels to the bottom-most available rows of the output grid.\n4.  **Row-wise Filling:** When placing pixels in the output grid, prioritize filling the lowest available row. Within that row, place pixels from the same input row in their original order. If pixels from a higher input row need to be placed, and there are still empty positions on rows that had non-zero pixels on lower rows of input, fill the lowest of available rows.\n5.  **Fill Remaining:** Fill any remaining cells in the output grid (those not occupied by moved non-zero pixels) with 0.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by moving all non-zero pixels to the bottom,\n    preserving their original row-wise order, and filling the remaining\n    cells with zeros.\n    \"\"\"\n    rows, cols = input_grid.shape\n    output_grid = np.zeros_like(input_grid)\n    non_zero_pixels_by_row = [[] for _ in range(rows)]\n\n    # 1. Identify and store non-zero pixels, preserving row and original order.\n    for r in range(rows):\n        for c in range(cols):\n            if input_grid[r, c] != 0:\n                non_zero_pixels_by_row[r].append((input_grid[r, c], c))\n\n    # 2 & 3. Move to the bottom, maintaining row-wise order.\n    output_row = rows - 1\n    for row_pixels in reversed(non_zero_pixels_by_row):  # Iterate through original rows from bottom to top\n        output_col_indices = [0] * rows # keeps track of where we are in the output for each row\n        if not row_pixels:\n            continue\n        \n        for pixel_value, original_col in sorted(row_pixels, key=lambda x: x[1]):\n            #find output_col for the current output_row\n            output_col = output_col_indices[output_row]\n            while output_col < cols and output_grid[output_row, output_col] != 0:\n              output_col += 1            \n            \n            if output_col < cols:            \n                output_grid[output_row, output_col] = pixel_value\n                output_col_indices[output_row] = output_col + 1 #increment for next time we use this output row\n            else:\n                #find the next available spot in higher rows\n                curr_output_row = output_row - 1\n                while curr_output_row >= 0:\n                    output_col = output_col_indices[curr_output_row]\n                    while output_col < cols and output_grid[curr_output_row, output_col] != 0:\n                        output_col += 1\n                    \n                    if output_col < cols:\n                        output_grid[curr_output_row, output_col] = pixel_value\n                        output_col_indices[curr_output_row] = output_col + 1\n                        break\n                    else:\n                      curr_output_row -= 1\n\n        output_row -= 1\n        if output_row < 0:\n            break\n        \n\n    # 5. Fill the remaining (already done by initializing output_grid with zeros).\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3240,
+    "candidates_token_count": 851,
+    "total_token_count": 4091,
+    "cached_content_token_count": 0
+  },
+  "response_time": 8.858108,
+  "response_file": "004-response.json"
+}

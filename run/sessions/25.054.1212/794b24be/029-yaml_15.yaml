@@ -1,0 +1,16 @@
+facts:
+  - description: "Blue pixels define a rectangular region."
+  - property: color
+    values: [blue, red, black]
+  - object: bounding_box
+    description: "The smallest rectangle encompassing all blue pixels in the input."
+    attributes:
+      - top_left: "Coordinate of the top-left corner."
+      - bottom_right: "Coordinate of the bottom-right corner."
+  - action: fill
+    description: "Fill the bounding box area with red."
+  - action: zero_out
+    description: "Set all pixels outside the bounding box to black."
+  - input_grid_property: "Input grids contain blue and black pixels."
+  - output_grid_property: "Output grids contain only red and black pixels."
+  - transformation: "Input blue pixels are transformed to output red, filling the minimum bounding rectangle"

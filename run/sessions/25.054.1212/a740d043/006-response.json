@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Locate Starting Point:** Find the top-left most non-blue pixel in the input grid. This is the initial starting point (row, col).\n\n2.  **Determine Bounding Box:**\n    *   From the starting point, expand downwards until you encounter a fully blue row. The row *before* the fully blue row is the bottom boundary.\n    *   From the starting point, expand to the right until you encounter a fully blue column. The column *before* the fully blue column is the right boundary.\n    *   The top boundary is the row of the starting point.\n    *  The left boundary is the column of the starting point.\n\n3.  **Extract Sub-grid:** Create an output grid with the dimensions defined by the bounding box.\n\n4. **Fill Output:**\n    *  Iterate through the bounding box area in the original grid.\n    *  If a cell is not blue, replace it with a zero.\n    *  Copy the cells of the original grid into the output.\n\"\"\"\n\nimport numpy as np\n\ndef get_top_left_non_blue_pixel(grid):\n    \"\"\"\n    Returns the (row, col) tuple of the top-left most non-blue pixel.\n    Returns None if no non-blue pixels are found.\n    \"\"\"\n    rows, cols = np.shape(grid)\n    for r in range(rows):\n        for c in range(cols):\n            if grid[r][c] != 1:\n                return (r, c)\n    return None\n\ndef determine_bounding_box(input_grid, start_row, start_col):\n    \"\"\"\n    Determines the bounding box of the region of interest.\n    \"\"\"\n    max_rows, max_cols = np.shape(input_grid)\n    bottom_row = start_row\n    right_col = start_col\n\n    # Expand downwards\n    for r in range(start_row + 1, max_rows):\n        if all(input_grid[r, :] == 1):\n            break\n        bottom_row = r\n\n    # Expand to the right\n    for c in range(start_col + 1, max_cols):\n        if all(input_grid[:, c] == 1):\n            break\n        right_col = c\n\n    return start_row, start_col, bottom_row, right_col\n\ndef transform(input_grid):\n    \"\"\"\n    Transforms the input grid by extracting a contiguous region of non-blue\n    pixels, using solid blue rows/columns as boundaries, and sets to zero\n    pixels in the output grid if they are not blue.\n    \"\"\"\n    # Find the starting point (top-left non-blue pixel)\n    start_coords = get_top_left_non_blue_pixel(input_grid)\n    if start_coords is None:\n        return np.array([])  # Return an empty array if no non-blue\n\n    start_row, start_col = start_coords\n\n    # Determine the bounding box\n    top_row, left_col, bottom_row, right_col = determine_bounding_box(input_grid, start_row, start_col)\n\n    # Create the output grid\n    out_rows = bottom_row - top_row + 1\n    out_cols = right_col - left_col + 1\n    output_grid = np.zeros((out_rows, out_cols), dtype=int)\n\n    # Copy and modify pixels within the bounding box\n    for r in range(out_rows):\n        for c in range(out_cols):\n            original_value = input_grid[top_row + r, left_col + c]\n            output_grid[r,c] = original_value\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3314,
+    "candidates_token_count": 854,
+    "total_token_count": 4168,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.826572,
+  "response_file": "006-response.json"
+}

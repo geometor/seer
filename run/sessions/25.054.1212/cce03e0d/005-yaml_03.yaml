@@ -1,0 +1,29 @@
+objects:
+  - input_grid:
+      type: grid
+      dimensions: 3x3
+      elements: integers (0-9)
+      properties:
+        - color: varies per cell
+  - output_grid:
+      type: grid
+      dimensions: 9x9
+      elements: integers (0-9)
+      properties:
+        - color: varies per cell
+
+actions:
+  - copy:
+      source: input_grid
+      destination: output_grid
+      properties:
+        - placement: specific regions of the output_grid, based on input grid position
+  - fill:
+      area: output_grid (non-copied regions)
+      value: 0  # Represents the color white
+      properties:
+          - context dependent positioning
+
+relationships:
+  - input_to_output: The output grid is a transformation of the input grid, consisting of copies and filled regions.
+  - spatial_relationships: The placement of copies within the output grid is related to the original input grid position and other blank regions

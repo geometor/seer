@@ -1,0 +1,99 @@
+example1:
+  input:
+    objects:
+      - color: 5 #gray
+        shape: diagonal_line
+        positions: [(0, 0), (1, 1), (2, 2)]
+      - color: 3 #green
+        shape: single_pixel
+        positions: [(1, 0)]
+      - color: 0 #white
+        shape: irregular
+        positions:  [(0, 1), (0, 2), (1, 2), (2, 0), (2, 1)]
+
+  output:
+    objects:
+      - color: 5
+        shape: diagonal_line #from top left
+        positions: [(0, 0), (1, 1)]
+      - color: 3
+        shape: single_pixel
+        positions: [(0, 1)]  #adjacent right of gray
+      - color: 0
+        shape: irregular
+        positions: [(0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)]
+
+  transformations:
+    - object_5: move_adjacent_left; from [(2,2)] to output [(1,1)]
+    - object_3: move_up; from [(1,0)] to output [(0,1)]
+    - object_0: partial_move; fill_gaps
+
+example2:
+  input:
+      objects:
+          - color: 5  # Gray
+            shape: diagonal
+            positions: [(0, 0), (1, 1), (2, 2)]
+          - color: 0 #white
+            shape: irregular
+            positions: [(0, 1), (0, 2), (0, 3), (1, 0), (1, 2), (1, 3), (2, 1), (3, 1)]
+          - color: 6  # Magenta
+            shape: vertical_line
+            positions: [(2, 0), (3, 0)]
+          - color: 4 #yellow
+            positions: [(3,2)]
+          - color: 5
+            positions: [(3,3)]
+  output:
+      objects:
+          - color: 5
+            positions: [(0,0), (1,1)]
+          - color: 0 #white
+            positions: [(0, 1), (1, 0), (1, 2), (1, 3), (2, 0), (2, 1), (3, 0), (3, 1), (3, 2)]
+          - color: 6 # Magenta
+            positions: [(0,2), (0,3)] #moved to top row
+          - color: 4 # yellow
+            positions: [(2,3)]
+          - color: 5 #gray
+            positions: [(2,2), (3,3)] #fills the empty space created by 6
+
+  transformations:
+      - object_5: move_adjacent_left; from [(2,2)] to output [(1,1)]
+      - object_6: move_to_top; two pixels moved up
+      - object_4: no_change_row, move_right; stays in row, moves right as 5 fills the spot
+      - object_0: partial_move, fill_gaps
+
+example3:
+  input:
+      objects:
+        - color: 5
+          positions: [(0, 0), (1, 1), (2, 2)]
+        - color: 0
+          positions: [(0, 1), (0, 2), (0, 3), (0, 4), (1, 0), (1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 1), (3, 3), (4, 1), (4, 3)]
+        - color: 8
+          positions: [(2, 0), (2, 1)]
+        - color: 2
+          positions: [(3, 1), (4, 1)]
+        - color: 1
+          positions: [(4,3)]
+        - color: 5
+          positions: [(3,3), (4,4)]
+  output:
+      objects:
+        - color: 5
+          positions: [(0, 0), (1, 1), (2,2)] #no change
+        - color: 0
+          positions:  [(0, 1), (0, 3), (0, 4), (1, 0), (2, 0), (2, 1), (2, 3), (2, 4), (3, 0), (3, 1), (3, 2), (3, 3), (4, 0), (4, 1), (4, 2), (4, 3), (4, 4)] #fill
+        - color: 8
+          positions: [(0, 2), (1, 2)] #move up
+        - color: 2
+          positions: [(1,3), (1,4)] #move up
+        - color: 1
+          positions: [(3,4)]
+
+  transformations:
+    - object_8: move_up
+    - object_2: move_up; placed on the right of 8
+    - object_5: from [(3,3)] to output [(2,2)]
+    - object_1: no change to row;
+    - object_0: fill_gaps

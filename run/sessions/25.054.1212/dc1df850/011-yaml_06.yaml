@@ -1,0 +1,30 @@
+objects:
+  - name: red_pixel
+    color: 2
+    role: initiator
+    properties:
+      shape: single pixel
+  - name: white_pixel
+    color: 0
+    role: target
+    properties:
+      shape: single pixel
+  - name: blue_pixel
+    color: 1
+    role: result
+    properties:
+      shape: single pixel
+  - name: L_shape
+    description: One red pixel and two adjacent white pixels forming an "L". The white pixels can be adjacent to each other or diagonal.
+    properties:
+        colors: [2, 0, 0]
+
+actions:
+  - name: find_red_pixels
+    description: Locate all red pixels in the input grid.
+  - name: check_L_shape
+    description: Determine if a red pixel forms an L-shape with two adjacent white pixels.
+  - name: flood_fill
+    description: Change the color of directly adjacent white pixels to blue, starting from a white pixel in the L-shape.
+  - name: preserve_other_colors
+    description: Keep the colors of pixels that aren't white or part of a flood fill.

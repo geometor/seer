@@ -1,0 +1,115 @@
+
+## example 1
+*input:*
+```
+0 9 9 1 9 9 9
+0 0 9 1 9 9 0
+9 0 9 1 9 9 0
+0 0 0 1 9 0 0
+0 9 9 1 9 9 9
+```
+*expected output:*
+```
+0 0 0
+0 0 0
+0 0 0
+0 8 8
+0 0 0
+```
+size: None
+palette: None
+color count: None
+pixels off: None
+**ERROR**: ERROR: operands could not be broadcast together with shapes (5,) (2,) 
+
+## example 2
+*input:*
+```
+0 0 0 1 9 0 0
+9 0 9 1 9 9 9
+0 9 9 1 9 9 9
+0 0 0 1 9 9 9
+0 9 9 1 9 9 9
+```
+*expected output:*
+```
+0 8 8
+0 0 0
+0 0 0
+0 0 0
+0 0 0
+```
+size: None
+palette: None
+color count: None
+pixels off: None
+**ERROR**: ERROR: operands could not be broadcast together with shapes (5,) (2,) 
+
+## example 3
+*input:*
+```
+9 0 0 1 9 0 9
+9 0 0 1 0 9 0
+9 0 0 1 9 0 0
+0 9 9 1 0 9 9
+0 0 9 1 0 9 0
+```
+*expected output:*
+```
+0 8 0
+0 0 8
+0 8 8
+8 0 0
+8 0 0
+```
+size: None
+palette: None
+color count: None
+pixels off: None
+**ERROR**: ERROR: operands could not be broadcast together with shapes (5,) (2,) 
+
+## example 4
+*input:*
+```
+0 9 9 1 9 0 9
+9 0 0 1 9 0 0
+9 9 9 1 9 9 9
+0 9 0 1 0 0 0
+9 0 0 1 9 0 0
+```
+*expected output:*
+```
+0 0 0
+0 8 8
+0 0 0
+8 0 8
+0 8 8
+```
+size: None
+palette: None
+color count: None
+pixels off: None
+**ERROR**: ERROR: operands could not be broadcast together with shapes (5,) (2,) 
+
+## example 5
+*input:*
+```
+0 9 9 1 9 0 9
+9 0 9 1 9 9 9
+9 9 9 1 0 0 9
+9 0 0 1 9 0 0
+9 9 9 1 0 0 9
+```
+*expected output:*
+```
+0 0 0
+0 0 0
+0 0 0
+0 8 8
+0 0 0
+```
+size: None
+palette: None
+color count: None
+pixels off: None
+**ERROR**: ERROR: operands could not be broadcast together with shapes (5,) (2,) 

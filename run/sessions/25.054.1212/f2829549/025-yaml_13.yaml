@@ -1,0 +1,32 @@
+facts:
+  - type: grid
+    description: input grid
+    dimensions: [4, 7]
+    colors: [0, 1, 5, 7]
+    color_names: [white, blue, gray, orange]
+
+  - type: grid
+    description: output grid
+    dimensions: [4, 3]
+    colors: [0, 3]
+    color_names: [white, green]
+
+  - type: observation
+    description: Output grid height matches input grid height.
+    input_property: height
+    output_property: height
+
+  - type: observation
+    description: Output grid width is less than half of the input grid width, plus one.
+    input: input width
+    output: output width
+
+  - type: observation
+    description: Green (3) appears in the output grid where orange (7) or blue (1) was present in the columns used from the input grid.
+    input_colors: [7, 1]
+    output_color: 3
+
+  - type: observation
+    description: The specific columns used appear to be the first, the fourth, then the sum of the unique values of the two columns
+    input_colors: [7, 1]
+    output_color: 3

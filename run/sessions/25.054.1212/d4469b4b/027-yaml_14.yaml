@@ -1,0 +1,30 @@
+objects:
+  - name: input_grid
+    type: grid
+    dimensions: 5x5
+    elements: integers (0-9)
+    description: Represents a 2D array of colored pixels.
+  - name: output_grid
+    type: grid
+    dimensions: 3x3
+    elements: integers (0-9)
+    description: Represents a 2D array of colored pixels, derived from the input grid.
+  - name: 3x3_region
+    type: subgrid
+    dimensions: 3x3
+    elements: integers (0-9)
+    description: A sliding window within the input_grid, centered at a specific pixel.
+  - name: pixel
+    type: element
+    dimensions: 1x1
+    possible_values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+actions:
+  - name: check_region_for_non_zero
+    input: 3x3_region
+    output: boolean
+    description: Checks if there are pixels other than background color within a 3x3 region of the input grid.
+  - name: summarize_region
+    input: 3x3_region
+    output: pixel
+    description: Transforms a 3x3 region of the input grid into a single pixel in the output grid.

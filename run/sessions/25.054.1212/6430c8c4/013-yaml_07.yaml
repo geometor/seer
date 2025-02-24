@@ -1,0 +1,45 @@
+objects:
+  - id: input_grid
+    type: grid
+    properties:
+      dimensions: [9, 4] # Height, Width
+      colors: [0, 2, 4, 7]
+
+  - id: output_grid
+    type: grid
+    properties:
+      dimensions: [4, 4]
+      colors: [0, 3]
+
+  - id: orange_region
+    type: contiguous_region
+    properties:
+     color: 7
+     location: input_grid_top
+
+  - id: yellow_region
+    type: contiguous_region
+    properties:
+     color: 4
+     location: input_grid_middle
+
+  - id: red_region
+    type: contiguous_region
+    properties:
+     color: 2
+     location: input_grid_bottom
+
+actions:
+  - type: transformation
+    input: input_grid
+    output: output_grid
+    description: "Transforms the input grid into a smaller output grid based on the presence and arrangement of colors."
+
+relationships:
+  - type: contains
+    from: input_grid
+    to: [orange_region, yellow_region, red_region]
+
+  - type: size_reduction
+    from: input_grid
+    to:  output_grid

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify the Target:** Locate the vertical line of blue (1) pixels in the input grid. It's in the center (column 4).\n2.  **Extract:** extract the column where all the values are equal to one\n3.  **Resize/Compress:** Reduce the width of the extracted column to three. Place the column in the center\n4.  **Recolor:** Change all blue (1) pixels in the extracted area to azure (8).\n5.  **Fill Remaining:** Fill all other cells in output with the color white (0).\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    # Find a vertical line of the specified color\n    for col in range(grid.shape[1]):\n        if np.all(grid[:, col] == color):\n            return col\n    return -1  # Return -1 if no such line is found\n\ndef transform(input_grid):\n    # Find the vertical line of blue (1) pixels\n    blue_column_index = find_vertical_line(input_grid, 1)\n\n    # initialize output grid\n    output_height = input_grid.shape[0]\n    output_width = 3\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    if blue_column_index != -1:\n      # Extract the blue column\n      blue_column = input_grid[:, blue_column_index]\n\n      # Recolor the blue column to azure (8)\n      blue_column[blue_column == 1] = 8\n      \n      # place in the center of output\n      output_grid[:, 1] = blue_column\n\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2347,
+    "candidates_token_count": 392,
+    "total_token_count": 2739,
+    "cached_content_token_count": 0
+  },
+  "response_time": 5.090341,
+  "response_file": "014-response.json"
+}

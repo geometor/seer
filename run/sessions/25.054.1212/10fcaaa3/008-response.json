@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe transformation rule is as follows:\n1. Copy and Expand: Create a new grid which doubles the height and width from the input grid to new grid.\n2. Duplicate Magenta: Copy all the magenta element in the original grid locations in the new grid, then duplicate the magenta pixels at a mirrored location at the right side.\n3. Mirror Magenta: Duplicate the expanded top grid, below a solid line of azure.\n4. Fill Azure: Add a complete line of azure below the created top grid.\n5. Fill Azure: Fill with azure the columns between the two first and between the next two columns in the original grid.\n6. Fill Azure: Fill the created structure with azure where ever required.\n\"\"\"\n\nimport numpy as np\n\ndef transform(input_grid):\n    input_height, input_width = input_grid.shape\n    output_height = input_height * 2\n    output_width = input_width * 2\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n    # Duplicate and mirror magenta pixels, and introduce azure.\n    for i in range(input_height):\n        for j in range(input_width):\n            if input_grid[i, j] == 6:\n                output_grid[i, j] = 6\n                output_grid[i, j + input_width] = 6\n\n    # Fill between magenta columns with azure in the top half.\n    magenta_cols = []\n    for j in range(output_width) :\n        for i in range(output_height) :\n            if output_grid[i,j] == 6:\n                magenta_cols.append(j)\n                break;\n\n    if len(magenta_cols) > 0:\n      for j in range(len(magenta_cols)-1):\n        cur_col = magenta_cols[j]\n        next_col = magenta_cols[j+1]\n        if next_col - cur_col > 1:\n           for k in range(cur_col+1,next_col):\n             for i in range(input_height):\n                  output_grid[i,k] = 8\n\n    # Add a complete line of azure.\n    output_grid[input_height, :] = 8\n\n    # Mirror the top part of the grid to the bottom.\n    for i in range(input_height):\n        for j in range(output_width):\n            output_grid[output_height - 1 - i, j] = output_grid[i, j]\n            if (output_grid[output_height - 1 - i, j] == 8) and (i != input_height-1):\n               output_grid[output_height - 1 - i, j] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2204,
+    "candidates_token_count": 637,
+    "total_token_count": 2841,
+    "cached_content_token_count": 0
+  },
+  "response_time": 7.120761,
+  "response_file": "008-response.json"
+}

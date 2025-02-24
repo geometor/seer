@@ -1,0 +1,33 @@
+objects:
+  - name: grid
+    type: 2D array
+    description: Contains pixels representing colors.
+  - name: pixel
+    type: integer
+    description: Represents a color. Value range 0-9.
+  - name: grey_pixel
+    type: pixel
+    value: 5
+    description: Triggers a pattern replacement.
+  - name: pattern
+    type: sequence
+    description: Sequence of colors to the right of a grey pixel.
+  - name: white_pixel
+    type: pixel
+    value: 0
+    description: Gets replaced by the pattern after a grey pixel.
+
+actions:
+  - name: identify_pattern
+    input: grid, grey_pixel_location
+    output: pattern
+    description: Extracts the color sequence to the right of a grey pixel.
+  - name: replace_pixels
+    input: grid, grey_pixel_location, pattern
+    output: modified_grid
+    description: Replaces white pixels with the pattern colors, starting from the grey pixel's location. Stops at another grey or the end of the row.
+
+rules:
+  - trigger: grey_pixel
+    action: identify_pattern, replace_pixels
+  - termination: next grey_pixel or end of row

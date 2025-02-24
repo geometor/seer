@@ -1,0 +1,22 @@
+facts:
+  - type: grid
+    description: Input and output are 3x3 grids.
+    properties:
+      - dimensions: [3, 3]
+      - data_type: integer (0-9 representing colors)
+
+  - type: object
+    description: Pixels within the grid.
+    properties:
+      - color: Represented by an integer (0-9).
+      - position: Defined by row and column index.
+
+  - type: transformation
+    description:  Conversion of input grid to output grid.
+    actions:
+      - selection:  Pixels are selected to retain their original color/value.
+      - blanking:  Non-selected pixels are changed to white (0).
+      - persistence: Two colored blocks seem to persist.
+
+  - type: observation
+      description: colors yellow(4) and green(3) in the center of their respective rows.

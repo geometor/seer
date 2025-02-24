@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1.  **Identify Object:** Locate the isolated vertical line of orange (7) pixels. An isolated line means that no other orange pixels are directly adjacent to it, either vertically or horizontally.\n2.  **Store Initial Position:** Record the row and column indices of each pixel in the orange line.\n3.  **Shift:** Move the original orange (7) line upwards by one pixel. If the line is already at the top, parts will disappear off the edge.\n4. **Store Final and Combined Positions** Record the row and column indices of the *new* position of the vertical line. Combine both positions for use when drawing the frame\n5.  **Frame:** Create a single-pixel thick frame of azure (8) that surrounds both the initial *and* final positions of the orange line.\n\"\"\"\n\nimport numpy as np\n\ndef find_vertical_line(grid, color):\n    rows, cols = grid.shape\n    for c in range(cols):\n        for r in range(rows):\n            if grid[r, c] == color:\n                # Check if it's a vertical line\n                start_row = r\n                end_row = r\n                while end_row + 1 < rows and grid[end_row + 1, c] == color:\n                    end_row += 1\n                \n                # verify that it is isolated\n                if (start_row == 0 or grid[start_row-1,c] != color) and \\\n                 (end_row == rows-1 or grid[end_row+1, c] != color):\n\n                  # if it's not isolated on the sides, return none\n                  if (c > 0 and grid[start_row:end_row+1, c-1].any() == color) or \\\n                     (c < cols -1 and grid[start_row:end_row+1, c+1].any() == color):\n                      return None, None, None\n                  \n                  return c, start_row, end_row\n    return None, None, None\n\ndef get_positions(col, start_row, end_row):\n    # return positions of pixels in a vertical line\n    positions = []\n    for r in range(start_row, end_row + 1):\n        positions.append((r, col))\n    return positions\n\ndef shift_positions(positions, shift_amount, rows):\n    # shift the positions up\n    shifted_positions = []\n    for r, c in positions:\n        new_r = max(0, r + shift_amount) # Ensure we don't go out of bounds\n        shifted_positions.append((new_r,c))\n    return shifted_positions\n    \n\ndef add_frame(grid, positions, frame_color):\n    # create a combined set of initial and final positions\n    rows, cols = grid.shape\n    \n    # Add frame around combined positions\n    for r, c in positions:\n      # frame above\n      if r-1 >= 0:\n        grid[r - 1, c] = frame_color\n\n      # frame below\n      if r+1 < rows:\n        grid[r + 1, c] = frame_color\n      \n      # frame to the left\n      if c-1 >= 0:\n          grid[r,c-1] = frame_color\n      \n      # frame to the right\n      if c+1 < cols:\n          grid[r,c+1] = frame_color\n\n      # frame to top left\n      if r-1 >= 0 and c-1 >= 0:\n        grid[r-1,c-1] = frame_color\n\n      # frame to top right\n      if r-1 >= 0 and c+1 < cols:\n        grid[r-1, c+1] = frame_color\n      \n      # frame to bottom left\n      if r+1 < rows and c-1 >= 0:\n        grid[r+1, c-1] = frame_color\n      \n      # frame to bottom right\n      if r+1 < rows and c+1 < cols:\n          grid[r+1, c+1] = frame_color\n    return grid\n\ndef transform(input_grid):\n    # initialize output_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Find the vertical line of orange (7) pixels\n    col, start_row, end_row = find_vertical_line(output_grid, 7)\n\n    if col is not None:\n        # Store initial position\n        initial_positions = get_positions(col, start_row, end_row)\n\n        # Shift the line and store new position (-1 for up)\n        shifted_positions = shift_positions(initial_positions, -1, rows)\n        \n        # clear original positions\n        for r,c in initial_positions:\n          output_grid[r,c] = 0\n\n        # set shifted positions\n        for r,c in shifted_positions:\n          output_grid[r,c] = 7\n        \n        # combine positions\n        combined_positions = list(set(initial_positions + shifted_positions))\n\n        # Create a frame of azure (8) around the combined positions\n        output_grid = add_frame(output_grid, combined_positions, 8)\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 4676,
+    "candidates_token_count": 1225,
+    "total_token_count": 5901,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.19337,
+  "response_file": "006-response.json"
+}

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nThe input grid is transformed into a smaller output grid. The output grid represents\na condensed version of the input, highlighting the non-zero, non-white corners\nof colored regions in each quadrant of the input grid with a specific color (green=3).\n\"\"\"\n\nimport numpy as np\n\ndef get_quadrant(input_grid, row_start, row_end, col_start, col_end):\n    return input_grid[row_start:row_end, col_start:col_end]\n\ndef transform(input_grid):\n    # initialize output_grid\n    input_grid = np.array(input_grid)\n    rows, cols = input_grid.shape\n    output_grid = np.zeros((4, 4), dtype=int)\n\n    # Define quadrant boundaries\n    row_mid = rows // 2\n    col_mid = cols // 2\n\n    # Quadrant 1 (Top-Left)\n    quadrant1 = get_quadrant(input_grid, 0, row_mid, 0, col_mid)\n    if quadrant1.size > 0:\n      val = quadrant1[0,0]\n      output_grid[0, 0] = val if val != 0 else 0\n\n    # Quadrant 2 (Top-Right)\n    quadrant2 = get_quadrant(input_grid, 0, row_mid, col_mid, cols)\n    if quadrant2.size > 0:\n        val = quadrant2[0, -1]\n        output_grid[0, 3] = val if val != 0 else 0\n\n    # Quadrant 3 (Bottom-Left)\n    quadrant3 = get_quadrant(input_grid, row_mid, rows, 0, col_mid)\n    if quadrant3.size > 0:\n      val = quadrant3[-1, 0]\n      output_grid[3, 0] = val if val != 0 else 0\n    \n    # Quadrant 4 (Bottom-Right)\n    quadrant4 = get_quadrant(input_grid, row_mid, rows, col_mid, cols)\n    if quadrant4.size > 0:\n        val = quadrant4[-1, -1]\n        output_grid[3, 3] = val if val != 0 else 0\n    \n    output_grid = np.where(output_grid != 0, 3, 0)\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2128,
+    "candidates_token_count": 573,
+    "total_token_count": 2701,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.377737,
+  "response_file": "008-response.json"
+}

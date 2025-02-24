@@ -1,0 +1,18 @@
+facts:
+  - object: blue_pixels
+    description: Pixels with a value of 1 in the input grid.
+    properties:
+      color: blue
+      value: 1
+    actions:
+      - change_color:
+          to: red
+          new_value: 2
+      - reposition:
+          description: All blue pixels, after turning red, are arranged to top-left corner and form a smallest rectangle containing all of them.
+
+  - object: output_grid
+    description: the smallest rectangle grid containing all red pixels after the blue pixels in the input grid change color and are moved to top-left.
+    properties:
+      initial_value: 0
+      shape_derivation: Bounding box of all blue pixels in the input

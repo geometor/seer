@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\n1. **Identify Divider:** Locate the horizontal line of yellow (4) pixels in the input grid. This line divides the input grid into an \"upper region\" and \"lower region\".\n2.  **Focus on Upper Region:** Disregard the \"lower region\" of the input grid (everything at or below the yellow line).\n3. **Determine output size:** The output size is the dimensions of the \"upper region\".\n4.  **Map to Output:** Create an output grid of the dimensions determined in the previous step. For each non-white pixel in the \"upper region\", change the color to green (3). Change all the white pixels to 0.\n\"\"\"\n\nimport numpy as np\n\ndef find_horizontal_line(grid, color):\n    \"\"\"Finds the row index of a horizontal line of a given color.\"\"\"\n    for i, row in enumerate(grid):\n        if all(pixel == color for pixel in row):\n            return i\n    return -1  # Not found\n\ndef transform(input_grid):\n    \"\"\"Transforms the input grid according to the described rule.\"\"\"\n    input_grid = np.array(input_grid)\n\n    # 1. Identify Divider\n    yellow_line_row = find_horizontal_line(input_grid, 4)\n\n    # 2. Focus on Upper Region\n    upper_region = input_grid[:yellow_line_row]\n\n    # 3. Determine Output size\n    output_height, output_width = upper_region.shape\n    \n    # Initialize the output_grid\n    output_grid = np.zeros((output_height, output_width), dtype=int)\n\n\n    # 4. Map to Output\n    for i in range(output_height):\n        for j in range(output_width):\n            if upper_region[i,j] != 0:\n                output_grid[i,j] = 3\n            else:\n                output_grid[i, j] = 0\n\n\n    return output_grid.tolist()\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 2217,
+    "candidates_token_count": 451,
+    "total_token_count": 2668,
+    "cached_content_token_count": 0
+  },
+  "response_time": 11.124666,
+  "response_file": "020-response.json"
+}

@@ -1,0 +1,30 @@
+task_id: 010_modified # Added a task ID for easier tracking
+observations:
+  - type: object
+    description: Input grid, varying dimensions.
+    properties:
+      - contains_pixels: True
+      - colors: [0, 1, 2, 4] # All observed colors
+      - shape: 2D array
+
+  - type: object
+    description: Output grid, fixed 4x4 dimensions.
+    properties:
+      - contains_pixels: True
+      - colors: [0, 3]  # Output only uses 0 and 3
+      - shape: 2D array (4x4)
+
+  - type: process
+    description: Quadrant division.  Input grid is divided into four quadrants.
+    properties:
+        - method:  rows and columns are divided by two.
+        - result: Four sub-grids (Q1, Q2, Q3, Q4)
+
+  - type: process
+    description: Output generation.  Output 2x2 quadrants filled based on input.
+    properties:
+        - condition: Presence and arrangement of non-zero pixels in input quadrants.
+        - action:  Set corresponding output quadrant pixels to 3 (green) or 0 (white).
+
+  - type: relation
+    description: "The output grid represents the presence of non-zero colors for each quadrant of the input grid"

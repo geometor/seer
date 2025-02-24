@@ -1,0 +1,22 @@
+facts:
+  - object: grid
+    type: 2D array
+    properties:
+      - dimensions: 5x5
+      - elements: pixels
+      - values: [0, 2]
+  - object: pixel
+    type: element
+    properties:
+      - color:
+          mapping:
+            0: white
+            2: red
+  - transformation:
+      type: color change
+      details:
+        -  A "frame" of white pixels appear in the output.
+        - The center pixel stays the same
+        - White pixels are placed, on the first and last columns and rows, such
+          that when a "0" appears in the input, it will create a whole line and
+          column (cross-like) filled with 0 in the ouput.

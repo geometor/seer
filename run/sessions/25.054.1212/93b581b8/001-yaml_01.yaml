@@ -1,0 +1,22 @@
+objects:
+  - type: grid
+    properties:
+      dimensions: 6x6
+      elements: pixels (integers 0-9)
+  - type: pixel_block
+    properties:
+      dimensions: 2x2
+      location: center
+      elements: [9, 3, 7, 8] # maroon, green, orange, azure
+  - type: pixel
+    properties:
+      color: integer (0-9)
+      location: [row, column]
+
+actions:
+  - name: mirror_and_extend
+    description: Certain pixels from the central block, and the corners diagonally opposite of the central block's corners, are mirrored and extended towards the top and bottom edges of the grid.
+
+relationships:
+  - central_block_to_output_top:  The values 7 and 8 (orange, azure) from lower row of central block are copied and repeated, at the top of the grid to form a 2x2 azure and a 2x2 orange block of pixels.
+  - central_block_to_output_bottom: The values 9 and 3 (maroon, green) from the top row of the central block are copied and repeated, at the bottom of the grid to form a 2x2 green and a 2x2 maroon block of pixels.

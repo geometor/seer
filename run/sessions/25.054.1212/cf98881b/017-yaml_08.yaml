@@ -1,0 +1,46 @@
+objects:
+  - name: input_grid
+    type: grid
+    properties:
+      colors: [0, 1, 2, 4, 9]  # All possible colors across examples
+      shape: variable
+      elements: integers (representing colors)
+
+  - name: output_grid
+    type: grid
+    properties:
+      colors: [0, 1, 4, 9] # All possible colors across examples.
+      shape: (4, 4) # Always 4x4
+      elements: integers (representing colors)
+
+  - name: subgrid_4x4
+    type: grid
+    properties:
+      colors: [0,1,2,4,9]
+      shape: (4,4)
+
+actions:
+  - name: extract_subgrid
+    input: input_grid
+    output: subgrid_4x4
+    parameters:
+      row_start: integer
+      col_start: integer
+      size: (4, 4) #Fixed size
+
+  - name: rotate_ccw # counter clockwise
+    input: subgrid
+    output: rotated_subgrid
+    parameters:
+        times: integer, [0,1,2,3]
+
+  - name: flip
+    input: grid
+    output: flipped_grid
+    parameters:
+        direction: [horizontal, vertical]
+
+  - name: compare
+    input_1: grid_1
+    input_2: grid_2
+    output: boolean

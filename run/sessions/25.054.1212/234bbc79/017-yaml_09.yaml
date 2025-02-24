@@ -1,0 +1,32 @@
+observations:
+  - object: horizontal_lines
+    color: [2, 6]
+    properties:
+      - position_fixed: true
+      - color_fixed: true
+      - rows: [1]  # Rows are 0-indexed
+      - color_2_start_col: [0] # Starting column index of color_2 segment for each example
+      - color_2_end_col: [2]   # Ending column index
+      - color_6_start_col: [-1] # -1 indicates it doesn't exist
+      - color_6_end_col: [-1]
+
+  - object: gray_pixels
+    color: 5
+    properties:
+      - row_dependent_replacement: true
+      - row_0:
+          action: remove
+      - row_1:
+          action: replace_adjacent
+          replace_with: [1, 2]
+          priority: right_to_left # propagation direction
+      - row_2:
+          action: replace_adjacent
+          replace_with: [3, 8]
+          priority: right_to_left
+
+  - object: grid
+    properties:
+      - consistent_height: true
+      - height: 3
+      - inconsistent_width: true # the input width does not equal the output width.

@@ -1,0 +1,28 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "```python\n\"\"\"\nTransforms a grid by inverting the color of the frame pixels (changing non-zero pixels to 0) \nand setting adjacent pixels to 0 as well, while preserving the center pixel's original color.\n\"\"\"\n\nimport numpy as np\n\ndef get_frame_indices(grid):\n    \"\"\"Returns a list of (row, col) tuples representing the frame indices.\"\"\"\n    rows, cols = grid.shape\n    frame = []\n    for r in range(rows):\n        for c in range(cols):\n            if r == 0 or r == rows - 1 or c == 0 or c == cols - 1:\n                frame.append((r, c))\n    return frame\n\ndef get_adjacent_indices(grid, row, col):\n    \"\"\"Returns a list of valid adjacent indices (up, down, left, right).\"\"\"\n    rows, cols = grid.shape\n    adjacent = []\n    for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:\n        new_row, new_col = row + dr, col + dc\n        if 0 <= new_row < rows and 0 <= new_col < cols:\n            adjacent.append((new_row, new_col))\n    return adjacent\n\ndef transform(input_grid):\n    # Initialize output_grid as a copy of the input_grid\n    output_grid = np.copy(input_grid)\n    rows, cols = output_grid.shape\n\n    # Identify the center pixel coordinates\n    center_row = rows // 2\n    center_col = cols // 2\n\n    # Get frame indices\n    frame_indices = get_frame_indices(input_grid)\n    \n    # Find adjacent pixels to non-zero frame pixels *before* inverting\n    adjacent_to_frame = []\n    for r, c in frame_indices:\n        if input_grid[r, c] != 0:\n            adjacent_to_frame.extend(get_adjacent_indices(input_grid, r, c))\n\n    # Invert frame pixels (non-zero to 0)\n    for r, c in frame_indices:\n        if output_grid[r, c] != 0:\n             output_grid[r, c] = 0\n\n    # Set adjacent pixels to 0\n    for r, c in adjacent_to_frame:\n        if (r,c) != (center_row, center_col): #don't change center pixel\n           output_grid[r, c] = 0\n\n    return output_grid\n```"
+          }
+        ],
+        "role": "model"
+      },
+      "finish_reason": 1,
+      "index": 0,
+      "safety_ratings": [],
+      "token_count": 0,
+      "grounding_attributions": [],
+      "avg_logprobs": 0.0
+    }
+  ],
+  "usage_metadata": {
+    "prompt_token_count": 3250,
+    "candidates_token_count": 590,
+    "total_token_count": 3840,
+    "cached_content_token_count": 0
+  },
+  "response_time": 6.699684,
+  "response_file": "012-response.json"
+}

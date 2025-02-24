@@ -1,0 +1,24 @@
+facts:
+  - task_id: "014d52c7"
+  - input_type: "grid"
+  - output_type: "grid"
+  - objects:
+    - name: "grid"
+      properties:
+        - "has_border"
+        - "border_is_contiguous"
+        - "border_color_is_dominant"
+        - "interior_can_contain_multiple_colors"
+    - name: "border"
+      properties:
+        - "color" #dominant color on the border
+        - "contiguous_pixels" #pixels of the same color that forms a border
+    -name: "interior"
+      properties:
+        -"different colors from border"
+
+  - actions:
+    - name: "remove_border"
+      description: "Removes the outer layer(s) of the grid consisting of the dominant border color."
+      input: "grid"
+      output: "modified_grid"
