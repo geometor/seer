@@ -4,6 +4,7 @@ The Seer class orchestrates the process of solving tasks.
 It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
+
 from rich import print
 from datetime import datetime
 from pathlib import Path
@@ -196,7 +197,7 @@ class Seer:
                     self.session.task_dir,
                     base_filename + "-train",
                 )
-                if current_train_results:
+                if "examples" in current_train_results:
                     train_image = task.to_image(
                         train_results=current_train_results, show_test=False
                     )
@@ -204,42 +205,46 @@ class Seer:
                     train_image_path = self.session.task_dir / train_image_filename
                     train_image.save(train_image_path)
 
-                all_train_passed = all(
-                    result.get("match") is True for result in current_train_results
-                )  # Use current_train_results
-                if all_train_passed:
-                    current_test_results = verifier.test_code_with_timeout(
-                        code,
-                        self.session.task_dir,
-                        task.test,
+                    all_train_passed = all(
+                        result.get("match") is True
+                        for result in current_train_results["examples"]
                     )
-                    verifier.write_test_results(
-                        current_test_results,
-                        self.session.task_dir,
-                        base_filename + "-test",
-                    )
-
-                    if current_test_results:
-                        test_image = task.to_image(
-                            train_results=current_train_results,
-                            test_results=current_test_results,
+                    if all_train_passed:
+                        current_test_results = verifier.test_code_with_timeout(
+                            code,
+                            self.session.task_dir,
+                            task.test,
                         )
-                        test_image_filename = f"{base_filename}-test_results.png"
-                        test_image_path = self.session.task_dir / test_image_filename
-                        test_image.save(test_image_path)
-
-                    all_test_passed = all(
-                        result.get("match") is True for result in current_test_results
-                    )  # Use current_test_results
-                    if all_test_passed:
-                        self.task_solved = True  # Set the flag
-                        break  # Exit the loop *after* setting the flag
-                else:
-                    if self.current_iteration <= self.max_iterations:
-                        #  if not self.task_solved:
-                        self.refine(
-                            task, train_results, test_results, code, base_filename
+                        verifier.write_test_results(
+                            current_test_results,
+                            self.session.task_dir,
+                            base_filename + "-test",
                         )
+
+                        if "examples" in current_test_results:
+                            test_image = task.to_image(
+                                train_results=current_train_results,
+                                test_results=current_test_results,
+                            )
+                            test_image_filename = f"{base_filename}-test_results.png"
+                            test_image_path = (
+                                self.session.task_dir / test_image_filename
+                            )
+                            test_image.save(test_image_path)
+
+                            all_test_passed = all(
+                                result.get("match") is True
+                                for result in current_test_results["examples"]
+                            )  # Use current_test_results
+                            if all_test_passed:
+                                self.task_solved = True  # Set the flag
+                                break  # Exit the loop *after* setting the flag
+                    else:
+                        if self.current_iteration <= self.max_iterations:
+                            #  if not self.task_solved:
+                            self.refine(
+                                task, train_results, test_results, code, base_filename
+                            )
 
     def _generate(
         self,
@@ -340,33 +345,34 @@ class Seer:
         dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
 
         dreamer_prompt.append("\nTrain Set Results:\n")
-        for i, result in enumerate(train_results):
-            dreamer_prompt.append(f"\n## Example {i+1}:\n")
-            dreamer_prompt.append(f"\nInput:\n```\n{result.get('input')}\n```\n")
-            dreamer_prompt.append(
-                f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
-            )
-            if "transformed_output" in result:
+        if train_results and 'examples' in train_results:
+            for i, result in enumerate(train_results["examples"]):
+                dreamer_prompt.append(f"\n## Example {i+1}:\n")
+                dreamer_prompt.append(f"\nInput:\n```\n{result.get('input')}\n```\n")
                 dreamer_prompt.append(
-                    f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
                 )
-                # Add images
-                image_filename = f"{base_filename}-train-example_{i+1}.png"
-                dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
+                if "transformed_output" in result:
+                    dreamer_prompt.append(
+                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    )
+                    # Add images
+                    image_filename = f"{base_filename}-train-example_{i+1}.png"
+                    dreamer_prompt.append(f"![Transformed Image]({image_filename})\n")
 
-            dreamer_prompt.append(f"match: {result.get('match')}\n")
-            dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
-            dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
-            dreamer_prompt.append(
-                f"color_palette_correct: {result.get('color_palette_correct')}\n"
-            )
-            dreamer_prompt.append(
-                f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
-            )
+                dreamer_prompt.append(f"match: {result.get('match')}\n")
+                dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
+                dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
+                dreamer_prompt.append(
+                    f"color_palette_correct: {result.get('color_palette_correct')}\n"
+                )
+                dreamer_prompt.append(
+                    f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
+                )
 
-        if test_results:  # Only include if there are test results
+        if test_results and "examples" in test_results:  
             dreamer_prompt.append("\nTest Set Results (if applicable):\n")
-            for i, result in enumerate(test_results):
+            for i, result in enumerate(test_results["examples"]):
                 dreamer_prompt.append(f"\n**Test {i+1}:**\n")
                 dreamer_prompt.append(f"Input:\n```\n{result.get('input')}\n```\n")
                 dreamer_prompt.append(

@@ -148,9 +148,9 @@ class Task:
             images.append(output_row)
 
 
-            if result_set:
+            if result_set and "examples" in result_set:
                 result_row = []
-                for result in result_set:
+                for result in result_set["examples"]:
                     if "transformed_output" in result:
                         try:
                             result_grid_str = result["transformed_output"]

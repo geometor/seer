@@ -150,17 +150,17 @@ def summarize_task(task_dir, log_error):
 
     for file_index, results in sorted_grouped_test_results.items():
         if file_index.endswith("-train"):
-            passed_count = sum(1 for res in results if res.get("match") is True)
-            if results:  # Check if results is not empty
-                total_count = len(results)
+            if results and "examples" in results:
+                passed_count = sum(1 for res in results["examples"] if res.get("match") is True)
+                total_count = len(results["examples"])
                 if passed_count > best_train_results["passed"]:
                     best_train_results["passed"] = passed_count
                     best_train_results["total"] = total_count
 
         elif file_index.endswith("-test"):
-            passed_count = sum(1 for res in results if res.get("match") is True)
-            if results:  # Check if results is not empty
-                total_count = len(results)
+            if results and "examples" in results:
+                passed_count = sum(1 for res in results["examples"] if res.get("match") is True)
+                total_count = len(results["examples"])
                 if passed_count > best_test_results["passed"]:
                     best_test_results["passed"] = passed_count
                     best_test_results["total"] = total_count
@@ -196,34 +196,35 @@ def summarize_task(task_dir, log_error):
     test_report_json = {}
     for file_index, test_results in sorted_grouped_test_results.items():
         test_report_json[file_index] = []
-        for result in test_results:
-            if "example" in result:
-                test_report_json[file_index].append(
-                    {
-                        "example": result["example"],
-                        "input": result["input"],
-                        "expected_output": result["expected_output"],
-                        "transformed_output": result.get("transformed_output", ""),
-                        "match": result["match"],
-                        "size_correct": result.get("size_correct", "N/A"),
-                        "color_palette_correct": result.get(
-                            "color_palette_correct", "N/A"
-                        ),
-                        "correct_pixel_counts": result.get(
-                            "correct_pixel_counts", "N/A"
-                        ),
-                        "pixels_off": result.get("pixels_off", "N/A"),
-                        "percent_correct": result.get("percent_correct", "N/A"),
-                    }
-                )
-            elif "captured_output" in result:
-                test_report_json[file_index].append(
-                    {"captured_output": result["captured_output"]}
-                )
-            elif "code_execution_error" in result:
-                test_report_json[file_index].append(
-                    {"code_execution_error": result["code_execution_error"]}
-                )
+        if test_results and "examples" in test_results:
+            for result in test_results["examples"]:
+                if "example" in result:
+                    test_report_json[file_index].append(
+                        {
+                            "example": result["example"],
+                            "input": result["input"],
+                            "expected_output": result["expected_output"],
+                            "transformed_output": result.get("transformed_output", ""),
+                            "match": result["match"],
+                            "size_correct": result.get("size_correct", "N/A"),
+                            "color_palette_correct": result.get(
+                                "color_palette_correct", "N/A"
+                            ),
+                            "correct_pixel_counts": result.get(
+                                "correct_pixel_counts", "N/A"
+                            ),
+                            "pixels_off": result.get("pixels_off", "N/A"),
+                            "percent_correct": result.get("percent_correct", "N/A"),
+                        }
+                    )
+                elif "captured_output" in result:
+                    test_report_json[file_index].append(
+                        {"captured_output": result["captured_output"]}
+                    )
+                elif "code_execution_error" in result:
+                    test_report_json[file_index].append(
+                        {"code_execution_error": result["code_execution_error"]}
+                    )
 
     report_json = {
         "response_report": response_report_json,
@@ -321,31 +322,33 @@ def _create_test_table(grouped_test_results):
         table.add_column("diff pixels")
         table.add_column("%")
 
-        for result in test_results:
-            if "example" in result:
-                # --- Emoji Logic ---
-                match = _get_status_emoji(result.get("match"))
-                size_correct = _get_status_emoji(result.get("size_correct"))
-                palette_correct = _get_status_emoji(result.get("color_palette_correct"))
-                color_count_correct = _get_status_emoji(result.get("correct_pixel_counts"))
+        if "examples" in test_results:
+            for result in test_results["examples"]:
+                if "example" in result:
+                    # --- Emoji Logic ---
+                    match = _get_status_emoji(result.get("match"))
+                    size_correct = _get_status_emoji(result.get("size_correct"))
+                    palette_correct = _get_status_emoji(result.get("color_palette_correct"))
+                    color_count_correct = _get_status_emoji(result.get("correct_pixel_counts"))
 
-                pixels_off = str(result.get("pixels_off", "N/A"))
-                percent_correct = float(result.get("percent_correct", 0))
+                    pixels_off = str(result.get("pixels_off", "N/A"))
+                    percent_correct = float(result.get("percent_correct", 0))
 
-                table.add_row(
-                    str(result["example"]),
-                    match,
-                    size_correct,
-                    palette_correct,
-                    color_count_correct,
-                    pixels_off,
-                    f"{percent_correct:.2f}"
-                )
-            elif "captured_output" in result:
-                table.add_row("Captured Output", result["captured_output"])
-            elif "code_execution_error" in result:
-                table.add_row("Code Execution Error", result["code_execution_error"])
-        tables[file_index] = table
+                    table.add_row(
+                        str(result["example"]),
+                        match,
+                        size_correct,
+                        palette_correct,
+                        color_count_correct,
+                        pixels_off,
+                        f"{percent_correct:.2f}"
+                    )
+                elif "captured_output" in result:
+                    table.add_row("Captured Output", result["captured_output"])
+                elif "code_execution_error" in result:
+                    table.add_row("Code Execution Error", result["code_execution_error"])
+            tables[file_index] = table
+
     return tables
 
 def _write_to_file_task(task_dir, file_name, content, log_error):
