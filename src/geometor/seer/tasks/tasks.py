@@ -278,3 +278,6 @@ class Tasks(list):
                 for pair in p.all_pairs
             )
         ]
+
+    def get_ordered_by_train_count(self, reverse=False):
+        return sorted(self, key=lambda task: len(task.train), reverse=reverse)
