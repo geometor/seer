@@ -13,14 +13,16 @@ from geometor.seer.tasks.grid import Grid
 from geometor.seer import verifier
 
 
-class TaskPair:
+class TaskPair(dict):
     def __init__(self, puzzle_id, set_type, index, input_grid, output_grid=None):
         self.input = Grid(input_grid, puzzle_id, set_type, index, "input")
+        self["input"] = self.input
         self.output = (
             Grid(output_grid, puzzle_id, set_type, index, "output")
             if output_grid is not None
             else None
         )
+        self["output"] = self.output
 
     @property
     def weight(self):
