@@ -186,7 +186,7 @@ class Seer:
         # Iterate and test *all* code blocks
         for code_type, code, base_filename in extracted_code_list:
             if code_type == "py":
-                current_train_results = verifier.test_code(
+                current_train_results = verifier.test_code_with_timeout(
                     code,
                     self.session.task_dir,
                     task.train,
@@ -196,18 +196,19 @@ class Seer:
                     self.session.task_dir,
                     base_filename + "-train",
                 )
-                train_image = task.to_image(
-                    train_results=current_train_results, show_test=False
-                )
-                train_image_filename = f"{base_filename}-train_results.png"
-                train_image_path = self.session.task_dir / train_image_filename
-                train_image.save(train_image_path)
+                if current_train_results:
+                    train_image = task.to_image(
+                        train_results=current_train_results, show_test=False
+                    )
+                    train_image_filename = f"{base_filename}-train_results.png"
+                    train_image_path = self.session.task_dir / train_image_filename
+                    train_image.save(train_image_path)
 
                 all_train_passed = all(
                     result.get("match") is True for result in current_train_results
                 )  # Use current_train_results
                 if all_train_passed:
-                    current_test_results = verifier.test_code(
+                    current_test_results = verifier.test_code_with_timeout(
                         code,
                         self.session.task_dir,
                         task.test,
@@ -218,13 +219,14 @@ class Seer:
                         base_filename + "-test",
                     )
 
-                    test_image = task.to_image(
-                        train_results=current_train_results,
-                        test_results=current_test_results,
-                    )
-                    test_image_filename = f"{base_filename}-test_results.png"
-                    test_image_path = self.session.task_dir / test_image_filename
-                    test_image.save(test_image_path)
+                    if current_test_results:
+                        test_image = task.to_image(
+                            train_results=current_train_results,
+                            test_results=current_test_results,
+                        )
+                        test_image_filename = f"{base_filename}-test_results.png"
+                        test_image_path = self.session.task_dir / test_image_filename
+                        test_image.save(test_image_path)
 
                     all_test_passed = all(
                         result.get("match") is True for result in current_test_results

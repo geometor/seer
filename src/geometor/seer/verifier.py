@@ -5,6 +5,8 @@ import numpy as np
 from geometor.seer.tasks.grid import Grid
 import json
 from pathlib import Path
+import multiprocessing
+import time
 
 
 def get_transform_function(code):
@@ -19,6 +21,33 @@ def get_transform_function(code):
         return None  # Explicitly return None if no transform function
     except SyntaxError as e:
         raise  # Re-raise SyntaxError to be handled by caller
+
+
+def test_code_with_timeout(code, task_dir, task_pairs, timeout=10):
+     """Executes and validates the generated code with a timeout."""
+
+     def worker(code, task_pairs, result_queue):
+         """Worker function to execute the code."""
+         try:
+             test_results = test_code(code, task_dir, task_pairs)
+             result_queue.put(test_results)
+         except Exception as e:
+             result_queue.put([{"code_execution_error": str(e)}])
+
+
+     result_queue = multiprocessing.Queue()
+     process = multiprocessing.Process(target=worker, args=(code, task_pairs, result_queue))
+     process.start()
+
+     process.join(timeout)
+
+     if process.is_alive():
+         process.terminate()
+         process.join()  # Ensure termination
+         return [{"code_execution_error": f"Timeout: Code execution exceeded {timeout} seconds"}]
+
+     else:
+         return result_queue.get()
 
 
 def test_code(code, task_dir, task_pairs):
