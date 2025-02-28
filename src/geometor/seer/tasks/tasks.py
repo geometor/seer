@@ -249,6 +249,46 @@ class Task:
 
         return final_image
 
+    def rotate(self, k=1):
+        """
+        Rotates all grids in the task by 90 degrees clockwise k times.
+        Returns a new Task object with the rotated grids.
+        """
+        rotated_train = [
+            TaskPair(
+                self.id,
+                "train",
+                i,
+                pair.input.rotate(k).grid,
+                pair.output.rotate(k).grid,
+            )
+            for i, pair in enumerate(self.train)
+        ]
+        rotated_test = [
+            TaskPair(
+                self.id,
+                "test",
+                i,
+                pair.input.rotate(k).grid,
+                pair.output.rotate(k).grid if pair.output else None,
+            )
+            for i, pair in enumerate(self.test)
+        ]
+        rotated_data = {"train": [], "test": []}
+        for pair in rotated_train:
+            rotated_data["train"].append(
+                {"input": pair.input.grid.tolist(), "output": pair.output.grid.tolist()}
+            )
+        for pair in rotated_test:
+            rotated_data["test"].append(
+                {
+                    "input": pair.input.grid.tolist(),
+                    "output": pair.output.grid.tolist() if pair.output else None,
+                }
+            )
+
+        return Task(self.id, rotated_data)
+
 
 class Tasks(list):
     def __init__(self, folder_path="."):
