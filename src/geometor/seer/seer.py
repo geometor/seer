@@ -27,8 +27,8 @@ from geometor.seer.exceptions import (
     FunctionExecutionError,
 )
 from geometor.seer.session import Session
-import geometor.seer.verifier as verifier
 from geometor.seer.session.summary import summarize_session, summarize_task
+import geometor.seer.verifier as verifier
 
 
 class Seer:
@@ -104,39 +104,82 @@ class Seer:
         """
         self.task_solved = False  # Reset at the start of each task
 
+        def get_pair_prompt(title, task_pair):
+            prompt = [
+                f"\n## {title}\n",
+                ]
+            for key, grid in task_pair.items():
+                prompt += [
+                    f"\n**{key}:**\n```\n",
+                    grid.to_string(),
+                    "\n```\n\n",
+                ]
+                if include_images:
+                    input_image_filename = self.session.log_prompt_image(
+                        grid, self.prompt_count + 1, f"{title}_{key}"
+                    )
+                    #  prompt.append(f"![Image]({input_image_filename})\n")
+                    prompt.append(grid.to_image())
+                    prompt.append("\n")
+
+            return prompt
+        
+        # TODO: show all training examples first
+        history = []
+        show_training_prompt = []
+        for i, pair in enumerate(task.train, 1):
+            show_training_prompt.extend(get_pair_prompt(f"train_{i}", pair))
+
+        show_training_prompt.append(task.to_image(show_test=False))
+
+        instructions = [self.instructions["investigate_dreamer"]]
+        (
+            response,
+            response_parts,
+            extracted_code_list,
+        ) = self._generate(
+            "dreamer",
+            history,
+            show_training_prompt,
+            instructions,
+            tools="code_execution",
+            description=f"all training • investigate_dreamer",
+        )
+        history.extend(show_training_prompt)
+        history.extend(response_parts)
+
+        self._test_extracted_codelist(extracted_code_list, task)
+        if self.task_solved:  # Check if solved
+            return  # Exit the loop if solved
+
+        # coder prompt
+        instructions = [self.instructions["investigate_coder"]]
+        prompt = [""]
+        (
+            response,
+            response_parts,
+            extracted_code_list,
+        ) = self._generate(
+            "coder",
+            history,
+            prompt,
+            instructions,
+            #  tools="code_execution",
+            description=f"example_{i} • investigate_coder",
+        )
+        history.extend(prompt)
+        history.extend(response_parts)
+
+        self._test_extracted_codelist(extracted_code_list, task)
+        if self.task_solved:  # Check if solved
+            return  # Exit loop
+
         for i, pair in enumerate(task.train, 1):
             # reset history for each pair
             history = [""]
             self.current_iteration = 0
 
-            input_grid_str = pair.input.to_string()
-            output_grid_str = pair.output.to_string()
-
-            # dreamer prompt
-            prompt = [
-                f"\n## Example {i}\n",
-                "\n**input:**\n```\n",
-                input_grid_str,
-                "\n```\n\n",
-            ]
-            if include_images:
-                input_image_filename = self.session.log_prompt_image(
-                    pair.input, self.prompt_count + 1, f"example_{i}_input"
-                )
-                #  prompt.append(f"![Image]({input_image_filename})\n")
-                prompt.append(pair.input.to_image())
-                prompt.append("\n")
-            prompt.append("\n**output:**\n```\n")
-            prompt.append(output_grid_str)
-            prompt.append("\n```\n\n")
-            if include_images:
-                output_image_filename = self.session.log_prompt_image(
-                    pair.output, self.prompt_count + 1, f"example_{i}_output"
-                )
-                #  prompt.append(f"![Image]({output_image_filename})\n")
-                prompt.append(pair.output.to_image())
-                prompt.append("\n")
-
+            dreamer_prompt = get_pair_prompt(f"train_{i}", pair)
             instructions = [self.instructions["investigate_dreamer"]]
             (
                 response,
@@ -145,12 +188,12 @@ class Seer:
             ) = self._generate(
                 "dreamer",
                 history,
-                prompt,
+                dreamer_prompt,
                 instructions,
                 tools="code_execution",
                 description=f"example_{i} • investigate_dreamer",
             )
-            history.extend(prompt)
+            history.extend(dreamer_prompt)
             history.extend(response_parts)
 
             self._test_extracted_codelist(extracted_code_list, task)

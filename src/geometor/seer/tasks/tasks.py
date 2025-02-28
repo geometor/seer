@@ -126,9 +126,9 @@ class Task:
         train_results: list = None,
         test_results: list = None,
         show_test=True,
-        outer_border=20,
-        col_spacing=20,
-        row_spacing=10,
+        outer_border=32,
+        col_spacing=32,
+        row_spacing=16,
     ):
         """
         Creates a combined image for all train and test pairs in the task.
