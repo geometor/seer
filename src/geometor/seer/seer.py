@@ -51,7 +51,7 @@ class Seer:
         self.current_iteration = 0
         self.use_images = config.get("use_images", False)
 
-        self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
+        #  self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
         self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
         self.task_solved = False  # Initialize task_solved flag
 

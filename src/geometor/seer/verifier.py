@@ -2,7 +2,7 @@ import ast
 import io
 import contextlib
 import numpy as np
-from geometor.seer.tasks.grid import Grid
+from geometor.seer.tasks.grid import Grid, string_to_grid
 import json
 from pathlib import Path
 import multiprocessing
@@ -151,33 +151,6 @@ def test_code(code, task_dir, task_pairs):
 
     return test_results
 
-
-def string_to_grid(grid_string, row_delimiter="\n", cell_delimiter=" "):
-    """
-    Converts a grid string back to a list of lists for Grid
-    """
-    try:
-        rows = grid_string.strip().split(row_delimiter)
-        grid_list = []
-        for row in rows:
-            cells = row.strip().split(cell_delimiter)
-            # Convert each cell to an integer.  Handle potential errors.
-            int_cells = [int(cell) for cell in cells]
-            grid_list.append(int_cells)
-
-        return Grid(
-            grid_list,
-            "",
-            "",
-            "",
-            "",
-        )
-    except ValueError:
-        # Handle cases where conversion to int fails
-        return None
-    except Exception:
-        # Catch any other unexpected errors
-        return None
 
 
 def write_test_results(test_results, task_dir, base_filename):

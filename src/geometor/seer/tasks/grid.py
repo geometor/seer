@@ -18,6 +18,35 @@ COLOR_MAP = {
 }
 
 
+
+def string_to_grid(grid_string, row_delimiter="\n", cell_delimiter=" "):
+    """
+    Converts a grid string back to a list of lists for Grid
+    """
+    try:
+        rows = grid_string.strip().split(row_delimiter)
+        grid_list = []
+        for row in rows:
+            cells = row.strip().split(cell_delimiter)
+            # Convert each cell to an integer.  Handle potential errors.
+            int_cells = [int(cell) for cell in cells]
+            grid_list.append(int_cells)
+
+        return Grid(
+            grid_list,
+            "",
+            "",
+            "",
+            "",
+        )
+    except ValueError:
+        # Handle cases where conversion to int fails
+        return None
+    except Exception:
+        # Catch any other unexpected errors
+        return None
+
+
 class Grid:
     def __init__(self, grid, puzzle_id, set_type, index, io_type):
         self.grid = np.array(grid, dtype=int)
