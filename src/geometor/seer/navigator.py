@@ -81,20 +81,21 @@ class GridApp(App):
         self.ax.axis('off')
 
         # --- Calculate maximum dimensions for TRAIN set (stacked pairs) ---
-        max_train_width = 0
-        max_train_height = 0  # Total height of stacked pairs
+        max_train_width = 0  # Maximum width of a *single* stacked pair
+        max_train_height = 0 # Maximum height of a *single* stacked pair
         for task_pair in task.train:
             input_height = task_pair.input.grid.shape[0]
             input_width = task_pair.input.grid.shape[1]
             output_height = task_pair.output.grid.shape[0] if task_pair.output else 0
             output_width = task_pair.output.grid.shape[1] if task_pair.output else 0
 
-            max_train_width = max(max_train_width, max(input_width, output_width))
-            max_train_height = max(max_train_height, input_height + output_height)
+            max_train_width = max(max_train_width, max(input_width, output_width))  # Find widest pair
+            max_train_height = max(max_train_height, input_height + output_height) # Find tallest pair
 
-        total_train_width_pixels = max_train_width * (self.cell_size + self.line_width) - self.line_width
+        # total_train_width_pixels: max width of a pair * number of pairs
+        total_train_width_pixels = (max_train_width * (self.cell_size + self.line_width) - self.line_width) * len(task.train)
+        # total_train_height_pixels: max height of a stacked pair
         total_train_height_pixels = max_train_height * (self.cell_size + self.line_width) - self.line_width
-
 
         # --- Calculate maximum dimensions for TEST set (separate rows) ---
         max_rows_input = 0
@@ -116,7 +117,9 @@ class GridApp(App):
         total_test_output_width_pixels = max_cols_output * (self.cell_size + self.line_width) - self.line_width
 
         # --- Calculate total dimensions and set axis limits ---
-        total_width_pixels = max(total_train_width_pixels * len(task.train), total_test_input_width_pixels, total_test_output_width_pixels )
+        # Total width:  the wider of (all train pairs) and (test inputs + test outputs)
+        total_width_pixels = max(total_train_width_pixels, total_test_input_width_pixels, total_test_output_width_pixels)
+        # Total height: train height + test input height + test output height + spacing
         total_height_pixels = total_train_height_pixels + total_test_input_height_pixels + total_test_output_height_pixels + 4 * self.cell_size
 
         self.ax.set_xlim(0, total_width_pixels)
@@ -129,7 +132,7 @@ class GridApp(App):
         x_offset = self._draw_train_pairs(task, x_offset, y_offset)
 
         # --- Draw test inputs ---
-        y_offset += total_train_height_pixels + 2 * self.cell_size  # Add space after train set
+        y_offset += total_train_height_pixels + 3 * self.cell_size  # Add space after train set
         x_offset = 0
         x_offset = self._draw_single_grid_row(task.test, "input", x_offset, y_offset)
 
