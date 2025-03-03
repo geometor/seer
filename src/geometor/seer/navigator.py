@@ -26,8 +26,8 @@ class GridApp(App):
         self.ax = None
         self.cell_size = cell_size
         self.line_width = line_width
-        self.colors = [
-            '#000000',  # 0: black
+        self.map_colors = [
+            '#FFFFFF',  # 0: white
             '#0074D9',  # 1: blue
             '#FF4136',  # 2: red
             '#2ECC40',  # 3: green
@@ -134,7 +134,7 @@ class GridApp(App):
           for col in range(cols):
               x, y = self._data_to_pixel(row, col, rows, cols)
               x += x_offset  # Apply the x_offset
-              color = self.colors[grid[row, col]]
+              color = self.map_colors[grid[row, col]]
               rect = Rectangle(
                   (x, y), self.cell_size, self.cell_size,
                   facecolor=color, edgecolor='none'
@@ -147,13 +147,13 @@ class GridApp(App):
           y += 0  # No y_offset needed as we are drawing full lines
           x_start = x_offset - self.line_width / 2
           x_end = x_offset + cols * (self.cell_size + self.line_width) - self.line_width / 2
-          self.ax.plot([x_start, x_end], [y, y], color='white', linewidth=self.line_width)
+          self.ax.plot([x_start, x_end], [y, y], color='black', linewidth=self.line_width)
       for col in range(cols + 1):
           x = col * (self.cell_size + self.line_width) - self.line_width / 2
           x += x_offset
           y_start = - self.line_width / 2
           y_end = rows * (self.cell_size + self.line_width) - self.line_width / 2
-          self.ax.plot([x, x], [y_start, y_end], color='white', linewidth=self.line_width)
+          self.ax.plot([x, x], [y_start, y_end], color='black', linewidth=self.line_width)
 
 
     def display_task(self, task_id: str) -> None:
