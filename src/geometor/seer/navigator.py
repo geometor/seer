@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches  # Import patches
 from textual.app import App, ComposeResult
-from textual.widgets import Button, Static
+from textual.widgets import Button, Static, ListView, ListItem, Label
 from textual.widgets import Footer
-from textual.containers import Horizontal, Vertical
-
-# Removed pattern generation functions and PATTERNS
+from textual.containers import Vertical
 
 class GridApp(App):
     """Textual Application that displays buttons to select tasks and updates a Matplotlib plot."""
@@ -29,11 +26,10 @@ class GridApp(App):
         """Create the UI layout with one button per task."""
         with Vertical():
             yield Static("Select a Task:", id="task_title")  # Add a title
-            with Horizontal():
-                for task in self.tasks:
-                    # Create a Button for each task.
-                    # The button's label is the task ID, and the id is the task ID.
-                    yield Button(label=str(task.id), id=f"task_{task.id}")  # Prefix task ID
+            list_view = ListView()
+            for task in self.tasks:
+                list_view.append(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
+            yield list_view
             yield Footer()
 
     def on_mount(self) -> None:
@@ -52,16 +48,15 @@ class GridApp(App):
             self.display_task(self.tasks[0].id)
 
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Event handler for button presses. Updates the Matplotlib plot based on which button was clicked."""
-        task_id = event.button.id
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        """Event handler for list view selection. Updates the Matplotlib plot based on which list item was selected."""
+        task_id = event.item.id
         self.display_task(task_id)
 
     def display_task(self, task_id: str) -> None:
         """Generate and display the task image corresponding to the given task ID on the Matplotlib plot."""
         # Find the task with the given ID
-        #  task = next((t for t in self.tasks if t.id == task_id), None) # Original
-        task = next((t for t in self.tasks if f"task_{t.id}" == task_id), None) # Modified for prefixed IDs
+        task = next((t for t in self.tasks if f"task_{t.id}" == task_id), None)
         if not task:
             return  # Unknown task, do nothing (or could log an error)
 
