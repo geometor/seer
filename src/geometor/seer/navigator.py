@@ -27,9 +27,9 @@ class GridApp(App):
         with Vertical():
             yield Static("Select a Task:", id="task_title")  # Add a title
             list_view = ListView()
+            yield list_view  # Yield the ListView *before* adding items
             for task in self.tasks:
                 list_view.append(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
-            yield list_view
             yield Footer()
 
     def on_mount(self) -> None:
