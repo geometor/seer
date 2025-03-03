@@ -29,7 +29,7 @@ from geometor.seer.exceptions import (
 from geometor.seer.session import Session
 from geometor.seer.session.summary import summarize_session, summarize_task
 import geometor.seer.verifier as verifier
-
+from geometor.seer.response_handler import ResponseHandler  # Import the new class
 
 class Seer:
     def __init__(
@@ -333,10 +333,12 @@ class Seer:
             elapsed_time,
         )
 
-        (
-            response_parts,
-            extracted_code_list,
-        ) = self._process_response(response, functions, total_prompt)
+        # --- USE THE RESPONSE HANDLER ---
+        handler = ResponseHandler(self.session)
+        response_parts, extracted_code_list = handler.process_response(
+            response, functions, total_prompt, self.prompt_count, self.extracted_file_counts
+        )
+        # --- END OF RESPONSE HANDLER USAGE ---
 
         self.session.log_response_md(
             response,
@@ -351,30 +353,6 @@ class Seer:
             response_parts,
             extracted_code_list,
         )
-
-    def _parse_code_text(self, text):
-        """Extracts code blocks, writes them, and returns file info."""
-        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
-        extracted_code = []
-        for file_type, content in matches:
-            file_type = file_type.lower() if file_type else "txt"
-            if file_type == "python":
-                file_type = "py"
-
-            # Write to file and get the *full path*
-            file_path_str = self.session._write_code_text(
-                [(file_type, content)],
-                self.prompt_count,
-                self.extracted_file_counts,
-            )
-            file_path = Path(file_path_str)
-            # Get just the filename from the Path object.
-            filename = file_path.name
-            # Return filename (without extension)
-            base_filename = file_path.stem
-
-            extracted_code.append((file_type, content, base_filename))
-        return extracted_code
 
     def refine(self, task, train_results, test_results, code, base_filename):
         """
@@ -477,101 +455,3 @@ class Seer:
         history.extend(response_parts)
 
         self._test_extracted_codelist(extracted_code_list, task)
-
-    def _process_response(self, response, functions, total_prompt):
-        """Processes the response from the Gemini model."""
-        response_parts = []
-        #  code = None           # REMOVE
-        #  base_filename = None  # REMOVE
-        extracted_code_list = []  # Store extracted code blocks
-
-        if not response.candidates:  # Check if candidates is not empty
-            # Handle the case where response.candidates is empty
-            error_msg = "No candidates returned in response."
-            print(f"\nERROR: {error_msg}")
-            self.session.log_error(error_msg, "".join(total_prompt))
-            response_parts.append("\n*error:*\n")  # Add an error indicator to response
-            response_parts.append(error_msg + "\n")
-
-            return (
-                response_parts,
-                extracted_code_list,  # Return extracted code
-            )
-
-        if not hasattr(response.candidates[0].content, "parts"):
-            # Handle the case where response.candidates is empty
-            error_msg = "No content parts in response."
-            print(f"\nERROR: {error_msg}")
-            self.session.log_error(error_msg, "".join(total_prompt))
-            response_parts.append("\n*error:*\n")  # Add an error indicator to response
-            response_parts.append(error_msg + "\n")
-
-            return (
-                response_parts,
-                extracted_code_list,  # Return extracted code
-            )
-
-        for part in response.candidates[0].content.parts:
-            if part.text:
-                response_parts.append(part.text + "\n")
-                extracted_code = self._parse_code_text(part.text)
-                extracted_code_list.extend(extracted_code)
-
-            if part.executable_code:
-                response_parts.append("\n*code_execution:*\n")
-                code = part.executable_code.code
-                response_parts.append(f"```python\n{code}\n```\n")
-
-            if part.code_execution_result:
-                response_parts.append("\n*code_execution_result:*\n")
-                outcome = part.code_execution_result.outcome
-                output = part.code_execution_result.output
-                response_parts.append(f"outcome: {outcome}\n")
-                response_parts.append(f"```\n{output}\n```\n")
-                self.session._write_to_file(
-                    f"{self.prompt_count:03d}-code_result.txt", output
-                )
-
-            if part.function_call:
-                function_call_found = True
-                response_parts.append("\n*function_call:*\n")
-                response_parts.append(part.function_call.name + "\n")
-
-                result, msg = self._call_function(
-                    part.function_call, functions, total_prompt
-                )
-
-                response_parts.append("\nresult:\n")
-                response_parts.append(f"{result}\n")
-                response_parts.append(f"{msg}\n")
-
-        return (
-            response_parts,
-            extracted_code_list,
-        )
-
-    def _call_function(self, function_call, functions, total_prompt):
-        """Execute a function call with improved error handling."""
-        if not functions:
-            raise ValueError("No functions provided")
-
-        function_name = function_call.name
-        function_args = function_call.args
-
-        if function_name not in functions:
-            raise UnknownFunctionError(f"Unknown function: {function_name}")
-
-        try:
-            result = functions[function_name](**function_args)
-            return result
-        except TypeError as e:
-            raise FunctionArgumentError(
-                f"Invalid arguments for {function_name}: {str(e)}"
-            )
-        except Exception as e:
-            raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
-
-        # If we get here, we've exhausted retries without success
-        error_msg = "Failed to get valid function call after maximum retries"
-        print(f"\nERROR: {error_msg}")
-        self.session.log_error(error_msg, "".join(total_prompt))
