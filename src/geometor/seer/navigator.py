@@ -13,7 +13,7 @@ class GridApp(App):
         ("q", "quit", "Quit"),
     ]
 
-    def __init__(self, tasks: list, cell_size: int = 32, line_width: int = 2, **kwargs):
+    def __init__(self, tasks: list, cell_size: int = 32, line_width: int = 1, **kwargs):
         """
         Initialize the app.
         :param tasks: List of Task objects.
@@ -70,8 +70,8 @@ class GridApp(App):
 
     def _data_to_pixel(self, row, col, grid_height, grid_width):
         """Converts data coordinates (row, col) to pixel coordinates."""
-        x = col * (self.cell_size + self.line_width)
-        y = row * (self.cell_size + self.line_width)
+        x = col * (self.cell_size)
+        y = row * (self.cell_size)
         return x, y
 
     def _draw_grid(self, task):
@@ -93,9 +93,9 @@ class GridApp(App):
             max_train_height = max(max_train_height, input_height + output_height) # Find tallest pair
 
         # total_train_width_pixels: max width of a pair * number of pairs
-        total_train_width_pixels = (max_train_width * (self.cell_size + self.line_width) - self.line_width) * len(task.train)
+        total_train_width_pixels = max_train_width * self.cell_size * len(task.train)
         # total_train_height_pixels: max height of a stacked pair
-        total_train_height_pixels = max_train_height * (self.cell_size + self.line_width) - self.line_width
+        total_train_height_pixels = max_train_height * self.cell_size
 
         # --- Calculate maximum dimensions for TEST set (separate rows) ---
         max_rows_input = 0
@@ -111,10 +111,10 @@ class GridApp(App):
                 max_rows_output = max(max_rows_output, task_pair.output.grid.shape[0])
                 max_cols_output = max(max_cols_output, task_pair.output.grid.shape[1])
 
-        total_test_input_height_pixels = max_rows_input * (self.cell_size + self.line_width) - self.line_width
-        total_test_input_width_pixels = max_cols_input * (self.cell_size + self.line_width) - self.line_width
-        total_test_output_height_pixels = max_rows_output * (self.cell_size + self.line_width) - self.line_width
-        total_test_output_width_pixels = max_cols_output * (self.cell_size + self.line_width) - self.line_width
+        total_test_input_height_pixels = max_rows_input * (self.cell_size)
+        total_test_input_width_pixels = max_cols_input * (self.cell_size)
+        total_test_output_height_pixels = max_rows_output * (self.cell_size)
+        total_test_output_width_pixels = max_cols_output * (self.cell_size)
 
         # --- Calculate total dimensions and set axis limits ---
         # Total width:  the wider of (all train pairs) and (test inputs + test outputs)
@@ -151,8 +151,8 @@ class GridApp(App):
         for task_pair in task.train:
             # Draw input grid
             self._draw_single_grid(task_pair.input, x_offset, y_offset)
-            input_height_pixels = task_pair.input.grid.shape[0] * (self.cell_size + self.line_width) - self.line_width
-            input_width_pixels = task_pair.input.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
+            input_height_pixels = task_pair.input.grid.shape[0] * (self.cell_size)
+            input_width_pixels = task_pair.input.grid.shape[1] * (self.cell_size)
 
             # Calculate y_offset for output grid (below input)
             output_y_offset = y_offset + input_height_pixels + 2 * self.cell_size
@@ -160,7 +160,7 @@ class GridApp(App):
             # Draw output grid
             if task_pair.output:
                 self._draw_single_grid(task_pair.output, x_offset, output_y_offset)
-                output_width_pixels = task_pair.output.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
+                output_width_pixels = task_pair.output.grid.shape[1] * (self.cell_size)
             else:
                 output_width_pixels = 0
 
@@ -176,7 +176,7 @@ class GridApp(App):
             grid_obj = task_pair.input if io_type == "input" else task_pair.output
             if grid_obj is not None:  # Check for None, as test set may not have outputs
                 self._draw_single_grid(grid_obj, x_offset, y_offset)
-                grid_width_pixels = grid_obj.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
+                grid_width_pixels = grid_obj.grid.shape[1] * (self.cell_size)
                 x_offset += grid_width_pixels + 2 * self.cell_size  # Add space between grids
 
         return max(x_offset, initial_x_offset) # in case this row is empty, return the initial offset
@@ -193,23 +193,10 @@ class GridApp(App):
                 color = self.map_colors[grid[row, col]]
                 rect = Rectangle(
                     (x, y), self.cell_size, self.cell_size,
-                    facecolor=color, edgecolor='none'
+                    facecolor=color, edgecolor='black', lw=1
                 )
                 self.ax.add_patch(rect)
 
-        # Draw grid lines
-        for row in range(rows + 1):
-            y = row * (self.cell_size + self.line_width) - self.line_width / 2
-            y += y_offset  # y_offset is applied here
-            x_start = x_offset - self.line_width / 2
-            x_end = x_offset + cols * (self.cell_size + self.line_width) - self.line_width / 2
-            self.ax.plot([x_start, x_end], [y, y], color='black', linewidth=self.line_width)
-        for col in range(cols + 1):
-            x = col * (self.cell_size + self.line_width) - self.line_width / 2
-            x += x_offset
-            y_start = y_offset - self.line_width / 2 # y_offset is applied here
-            y_end = y_offset + rows * (self.cell_size + self.line_width) - self.line_width / 2
-            self.ax.plot([x, x], [y_start, y_end], color='black', linewidth=self.line_width)
 
     def display_task(self, task_id: str) -> None:
         """Generate and display the task image."""
@@ -223,3 +210,39 @@ class GridApp(App):
         """Called when the app is unmounted. Close the Matplotlib plot."""
         if self.fig:
             plt.close(self.fig)
+
+
+def main():
+    """
+    Loads tasks from the specified directory and runs the GridApp to display them.
+    """
+    from pathlib import Path
+    from geometor.seer.tasks.tasks import Tasks
+    from geometor.seer.navigator import GridApp
+
+    # --- Configuration ---
+    TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")  
+
+    # 1. Load tasks
+    if not TASKS_DIR.exists():
+        print(f"Error: Tasks directory '{TASKS_DIR}' not found.")
+        print("Please create a 'tasks' directory and place your JSON task files in it.")
+        return
+
+    try:
+        tasks = Tasks(TASKS_DIR)
+    except Exception as e:
+        print(f"Error loading tasks: {e}")
+        return
+
+    if not tasks:
+        print("No tasks found in the 'tasks' directory.")
+        return
+
+    # 2. Create and run the GridApp
+    app = GridApp(tasks[:5])
+    app.run()
+
+if __name__ == "__main__":
+    main()
+
