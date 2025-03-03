@@ -80,53 +80,77 @@ class GridApp(App):
         self.ax.set_facecolor('black')
         self.ax.axis('off')
 
-        # find max dimensions across train and test
-        max_rows = 0
-        max_cols = 0
+        # find max dimensions across train and test IN INPUTS
+        max_rows_input = 0
+        max_cols_input = 0
         for task_set in [task.train, task.test]:
             for task_pair in task_set:
-                max_rows = max(max_rows, task_pair.input.grid.shape[0])
-                max_cols = max(max_cols, task_pair.input.grid.shape[1])
-                if task_pair.output is not None:
-                    max_rows = max(max_rows, task_pair.output.grid.shape[0])
-                    max_cols = max(max_cols, task_pair.output.grid.shape[1])
+                max_rows_input = max(max_rows_input, task_pair.input.grid.shape[0])
+                max_cols_input = max(max_cols_input, task_pair.input.grid.shape[1])
 
-        total_height_pixels = max_rows * (self.cell_size + self.line_width) - self.line_width
-        total_width_pixels = max_cols * (self.cell_size + self.line_width) - self.line_width
+        # find max dimensions across train and test IN OUTPUTS
+        max_rows_output = 0
+        max_cols_output = 0
+        for task_set in [task.train, task.test]:
+            for task_pair in task_set:
+                if task_pair.output is not None:
+                    max_rows_output = max(max_rows_output, task_pair.output.grid.shape[0])
+                    max_cols_output = max(max_cols_output, task_pair.output.grid.shape[1])
+
+        total_input_height_pixels = max_rows_input * (self.cell_size + self.line_width) - self.line_width
+        total_input_width_pixels = max_cols_input * (self.cell_size + self.line_width) - self.line_width
+
+        total_output_height_pixels = max_rows_output * (self.cell_size + self.line_width) - self.line_width
+        total_output_width_pixels = max_cols_output * (self.cell_size + self.line_width) - self.line_width
+
+        total_width_pixels = max(total_input_width_pixels, total_output_width_pixels) # use the largest
+        total_height_pixels = (total_input_height_pixels + total_output_height_pixels + 2*self.cell_size) * 2 # *2 for train and test
 
         # Set the axis limits *in pixel coordinates*
         self.ax.set_xlim(0, total_width_pixels)
         self.ax.set_ylim(total_height_pixels, 0)  # Invert y-axis for correct display
         self.ax.set_aspect('equal')
 
-        # Draw train pairs
-        x_offset = 0
-        for task_pair in task.train:
-          x_offset = self._draw_task_pair(task_pair, x_offset) + 2 * self.cell_size # Add spacing
+        y_offset = 0
 
-        # Draw test pairs
-        x_offset += 3 * self.cell_size
-        for task_pair in task.test:
-          x_offset = self._draw_task_pair(task_pair, x_offset) + 2 * self.cell_size
+        # Draw train inputs
+        x_offset = 0
+        x_offset = self._draw_single_grid_row(task.train, "input", x_offset, y_offset)
+
+        # Draw train outputs
+        y_offset += total_input_height_pixels + 2 * self.cell_size
+        x_offset = 0
+        x_offset = self._draw_single_grid_row(task.train, "output", x_offset, y_offset)
+
+        # Draw test inputs
+        y_offset += total_output_height_pixels + 2 * self.cell_size
+        x_offset = 0
+        x_offset = self._draw_single_grid_row(task.test, "input", x_offset, y_offset)
+
+
+        # Draw test outputs
+        y_offset += total_input_height_pixels + 2 * self.cell_size
+        x_offset = 0
+        x_offset = self._draw_single_grid_row(task.test, "output", x_offset, y_offset)
+
 
         self.ax.set_title(task.id, color='white')
         self.fig.canvas.draw_idle()
         plt.pause(0.1)
 
-    def _draw_task_pair(self, task_pair, x_offset):
-        """Draws a single task pair (input and output grids)."""
+    def _draw_single_grid_row(self, task_set, io_type, x_offset, y_offset):
+        """Draws a row of grids (either all inputs or all outputs)."""
+        initial_x_offset = x_offset
+        for task_pair in task_set:
+            grid_obj = task_pair.input if io_type == "input" else task_pair.output
+            if grid_obj is not None:  # Check for None, as test set may not have outputs
+                self._draw_single_grid(grid_obj, x_offset, y_offset)
+                grid_width_pixels = grid_obj.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
+                x_offset += grid_width_pixels + 2 * self.cell_size  # Add space between grids
 
-        self._draw_single_grid(task_pair.input, x_offset)
-        input_width_pixels = task_pair.input.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
-        x_offset += input_width_pixels + 2 * self.cell_size  # Add space between input/output
+        return max(x_offset, initial_x_offset) # in case this row is empty, return the initial offset
 
-        if task_pair.output is not None:
-            self._draw_single_grid(task_pair.output, x_offset)
-            output_width_pixels = task_pair.output.grid.shape[1] * (self.cell_size + self.line_width) - self.line_width
-            x_offset += output_width_pixels
-        return x_offset
-
-    def _draw_single_grid(self, grid_obj, x_offset):
+    def _draw_single_grid(self, grid_obj, x_offset, y_offset):
       """Draws a single grid (either input or output)."""
       grid = grid_obj.grid
       rows, cols = grid.shape
@@ -134,6 +158,7 @@ class GridApp(App):
           for col in range(cols):
               x, y = self._data_to_pixel(row, col, rows, cols)
               x += x_offset  # Apply the x_offset
+              y += y_offset
               color = self.map_colors[grid[row, col]]
               rect = Rectangle(
                   (x, y), self.cell_size, self.cell_size,
@@ -144,17 +169,16 @@ class GridApp(App):
       # Draw grid lines
       for row in range(rows + 1):
           y = row * (self.cell_size + self.line_width) - self.line_width / 2
-          y += 0  # No y_offset needed as we are drawing full lines
+          y += y_offset  # y_offset is applied here
           x_start = x_offset - self.line_width / 2
           x_end = x_offset + cols * (self.cell_size + self.line_width) - self.line_width / 2
           self.ax.plot([x_start, x_end], [y, y], color='black', linewidth=self.line_width)
       for col in range(cols + 1):
           x = col * (self.cell_size + self.line_width) - self.line_width / 2
           x += x_offset
-          y_start = - self.line_width / 2
-          y_end = rows * (self.cell_size + self.line_width) - self.line_width / 2
+          y_start = y_offset - self.line_width / 2 # y_offset is applied here
+          y_end = y_offset + rows * (self.cell_size + self.line_width) - self.line_width / 2
           self.ax.plot([x, x], [y_start, y_end], color='black', linewidth=self.line_width)
-
 
     def display_task(self, task_id: str) -> None:
         """Generate and display the task image."""
