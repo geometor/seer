@@ -2,11 +2,13 @@ import sys
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtWidgets, QtGui, QtCore
+from pathlib import Path
+from geometor.seer.tasks.tasks import Tasks
 
 class GridViewer(QtWidgets.QMainWindow):
     """
     Alternate Task Viewer using PyQtGraph.
-    
+
     Displays a list of tasks and renders their train and test grids using a QGraphicsScene.
     """
     def __init__(self, tasks, cell_size: int = 32, parent=None):
@@ -25,16 +27,16 @@ class GridViewer(QtWidgets.QMainWindow):
             '#7FDBFF',  # 8: cyan
             '#870C25',  # 9: brown
         ]
-        
+
         self.setWindowTitle("Task Viewer (PyQtGraph)")
         self.resize(1000, 800)
-        
+
         # Central widget and layout
         centralWidget = QtWidgets.QWidget()
         self.setCentralWidget(centralWidget)
         layout = QtWidgets.QHBoxLayout()
         centralWidget.setLayout(layout)
-        
+
         # --- Task List Widget ---
         self.taskList = QtWidgets.QListWidget()
         layout.addWidget(self.taskList, 1)
@@ -42,26 +44,26 @@ class GridViewer(QtWidgets.QMainWindow):
             item = QtWidgets.QListWidgetItem(str(task.id))
             self.taskList.addItem(item)
         self.taskList.currentRowChanged.connect(self.onTaskSelected)
-        
+
         # --- Graphics View ---
         self.view = pg.GraphicsView()
         layout.addWidget(self.view, 4)
         self.scene = pg.GraphicsScene()
         self.view.setScene(self.scene)
-        
+
         # Select the first task if available
         if self.tasks:
             self.taskList.setCurrentRow(0)
-            
+
     def onTaskSelected(self, row: int):
         if row < 0 or row >= len(self.tasks):
             return
         task = self.tasks[row]
         self.displayTask(task)
-        
+
     def displayTask(self, task):
         self.scene.clear()
-        
+
         # --- Draw Training Pairs ---
         # For each training pair, we draw the input grid on top and (if available) output grid below.
         x_offset = 0
@@ -80,7 +82,7 @@ class GridViewer(QtWidgets.QMainWindow):
             # Increase x_offset for next training pair (include horizontal spacing)
             grid_width = task_pair.input.grid.shape[1] * self.cell_size
             x_offset += grid_width + self.cell_size * 2
-        
+
         # --- Draw Test Grids ---
         # We render test inputs in a row below the training pairs.
         if task.test:
@@ -98,7 +100,7 @@ class GridViewer(QtWidgets.QMainWindow):
                     self.drawGrid(task_pair.input.grid, x_offset_test, y_offset_test)
                     grid_width = task_pair.input.grid.shape[1] * self.cell_size
                     x_offset_test += grid_width + self.cell_size * 2
-                    
+
     def drawGrid(self, grid, x_offset, y_offset):
         """Draws a single grid using QGraphicsRectItem for each cell."""
         rows, cols = grid.shape
@@ -120,38 +122,30 @@ class GridViewer(QtWidgets.QMainWindow):
                 rect_item.setPen(QtGui.QPen(QtGui.QColor("black")))
                 self.scene.addItem(rect_item)
 
-# --- Dummy Classes for Demonstration ---
-# These simulate your Task, TaskPair, and Grid classes. In your actual integration,
-# you would load tasks from your repository rather than using dummy data.
-class DummyGrid:
-    def __init__(self, grid):
-        self.grid = grid
-
-class DummyTaskPair:
-    def __init__(self, grid_input, grid_output=None):
-        self.input = DummyGrid(grid_input)
-        self.output = DummyGrid(grid_output) if grid_output is not None else None
-
-class DummyTask:
-    def __init__(self, task_id):
-        self.id = task_id
-        # Create dummy training pairs with random 5x5 grids.
-        self.train = [DummyTaskPair(np.random.randint(0, 10, (5, 5)), 
-                                    np.random.randint(0, 10, (5, 5)))
-                      for _ in range(3)]
-        # Create dummy test pairs (only input grid).
-        self.test = [DummyTaskPair(np.random.randint(0, 10, (5, 5)))
-                     for _ in range(2)]
-
 def main():
-    # In production, replace dummy tasks with actual ones loaded from your tasks directory.
-    tasks = [DummyTask(i) for i in range(5)]
-    
+    # --- Configuration ---
+    TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")
+
+    # 1. Load tasks
+    if not TASKS_DIR.exists():
+        print(f"Error: Tasks directory '{TASKS_DIR}' not found.")
+        print("Please create a 'tasks' directory and place your JSON task files in it.")
+        return
+
+    try:
+        tasks = Tasks(TASKS_DIR)
+    except Exception as e:
+        print(f"Error loading tasks: {e}")
+        return
+
+    if not tasks:
+        print("No tasks found in the 'tasks' directory.")
+        return
+
     app = QtWidgets.QApplication(sys.argv)
-    viewer = GridViewer(tasks)
+    viewer = GridViewer(tasks)  # Use loaded tasks
     viewer.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
-
