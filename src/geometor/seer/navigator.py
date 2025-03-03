@@ -33,7 +33,7 @@ class GridApp(App):
                 for task in self.tasks:
                     # Create a Button for each task.
                     # The button's label is the task ID, and the id is the task ID.
-                    yield Button(label=task.id, id=task.id)
+                    yield Button(label=str(task.id), id=f"task_{task.id}")  # Prefix task ID
             yield Footer()
 
     def on_mount(self) -> None:
@@ -60,7 +60,8 @@ class GridApp(App):
     def display_task(self, task_id: str) -> None:
         """Generate and display the task image corresponding to the given task ID on the Matplotlib plot."""
         # Find the task with the given ID
-        task = next((t for t in self.tasks if t.id == task_id), None)
+        #  task = next((t for t in self.tasks if t.id == task_id), None) # Original
+        task = next((t for t in self.tasks if f"task_{t.id}" == task_id), None) # Modified for prefixed IDs
         if not task:
             return  # Unknown task, do nothing (or could log an error)
 
