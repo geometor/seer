@@ -29,13 +29,9 @@ class GridApp(App):
             list_view = ListView()
             yield list_view  # Yield the ListView *before* adding items
 
-            # Create all the ListItems *before* mounting them
-            list_items = [
-                ListItem(Label(str(task.id)), id=f"task_{task.id}")
-                for task in self.tasks
-            ]
-            # Mount all the ListItems at once
-            list_view.mount(*list_items)
+            # Add the ListItems to the ListView after it has been mounted
+            for task in self.tasks:
+                list_view.compose_add_child(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
 
             yield Footer()
 
