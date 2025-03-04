@@ -218,7 +218,7 @@ def main():
     """
     from pathlib import Path
     from geometor.seer.tasks.tasks import Tasks
-    from geometor.seer.navigator import GridApp
+    from geometor.seer.navigator.plt_navigator import GridApp
 
     # --- Configuration ---
     TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")  
