@@ -4,10 +4,11 @@ It demonstrates several rendering methods (image-based, Unicode block, and half-
 """
 
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal
-from textual.widgets import Static, Button
-
+from textual.containers import Horizontal, Vertical, Grid  # Import Grid
+from textual.widgets import Static, Button, ListView, ListItem, Label, Footer
 from geometor.seer.navigator.base_grid import BaseGrid
+from geometor.seer.tasks.tasks import Task  # Import Task
+import numpy as np
 
 # Global constants for grid lines in text modes and image mode.
 GRID_LINE_COLOR = "black"
@@ -42,10 +43,6 @@ GRID_DATA = [
     [1, 2, 2, 2, 2, 2, 2, 2, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
-
-
-
-
 
 class SplitBlockGrid(BaseGrid):
     """
@@ -119,44 +116,160 @@ class SquareCharGrid(BaseGrid):
 
 
 class Navigator(App):
-    CSS = """
-    Screen {
-        align: center middle;
-    }
-    """
+    CSS_PATH = "navigator.tcss"  # Use a separate CSS file
+    BINDINGS = [
+        ("q", "quit", "Quit"),
+    ]
+
+    def __init__(self, tasks: list, **kwargs):
+        super().__init__(**kwargs)
+        self.tasks = tasks
+
     def compose(self) -> ComposeResult:
-        button_bar = Horizontal(
-            Button("Split Grid", id="mode_split"),
-            Button("Squares", id="mode_box"),  
-            id="button_bar"
+        """Create the UI layout."""
+        with Horizontal():
+            with Vertical(id="task-selection"):
+                yield Static("Select a Task:", id="task_title")
+                list_view = ListView()
+                yield list_view
+                for task in self.tasks:
+                    list_view.append(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
+            with Vertical(id="grid-display"):
+                self.grid_container = Grid(id="grid-container")
+                yield self.grid_container  # Add the grid container here
+            yield Footer()
+
+    def on_mount(self) -> None:
+        if self.tasks:
+            self.display_task(self.tasks[0].id)
+
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        """Event handler for list view selection."""
+        task_id = event.item.id.removeprefix("task_")
+        self.display_task(task_id)
+
+    def display_task(self, task_id: str) -> None:
+        """Display the selected task."""
+        task = next((t for t in self.tasks if t.id == task_id), None)
+        if not task:
+            return
+
+        # Clear previous grids
+        self.grid_container.clear()
+
+        # Create and add new grids
+        self._create_grid_widgets(task)
+
+
+    def _create_grid_widgets(self, task: Task):
+        """Creates the grid widgets for the given task."""
+
+        # Determine max grid sizes for layout
+        max_train_input_width = 0
+        max_train_output_width = 0
+        for task_pair in task.train:
+            max_train_input_width = max(max_train_input_width, task_pair.input.grid.shape[1])
+            if task_pair.output:
+                max_train_output_width = max(max_train_output_width, task_pair.output.grid.shape[1])
+
+        max_test_input_width = 0
+        max_test_output_width = 0
+        if task.test:
+            for task_pair in task.test:
+                max_test_input_width = max(max_test_input_width, task_pair.input.grid.shape[1])
+                if task_pair.output:
+                    max_test_output_width = max(max_test_output_width, task_pair.output.grid.shape[1])
+
+        # +2 for spacing between input/output
+        num_train_cols = 2
+        num_test_input_cols = len(task.test) if task.test else 0
+        num_test_output_cols = sum(1 for tp in task.test if tp.output) if task.test else 0
+
+        self.grid_container.add_column("col0", size=max_train_input_width + 1)  # +1 for spacing
+        self.grid_container.add_column("col1", size=max_train_output_width + 1)
+
+        self.grid_container.add_row("train", repeat=len(task.train))
+        if task.test:
+            self.grid_container.add_row("test_input")
+            self.grid_container.add_row("test_output")
+            self.grid_container.add_column("test_in", repeat=num_test_input_cols, size=max_test_input_width + 1)
+            self.grid_container.add_column("test_out", repeat=num_test_output_cols, size=max_test_output_width + 1)
+
+        self.grid_container.add_areas(
+            **{
+                f"train_in_{i}": f"col0,train-{i}"
+                for i in range(len(task.train))
+            },
+            **{
+                f"train_out_{i}": f"col1,train-{i}"
+                for i in range(len(task.train))
+            },
         )
-        #  self.image_grid = ImageGrid(GRID_DATA, id="image_grid")
-        self.split_grid = SplitBlockGrid(GRID_DATA, id="split_grid")
-        self.box_grid = SquareCharGrid(GRID_DATA, id="box_grid")
+        if task.test:
+            self.grid_container.add_areas(
+                **{
+                    f"test_input_{i}": f"test_in-{i},test_input"
+                    for i in range(num_test_input_cols)
+                },
+                **{
+                    f"test_output_{i}": f"test_out-{i},test_output"
+                    for i in range(num_test_output_cols)
+                },
+            )
 
-        # Hide them by default (or show one by default)
-        #  self.image_grid.styles.display = "none"
-        self.split_grid.styles.display = "none"
-        self.box_grid.styles.display = "none"
+        # Add train grids
+        for i, task_pair in enumerate(task.train):
+            input_grid = SquareCharGrid(task_pair.input.grid)  # Use SquareCharGrid
+            output_grid = SquareCharGrid(task_pair.output.grid) if task_pair.output else Static("")
 
-        yield button_bar
-        yield self.split_grid
-        yield self.box_grid
+            self.grid_container.place(input_grid, area=f"train_in_{i}")
+            self.grid_container.place(output_grid, area=f"train_out_{i}")
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Switch the active rendering mode based on button presses."""
-        # Hide all modes
-        self.split_grid.styles.display = "none"
-        self.box_grid.styles.display = "none"
+        # Add test grids, if they exist
+        if task.test:
+            j = 0 # counter for output grids
+            for i, task_pair in enumerate(task.test):
+                input_grid = SquareCharGrid(task_pair.input.grid)
+                self.grid_container.place(input_grid, area=f"test_input_{i}")
 
-        # Show whichever was pressed
-        if event.button.id == "mode_split":
-            self.split_grid.styles.display = "block"
-        elif event.button.id == "mode_box":
-            self.box_grid.styles.display = "block"
+                if task_pair.output:
+                    output_grid = SquareCharGrid(task_pair.output.grid)
+                    self.grid_container.place(output_grid, area=f"test_output_{j}")
+                    j += 1
 
-        self.refresh()
+        self.grid_container.refresh()
+
+
+def main():
+    """
+    Loads tasks from the specified directory and runs the Navigator to display them.
+    """
+    from pathlib import Path
+    from geometor.seer.tasks.tasks import Tasks
+    from geometor.seer.navigator.navigator import Navigator
+
+    # --- Configuration ---
+    TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")
+
+    # 1. Load tasks
+    if not TASKS_DIR.exists():
+        print(f"Error: Tasks directory '{TASKS_DIR}' not found.")
+        print("Please create a 'tasks' directory and place your JSON task files in it.")
+        return
+
+    try:
+        tasks = Tasks(TASKS_DIR)
+    except Exception as e:
+        print(f"Error loading tasks: {e}")
+        return
+
+    if not tasks:
+        print("No tasks found in the 'tasks' directory.")
+        return
+
+    # 2. Create and run the Navigator app
+    app = Navigator(tasks[:5])  # Limit to 5 tasks for demonstration
+    app.run()
 
 if __name__ == "__main__":
-    app = Navigator()
-    app.run()
+    main()
