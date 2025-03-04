@@ -156,7 +156,8 @@ class Navigator(App):
             return
 
         # Clear previous grids
-        self.grid_container.clear()
+        for widget in list(self.grid_container.children):
+            self.grid_container.remove_widget(widget)
 
         # Create and add new grids
         self._create_grid_widgets(task)
