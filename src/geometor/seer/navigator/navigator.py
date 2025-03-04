@@ -130,17 +130,18 @@ class Navigator(App):
         with Horizontal():
             with Vertical(id="task-selection"):
                 yield Static("Select a Task:", id="task_title")
-                list_view = ListView()
-                yield list_view
-                for task in self.tasks:
-                    list_view.append(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
+                self.list_view = ListView()  # Create the ListView, but don't add items yet
+                yield self.list_view
             with Vertical(id="grid-display"):
                 self.grid_container = Grid(id="grid-container")
                 yield self.grid_container  # Add the grid container here
             yield Footer()
 
     def on_mount(self) -> None:
-        if self.tasks:
+        """Populate the list view after mounting."""
+        if self.tasks:  # Check if tasks are available
+            for task in self.tasks:
+                self.list_view.append(ListItem(Label(str(task.id)), id=f"task_{task.id}"))
             self.display_task(self.tasks[0].id)
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
