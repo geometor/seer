@@ -170,15 +170,13 @@ class UnicodeBlockGrid(BaseGrid):
             text.append(cell_line)
             text.append("\n")
             # Append horizontal grid line after the row.
-            text.append(horizontal_line())
-            text.append("\n")
+            #  text.append(horizontal_line())
+            #  text.append("\n")
         return text
 
 
 class SplitBlockGrid(BaseGrid):
     """
-    New Unicode rendering mode.
-
     For each grid cell, render:
       • A full block ("█") with the cell's fill color.
       • A vertical split block ("▌") styled with foreground = fill color and background = grid line color.
@@ -196,89 +194,15 @@ class SplitBlockGrid(BaseGrid):
             for cell in row:
                 fill_color = COLOR_PALETTE.get(cell, "black")
                 # First character: full block in fill color.
-                text.append("█", style=fill_color)
+                #  text.append("█", style=f"{fill_color} underline2")
+                #  text.append(" ", style=f"black on {fill_color} underline2")
+                text.append("▏", style=f"black on {fill_color} underline2")
                 # Second character: left half block, so its left half is fg and right half is bg.
-                text.append("▌", style=f"{fill_color} on {GRID_LINE_COLOR}")
+                #  text.append("▌", style=f"{fill_color} on {GRID_LINE_COLOR}")
+                #  text.append("▌", style=f"black on {fill_color} underline2")
             text.append("\n")
         return text
 
-
-class BoxDrawingGrid(BaseGrid):
-    """
-    A grid rendered with box-drawing characters to show horizontal and vertical lines clearly.
-    Each cell is rendered as a box of text with a colored background.
-    """
-
-    def render(self):
-        from rich.text import Text
-
-        text = Text()
-
-        # Number of text characters for each cell's width/height.
-        cell_width = 3
-        cell_height = 2
-
-        # Define a few helper functions to build the horizontal lines (top, middle, bottom).
-
-        def top_line():
-            # Example for cols=3: "┌───┬───┬───┐"
-            line = "┌"
-            for col in range(self.cols - 1):
-                line += "─" * cell_width + "┬"
-            line += "─" * cell_width + "┐"
-            return line
-
-        def mid_line():
-            # Example: "├───┼───┼───┤"
-            line = "├"
-            for col in range(self.cols - 1):
-                line += "─" * cell_width + "┼"
-            line += "─" * cell_width + "┤"
-            return line
-
-        def bot_line():
-            # Example: "└───┴───┴───┘"
-            line = "└"
-            for col in range(self.cols - 1):
-                line += "─" * cell_width + "┴"
-            line += "─" * cell_width + "┘"
-            return line
-
-        # Build the top border line.
-        text.append(top_line(), style=GRID_LINE_COLOR)
-        text.append("\n")
-
-        # Render each row of cells.
-        for row_index in range(self.rows):
-            # Each row of cells has 'cell_height' lines of text for the interior.
-            for _ in range(cell_height):
-                row_text = Text()
-                # Start with left border.
-                row_text.append("│", style=GRID_LINE_COLOR)
-
-                # For each column/cell in this row:
-                for col_index in range(self.cols):
-                    fill_color = COLOR_PALETTE.get(
-                        self.grid[row_index][col_index], "black"
-                    )
-                    # Append 'cell_width' spaces styled with the cell's fill color.
-                    row_text.append(" " * cell_width, style=f"on {fill_color}")
-                    # Append the right vertical line.
-                    row_text.append("│", style=GRID_LINE_COLOR)
-
-                # Add this row of text (one interior line of the box) plus a newline.
-                text.append(row_text)
-                text.append("\n")
-
-            # After finishing the interior of row_index:
-            # If it's not the last row, print the 'middle' line; otherwise, the bottom line.
-            if row_index < self.rows - 1:
-                text.append(mid_line(), style=GRID_LINE_COLOR)
-            else:
-                text.append(bot_line(), style=GRID_LINE_COLOR)
-            text.append("\n")
-
-        return text
 
 
 class SquareCharGrid(BaseGrid):
@@ -292,6 +216,8 @@ class SquareCharGrid(BaseGrid):
     SQUARE_CHAR = "■" # &#11200; black square centred
     SQUARE_CHAR = "■" # &#9632; black square
     SQUARE_CHAR = "▀ " # &#9632; black square
+    SQUARE_CHAR = "█" # &#9632; black square
+    SQUARE_CHAR = "●" # &#9632; black square
 
     # ◼"  # Change this to another square if you like.
 
