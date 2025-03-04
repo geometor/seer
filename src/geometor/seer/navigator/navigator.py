@@ -182,42 +182,42 @@ class Navigator(App):
                 if task_pair.output:
                     max_test_output_width = max(max_test_output_width, task_pair.output.grid.shape[1])
 
-        # +2 for spacing between input/output
-        num_train_cols = 2
-        num_test_input_cols = len(task.test) if task.test else 0
-        num_test_output_cols = sum(1 for tp in task.test if tp.output) if task.test else 0
+        # Define areas *before* adding columns and rows
+        areas = {
+            f"train_in_{i}": f"col0,train-{i}"
+            for i in range(len(task.train))
+        }
+        areas.update({
+            f"train_out_{i}": f"col1,train-{i}"
+            for i in range(len(task.train))
+        })
 
+        if task.test:
+            num_test_input_cols = len(task.test)
+            num_test_output_cols = sum(1 for tp in task.test if tp.output)
+            areas.update({
+                f"test_input_{i}": f"test_in-{i},test_input"
+                for i in range(num_test_input_cols)
+            })
+            areas.update({
+                f"test_output_{i}": f"test_out-{i},test_output"
+                for i in range(num_test_output_cols)
+            })
+
+
+        # Add columns and rows *before* placing any widgets
         self.grid_container.add_column("col0", size=max_train_input_width + 1)  # +1 for spacing
         self.grid_container.add_column("col1", size=max_train_output_width + 1)
-
         self.grid_container.add_row("train", repeat=len(task.train))
+
         if task.test:
             self.grid_container.add_row("test_input")
             self.grid_container.add_row("test_output")
             self.grid_container.add_column("test_in", repeat=num_test_input_cols, size=max_test_input_width + 1)
             self.grid_container.add_column("test_out", repeat=num_test_output_cols, size=max_test_output_width + 1)
 
-        self.grid_container.add_areas(
-            **{
-                f"train_in_{i}": f"col0,train-{i}"
-                for i in range(len(task.train))
-            },
-            **{
-                f"train_out_{i}": f"col1,train-{i}"
-                for i in range(len(task.train))
-            },
-        )
-        if task.test:
-            self.grid_container.add_areas(
-                **{
-                    f"test_input_{i}": f"test_in-{i},test_input"
-                    for i in range(num_test_input_cols)
-                },
-                **{
-                    f"test_output_{i}": f"test_out-{i},test_output"
-                    for i in range(num_test_output_cols)
-                },
-            )
+        self.grid_container.add_areas(**areas) # Add areas *after* rows/cols
+
 
         # Add train grids
         for i, task_pair in enumerate(task.train):
