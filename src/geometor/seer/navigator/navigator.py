@@ -184,11 +184,11 @@ class Navigator(App):
 
         # Define areas *before* adding columns and rows
         areas = {
-            f"train_in_{i}": f"col0,train-{i}"
+            f"train_in_{i}": f"col0,train-{i}"  # Correct train area names
             for i in range(len(task.train))
         }
         areas.update({
-            f"train_out_{i}": f"col1,train-{i}"
+            f"train_out_{i}": f"col1,train-{i}" # Correct train area names
             for i in range(len(task.train))
         })
 
@@ -196,11 +196,11 @@ class Navigator(App):
             num_test_input_cols = len(task.test)
             num_test_output_cols = sum(1 for tp in task.test if tp.output)
             areas.update({
-                f"test_input_{i}": f"test_in-{i},test_input"
+                f"test_input_{i}": f"test_in-{i},test_input" # Correct test area names
                 for i in range(num_test_input_cols)
             })
             areas.update({
-                f"test_output_{i}": f"test_out-{i},test_output"
+                f"test_output_{i}": f"test_out-{i},test_output" # Correct test area names
                 for i in range(num_test_output_cols)
             })
 
