@@ -17,9 +17,12 @@ class Navigator(App):
     CSS_PATH = "navigator.tcss"  # Use a separate CSS file
     BINDINGS = [
         ("q", "quit", "Quit"),
+        ("s", "set_renderer_solid", "Solid"),
+        ("c", "set_renderer_char", "Char"),
+        ("b", "set_renderer_block", "Block"),
     ]
 
-    def __init__(self, tasks: list, **kwargs):
+    def __init__(self, tasks: list, renderer=SolidGrid, **kwargs):
         super().__init__(**kwargs)
         self.tasks = tasks
         self.renderer = SolidGrid
@@ -45,10 +48,12 @@ class Navigator(App):
                 self.list_view.append(
                     ListItem(Label(str(task.id)), id=f"task_{task.id}")
                 )
-            self.display_task(self.tasks[0].id)
+            self.current_task_id = self.tasks[0].id
+            self.display_task(self.current_task_id)
 
     def on_list_view_selected(self, event: ListView.Selected) -> None:
         """Event handler for list view selection."""
+        self.current_task_id = event.item.id.removeprefix("task_")
         task_id = event.item.id.removeprefix("task_")
         self.display_task(task_id)
 
@@ -93,6 +98,21 @@ class Navigator(App):
                     #  j += 1
 
         self.grid_container.refresh()
+
+    def action_set_renderer_solid(self) -> None:
+        """Set the renderer to SolidGrid."""
+        self.renderer = SolidGrid
+        self.display_task(self.current_task_id)
+
+    def action_set_renderer_char(self) -> None:
+        """Set the renderer to CharGrid."""
+        self.renderer = CharGrid
+        self.display_task(self.current_task_id)
+
+    def action_set_renderer_block(self) -> None:
+        """Set the renderer to BlockGrid."""
+        self.renderer = BlockGrid
+        self.display_task(self.current_task_id)
 
 
 def main():
