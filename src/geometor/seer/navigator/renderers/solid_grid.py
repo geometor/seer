@@ -12,12 +12,10 @@ class SolidGrid(BaseGrid):
         for row in self.grid:
             line = Text()
             for cell_value in row:
-                fill_color = COLOR_PALETTE.get(cell_value, "black")
-                line.append(block, style=fill_color)
+                fill_color = self.get_color(cell_value)  # Use get_color
+                line.append(block, style=fill_color.rich_color) # Use rich_color
 
             line.append("\n")
             text.append(line)
 
         return text
-
-

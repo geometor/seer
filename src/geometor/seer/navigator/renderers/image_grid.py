@@ -1,3 +1,4 @@
+from geometor.seer.navigator.renderers.base_grid import *
 
 class ImageGrid(BaseGrid):
     """
@@ -27,14 +28,12 @@ class ImageGrid(BaseGrid):
         # Fill each cell: calculate its top-left offset including the grid line offset.
         for r in range(self.rows):
             for c in range(self.cols):
-                color = COLOR_PALETTE.get(self.grid[r][c], "black")
-                # Convert color to an RGB tuple.
-                rgb_color = Image.new("RGB", (1, 1), color).getpixel((0, 0))
+                color = self.get_color(self.grid[r][c]) # use get_color
                 x0 = lw + c * (cell_pixel_size + lw)
                 y0 = lw + r * (cell_pixel_size + lw)
                 for y in range(y0, y0 + cell_pixel_size):
                     for x in range(x0, x0 + cell_pixel_size):
-                        image.putpixel((x, y), rgb_color)
+                        image.putpixel((x, y), color.rgb) # use .rgb
         pixels = Pixels.from_image(image)
         self.update(pixels)
 
@@ -64,12 +63,11 @@ class ImageGrid(BaseGrid):
         image = Image.new("RGB", (img_width, img_height), GRID_LINE_COLOR)
         for r in range(self.rows):
             for c in range(self.cols):
-                color = COLOR_PALETTE.get(self.grid[r][c], "black")
-                rgb_color = Image.new("RGB", (1, 1), color).getpixel((0, 0))
+                color = self.get_color(self.grid[r][c])  # use get_color
                 x0 = lw + c * (cell_pixel_size + lw)
                 y0 = lw + r * (cell_pixel_size + lw)
                 for y in range(y0, y0 + cell_pixel_size):
                     for x in range(x0, x0 + cell_pixel_size):
-                        image.putpixel((x, y), rgb_color)
+                        image.putpixel((x, y), color.rgb) # use .rgb
         pixels = Pixels.from_image(image)
         self.update(pixels)

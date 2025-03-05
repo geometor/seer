@@ -27,12 +27,10 @@ class CharGrid(BaseGrid):
             line = Text()
             # For each cell, append the chosen square character, styled in the cell's color
             for cell_value in row:
-                fill_color = COLOR_PALETTE.get(cell_value, "black")
+                fill_color = self.get_color(cell_value)  # Use get_color
                 # Append the square character with the fill color
-                line.append(self.SQUARE_CHAR, style=fill_color)
+                line.append(self.SQUARE_CHAR, style=fill_color.rich_color) # Use rich_color
             # Add a newline after finishing a row
             line.append("\n")
             text.append(line)
         return text
-
-
