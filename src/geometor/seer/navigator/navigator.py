@@ -51,11 +51,13 @@ class Navigator(App):
             self.current_task_id = self.tasks[0].id
             self.display_task(self.current_task_id)
 
-    def on_list_view_selected(self, event: ListView.Selected) -> None:
+    def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
         """Event handler for list view selection."""
-        self.current_task_id = event.item.id.removeprefix("task_")
-        task_id = event.item.id.removeprefix("task_")
-        self.display_task(task_id)
+        if event.item is not None:  # Check if an item is actually highlighted
+            self.current_task_id = event.item.id.removeprefix("task_")
+            task_id = event.item.id.removeprefix("task_")
+            self.display_task(task_id)
+
 
     def display_task(self, task_id: str) -> None:
         """Display the selected task."""
