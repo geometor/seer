@@ -10,7 +10,9 @@ from textual.widgets import Static, Button, ListView, ListItem, Label, Footer
 from geometor.seer.navigator.renderers.char_grid import CharGrid
 from geometor.seer.navigator.renderers.block_grid import BlockGrid
 from geometor.seer.navigator.renderers.solid_grid import SolidGrid
+
 from geometor.seer.tasks.tasks import Task  # Import Task
+
 import numpy as np
 
 class Navigator(App):
@@ -65,9 +67,6 @@ class Navigator(App):
         if not task:
             return
 
-        # Clear previous grids
-        #  for widget in list(self.grid_container.children):
-
         self.grid_container.remove_children()
 
         self.grid_container.styles.grid_size_rows = 2
@@ -77,7 +76,6 @@ class Navigator(App):
         for i, task_pair in enumerate(task.train):
             input_grid = self.renderer(task_pair.input.grid)
 
-            #  new_stopwatch.scroll_visible()
             self.grid_container.mount(input_grid)
 
         for i, task_pair in enumerate(task.train):
@@ -145,7 +143,7 @@ def main():
         return
 
     # 2. Create and run the Navigator app
-    app = Navigator(tasks[:5])  # Limit to 5 tasks for demonstration
+    app = Navigator(tasks)  # Limit to 5 tasks for demonstration
     app.run()
 
 

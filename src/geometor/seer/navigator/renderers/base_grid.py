@@ -1,31 +1,9 @@
-#  from textual.app import App, ComposeResult
-#  from textual.containers import Horizontal
 from textual.widgets import Static
 from textual.color import Color  # Import the Color class
 
 # Import COLOR_MAP from the tasks.grid module
 from geometor.seer.tasks.grid import COLOR_MAP
 
-
-# Global constants for grid lines in text modes and image mode.
-GRID_LINE_COLOR = "black"
-GRID_LINE_WIDTH = (
-    1  # For text modes: in number of characters; for image mode: in pixels.
-)
-
-# Define a color palette mapping for grid values (0-9) to colors.
-#  COLOR_PALETTE = {
-#      0: "white",
-#      1: "red",
-#      2: "green",
-#      3: "yellow",
-#      4: "blue",
-#      5: "magenta",
-#      6: "cyan",
-#      7: "#DC143C",
-#      8: "#ff8800",  # orange
-#      9: "#00ffff",  # cyan variant
-#  }
 
 class BaseGrid(Static):
     """Base widget class for rendering the colored grid."""
@@ -40,7 +18,7 @@ class BaseGrid(Static):
         """Gets a Textual Color object for the given cell value."""
         rgb_tuple = COLOR_MAP.get(cell_value)
         if rgb_tuple:
-            return Color(*rgb_tuple)  # Create a Color object from the RGB tuple
+            return Color(*rgb_tuple).hex6  # Create a Color object from the RGB tuple
         else:
-            return Color(0, 0, 0)  # Default to black if color not found
+            return Color(0, 0, 0).hex6  # Default to black if color not found
 

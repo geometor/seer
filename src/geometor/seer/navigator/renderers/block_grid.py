@@ -18,16 +18,16 @@ class BlockGrid(BaseGrid):
         for row_num, row in enumerate(self.grid):
             if row_num % 2:
                 for cell in row:
-                    fill_color = self.get_color(cell)  # Use get_color
-                    text.append(" ██", style=fill_color.rich_color) # Use rich_color
+                    fill_color = self.get_color(cell) 
+                    text.append(" ██", style=fill_color)
                 text.append("\n")
             else:
                 top_half = Text()
                 bottom_half = Text()
                 for cell in row:
-                    fill_color = self.get_color(cell)  # Use get_color
-                    top_half.append(" ▄▄", style=fill_color.rich_color) # Use rich_color
-                    bottom_half.append(" ▀▀", style=fill_color.rich_color) # Use rich_color
+                    fill_color = self.get_color(cell)  
+                    top_half.append(" ▄▄", style=fill_color) 
+                    bottom_half.append(" ▀▀", style=fill_color) 
                 text.append(top_half)
                 text.append("\n")
                 text.append(bottom_half)
