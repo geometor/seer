@@ -4,6 +4,7 @@ from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 import os
 from pathlib import Path
+import argparse
 
 
 class TaskSummary(Static):
@@ -31,7 +32,10 @@ class TaskSummary(Static):
 
 
 class SessionNavigator(App):
-    """Main application for navigating ARC test sessions."""
+    """Main application for navigating ARC test sessions.
+
+    The sessions directory can be specified via the --sessions-dir command-line argument.
+    """
 
     BINDINGS = [
         ("j", "move_down", "Move Down"),
@@ -49,12 +53,16 @@ class SessionNavigator(App):
 
     selected_path: reactive[Path | None] = reactive(None)
 
+    def __init__(self, session_root: str = "./sessions"):
+        super().__init__()
+        self.session_root = session_root
+
     def compose(self) -> ComposeResult:
         """Creates the initial layout."""
         with Horizontal():
             self.directory_tree = DirectoryTree(
-                "./sessions", id="tree"
-            )  # starts in sessions folder
+                self.session_root, id="tree"
+            )  # Use session_root here
             yield self.directory_tree
             self.task_summary = TaskSummary(id="summary")
             yield self.task_summary
@@ -117,5 +125,16 @@ class SessionNavigator(App):
 
 
 if __name__ == "__main__":
-    app = SessionNavigator()
+    parser = argparse.ArgumentParser(
+        description="Navigate ARC test sessions."
+    )  # create ArgumentParser
+    parser.add_argument(
+        "--sessions-dir",
+        type=str,
+        default="./sessions",
+        help="Path to the sessions directory",
+    )  # Add sessions-dir argument
+    args = parser.parse_args()  # Parse arguments
+
+    app = SessionNavigator(session_root=args.sessions_dir)  # Pass sessions_dir to App
     app.run()
