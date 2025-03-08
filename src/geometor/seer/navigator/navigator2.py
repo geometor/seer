@@ -4,7 +4,7 @@ from pathlib import Path
 import argparse
 
 # Import the screen classes
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+from geometor.seer.navigator.screens.sessions_screen import SessionsScreen, SessionInfo
 from geometor.seer.navigator.screens.session_screen import SessionScreen  # Corrected import
 from geometor.seer.navigator.screens.task_screen import TaskScreen  # Corrected import
 
@@ -26,7 +26,17 @@ class SessionNavigator(App):
 
     def on_mount(self) -> None:
         """Sets up initial state."""
-        self.push_screen(SessionsScreen(self.session_root, self))  # Pass self (the app)
+        sessions = self._load_sessions()
+        self.push_screen(SessionsScreen(sessions, self))  # Pass the list of SessionInfo
+
+    def _load_sessions(self) -> list[SessionInfo]:
+        """Loads session information from the session root directory."""
+        sessions = []
+        session_root_path = Path(self.session_root)
+        for session_dir in session_root_path.iterdir():
+            if session_dir.is_dir():
+                sessions.append(SessionInfo(name=session_dir.name, path=session_dir))
+        return sessions
 
     def action_quit(self) -> None:
         """Quits the application"""

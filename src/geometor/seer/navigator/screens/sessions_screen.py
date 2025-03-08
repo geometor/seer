@@ -5,12 +5,18 @@ from textual.widgets import Static, ListView, ListItem
 from pathlib import Path
 #  from ..navigator2 import SessionNavigator  # Import for type hinting
 from geometor.seer.navigator.screens.session_screen import SessionScreen  # Import SessionScreen
+from dataclasses import dataclass
 
+@dataclass
+class SessionInfo:
+    name: str
+    path: Path
+    #  You can add other fields here later, like task count, etc.
 
 class SessionsScreen(Screen):
-    def __init__(self, session_root: str, navigator) -> None:
+    def __init__(self, sessions: list[SessionInfo], navigator) -> None:
         super().__init__()
-        self.session_root = Path(session_root)
+        self.sessions = sessions
         self.navigator = navigator  # Store a reference to the main app
 
     def compose(self) -> ComposeResult:
@@ -26,20 +32,19 @@ class SessionsScreen(Screen):
         list_view = self.query_one("#sessions_list", ListView)
         list_view.clear()
 
-        for session_dir in self.session_root.iterdir():
-            if session_dir.is_dir():
-                list_view.append(ListItem(Static(str(session_dir.name)), id=f"session-{session_dir.name.replace('.', '-')}"))  # Add unique ID
+        for idx, session_info in enumerate(self.sessions):
+            list_view.append(ListItem(Static(session_info.name), id=f"session-{idx}"))  # Use index as ID
 
         self.update_summary()
 
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#sessions_summary", Static)
-        num_sessions = len(self.query_one("#sessions_list", ListView))
+        num_sessions = len(self.sessions)  # Use the length of the sessions list
         summary.update(f"Total Sessions: {num_sessions}")
 
     def on_list_view_selected(self, event) -> None:
         """Handles session selection."""
-        selected_session_id = event.item.id.removeprefix("session-")  # Extract session name from ID
-        selected_session_path = self.session_root / selected_session_id
-        self.navigator.push_screen(SessionScreen(selected_session_path, self.navigator))
+        selected_session_index = int(event.item.id.removeprefix("session-"))  # Extract index
+        selected_session_info = self.sessions[selected_session_index]
+        self.navigator.push_screen(SessionScreen(selected_session_info.path, self.navigator))

@@ -10,7 +10,7 @@ from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import Tas
 class SessionScreen(Screen):
     def __init__(self, session_path: Path, navigator) -> None:
         super().__init__()
-        self.session_path = session_path
+        self.session_path = session_path  # Now directly a Path object
         self.navigator = navigator
 
     def compose(self) -> ComposeResult:
