@@ -136,5 +136,7 @@ if __name__ == "__main__":
     )  # Add sessions-dir argument
     args = parser.parse_args()  # Parse arguments
 
-    app = SessionNavigator(session_root=args.sessions_dir)  # Pass sessions_dir to App
+    #  app = SessionNavigator(session_root=args.sessions_dir)  # Pass sessions_dir to App
+    SESSION_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/sessions")
+    app = SessionNavigator(SESSION_DIR)  # Pass sessions_dir to App
     app.run()
