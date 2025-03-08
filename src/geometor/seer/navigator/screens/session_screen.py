@@ -25,9 +25,18 @@ class SessionScreen(Screen):
         list_view = self.query_one("#tasks_list", ListView)
         list_view.clear()
 
-        for task_dir in self.session_path.iterdir():
-            if task_dir.is_dir():
-                list_view.append(ListItem(Static(str(task_dir.name)), id=f"task-{task_dir.name}"))  # Add unique ID
+        if not self.session_path.exists():
+            print(f"Error: Session directory not found: {self.session_path}")
+            self.update_summary()  # Update summary with 0 tasks
+            return
+
+        try:
+            for task_dir in self.session_path.iterdir():
+                if task_dir.is_dir():
+                    list_view.append(ListItem(Static(str(task_dir.name)), id=f"task-{task_dir.name}"))  # Add unique ID
+        except FileNotFoundError:
+            print(f"Error: Session directory not found during iteration: {self.session_path}")
+            #  You could also display a Textual notification here.
 
         self.update_summary()
 
