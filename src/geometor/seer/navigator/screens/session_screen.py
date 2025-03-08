@@ -4,6 +4,7 @@ from textual.widgets import Static, ListView, ListItem
 from textual.widgets.list_view import ListItemSelected
 from pathlib import Path
 from ..navigator2 import SessionNavigator  # Import for type hinting
+from .task_screen import TaskScreen  # Import TaskScreen
 
 
 class SessionScreen(Screen):
@@ -26,7 +27,7 @@ class SessionScreen(Screen):
 
         for task_dir in self.session_path.iterdir():
             if task_dir.is_dir():
-                list_view.append(ListItem(Static(str(task_dir.name)), id=f"task-{task_dir.name}")) # Add unique ID
+                list_view.append(ListItem(Static(str(task_dir.name)), id=f"task-{task_dir.name}"))  # Add unique ID
 
         self.update_summary()
 

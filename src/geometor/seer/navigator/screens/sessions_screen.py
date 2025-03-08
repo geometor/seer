@@ -4,6 +4,7 @@ from textual.widgets import Static, ListView, ListItem
 from textual.widgets.list_view import ListItemSelected
 from pathlib import Path
 from ..navigator2 import SessionNavigator  # Import for type hinting
+from .session_screen import SessionScreen  # Import SessionScreen
 
 
 class SessionsScreen(Screen):
