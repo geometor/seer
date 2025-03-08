@@ -28,7 +28,7 @@ class SessionsScreen(Screen):
 
         for session_dir in self.session_root.iterdir():
             if session_dir.is_dir():
-                list_view.append(ListItem(Static(str(session_dir.name)), id=f"session-{session_dir.name}"))  # Add unique ID
+                list_view.append(ListItem(Static(str(session_dir.name)), id=f"session-{session_dir.name.replace('.', '-')}"))  # Add unique ID
 
         self.update_summary()
 
