@@ -1,13 +1,13 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem
-from textual.widgets.list_view import ListItemSelected  # Import ListItemSelected
+#  from textual.widgets.list_view import ListItemSelected  # Import ListItemSelected
 from pathlib import Path
-from ..navigator2 import SessionNavigator
+#  from ..navigator2 import SessionNavigator
 
 
 class TaskScreen(Screen):
-    def __init__(self, task_path: Path, navigator: SessionNavigator) -> None:
+    def __init__(self, task_path: Path, navigator) -> None:
         super().__init__()
         self.task_path = task_path
         self.navigator = navigator
@@ -35,7 +35,7 @@ class TaskScreen(Screen):
         num_files = self.query_one("#files_list", ListView).item_count
         summary.update(f"Files in {self.task_path.name}: {num_files}")
 
-    def on_list_view_selected(self, event: ListItemSelected) -> None:
+    def on_list_view_selected(self, event) -> None:
         """Handles file/directory selection within a task (if needed)."""
         selected_item_id = event.item.id.removeprefix("file-")
         selected_item_path = self.task_path / selected_item_id

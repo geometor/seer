@@ -1,14 +1,14 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem
-from textual.widgets.list_view import ListItemSelected
+#  from textual.widgets.list_view import ListItemSelected
 from pathlib import Path
-from ..navigator2 import SessionNavigator  # Import for type hinting
-from .task_screen import TaskScreen  # Import TaskScreen
+#  from ..navigator2 import SessionNavigator  # Import for type hinting
+from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
 
 
 class SessionScreen(Screen):
-    def __init__(self, session_path: Path, navigator: SessionNavigator) -> None:
+    def __init__(self, session_path: Path, navigator) -> None:
         super().__init__()
         self.session_path = session_path
         self.navigator = navigator
@@ -37,7 +37,7 @@ class SessionScreen(Screen):
         num_tasks = self.query_one("#tasks_list", ListView).item_count
         summary.update(f"Tasks in {self.session_path.name}: {num_tasks}")
 
-    def on_list_view_selected(self, event: ListItemSelected) -> None:
+    def on_list_view_selected(self, event) -> None:
         """Handles task selection."""
         selected_task_id = event.item.id.removeprefix("task-")
         selected_task_path = self.session_path / selected_task_id
