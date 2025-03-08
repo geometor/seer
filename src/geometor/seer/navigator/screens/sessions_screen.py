@@ -35,7 +35,7 @@ class SessionsScreen(Screen):
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#sessions_summary", Static)
-        num_sessions = self.query_one("#sessions_list", ListView).item_count
+        num_sessions = self.query_one("#sessions_list", ListView).child_count
         summary.update(f"Total Sessions: {num_sessions}")
 
     def on_list_view_selected(self, event) -> None:

@@ -32,7 +32,7 @@ class TaskScreen(Screen):
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#task_summary", Static)
-        num_files = self.query_one("#files_list", ListView).item_count
+        num_files = self.query_one("#files_list", ListView).child_count
         summary.update(f"Files in {self.task_path.name}: {num_files}")
 
     def on_list_view_selected(self, event) -> None:
