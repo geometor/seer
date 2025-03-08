@@ -1,14 +1,14 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem
-from textual.widgets.list_view import ListItemSelected
+#  from textual.widgets.list_view import ListItemSelected
 from pathlib import Path
-from ..navigator2 import SessionNavigator  # Import for type hinting
-from .session_screen import SessionScreen  # Import SessionScreen
+#  from ..navigator2 import SessionNavigator  # Import for type hinting
+from geometor.seer.navigator.screens.session_screen import SessionScreen  # Import SessionScreen
 
 
 class SessionsScreen(Screen):
-    def __init__(self, session_root: str, navigator: SessionNavigator) -> None:
+    def __init__(self, session_root: str, navigator) -> None:
         super().__init__()
         self.session_root = Path(session_root)
         self.navigator = navigator  # Store a reference to the main app
@@ -38,7 +38,7 @@ class SessionsScreen(Screen):
         num_sessions = self.query_one("#sessions_list", ListView).item_count
         summary.update(f"Total Sessions: {num_sessions}")
 
-    def on_list_view_selected(self, event: ListItemSelected) -> None:
+    def on_list_view_selected(self, event) -> None:
         """Handles session selection."""
         selected_session_id = event.item.id.removeprefix("session-")  # Extract session name from ID
         selected_session_path = self.session_root / selected_session_id
