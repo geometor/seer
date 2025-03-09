@@ -25,19 +25,19 @@ class TaskScreen(Screen):
         list_view.clear()
 
         for item in self.task_path.iterdir():
-            list_view.append(ListItem(Static(str(item.name)), id=f"file-{item.name}"))  # Add unique ID
+            list_view.append(ListItem(Static(str(item.name)), id=f"{item.name}"))  # Add unique ID
 
         self.update_summary()
 
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#task_summary", Static)
-        num_files = self.query_one("#files_list", ListView).child_count
+        num_files = len(self.query_one("#files_list", ListView))
         summary.update(f"Files in {self.task_path.name}: {num_files}")
 
     def on_list_view_selected(self, event) -> None:
         """Handles file/directory selection within a task (if needed)."""
-        selected_item_id = event.item.id.removeprefix("file-")
+        selected_item_id = event.item.id #.removeprefix("file-")
         selected_item_path = self.task_path / selected_item_id
         #  Example: If you want to handle directory selection within a task:
         if selected_item_path.is_dir():
