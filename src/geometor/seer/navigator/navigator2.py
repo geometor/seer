@@ -16,24 +16,23 @@ class SessionNavigator(App):
         ("ctrl+q", "quit", "Quit"),  # add quit binding
     ]
 
-    def __init__(self, session_root: str = "./sessions"):
-        super().__init__()
-        self.session_root = session_root
 
+    def __init__(self, sessions_root: str = "./sessions"):
+        super().__init__()
+        self.sessions_root = Path(sessions_root)
     def compose(self) -> ComposeResult:
         """Creates the initial layout."""
         yield Static("Loading...")  # Placeholder
 
     def on_mount(self) -> None:
         """Sets up initial state."""
-        sessions = self._load_sessions()
-        self.push_screen(SessionsScreen(sessions, self))  # Pass the list of SessionInfo
+        self.sessions = self._load_sessions()
+        self.push_screen(SessionsScreen(self.sessions))  # Pass the list of SessionInfo
 
     def _load_sessions(self) -> list[SessionInfo]:
         """Loads session information from the session root directory."""
         sessions = []
-        session_root_path = Path(self.session_root)
-        for session_dir in session_root_path.iterdir():
+        for session_dir in self.sessions_root.iterdir():
             if session_dir.is_dir():
                 sessions.append(SessionInfo(name=session_dir.name, path=session_dir))
         return sessions
@@ -55,5 +54,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    app = SessionNavigator(session_root=args.sessions_dir)
+    app = SessionNavigator(sessions_root=args.sessions_dir)
     app.run()

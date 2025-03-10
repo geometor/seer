@@ -1,29 +1,37 @@
+import os
+from pathlib import Path
+
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Static, ListView, ListItem
-#  from textual.widgets.list_view import ListItemSelected
-from pathlib import Path
-#  from ..navigator2 import SessionNavigator  # Import for type hinting
+from textual.widgets import Static, ListView, ListItem, DataTable
+from textual import log  
+from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer # Import Grid
+
 from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
 
 
 class SessionScreen(Screen):
-    def __init__(self, session_path: Path, navigator) -> None:
+    def __init__(self, session_path: Path) -> None:
         super().__init__()
         self.session_path = session_path  # Now directly a Path object
-        self.navigator = navigator
+        #  self.navigator = navigator
 
     def compose(self) -> ComposeResult:
-        yield ListView(id="tasks_list")
-        yield Static(id="session_summary")
+        self.table = DataTable()
+        self.table.add_columns("tasks", "match", "prompts")
+        with Vertical():
+            yield self.table
+            yield Static(id="session_summary")
 
     def on_mount(self) -> None:
         self.update_tasks_list()
 
     def update_tasks_list(self):
-        """Populates the tasks ListView."""
-        list_view = self.query_one("#tasks_list", ListView)
-        list_view.clear()
+
+        self.table.cursor_type = "row"
+        self.table.focus()
+
+        self.update_summary()
 
         if not self.session_path.exists():
             print(f"Error: Session directory not found: {self.session_path}")
@@ -33,7 +41,8 @@ class SessionScreen(Screen):
         try:
             for task_dir in self.session_path.iterdir():
                 if task_dir.is_dir():
-                    list_view.append(ListItem(Static(str(task_dir.name)), id=f"task-{task_dir.name}"))  # Add unique ID
+                    self.table.add_row(task_dir.name)
+
         except FileNotFoundError:
             print(f"Error: Session directory not found during iteration: {self.session_path}")
             #  You could also display a Textual notification here.
@@ -43,7 +52,7 @@ class SessionScreen(Screen):
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#session_summary", Static)
-        num_tasks = len(self.query_one("#tasks_list", ListView))
+        num_tasks = self.table.rows
         summary.update(f"Tasks in {self.session_path.name}: {num_tasks}")
 
     def on_list_view_selected(self, event) -> None:
