@@ -1,12 +1,19 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem
-#  from textual.widgets.list_view import ListItemSelected  # Import ListItemSelected
+from textual.binding import Binding
+
 from pathlib import Path
-#  from ..navigator2 import SessionNavigator
 
 
 class TaskScreen(Screen):
+    BINDINGS = [
+        Binding("l", "select_row", "Select", show=False),
+        Binding("k", "move_up", "Cursor up", show=False),
+        Binding("j", "move_down", "Cursor down", show=False),
+        Binding("h", "app.pop_screen", "back", show=False),
+    ]
+
     def __init__(self, task_path: Path, navigator) -> None:
         super().__init__()
         self.task_path = task_path

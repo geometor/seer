@@ -6,11 +6,19 @@ from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem, DataTable
 from textual import log  
 from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer # Import Grid
+from textual.binding import Binding
 
 from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
 
 
 class SessionScreen(Screen):
+    BINDINGS = [
+        Binding("l", "select_row", "Select", show=False),
+        Binding("k", "move_up", "Cursor up", show=False),
+        Binding("j", "move_down", "Cursor down", show=False),
+        Binding("h", "app.pop_screen", "back", show=False),
+    ]
+
     def __init__(self, session_path: Path) -> None:
         super().__init__()
         self.session_path = session_path  # Now directly a Path object
@@ -25,6 +33,22 @@ class SessionScreen(Screen):
 
     def on_mount(self) -> None:
         self.update_tasks_list()
+
+    
+    def action_move_up(self):
+        row = self.table.cursor_row - 1
+        self.table.move_cursor(row=row)
+
+    def action_move_down(self):
+        row = self.table.cursor_row + 1
+        self.table.move_cursor(row=row)
+
+    def action_select_row(self):
+        row_id = self.table.cursor_row
+        row = self.table.get_row_at(row_id)
+        selected_session = row[0]
+        session_path = self.app.sessions_root / selected_session
+        self.app.push_screen(Task(session_path))
 
     def update_tasks_list(self):
 
