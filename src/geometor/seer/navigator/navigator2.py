@@ -3,38 +3,43 @@ from textual.widgets import Static
 from pathlib import Path
 import argparse
 
-# Import the screen classes
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen, SessionInfo
-from geometor.seer.navigator.screens.session_screen import SessionScreen  # Corrected import
-from geometor.seer.navigator.screens.task_screen import TaskScreen  # Corrected import
+from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
 
 
 class SessionNavigator(App):
-    """Main application for navigating ARC test sessions."""
 
     BINDINGS = [
-        ("ctrl+q", "quit", "Quit"),  # add quit binding
+        ("q", "quit", "Quit"),
     ]
-
 
     def __init__(self, sessions_root: str = "./sessions"):
         super().__init__()
         self.sessions_root = Path(sessions_root)
+
     def compose(self) -> ComposeResult:
-        """Creates the initial layout."""
-        yield Static("Loading...")  # Placeholder
+        yield Static("Loading...")
 
     def on_mount(self) -> None:
-        """Sets up initial state."""
         self.sessions = self._load_sessions()
-        self.push_screen(SessionsScreen(self.sessions))  # Pass the list of SessionInfo
+        self.push_screen(SessionsScreen())
 
-    def _load_sessions(self) -> list[SessionInfo]:
-        """Loads session information from the session root directory."""
-        sessions = []
-        for session_dir in self.sessions_root.iterdir():
+    def _load_sessions(self) -> dict:
+        sessions = {}
+        session_dirs = sorted(self.sessions_root.iterdir(), key=lambda x: x.name)
+        for session_dir in session_dirs:
             if session_dir.is_dir():
-                sessions.append(SessionInfo(name=session_dir.name, path=session_dir))
+                tasks = {}
+                task_dirs = sorted(session_dir.iterdir(), key=lambda x: x.name)
+                for task_dir in task_dirs:
+                    if task_dir.is_dir():
+                        task_files = sorted(task_dir.iterdir(), key=lambda x: x.name)
+                        #  for task_file in task_files:
+                            #  if task_file.is_file():
+                                #  task_files.append(task_file)
+
+                        tasks[task_dir.name] = task_files
+
+                sessions[session_dir.name] = tasks
         return sessions
 
     def action_quit(self) -> None:
@@ -43,9 +48,7 @@ class SessionNavigator(App):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Navigate ARC test sessions."
-    )
+    parser = argparse.ArgumentParser(description="Navigate ARC test sessions.")
     parser.add_argument(
         "--sessions-dir",
         type=str,

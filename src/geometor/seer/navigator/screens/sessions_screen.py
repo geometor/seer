@@ -1,9 +1,10 @@
-import os
 from pathlib import Path
+
+from rich.text import Text
 
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Static, ListView, ListItem, DataTable
+from textual.widgets import Static, ListView, ListItem, DataTable, Header, Footer
 from textual import log
 from textual.containers import (
     Horizontal,
@@ -13,17 +14,7 @@ from textual.containers import (
 )
 from textual.binding import Binding
 
-from geometor.seer.navigator.screens.session_screen import (
-    SessionScreen,
-)  # Import SessionScreen
-from dataclasses import dataclass
-
-
-@dataclass
-class SessionInfo:
-    name: str
-    path: Path
-    #  You can add other fields here later, like task count, etc.
+from geometor.seer.navigator.screens.session_screen import SessionScreen
 
 
 class SessionsScreen(Screen):
@@ -38,33 +29,35 @@ class SessionsScreen(Screen):
         #  Binding("h", "pop_screen", "back", show=False),
     ]
 
-    def __init__(self, sessions: list[SessionInfo]) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.sessions = sessions
-        #  self.navigator = navigator  # Store a reference to the main app
+        self.sessions = self.app.sessions
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("session", "tasks", "matches")
+        #  self.table.add_columns("session", "tasks", "matches")
+        self.table.add_column("session")
+        self.table.add_column("tasks")
+        self.table.add_column("matches")
+        self.table.cursor_type = "row"
+        yield Header()
         with Vertical():
             yield self.table
-            yield Static(id="sessions_summary")
+            yield Static("count:", id="summary")
+        yield Footer()
 
     def on_mount(self) -> None:
-        """Load initial sessions."""
-        self.update_sessions_list()
+        self.title = "Session Navigator"
+        for session_key, session in self.sessions.items():
+            num_sessions = Text(str(len(session)), style="", justify="right")
+            self.table.add_row(session_key, num_sessions)
 
-    def update_sessions_list(self):
-        for idx, session_info in enumerate(self.sessions):
-            self.table.add_row(session_info.name)
-
-        self.table.cursor_type = "row"
         self.table.focus()
 
         self.update_summary()
 
     def update_summary(self):
-        summary = self.query_one("#sessions_summary", Static)
+        summary = self.query_one("#summary", Static)
         num_sessions = len(self.sessions)  # Use the length of the sessions list
         summary.update(f"Total Sessions: {num_sessions}")
 
@@ -79,20 +72,10 @@ class SessionsScreen(Screen):
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
-        selected_session = row[0]
-        session_path = self.app.sessions_root / selected_session
-        self.app.push_screen(SessionScreen(session_path))
+        session_key = row[0]
+        self.app.push_screen(SessionScreen(session_key))
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
-        selected_session = row[0]
-        log(f"{event.row_key=}")
-        session_path = self.app.sessions_root / selected_session
-        log(f"{session_path=}")
-        self.app.push_screen(SessionScreen(session_path))
-
-    #  def on_list_view_selected(self, event) -> None:
-    #  """Handles session selection."""
-    #  selected_session_index = int(event.item.id.removeprefix("session-"))  # Extract index
-    #  selected_session_info = self.sessions[selected_session_index]
-    #  self.navigator.push_screen(SessionScreen(selected_session_info.path, self.navigator))
+        session_key = row[0]
+        self.app.push_screen(SessionScreen(session_key))
