@@ -4,6 +4,7 @@ from pathlib import Path
 import argparse
 import json
 import re  # Import the regular expression module
+from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
 
 
 class Step:
@@ -108,9 +109,9 @@ class SessionNavigator(App):
 
     def compose(self) -> ComposeResult:
         yield Static("Loading...")
+        self.sessions = self._load_sessions()
 
     def on_mount(self) -> None:
-        self.sessions = self._load_sessions()
         self.push_screen(SessionsScreen())
 
     def _load_sessions(self) -> dict:
