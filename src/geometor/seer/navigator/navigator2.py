@@ -3,10 +3,9 @@ from textual.widgets import Static
 from pathlib import Path
 import argparse
 import json
-import re  # Import the regular expression module
-# Moved the import to before the class definition
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+import re  
 
+from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
 
 class Step:
     def __init__(self, step_prefix: str, task_dir: Path):
@@ -16,7 +15,7 @@ class Step:
         self.total_prompt_file = None
         self.response_json_file = None
         self.response_md_file = None
-        self.py_files = {}  # Store as a dictionary with index as key
+        self.py_files = {}  
         self.train_json_files = {}
         self.test_json_files = {}
         self.yaml_files = []
@@ -24,8 +23,8 @@ class Step:
 
         self.usage_metadata = None
         self.response_time = None
-        self.train_results = {}  # Store train results by index
-        self.test_results = {}  # Store test results by index
+        self.train_results = {}  
+        self.test_results = {}  
         self.train_match = False
         self.test_match = False
 
@@ -43,17 +42,23 @@ class Step:
                     self.response_json_file = file
                 elif file.name.endswith("response.md"):
                     self.response_md_file = file
-                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith(".py"):
+                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith(
+                    ".py"
+                ):
                     match = re.match(rf"{self.prefix}py_(\d+)\.py", file.name)
                     if match:
                         index = int(match.group(1))
                         self.py_files[index] = file
-                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith("-train.json"):
+                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith(
+                    "-train.json"
+                ):
                     match = re.match(rf"{self.prefix}py_(\d+)-train\.json", file.name)
                     if match:
                         index = int(match.group(1))
                         self.train_json_files[index] = file
-                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith("-test.json"):
+                elif file.name.startswith(f"{self.prefix}py_") and file.name.endswith(
+                    "-test.json"
+                ):
                     match = re.match(rf"{self.prefix}py_(\d+)-test\.json", file.name)
                     if match:
                         index = int(match.group(1))
@@ -81,7 +86,7 @@ class Step:
                     for example in data.get("examples", []):
                         if example.get("match"):
                             self.train_match = True
-                            break  # Exit inner loop once a match is found
+                            break  # Exit if match is found
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
@@ -111,7 +116,6 @@ class SessionNavigator(App):
     def compose(self) -> ComposeResult:
         yield Static("Loading...")
 
-
     def on_mount(self) -> None:
         self.sessions = self._load_sessions()
         self.push_screen(SessionsScreen())
@@ -126,7 +130,7 @@ class SessionNavigator(App):
                 for task_dir in task_dirs:
                     if task_dir.is_dir():
                         steps = {}
-                        # Find all prefixes
+                        # group by prefixes
                         prefixes = set()
                         for file in task_dir.iterdir():
                             match = re.match(r"(\d{3})-.*", file.name)
@@ -137,7 +141,7 @@ class SessionNavigator(App):
                         for prefix in sorted(prefixes):
                             steps[prefix] = Step(prefix, task_dir)
 
-                        tasks[task_dir.name] = steps  # Store steps dict
+                        tasks[task_dir.name] = steps  
                 sessions[session_dir.name] = tasks
         return sessions
 

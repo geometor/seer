@@ -19,14 +19,14 @@ from geometor.seer.navigator.screens.session_screen import SessionScreen
 
 class SessionsScreen(Screen):
     CSS = """
-    DataTable {height: auto;}
-    Static {padding: 1;}
+    DataTable {height: 1fr;}
+    Static {padding: 1; height: 3}
+    Vertical {height: 100%;}
     """
     BINDINGS = [
-        Binding("l", "select_row", "Select", show=False),
-        Binding("k", "move_up", "Cursor up", show=False),
-        Binding("j", "move_down", "Cursor down", show=False),
-        #  Binding("h", "pop_screen", "back", show=False),
+        Binding("j", "move_down", "Cursor down", show=True),
+        Binding("k", "move_up", "Cursor up", show=True),
+        Binding("l", "select_row", "Select", show=True),
     ]
 
     def __init__(self) -> None:
@@ -35,10 +35,9 @@ class SessionsScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        #  self.table.add_columns("session", "tasks", "matches")
-        self.table.add_column("session")
-        self.table.add_column("tasks")
-        self.table.add_column("matches")
+        self.table.add_column("SESSION")
+        self.table.add_column("TASKS")
+        self.table.add_column("MATCHES")
         self.table.cursor_type = "row"
         yield Header()
         with Vertical():
@@ -59,7 +58,7 @@ class SessionsScreen(Screen):
     def update_summary(self):
         summary = self.query_one("#summary", Static)
         num_sessions = len(self.sessions)  # Use the length of the sessions list
-        summary.update(f"Total Sessions: {num_sessions}")
+        summary.update(f"count: {num_sessions}")
 
     def action_move_up(self):
         row = self.table.cursor_row - 1

@@ -8,12 +8,18 @@ from geometor.seer.exceptions import (
     FunctionExecutionError,
 )
 
+
 class ResponseHandler:
     def __init__(self, session):
         self.session = session
 
     def process_response(
-        self, response: Any, functions: dict, total_prompt: List[str], prompt_count: int, extracted_file_counts: dict
+        self,
+        response: Any,
+        functions: dict,
+        total_prompt: List[str],
+        prompt_count: int,
+        extracted_file_counts: dict,
     ) -> Tuple[List[str], List[Tuple[str, str, str]]]:
         """Processes the response from the Gemini model."""
         response_parts = []
@@ -38,7 +44,9 @@ class ResponseHandler:
         for part in response.candidates[0].content.parts:
             if part.text:
                 response_parts.append(part.text + "\n")
-                extracted_code = self._parse_code_text(part.text, prompt_count, extracted_file_counts)
+                extracted_code = self._parse_code_text(
+                    part.text, prompt_count, extracted_file_counts
+                )
                 extracted_code_list.extend(extracted_code)
 
             if part.executable_code:
@@ -68,15 +76,20 @@ class ResponseHandler:
                     response_parts.append(f"{result}\n")
                     response_parts.append(f"{msg}\n")
 
-                except (UnknownFunctionError, FunctionArgumentError, FunctionExecutionError) as e:
+                except (
+                    UnknownFunctionError,
+                    FunctionArgumentError,
+                    FunctionExecutionError,
+                ) as e:
                     print(f"\nERROR: {str(e)}")
                     self.session.log_error(str(e), "".join(total_prompt))
                     response_parts.append(f"\n*error:*\n{str(e)}\n")
 
-
         return response_parts, extracted_code_list
 
-    def _parse_code_text(self, text: str, prompt_count:int, extracted_file_counts: dict) -> List[Tuple[str, str, str]]:
+    def _parse_code_text(
+        self, text: str, prompt_count: int, extracted_file_counts: dict
+    ) -> List[Tuple[str, str, str]]:
         """Extracts code blocks, writes them, and returns file info."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         extracted_code = []
@@ -87,9 +100,7 @@ class ResponseHandler:
 
             # Write to file and get the *full path*
             file_path_str = self.session._write_code_text(
-                [(file_type, content)],
-                prompt_count,
-                extracted_file_counts
+                [(file_type, content)], prompt_count, extracted_file_counts
             )
 
             file_path = Path(file_path_str)
@@ -98,7 +109,9 @@ class ResponseHandler:
             extracted_code.append((file_type, content, base_filename))
         return extracted_code
 
-    def _call_function(self, function_call: Any, functions: dict, total_prompt: List[str]):
+    def _call_function(
+        self, function_call: Any, functions: dict, total_prompt: List[str]
+    ):
         """Execute a function call with improved error handling."""
         if not functions:
             raise ValueError("No functions provided")

@@ -31,10 +31,11 @@ from geometor.seer.session.summary import summarize_session, summarize_task
 import geometor.seer.verifier as verifier
 from geometor.seer.response_handler import ResponseHandler  # Import the new class
 
+
 class Seer:
     def __init__(
         self,
-        config: dict,
+        config: dict
     ):
         self.config = config
 
@@ -52,62 +53,41 @@ class Seer:
         self.use_images = config.get("use_images", False)
 
         #  self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
-        self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
+        #  self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
         self.task_solved = False  # Initialize task_solved flag
 
     def run(self, tasks):
-        """
-        Runs the Seer over the set of tasks.
-        """
         self.tasks = tasks
         self.session = Session(self.config, self.tasks)
 
         for task in self.tasks:
-            self.solve(self.session, task)
+            self.solve(task, session)
 
         summarize_session(self.session)
 
-    def solve(
-        self,
-        session,
-        task,
-    ):
-        """
-        Main method to orchestrate the task solving workflow.
-        """
-        session.set_task_dir(task.id)
-
-        self.prompt_count = 0
-        self.task = task
-
-        self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
+    def solve(self, task, session):
+        session_task = session.add_task(task)
 
         try:
-            task_image = task.to_image()
-
-            image_path = self.session.task_dir / "task.png"
-            task_image.save(image_path)
-
-            task_json_str = task.nice_json_layout()
-            task_json_file = session.task_dir / "task.json"
-            task_json_file.write_text(task_json_str)
-
-            self._investigate(task)
+            self._investigate(task, session_task)
         except Exception as e:
-            self.session.log_error(e)
+            # TODO: make sure log error is implemented
+            session_task.log_error(e)
 
-        summarize_task(session.task_dir, session.log_error)
+        #  summarize_task(session.task_dir, session.log_error)
+        session_task.summarize()
 
-    def _investigate(self, task, include_images=True):
+    def _investigate(self, task, session_task, include_images=True):
         """
         investigate all training pairs
         """
         self.task_solved = False  # Reset at the start of each task
 
+
         def get_pair_prompt(title, task_pair):
             prompt = [
                 f"\n## {title}\n",
-                ]
+            ]
             for key, grid in task_pair.items():
                 prompt += [
                     f"\n**{key}:**\n```\n",
@@ -115,7 +95,7 @@ class Seer:
                     "\n```\n\n",
                 ]
                 if include_images:
-                    input_image_filename = self.session.log_prompt_image(
+                    input_image_filename = task_step.log_prompt_image(
                         grid, self.prompt_count + 1, f"{title}_{key}"
                     )
                     #  prompt.append(f"![Image]({input_image_filename})\n")
@@ -123,8 +103,9 @@ class Seer:
                     prompt.append("\n")
 
             return prompt
-        
-        # TODO: show all training examples first
+
+        # dream review all train *****************************
+        description = f"all training • investigate_dreamer"
         history = []
         show_training_prompt = []
         for i, pair in enumerate(task.train, 1):
@@ -133,6 +114,10 @@ class Seer:
         show_training_prompt.append(task.to_image(show_test=False))
 
         instructions = [self.instructions["investigate_dreamer"]]
+
+        
+        task_step = session_task.add_step(history, show_training_prompt, instructions)
+
         (
             response,
             response_parts,
@@ -152,7 +137,10 @@ class Seer:
         if self.task_solved:  # Check if solved
             return  # Exit the loop if solved
 
-        # coder prompt
+
+        task_step.add_result(reponse, response_parts, extracted_code_list) 
+
+        # coder prompt *********************************
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
         (
@@ -336,7 +324,11 @@ class Seer:
         # --- USE THE RESPONSE HANDLER ---
         handler = ResponseHandler(self.session)
         response_parts, extracted_code_list = handler.process_response(
-            response, functions, total_prompt, self.prompt_count, self.extracted_file_counts
+            response,
+            functions,
+            total_prompt,
+            self.prompt_count,
+            self.extracted_file_counts,
         )
         # --- END OF RESPONSE HANDLER USAGE ---
 
@@ -366,7 +358,7 @@ class Seer:
         dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
 
         dreamer_prompt.append("\nTrain Set Results:\n")
-        if train_results and 'examples' in train_results:
+        if train_results and "examples" in train_results:
             for i, result in enumerate(train_results["examples"]):
                 dreamer_prompt.append(f"\n## Example {i+1}:\n")
                 dreamer_prompt.append(f"\nInput:\n```\n{result.get('input')}\n```\n")
@@ -391,7 +383,7 @@ class Seer:
                     f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
                 )
 
-        if test_results and "examples" in test_results:  
+        if test_results and "examples" in test_results:
             dreamer_prompt.append("\nTest Set Results (if applicable):\n")
             for i, result in enumerate(test_results["examples"]):
                 dreamer_prompt.append(f"\n**Test {i+1}:**\n")

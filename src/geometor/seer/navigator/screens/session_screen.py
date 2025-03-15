@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from rich.text import Text
+
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem, DataTable, Header, Footer
@@ -10,13 +12,18 @@ from textual.containers import (
     Vertical,
     Grid,
     ScrollableContainer,
-)  # Import Grid
+)  
 from textual.binding import Binding
 
-from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
+from geometor.seer.navigator.screens.task_screen import TaskScreen  
 
 
 class SessionScreen(Screen):
+    CSS = """
+    DataTable {height: 1fr;}
+    Static {padding: 1; height: 3}
+    Vertical {height: 100%;}
+    """
     BINDINGS = [
         Binding("l", "select_row", "Select", show=False),
         Binding("k", "move_up", "Cursor up", show=False),
@@ -31,7 +38,7 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("tasks", "match", "prompts")
+        self.table.add_columns("TASKS", "MATCH", "STEPS")
         yield Header()
         with Vertical():
             yield self.table
@@ -52,7 +59,10 @@ class SessionScreen(Screen):
 
         for task_key, task in self.session.items():
             #TODO: determine if there is match in task
-            self.table.add_row(task_key, 0, len(task))
+            num_steps = Text(
+                str(len(task)), justify="right"
+            )
+            self.table.add_row(task_key, 0, num_steps)
 
         self.update_summary()
 
