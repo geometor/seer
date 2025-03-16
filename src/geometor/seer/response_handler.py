@@ -17,18 +17,16 @@ class ResponseHandler:
         self,
         response: Any,
         functions: dict,
-        total_prompt: List[str],
-        prompt_count: int,
         extracted_file_counts: dict,
-    ) -> Tuple[List[str], List[Tuple[str, str, str]]]:
+    ):
         """Processes the response from the Gemini model."""
         response_parts = []
         extracted_code_list = []
 
         if not response.candidates:
             error_msg = "No candidates returned in response."
-            print(f"\nERROR: {error_msg}")
-            self.session.log_error(error_msg, "".join(total_prompt))
+            #  print(f"\nERROR: {error_msg}")
+            self.session.log_error(error_msg)
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             return response_parts, extracted_code_list
@@ -36,7 +34,7 @@ class ResponseHandler:
         if not hasattr(response.candidates[0].content, "parts"):
             error_msg = "No content parts in response."
             print(f"\nERROR: {error_msg}")
-            self.session.log_error(error_msg, "".join(total_prompt))
+            self.session.log_error(error_msg)
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             return response_parts, extracted_code_list
@@ -44,8 +42,9 @@ class ResponseHandler:
         for part in response.candidates[0].content.parts:
             if part.text:
                 response_parts.append(part.text + "\n")
+
                 extracted_code = self._parse_code_text(
-                    part.text, prompt_count, extracted_file_counts
+                    part.text, extracted_file_counts,
                 )
                 extracted_code_list.extend(extracted_code)
 
@@ -61,7 +60,7 @@ class ResponseHandler:
                 response_parts.append(f"outcome: {outcome}\n")
                 response_parts.append(f"```\n{output}\n```\n")
                 self.session._write_to_file(
-                    f"{prompt_count:03d}-code_result.txt", output
+                    f"code_result.txt", output
                 )
 
             if part.function_call:
@@ -70,7 +69,8 @@ class ResponseHandler:
 
                 try:
                     result, msg = self._call_function(
-                        part.function_call, functions, total_prompt
+                        part.function_call,
+                        functions,
                     )
                     response_parts.append("\nresult:\n")
                     response_parts.append(f"{result}\n")
@@ -82,14 +82,14 @@ class ResponseHandler:
                     FunctionExecutionError,
                 ) as e:
                     print(f"\nERROR: {str(e)}")
-                    self.session.log_error(str(e), "".join(total_prompt))
+                    self.session.log_error(str(e))
                     response_parts.append(f"\n*error:*\n{str(e)}\n")
 
         return response_parts, extracted_code_list
 
     def _parse_code_text(
-        self, text: str, prompt_count: int, extracted_file_counts: dict
-    ) -> List[Tuple[str, str, str]]:
+        self, text: str, prompt_count: int, extracted_file_counts: dict,
+        ): 
         """Extracts code blocks, writes them, and returns file info."""
         matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
         extracted_code = []
@@ -110,7 +110,9 @@ class ResponseHandler:
         return extracted_code
 
     def _call_function(
-        self, function_call: Any, functions: dict, total_prompt: List[str]
+        self,
+        function_call,
+        functions: dict,
     ):
         """Execute a function call with improved error handling."""
         if not functions:

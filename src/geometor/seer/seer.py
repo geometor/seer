@@ -5,38 +5,24 @@ It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
 
-from rich import print
 from datetime import datetime
-from pathlib import Path
-import json
-import numpy as np
-import os
-import re
-import contextlib
-import traceback
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
 
+from geometor.seer.prompts import get_pair_prompt
+
 from geometor.seer.gemini_client import GeminiClient as Client
-from geometor.seer.exceptions import (
-    MultipleFunctionCallsError,
-    MaxRetriesExceededError,
-    UnknownFunctionError,
-    FunctionArgumentError,
-    FunctionExecutionError,
-)
-from geometor.seer.session import Session
-from geometor.seer.session.summary import summarize_session, summarize_task
+
+from geometor.seer.session.session import Session
+from geometor.seer.session.session_task import SessionTask
+
 import geometor.seer.verifier as verifier
 from geometor.seer.response_handler import ResponseHandler  # Import the new class
 
 
 class Seer:
-    def __init__(
-        self,
-        config: dict
-    ):
+    def __init__(self, config: dict):
         self.config = config
 
         self.roles = {}
@@ -52,20 +38,15 @@ class Seer:
         self.current_iteration = 0
         self.use_images = config.get("use_images", False)
 
-        #  self.token_counts = {"prompt": 0, "candidates": 0, "total": 0, "cached": 0}
-        #  self.extracted_file_counts = {"py": 0, "yaml": 0, "json": 0, "txt": 0}
-        self.task_solved = False  # Initialize task_solved flag
+    def run(self, tasks: Tasks):
+        session = Session(self.config, self.tasks)
 
-    def run(self, tasks):
-        self.tasks = tasks
-        self.session = Session(self.config, self.tasks)
+        for task in tasks:
+            self.solve(session, task)
 
-        for task in self.tasks:
-            self.solve(task, session)
+        session.summarize()
 
-        summarize_session(self.session)
-
-    def solve(self, task, session):
+    def solve(self, session: Session, task: Task):
         session_task = session.add_task(task)
 
         try:
@@ -74,73 +55,51 @@ class Seer:
             # TODO: make sure log error is implemented
             session_task.log_error(e)
 
-        #  summarize_task(session.task_dir, session.log_error)
         session_task.summarize()
 
-    def _investigate(self, task, session_task, include_images=True):
+    def _investigate(self, task: Task, session_task: SessionTask):
         """
         investigate all training pairs
         """
-        self.task_solved = False  # Reset at the start of each task
 
-
-        def get_pair_prompt(title, task_pair):
-            prompt = [
-                f"\n## {title}\n",
-            ]
-            for key, grid in task_pair.items():
-                prompt += [
-                    f"\n**{key}:**\n```\n",
-                    grid.to_string(),
-                    "\n```\n\n",
-                ]
-                if include_images:
-                    input_image_filename = task_step.log_prompt_image(
-                        grid, self.prompt_count + 1, f"{title}_{key}"
-                    )
-                    #  prompt.append(f"![Image]({input_image_filename})\n")
-                    prompt.append(grid.to_image())
-                    prompt.append("\n")
-
-            return prompt
-
-        # dream review all train *****************************
-        description = f"all training • investigate_dreamer"
+        # STEP: dream review all train *****************************
+        title = f"all training • investigate_dreamer"
         history = []
-        show_training_prompt = []
+        prompt = []
         for i, pair in enumerate(task.train, 1):
-            show_training_prompt.extend(get_pair_prompt(f"train_{i}", pair))
+            prompt.extend(get_pair_prompt(f"train_{i}", pair, self.use_images))
 
-        show_training_prompt.append(task.to_image(show_test=False))
+        if self.use_images:
+            #  show full task image
+            prompt.append(task.to_image(show_test=False))
 
         instructions = [self.instructions["investigate_dreamer"]]
 
-        
-        task_step = session_task.add_step(history, show_training_prompt, instructions)
+        task_step = session_task.add_step(title, history, prompt, instructions)
+        total_prompt = history + prompt + instructions
 
+        # TODO: set conditional `code_execution`
         (
             response,
             response_parts,
             extracted_code_list,
         ) = self._generate(
             "dreamer",
-            history,
-            show_training_prompt,
-            instructions,
+            history, prompt, instructions,
             tools="code_execution",
-            description=f"all training • investigate_dreamer",
+            description=title,
         )
-        history.extend(show_training_prompt)
+        history.extend(prompt)
         history.extend(response_parts)
 
         self._test_extracted_codelist(extracted_code_list, task)
         if self.task_solved:  # Check if solved
             return  # Exit the loop if solved
 
+        task_step.add_response(response, response_parts, extracted_code_list)
 
-        task_step.add_result(reponse, response_parts, extracted_code_list) 
-
-        # coder prompt *********************************
+        # STEP: coder prompt *********************************
+        title = f"all training • investigate_coder",
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
         (
@@ -153,7 +112,7 @@ class Seer:
             prompt,
             instructions,
             #  tools="code_execution",
-            description=f"example_{i} • investigate_coder",
+            description=title,
         )
         history.extend(prompt)
         history.extend(response_parts)
@@ -162,120 +121,6 @@ class Seer:
         if self.task_solved:  # Check if solved
             return  # Exit loop
 
-        for i, pair in enumerate(task.train, 1):
-            # reset history for each pair
-            history = [""]
-            self.current_iteration = 0
-
-            dreamer_prompt = get_pair_prompt(f"train_{i}", pair)
-            instructions = [self.instructions["investigate_dreamer"]]
-            (
-                response,
-                response_parts,
-                extracted_code_list,
-            ) = self._generate(
-                "dreamer",
-                history,
-                dreamer_prompt,
-                instructions,
-                tools="code_execution",
-                description=f"example_{i} • investigate_dreamer",
-            )
-            history.extend(dreamer_prompt)
-            history.extend(response_parts)
-
-            self._test_extracted_codelist(extracted_code_list, task)
-            if self.task_solved:  # Check if solved
-                break  # Exit the loop if solved
-
-            # coder prompt
-            instructions = [self.instructions["investigate_coder"]]
-            prompt = [""]
-            (
-                response,
-                response_parts,
-                extracted_code_list,
-            ) = self._generate(
-                "coder",
-                history,
-                prompt,
-                instructions,
-                #  tools="code_execution",
-                description=f"example_{i} • investigate_coder",
-            )
-            history.extend(prompt)
-            history.extend(response_parts)
-
-            self._test_extracted_codelist(extracted_code_list, task)
-            if self.task_solved:  # Check if solved
-                break  # Exit loop
-
-    def _test_extracted_codelist(self, extracted_code_list, task):
-        # TODO: this function cannot call refine if we are already in a refine loop
-        train_results = []
-        test_results = []
-
-        # Iterate and test *all* code blocks
-        for code_type, code, base_filename in extracted_code_list:
-            if code_type == "py":
-                current_train_results = verifier.test_code_with_timeout(
-                    code,
-                    self.session.task_dir,
-                    task.train,
-                )
-                verifier.write_test_results(
-                    current_train_results,
-                    self.session.task_dir,
-                    base_filename + "-train",
-                )
-                if "examples" in current_train_results:
-                    train_image = task.to_image(
-                        train_results=current_train_results, show_test=False
-                    )
-                    train_image_filename = f"{base_filename}-train_results.png"
-                    train_image_path = self.session.task_dir / train_image_filename
-                    train_image.save(train_image_path)
-
-                    all_train_passed = all(
-                        result.get("match") is True
-                        for result in current_train_results["examples"]
-                    )
-                    if all_train_passed:
-                        current_test_results = verifier.test_code_with_timeout(
-                            code,
-                            self.session.task_dir,
-                            task.test,
-                        )
-                        verifier.write_test_results(
-                            current_test_results,
-                            self.session.task_dir,
-                            base_filename + "-test",
-                        )
-
-                        if "examples" in current_test_results:
-                            test_image = task.to_image(
-                                train_results=current_train_results,
-                                test_results=current_test_results,
-                            )
-                            test_image_filename = f"{base_filename}-test_results.png"
-                            test_image_path = (
-                                self.session.task_dir / test_image_filename
-                            )
-                            test_image.save(test_image_path)
-
-                            all_test_passed = all(
-                                result.get("match") is True
-                                for result in current_test_results["examples"]
-                            )  # Use current_test_results
-                            if all_test_passed:
-                                self.task_solved = True  # Set the flag
-                                break  # Exit the loop *after* setting the flag
-                    else:
-                        if self.current_iteration <= self.max_iterations:
-                            #  if not self.task_solved:
-                            self.refine(
-                                task, train_results, test_results, code, base_filename
-                            )
 
     def _generate(
         self,
@@ -285,26 +130,10 @@ class Seer:
         instructions,
         tools=None,
         functions=None,
-        description="",
     ):
         """
         Generate content from the model, handling logging.
         """
-        self.prompt_count += 1
-
-        total_prompt = history + prompt + instructions
-
-        self.session.log_prompt(
-            prompt,
-            instructions,
-            self.prompt_count,
-            description=description,
-        )
-        self.session.log_total_prompt(
-            total_prompt,
-            self.prompt_count,
-            description=description,
-        )
 
         client = self.roles[role_name]
         start_time = datetime.now()
@@ -331,14 +160,6 @@ class Seer:
             self.extracted_file_counts,
         )
         # --- END OF RESPONSE HANDLER USAGE ---
-
-        self.session.log_response_md(
-            response,
-            response_parts,
-            self.prompt_count,
-            description=description,
-            elapsed_time=elapsed_time,
-        )
 
         return (
             response,

@@ -23,13 +23,13 @@ def get_transform_function(code):
         raise  # Re-raise SyntaxError to be handled by caller
 
 
-def test_code_with_timeout(code, task_dir, task_pairs, timeout=10):
+def test_code_with_timeout(code, task_pairs, timeout=10):
     """Executes and validates the generated code with a timeout."""
 
     def worker(code, task_pairs, result_queue):
         """Worker function to execute the code."""
         try:
-            test_results = test_code(code, task_dir, task_pairs)
+            test_results = test_code(code, task_pairs)
             result_queue.put(test_results)
         except Exception as e:
             result_queue.put({"error": str(e)})
@@ -55,9 +55,9 @@ def test_code_with_timeout(code, task_dir, task_pairs, timeout=10):
         return result_queue.get()
 
 
-def test_code(code, task_dir, task_pairs):
+def test_code(code, task_pairs):
     """Executes and validates the generated code, returning results as a list of dicts."""
-    test_results = {}
+    result = {}
 
     try:
         transform_function = get_transform_function(code)
@@ -78,7 +78,7 @@ def test_code(code, task_dir, task_pairs):
     # Capture stdout - still needed for print statements in code
     output_capture = io.StringIO()
     with contextlib.redirect_stdout(output_capture):
-        test_results["examples"] = []
+        test_results["trials"] = []
         for i, pair in enumerate(task_pairs):
             input_grid = pair.input.grid
             expected_output = pair.output.grid
