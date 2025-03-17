@@ -4,19 +4,19 @@ It demonstrates several rendering methods (image-based, Unicode block, and half-
 """
 
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer # Import Grid
+from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer 
 from textual.widgets import Static, Button, ListView, ListItem, Label, Footer
 
 from geometor.seer.navigator.renderers.char_grid import CharGrid
 from geometor.seer.navigator.renderers.block_grid import BlockGrid
 from geometor.seer.navigator.renderers.solid_grid import SolidGrid
 
-from geometor.seer.tasks.tasks import Task  # Import Task
+from geometor.seer.tasks.tasks import Task  
 
 import numpy as np
 
 class Navigator(App):
-    CSS_PATH = "navigator.tcss"  # Use a separate CSS file
+    CSS_PATH = "navigator.tcss"  
     BINDINGS = [
         ("q", "quit", "Quit"),
         ("s", "set_renderer_solid", "Solid"),
@@ -34,18 +34,16 @@ class Navigator(App):
         with Horizontal():
             with Vertical(id="task-selection"):
                 yield Static("Select a Task:", id="task_title")
-                self.list_view = (
-                    ListView()
-                )  # Create the ListView, but don't add items yet
+                self.list_view = ListView()  
                 yield self.list_view
             with ScrollableContainer(id="grid-display"):
                 self.grid_container = Grid(id="grid-container")
-                yield self.grid_container  # Add the grid container here
+                yield self.grid_container  
             yield Footer()
 
     def on_mount(self) -> None:
         """Populate the list view after mounting."""
-        if self.tasks:  # Check if tasks are available
+        if self.tasks:  
             for task in self.tasks:
                 self.list_view.append(
                     ListItem(Label(str(task.id)), id=f"task_{task.id}")
@@ -55,7 +53,7 @@ class Navigator(App):
 
     def on_list_view_highlighted(self, event: ListView.Highlighted) -> None:
         """Event handler for list view selection."""
-        if event.item is not None:  # Check if an item is actually highlighted
+        if event.item is not None:  
             self.current_task_id = event.item.id.removeprefix("task_")
             task_id = event.item.id.removeprefix("task_")
             self.display_task(task_id)

@@ -7,6 +7,9 @@ It also provides methods for saving images, logging prompts and responses, and
 handling errors.
 """
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from pathlib import Path
 from datetime import datetime
 import json
@@ -18,11 +21,11 @@ import re
 import contextlib
 import traceback
 
-from geometor.seer.session.summary import summarize_session, summarize_task
+if TYPE_CHECKING:
+    from geometor.seer.session import SessionTask
+
+#  from geometor.seer.session.summary import summarize_session, summarize_task 
 import geometor.seer.verifier as verifier
-
-#  from geometor.seer.session.session_task import SessionTask
-
 
 
 class Session:

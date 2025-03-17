@@ -45,6 +45,6 @@ class GeminiClient:
             )
             return response
         except Exception as e:
-            # TODO: Handle exceptions as needed
+            # TODO: Handle exceptions as needed - log_errors
             raise e
 

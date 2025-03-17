@@ -1,18 +1,23 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from datetime import datetime
 from pathlib import Path
 import json
 import traceback
 from PIL import Image
 
-#  from geometor.seer.session.session import Session
-from geometor.seer.session.task_step import TaskStep
+if TYPE_CHECKING:
+    from geometor.seer.session import (
+        Session,
+        TaskStep,
+    )
 
 from geometor.seer.tasks.tasks import Task
 
-
 class SessionTask:
-    def __init__(self, session, task: Task):
-        self.session = session # parent
+    def __init__(self, session: Session, task: Task):
+        self.session = session  # parent
         self.task = task
         self.dir = session.session_dir / task.id
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -35,11 +40,11 @@ class SessionTask:
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function
         error_content = {
-                "context": context,
-                "datetime": datetime.now().isoformat(),
-                "stack_trace": traceback.format_exc(),
-                "exception": e,
-                }
+            "context": context,
+            "datetime": datetime.now().isoformat(),
+            "stack_trace": traceback.format_exc(),
+            "exception": e,
+        }
         error_index = len(self.errors) + 1
 
         error_log_file = self.dir / f"error_{error_index:03d}.json"
@@ -59,7 +64,6 @@ class SessionTask:
         self.steps.append(task_step)
         return task_step
 
-
     def summarize():
         summary_file = self.dir / "task_summary.json"
         summary = {}
@@ -69,5 +73,3 @@ class SessionTask:
         except (IOError, PermissionError) as e:
             print(f"Error writing response JSON to file: {e}")
             self.log_error(f"Error writing response JSON to file: {e}")
-
-

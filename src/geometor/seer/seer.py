@@ -5,7 +5,14 @@ It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from datetime import datetime
+
+if TYPE_CHECKING:
+    from geometor.seer.session.session import Session
+    from geometor.seer.session.session_task import SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
@@ -13,12 +20,8 @@ from geometor.seer.tasks.grid import Grid
 from geometor.seer.prompts import get_pair_prompt
 
 from geometor.seer.gemini_client import GeminiClient as Client
-
-from geometor.seer.session.session import Session
-from geometor.seer.session.session_task import SessionTask
-
 import geometor.seer.verifier as verifier
-from geometor.seer.response_handler import ResponseHandler  # Import the new class
+from geometor.seer.response_handler import ResponseHandler  
 
 
 class Seer:
@@ -35,7 +38,6 @@ class Seer:
                 self.instructions[key] = f.read().strip()
 
         self.max_iterations = config["max_iterations"]
-        self.current_iteration = 0
         self.use_images = config.get("use_images", False)
 
     def run(self, tasks: Tasks):
@@ -75,28 +77,40 @@ class Seer:
 
         instructions = [self.instructions["investigate_dreamer"]]
 
+        # init step
         task_step = session_task.add_step(title, history, prompt, instructions)
-        total_prompt = history + prompt + instructions
 
-        # TODO: set conditional `code_execution`
+        # TODO: set config fo `code_execution`
         (
             response,
-            response_parts,
-            extracted_code_list,
+            response_time,
         ) = self._generate(
             "dreamer",
             history, prompt, instructions,
             tools="code_execution",
             description=title,
         )
+
+        task_step.log_response(response, response_time)
+        reponse_parts = task_step.process_response(response)
+
         history.extend(prompt)
         history.extend(response_parts)
 
-        self._test_extracted_codelist(extracted_code_list, task)
+        # TODO: results can be for more than one file
+        task_results = task_step.run_trials(task)
+
+        if task_results.train_solved:
+            return  # done solving
+
+            # TODO: fix - decision to refine should come from the caller
+            if self.current_iteration <= self.max_iterations:
+                #  if not self.task_solved:
+                self.refine(
+                    task, train_results, test_results, code, base_filename
+                )
         if self.task_solved:  # Check if solved
             return  # Exit the loop if solved
-
-        task_step.add_response(response, response_parts, extracted_code_list)
 
         # STEP: coder prompt *********************************
         title = f"all training • investigate_coder",
@@ -104,8 +118,7 @@ class Seer:
         prompt = [""]
         (
             response,
-            response_parts,
-            extracted_code_list,
+            response_time,
         ) = self._generate(
             "coder",
             history,
@@ -144,27 +157,9 @@ class Seer:
         end_time = datetime.now()
         elapsed_time = (end_time - start_time).total_seconds()
 
-        self.session.log_response_json(
-            response,
-            self.prompt_count,
-            elapsed_time,
-        )
-
-        # --- USE THE RESPONSE HANDLER ---
-        handler = ResponseHandler(self.session)
-        response_parts, extracted_code_list = handler.process_response(
-            response,
-            functions,
-            total_prompt,
-            self.prompt_count,
-            self.extracted_file_counts,
-        )
-        # --- END OF RESPONSE HANDLER USAGE ---
-
         return (
             response,
-            response_parts,
-            extracted_code_list,
+            elapsed_time,
         )
 
     def refine(self, task, train_results, test_results, code, base_filename):

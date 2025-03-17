@@ -1,11 +1,18 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from datetime import datetime
 from pathlib import Path
 import json
 import traceback
 from PIL import Image
 
-#  from geometor.seer.session.session_task import SessionTask
+from google.generativeai.types import GenerateContentResponse
 
+if TYPE_CHECKING:
+    from geometor.seer.session import SessionTask
+
+from geometor.seer.tasks.task import Task
 
 class TaskStep:
     def __init__(
@@ -14,7 +21,7 @@ class TaskStep:
         history: list,
         prompt: list,
         instructions: list,
-        session_task,
+        session_task: SessionTask,
     ):
         self.session_task = session_task  # parent
         self.title = title
@@ -37,6 +44,8 @@ class TaskStep:
         self.log_markdown("prompt", prompt)
         self.instructions = instructions
         self.log_markdown("instructions", instructions)
+
+        self.current_iteration = 0
 
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function
@@ -80,9 +89,9 @@ class TaskStep:
             print(f"Error writing prompt to file: {e}")
             self.log_error(f"Error writing prompt to file: {e}")
 
-    def log_response(self, response, response_time):
+    def log_response(self, response: GenerateContentResponse, response_time: float):
         self.response = response
-        self.response_time = response_time
+        self.response_time = response_time  # seconds
 
         # gemini response object cannot be dumped directly
         response_dict = response.to_dict()
@@ -90,7 +99,7 @@ class TaskStep:
 
         self._write_to_json("response.json", response_dict)
 
-    def process_response(self, response):
+    def process_response(self, response: GenerateContentResponse):
         """Processes the response from the Gemini model."""
         response_parts = []
 
@@ -171,7 +180,7 @@ class TaskStep:
         except Exception as e:
             self.log_error(e, f"Error writing to file: {file_path}")
 
-    def _write_to_json(self, file_name: str, content):
+    def _write_to_json(self, file_name: str, content: object):
         """Writes content to a file in the task directory."""
         file_path = self.dir / file_name
         try:
@@ -209,6 +218,7 @@ class TaskStep:
         if function_name not in functions:
             raise UnknownFunctionError(f"Unknown function: {function_name}")
 
+        # TODO: log errors
         try:
             result = functions[function_name](**function_args)
             return result
@@ -219,72 +229,79 @@ class TaskStep:
         except Exception as e:
             raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
-    def run_trial(self):
-        # TODO: this function cannot call refine if we are already in a refine loop
-        #  train_results = []
-        #  test_results = []
-        results = 
+    def run_trials(self, task):
 
+        train_results = self.run_trial("train", task.train)
+
+        if "trials" in train_results:
+
+            #  # TODO: save image
+            results_image = task.to_image(
+                train_results=train_results, show_test=False
+            )
+            png_file = self.dir / file_name + f".train.png"
+            results_image.save(png_file)
+
+            # TODO: this should come from run_trial
+            all_train_passed = all(
+                result.get("match") is True
+                for result in train_results["trials"]
+            )
+
+            if all_train_passed:
+                test_results = task_step.run_trial("test", task.test)
+
+                if "trials" in test_results:
+                    test_image = task.to_image(
+                        train_results=train_results,
+                        test_results=test_results,
+                    )
+                    # TODO: save image
+                    test_image = task.to_image(
+                        train_results=train_results,
+                        test_results=test_results,
+                    )
+                    png_file = self.dir / file_name + f".test.png"
+                    test_image.save(png_file)
+
+                    all_test_passed = all(
+                        result.get("match") is True
+                        for result in test_results["examples"]
+                    )  # Use test_results
+                    if all_test_passed:
+                        # TODO: fix - just return all the results
+                        self.task_solved = True  # Set the flag
+
+
+    def run_trial(self, trial_name, task_pairs) -> dict:
+
+        results = {}
         # Iterate and test *all* code blocks
         if not self.codes["py"]:
             return
 
         for file_name, code in self.codes["py"]:
-            current_train_results = verifier.test_code_with_timeout(
+
+            code_results = verifier.test_code_with_timeout(
                 code,
-                task.train,
+                task_pairs,
             )
-            verifier.write_test_results(
-                current_train_results,
-                self.dir,
-                base_filename + "-train",
-            )
-            if "trials" in current_train_results:
-                train_image = task.to_image(
-                    train_results=current_train_results, show_test=False
-                )
+            results[file_name] = code_results
+            json_file = file_name + f".{trial_name}.json"
+            self._write_to_json(json_file, results)
+
+            if "trials" in train_results:
 
                 # TODO: save image
-                train_image_filename = f"{base_filename}-train_results.png"
-                train_image_path = self.dir / train_image_filename
-                train_image.save(train_image_path)
+                results_image = task.to_image(
+                    train_results=train_results, show_test=False
+                )
+                png_file = self.dir / file_name + f".{trial_name}.png"
+                results_image.save(png_file)
 
                 all_train_passed = all(
                     result.get("match") is True
-                    for result in current_train_results["trials"]
+                    for result in train_results["trials"]
                 )
 
-                if all_train_passed:
-                    current_test_results = verifier.test_code_with_timeout(
-                        code,
-                        task.test,
-                    )
-                    verifier.write_test_results(
-                        current_test_results,
-                        self.dir,
-                        base_filename + "-test",
-                    )
-
-                    if "trials" in current_test_results:
-                        test_image = task.to_image(
-                            train_results=current_train_results,
-                            test_results=current_test_results,
-                        )
-                        # TODO: save image
-                        test_image_filename = f"{base_filename}-test_results.png"
-                        test_image_path = self.dir / test_image_filename
-                        test_image.save(test_image_path)
-
-                        all_test_passed = all(
-                            result.get("match") is True
-                            for result in current_test_results["examples"]
-                        )  # Use current_test_results
-                        if all_test_passed:
-                            self.task_solved = True  # Set the flag
-                            break  # Exit the loop *after* setting the flag
-                else:
-                    if self.current_iteration <= self.max_iterations:
-                        #  if not self.task_solved:
-                        self.refine(
-                            task, train_results, test_results, code, base_filename
-                        )
+        return results
