@@ -62,29 +62,29 @@ def test_code(code, task_pairs):
     try:
         transform_function = get_transform_function(code)
         if transform_function is None:
-            test_results["error"] = "transform function not found"
-            return test_results
+            results["error"] = "transform function not found"
+            return results
 
     except SyntaxError as e:
         # TODO: log error
-        test_results["error"] = "syntax error:\n" + e
-        return test_results
+        results["error"] = "syntax error:\n" + e
+        return results
 
     except Exception as e:
         # TODO: log error
-        test_results["error"] = "error:\n" + e
-        return test_results
+        results["error"] = "error:\n" + e
+        return results
 
     # Capture stdout - still needed for print statements in code
     output_capture = io.StringIO()
     with contextlib.redirect_stdout(output_capture):
-        test_results["trials"] = []
+        results["trials"] = []
         for i, pair in enumerate(task_pairs):
             input_grid = pair.input.grid
             expected_output = pair.output.grid
 
             example_result = {
-                "example": i + 1,
+                "id": i + 1,
                 "input": pair.input.to_string(),
                 "expected_output": pair.output.to_string(),
             }
@@ -94,25 +94,23 @@ def test_code(code, task_pairs):
                 example_result["match"] = False
                 example_result["error"] = f"error calling transform:\n{str(e)}"
                 example_result["function_output"] = output_capture.getvalue()
-                test_results["examples"].append(example_result)
+                results["trials"].append(example_result)
                 continue
 
             if transformed_output is None:
                 example_result["match"] = False
                 example_result["error"] = "transform function returned None"
-                test_results["examples"].append(example_result)
+                results["trials"].append(example_result)
                 continue
 
             try:
-                transformed_output = np.array(
-                    transformed_output
-                )  # Convert to NumPy array
+                transformed_output = np.array(transformed_output)  
             except Exception as e:
                 example_result["match"] = False
                 example_result["error"] = (
                     "could not convert output to NumPy array:\n" + str(e)
                 )
-                test_results["examples"].append(example_result)
+                results["trials"].append(example_result)
                 continue
 
             example_result["transformed_output"] = Grid(
@@ -147,9 +145,9 @@ def test_code(code, task_pairs):
             else:
                 example_result["match"] = True
 
-            test_results["examples"].append(example_result)
+            results["examples"].append(example_result)
 
-    return test_results
+    return results
 
 
 
@@ -162,8 +160,8 @@ def write_test_results(test_results, task_dir, base_filename):
     with open(test_results_json_file, "w") as f:
         json.dump(test_results, f, indent=2)
 
-    if "examples" in test_results:
-        for result in test_results["examples"]:
+    if "trials" in test_results:
+        for result in test_results["trials"]:
             if "example" in result:  # It's an example result
                 test_results_str += f"\n## example {result['example']}\n"
                 test_results_str += f"*input:*\n```\n{result['input']}\n```\n"
