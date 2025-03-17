@@ -11,8 +11,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 
 if TYPE_CHECKING:
-    from geometor.seer.session.session import Session
-    from geometor.seer.session.session_task import SessionTask
+    from geometor.seer.session import Session, SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
