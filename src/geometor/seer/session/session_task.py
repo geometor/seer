@@ -10,8 +10,9 @@ from PIL import Image
 if TYPE_CHECKING:
     from geometor.seer.session import (
         Session,
-        TaskStep,
+        TaskStep
     )
+
 
 from geometor.seer.tasks.tasks import Task
 
@@ -19,7 +20,7 @@ class SessionTask:
     def __init__(self, session: Session, task: Task):
         self.session = session  # parent
         self.task = task
-        self.dir = session.session_dir / task.id
+        self.dir = session.dir / task.id
         self.dir.mkdir(parents=True, exist_ok=True)
         self.steps = []
         self.errors = {}
@@ -43,7 +44,7 @@ class SessionTask:
             "context": context,
             "datetime": datetime.now().isoformat(),
             "stack_trace": traceback.format_exc(),
-            "exception": e,
+            "exception": str(e),
         }
         error_index = len(self.errors) + 1
 
@@ -56,15 +57,17 @@ class SessionTask:
             # TODO: print not supported in textual
             print(f"FATAL: Error writing to error log: {e}")
             print(f"Attempted to log: {e=}, {context=}")
+            raise(e)
 
         self.errors[error_log_file.name] = error_content
 
-    def add_step(self, history, prompt, instructions):
-        task_step = TaskStep(self, history, prompt, instructions)
+    def add_step(self, title, history, prompt, instructions):
+        from geometor.seer.session import TaskStep
+        task_step = TaskStep(title, history, prompt, instructions, self)
         self.steps.append(task_step)
         return task_step
 
-    def summarize():
+    def summarize(self):
         summary_file = self.dir / "task_summary.json"
         summary = {}
         try:

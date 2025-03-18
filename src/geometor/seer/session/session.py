@@ -8,23 +8,18 @@ handling errors.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING
 
 from pathlib import Path
 from datetime import datetime
 import json
-from rich.markdown import Markdown
-from rich.table import Table
-from rich.console import Console
-from rich import print
 import re  
 import contextlib
 import traceback
 
+from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from geometor.seer.session import SessionTask
+    from geometor.seer.session.session_task import SessionTask
 
-#  from geometor.seer.session.summary import summarize_session, summarize_task 
 import geometor.seer.verifier as verifier
 
 
@@ -46,7 +41,8 @@ class Session:
         #  self.display_config()  
 
     def add_task(self, task):
-        session_task = SessionTask(self.session, task)
+        from geometor.seer.session.session_task import SessionTask
+        session_task = SessionTask(self, task)
         self.tasks[task.id] = session_task
         return session_task
 
@@ -75,7 +71,7 @@ class Session:
             task_context = f.read().strip()
         (self.dir / "task_context.md").write_text(task_context)
 
-    def summarize():
+    def summarize(self):
         summary_file = self.dir / "session_summary.json"
         summary = {}
         try:
@@ -91,7 +87,7 @@ class Session:
                 "context": context,
                 "datetime": datetime.now().isoformat(),
                 "stack_trace": traceback.format_exc(),
-                "exception": e,
+                "exception": str(e),
                 }
         error_index = len(self.errors) + 1
 

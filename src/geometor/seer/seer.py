@@ -10,8 +10,9 @@ from typing import TYPE_CHECKING
 
 from datetime import datetime
 
-if TYPE_CHECKING:
-    from geometor.seer.session import Session, SessionTask
+#  if TYPE_CHECKING:
+
+from geometor.seer.session import Session, SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
@@ -20,7 +21,7 @@ from geometor.seer.prompts import get_pair_prompt
 
 from geometor.seer.gemini_client import GeminiClient as Client
 import geometor.seer.verifier as verifier
-from geometor.seer.response_handler import ResponseHandler  
+#  from geometor.seer.response_handler import ResponseHandler  
 
 
 class Seer:
@@ -40,7 +41,7 @@ class Seer:
         self.use_images = config.get("use_images", False)
 
     def run(self, tasks: Tasks):
-        session = Session(self.config, self.tasks)
+        session = Session(self.config)
 
         for task in tasks:
             self.solve(session, task)

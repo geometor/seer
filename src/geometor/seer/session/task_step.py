@@ -10,9 +10,9 @@ from PIL import Image
 from google.generativeai.types import GenerateContentResponse
 
 if TYPE_CHECKING:
-    from geometor.seer.session import SessionTask
+    from geometor.seer.session.session_task import SessionTask
 
-from geometor.seer.tasks.task import Task
+from geometor.seer.tasks.tasks import Task
 
 class TaskStep:
     def __init__(
@@ -53,7 +53,7 @@ class TaskStep:
             "context": context,
             "datetime": datetime.now().isoformat(),
             "stack_trace": traceback.format_exc(),
-            "exception": e,
+            "exception": str(e),
         }
         error_index = len(self.errors) + 1
 
