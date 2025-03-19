@@ -76,16 +76,17 @@ class TaskStep:
         content: list,
     ):
         markdown_file = self.dir / f"{name}.md"
-        with open(markdown_file, "w") as f:
-            for i, part in enumerate(content):
-                if isinstance(part, Image.Image):
-                    #  image_filename = f"{name}_{i}.png"  # Use name and index
-                    image_filename = f"{name}_{i:03d}.png"  # Use name and index
-                    image_path = self.dir / image_filename
-                    part.save(image_path)
-                    f.write(f"!\[image {i}]({image_filename})\n")  # Correct markdown
-                else:
-                    f.write(str(part))
+        try:
+            with open(markdown_file, "w") as f:
+                for i, part in enumerate(content):
+                    if isinstance(part, Image.Image):
+                        #  image_filename = f"{name}_{i}.png"  # Use name and index
+                        image_filename = f"{name}_{i:03d}.png"  # Use name and index
+                        image_path = self.dir / image_filename
+                        part.save(image_path)
+                        f.write(f"!\[image {i}]({image_filename})\n")  # Correct markdown
+                    else:
+                        f.write(str(part))
         except Exception as e:
             # TODO: print not supported in textual
             print(f"Error writing prompt to file: {e}")
