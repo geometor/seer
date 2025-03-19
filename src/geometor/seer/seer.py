@@ -21,7 +21,8 @@ from geometor.seer.prompts import get_pair_prompt
 
 from geometor.seer.gemini_client import GeminiClient as Client
 import geometor.seer.verifier as verifier
-#  from geometor.seer.response_handler import ResponseHandler  
+
+#  from geometor.seer.response_handler import ResponseHandler
 
 
 class Seer:
@@ -78,67 +79,69 @@ class Seer:
         instructions = [self.instructions["investigate_dreamer"]]
 
         # TODO: set config for `code_execution`
-        (
-            response,
-            response_time,
-        ) = self._generate(
+        task_step = self._generate(
             session_task,
             "dreamer",
             title,
-            history, prompt, instructions,
+            history,
+            prompt,
+            instructions,
             tools="code_execution",
-            description=title,
         )
 
-
         history.extend(prompt)
-        history.extend(response_parts)
+        history.extend(task_step.response_parts)
 
         # TODO: results can be for more than one file
         task_results = task_step.run_trials(task)
 
-        if task_results.train_solved:
-            return  # done solving
+        task_step.summarize()
 
+        if task_results.get("train_solved"):
+            return
 
         # STEP: coder prompt *********************************
-        title = f"all training • investigate_coder",
+        title = (f"all training • investigate_coder",)
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
-        (
-            response,
-            response_time,
-        ) = self._generate(
+        task_step = self._generate(
+            session_task,
             "coder",
-            history, prompt, instructions,
+            title,
+            history,
+            prompt,
+            instructions,
             #  tools="code_execution",
-            description=title,
         )
         history.extend(prompt)
-        history.extend(response_parts)
+        history.extend(task_step.response_parts)
 
         # TODO: results can be for more than one file
         task_results = task_step.run_trials(task)
 
-        if task_results.train_solved:
-            current_iteration = 0
-            while current_iteration < self.max_iterations:
+        if task_results.get("train_solved"):
+            return
 
-                # TODO: refine must create a complete task step
-                task_results = self.refine(
-                    task, task_results, 
-                )
-                current_iteration += 1
+        task_step.summarize()
 
+        current_iteration = 0
+        while current_iteration < self.max_iterations:
+
+            # TODO: refine must create a complete task step
+            task_results = self.refine(
+                task,
+                task_results,
+            )
+            current_iteration += 1
 
     def _generate(
         self,
-        session_task: SessionTask;
+        session_task: SessionTask,
         role_name: str,
         title: str,
         history: list,
-        prompt,: list
-        instructions,: list
+        prompt: list,
+        instructions: list,
         tools=None,
         functions=None,
     ):
@@ -151,28 +154,27 @@ class Seer:
 
         client = self.roles[role_name]
         start_time = datetime.now()
-        response = client.generate_content(
-            total_prompt,
-            tools=tools,
-        )
+        total_prompt = history + prompt + instructions
+        response = client.generate_content(total_prompt, tools=tools)
         end_time = datetime.now()
         response_time = (end_time - start_time).total_seconds()
 
         task_step.log_response(response, response_time)
         reponse_parts = task_step.process_response(response)
 
-        return (
-            task_step,
-            elapsed_time,
-        )
+        return task_step
 
-    def refine(self, task, train_results, test_results, code, base_filename):
+    def refine(
+        self,
+        session_task: SessionTask,
+        task,
+        trial_results,
+        code,
+    ):
         """
         Refines the generated code based on test results, using the dreamer/coder pattern.
         """
         history = [""]
-
-        self.current_iteration += 1
 
         # Construct the dreamer prompt
         dreamer_prompt = ["\nPrevious Code:\n", f"```python\n{code}\n```\n"]
@@ -203,32 +205,6 @@ class Seer:
                     f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
                 )
 
-        if test_results and "examples" in test_results:
-            dreamer_prompt.append("\nTest Set Results (if applicable):\n")
-            for i, result in enumerate(test_results["examples"]):
-                dreamer_prompt.append(f"\n**Test {i+1}:**\n")
-                dreamer_prompt.append(f"Input:\n```\n{result.get('input')}\n```\n")
-                dreamer_prompt.append(
-                    f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
-                )
-                if "transformed_output" in result:
-                    dreamer_prompt.append(
-                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
-                    )
-                    # Add images
-                    image_filename = f"{base_filename}-test-example_{i+1}.png"
-                    dreamer_prompt.append(
-                        f"!.get(Transformed Image)({image_filename})\n"
-                    )
-                dreamer_prompt.append(f"match: {result.get('match')}\n")
-                dreamer_prompt.append(f"pixels_off: {result.get('pixels_off')}\n")
-                dreamer_prompt.append(f"size_correct: {result.get('size_correct')}\n")
-                dreamer_prompt.append(
-                    f"color_palette_correct: {result.get('color_palette_correct')}\n"
-                )
-                dreamer_prompt.append(
-                    f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
-                )
 
         instructions = [self.instructions["refine_dreamer"]]
         (

@@ -93,6 +93,10 @@ class Session:
 
         error_log_file = self.dir / f"error_{error_index:03d}.json"
 
+        print("ERROR")
+        print(context)
+        print(str(e))
+        print(error_content["stack_trace"])
 
         try:
             with open(error_log_file, "w") as f:

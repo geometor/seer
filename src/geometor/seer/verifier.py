@@ -57,7 +57,7 @@ def test_code_with_timeout(code, task_pairs, timeout=10):
 
 def test_code(code, task_pairs):
     """Executes and validates the generated code, returning results as a list of dicts."""
-    result = {}
+    results = {}
 
     try:
         transform_function = get_transform_function(code)
@@ -100,6 +100,7 @@ def test_code(code, task_pairs):
             if transformed_output is None:
                 example_result["match"] = False
                 example_result["error"] = "transform function returned None"
+                example_result["function_output"] = output_capture.getvalue()
                 results["trials"].append(example_result)
                 continue
 
@@ -118,14 +119,18 @@ def test_code(code, task_pairs):
             ).to_string()
 
             # --- Calculate Statistics ---
+            # is size correct
             size_correct = transformed_output.shape == expected_output.shape
             example_result["size_correct"] = size_correct
 
+            # do the color palettes match
             transformed_colors = set(np.unique(transformed_output))
             expected_colors = set(np.unique(expected_output))
+            # TODO: why are we not testing if the two sets are equal
             color_palette_correct = transformed_colors.issubset(expected_colors)
             example_result["color_palette_correct"] = color_palette_correct
 
+            # do the color counts match
             transformed_counts = dict(
                 zip(*np.unique(transformed_output, return_counts=True))
             )
@@ -133,6 +138,7 @@ def test_code(code, task_pairs):
             correct_pixel_counts = transformed_counts == expected_counts
             example_result["correct_pixel_counts"] = correct_pixel_counts
 
+            # TODO: is it necessary to filter on size_correct?
             if size_correct:
                 pixels_off = int(np.sum(transformed_output != expected_output))
                 example_result["pixels_off"] = pixels_off
@@ -145,7 +151,7 @@ def test_code(code, task_pairs):
             else:
                 example_result["match"] = True
 
-            results["examples"].append(example_result)
+            results["trials"].append(example_result)
 
     return results
 

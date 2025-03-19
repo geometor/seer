@@ -61,9 +61,14 @@ class TaskStep:
 
         error_log_file = f"error_{error_index:03d}.json"
 
+        print("ERROR")
+        print(context)
+        print(str(e))
+        print(error_content["stack_trace"])
+
         self._write_to_json(error_log_file, error_content)
 
-        self.errors[error_log_file.name] = error_content
+        self.errors[error_log_file] = error_content
 
     def summarize(self):
         # TODO: construct summary
@@ -84,7 +89,7 @@ class TaskStep:
                         image_filename = f"{name}_{i:03d}.png"  # Use name and index
                         image_path = self.dir / image_filename
                         part.save(image_path)
-                        f.write(f"!\[image {i}]({image_filename})\n")  # Correct markdown
+                        f.write(f"!\\[image {i}]({image_filename})\n")  # Correct markdown
                     else:
                         f.write(str(part))
         except Exception as e:
@@ -218,33 +223,49 @@ class TaskStep:
         function_name = function_call.name
         function_args = function_call.args
 
-        if function_name not in functions:
-            raise UnknownFunctionError(f"Unknown function: {function_name}")
+        #  if function_name not in functions:
+            #  raise UnknownFunctionError(f"Unknown function: {function_name}")
 
-        # TODO: log errors
-        try:
-            result = functions[function_name](**function_args)
-            return result
-        except TypeError as e:
-            raise FunctionArgumentError(
-                f"Invalid arguments for {function_name}: {str(e)}"
-            )
-        except Exception as e:
-            raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
+        #  # TODO: log errors
+        #  try:
+            #  result = functions[function_name](**function_args)
+            #  return result
+        #  except TypeError as e:
+            #  raise FunctionArgumentError(
+                #  f"Invalid arguments for {function_name}: {str(e)}"
+            #  )
+        #  except Exception as e:
+            #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
     def run_trials(self, task):
+        trials_by_code = {
+                "train_passed": False,
+                "test_passed": False,
+                "code": {},
+                }
 
         if "py" not in self.codes:
-            self.log_error(Exception("No python code to run"), "run_trials")
-            return
+            #  self.log_error(Exception("No python code to run"), "run_trials")
+            return trials_by_code
 
         for file_name, code in self.codes["py"].items():
-            train_results = self.run_trial(file_name, "train", task.train)
+            code_trial = trials_by_code["code"][file_name] = {}
+            train_results = self.run_trial(code, task.train)
+            code_trial["train"] = train_results
 
-            if train_results and all(r["match"] for r in train_results.get("trials", [])):
-                test_results = self.run_trial(file_name, "test", task.test)
+            train_passed = all(r.get("match", False ) for r in train_results.get("trials", {}))
+            code_trial["train_passed"] = train_passed
+
+            if train_passed:
+                test_results = self.run_trial(code, task.test)
+                code_trial["test"] = test_results
+
+                test_passed = all(r.get("match", False) for r in test_results.get("trials", {}))
+                code_trial["test_passed"] = test_passed
+
             else:
                 test_results = None
+
 
             # Save combined image
             if train_results or test_results:  # Check if results exist
@@ -252,27 +273,20 @@ class TaskStep:
                     train_results=train_results.get("trials", []) if train_results else [],
                     test_results=test_results.get("trials", []) if test_results else [],
                 )  # Pass empty list if None
-                png_file = self.dir / f"{file_name}.png"
+                png_file = self.dir / f"file_name.png"
                 results_image.save(png_file)
+        
+            json_file = file_name + ".trial.json"
+            self._write_to_json(json_file, code_trial) 
+
+        return trials_by_code
 
 
-    def run_trial(self, file_name, trial_name, task_pairs) -> dict:
+    def run_trial(self, code, task_pairs) -> dict:
 
-        results = {}
-        # Iterate and test *all* code blocks
-        if "py" not in self.codes:
-            self.log_error(Exception("No python code to run"), "run_trial")
-            return
-
-        for file_name, code in self.codes["py"]:
-
-            code_results = verifier.test_code_with_timeout(
-                code,
-                task_pairs,
-            )
-            results[file_name] = code_results
-            json_file = file_name + f".{trial_name}.json"
-            self._write_to_json(json_file, code_results) # save the full results
-
+        code_results = verifier.test_code_with_timeout(
+            code,
+            task_pairs,
+        )
 
         return code_results # return the results
