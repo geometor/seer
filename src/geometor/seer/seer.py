@@ -77,22 +77,19 @@ class Seer:
 
         instructions = [self.instructions["investigate_dreamer"]]
 
-        # init step
-        task_step = session_task.add_step(title, history, prompt, instructions)
-
-        # TODO: set config fo `code_execution`
+        # TODO: set config for `code_execution`
         (
             response,
             response_time,
         ) = self._generate(
+            session_task,
             "dreamer",
+            title,
             history, prompt, instructions,
             tools="code_execution",
             description=title,
         )
 
-        task_step.log_response(response, response_time)
-        reponse_parts = task_step.process_response(response)
 
         history.extend(prompt)
         history.extend(response_parts)
@@ -103,14 +100,6 @@ class Seer:
         if task_results.train_solved:
             return  # done solving
 
-            # TODO: fix - decision to refine should come from the caller
-            if self.current_iteration <= self.max_iterations:
-                #  if not self.task_solved:
-                self.refine(
-                    task, train_results, test_results, code, base_filename
-                )
-        if self.task_solved:  # Check if solved
-            return  # Exit the loop if solved
 
         # STEP: coder prompt *********************************
         title = f"all training • investigate_coder",
@@ -121,32 +110,44 @@ class Seer:
             response_time,
         ) = self._generate(
             "coder",
-            history,
-            prompt,
-            instructions,
+            history, prompt, instructions,
             #  tools="code_execution",
             description=title,
         )
         history.extend(prompt)
         history.extend(response_parts)
 
-        self._test_extracted_codelist(extracted_code_list, task)
-        if self.task_solved:  # Check if solved
-            return  # Exit loop
+        # TODO: results can be for more than one file
+        task_results = task_step.run_trials(task)
+
+        if task_results.train_solved:
+            current_iteration = 0
+            while current_iteration < self.max_iterations:
+
+                # TODO: refine must create a complete task step
+                task_results = self.refine(
+                    task, task_results, 
+                )
+                current_iteration += 1
 
 
     def _generate(
         self,
-        role_name,
-        history,
-        prompt,
-        instructions,
+        session_task: SessionTask;
+        role_name: str,
+        title: str,
+        history: list,
+        prompt,: list
+        instructions,: list
         tools=None,
         functions=None,
     ):
         """
         Generate content from the model, handling logging.
         """
+
+        # init step
+        task_step = session_task.add_step(title, history, prompt, instructions)
 
         client = self.roles[role_name]
         start_time = datetime.now()
@@ -155,10 +156,13 @@ class Seer:
             tools=tools,
         )
         end_time = datetime.now()
-        elapsed_time = (end_time - start_time).total_seconds()
+        response_time = (end_time - start_time).total_seconds()
+
+        task_step.log_response(response, response_time)
+        reponse_parts = task_step.process_response(response)
 
         return (
-            response,
+            task_step,
             elapsed_time,
         )
 
