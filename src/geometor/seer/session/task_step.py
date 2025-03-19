@@ -57,7 +57,7 @@ class TaskStep:
         }
         error_index = len(self.errors) + 1
 
-        error_log_file = self.dir / f"error_{error_index:03d}.json"
+        error_log_file = f"error_{error_index:03d}.json"
 
         self._write_to_json(error_log_file, error_content)
 
