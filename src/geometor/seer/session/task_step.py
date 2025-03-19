@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 from pathlib import Path
 import json
+import re
 import traceback
 from PIL import Image
 
@@ -12,7 +13,8 @@ from google.generativeai.types import GenerateContentResponse
 if TYPE_CHECKING:
     from geometor.seer.session.session_task import SessionTask
 
-from geometor.seer.tasks.tasks import Task
+
+from geometor.seer import verifier
 
 class TaskStep:
     def __init__(
@@ -63,7 +65,7 @@ class TaskStep:
 
         self.errors[error_log_file.name] = error_content
 
-    def summarize():
+    def summarize(self):
         # TODO: construct summary
         summary = {}
         self._write_to_json("step_summary.json", summary)
@@ -74,16 +76,16 @@ class TaskStep:
         content: list,
     ):
         markdown_file = self.dir / f"{name}.md"
-        try:
-            with open(markdown_file, "w") as f:
-                for i, part in enumerate(content):
-                    if isinstance(part, Image):
-                        image_filename = f"{description}.png"
-                        image_path = self.dir / image_filename
-                        image.to_image().save(image_path)
-                        f.write(part)
-                    else:
-                        f.write(str(part))
+        with open(markdown_file, "w") as f:
+            for i, part in enumerate(content):
+                if isinstance(part, Image.Image):
+                    #  image_filename = f"{name}_{i}.png"  # Use name and index
+                    image_filename = f"{name}_{i:03d}.png"  # Use name and index
+                    image_path = self.dir / image_filename
+                    part.save(image_path)
+                    f.write(f"!\[image {i}]({image_filename})\n")  # Correct markdown
+                else:
+                    f.write(str(part))
         except Exception as e:
             # TODO: print not supported in textual
             print(f"Error writing prompt to file: {e}")
@@ -109,7 +111,7 @@ class TaskStep:
             self.log_error(error_msg)
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
-            return response_parts, extracted_code_list
+            return response_parts
 
         if not hasattr(response.candidates[0].content, "parts"):
             error_msg = "No content parts in response."
@@ -117,7 +119,7 @@ class TaskStep:
             self.log_error(error_msg)
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
-            return response_parts, extracted_code_list
+            return response_parts
 
         for part in response.candidates[0].content.parts:
             if part.text:
@@ -154,7 +156,7 @@ class TaskStep:
         def get_code_file_count():
             return len(list(self.dir.glob("code*")))
 
-        matches = re.findall(r"```(\w+)?\n(.*?)\n```", text, re.DOTALL)
+        matches = re.findall(r"```(\w+)\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
             file_type = file_type.lower() if file_type else "txt"
             if file_type == "python":
@@ -166,7 +168,7 @@ class TaskStep:
             self._write_to_file(file_name, content)
 
             # add code to dict
-            if not self.codes[file_type]:
+            if file_type not in self.codes:
                 self.codes[file_type] = {}
 
             self.codes[file_type][file_name] = content
@@ -231,53 +233,34 @@ class TaskStep:
 
     def run_trials(self, task):
 
-        train_results = self.run_trial("train", task.train)
+        if "py" not in self.codes:
+            self.log_error(Exception("No python code to run"), "run_trials")
+            return
 
-        if "trials" in train_results:
+        for file_name, code in self.codes["py"].items():
+            train_results = self.run_trial(file_name, "train", task.train)
 
-            #  # TODO: save image
-            results_image = task.to_image(
-                train_results=train_results, show_test=False
-            )
-            png_file = self.dir / file_name + f".train.png"
-            results_image.save(png_file)
+            if train_results and all(r["match"] for r in train_results.get("trials", [])):
+                test_results = self.run_trial(file_name, "test", task.test)
+            else:
+                test_results = None
 
-            # TODO: this should come from run_trial
-            all_train_passed = all(
-                result.get("match") is True
-                for result in train_results["trials"]
-            )
-
-            if all_train_passed:
-                test_results = task_step.run_trial("test", task.test)
-
-                if "trials" in test_results:
-                    test_image = task.to_image(
-                        train_results=train_results,
-                        test_results=test_results,
-                    )
-                    # TODO: save image
-                    test_image = task.to_image(
-                        train_results=train_results,
-                        test_results=test_results,
-                    )
-                    png_file = self.dir / file_name + f".test.png"
-                    test_image.save(png_file)
-
-                    all_test_passed = all(
-                        result.get("match") is True
-                        for result in test_results["examples"]
-                    )  # Use test_results
-                    if all_test_passed:
-                        # TODO: fix - just return all the results
-                        self.task_solved = True  # Set the flag
+            # Save combined image
+            if train_results or test_results:  # Check if results exist
+                results_image = task.to_image(
+                    train_results=train_results.get("trials", []) if train_results else [],
+                    test_results=test_results.get("trials", []) if test_results else [],
+                )  # Pass empty list if None
+                png_file = self.dir / f"{file_name}.png"
+                results_image.save(png_file)
 
 
-    def run_trial(self, trial_name, task_pairs) -> dict:
+    def run_trial(self, file_name, trial_name, task_pairs) -> dict:
 
         results = {}
         # Iterate and test *all* code blocks
-        if not self.codes["py"]:
+        if "py" not in self.codes:
+            self.log_error(Exception("No python code to run"), "run_trial")
             return
 
         for file_name, code in self.codes["py"]:
@@ -288,20 +271,7 @@ class TaskStep:
             )
             results[file_name] = code_results
             json_file = file_name + f".{trial_name}.json"
-            self._write_to_json(json_file, results)
+            self._write_to_json(json_file, code_results) # save the full results
 
-            if "trials" in train_results:
 
-                # TODO: save image
-                results_image = task.to_image(
-                    train_results=train_results, show_test=False
-                )
-                png_file = self.dir / file_name + f".{trial_name}.png"
-                results_image.save(png_file)
-
-                all_train_passed = all(
-                    result.get("match") is True
-                    for result in train_results["trials"]
-                )
-
-        return results
+        return code_results # return the results
