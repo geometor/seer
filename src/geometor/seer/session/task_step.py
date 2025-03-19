@@ -239,14 +239,17 @@ class TaskStep:
 
     def run_trials(self, task):
         trials_by_code = {
-                "train_passed": False,
-                "test_passed": False,
+                "train_passed": False, # overall
+                "test_passed": False,  # overall
                 "code": {},
                 }
 
         if "py" not in self.codes:
             #  self.log_error(Exception("No python code to run"), "run_trials")
             return trials_by_code
+
+        overall_train_passed = False
+        overall_test_passed = False
 
         for file_name, code in self.codes["py"].items():
             code_trial = trials_by_code["code"][file_name] = {}
@@ -255,6 +258,8 @@ class TaskStep:
 
             train_passed = all(r.get("match", False ) for r in train_results.get("trials", {}))
             code_trial["train_passed"] = train_passed
+            if train_passed: overall_train_passed = True
+
 
             if train_passed:
                 test_results = self.run_trial(code, task.test)
@@ -262,6 +267,7 @@ class TaskStep:
 
                 test_passed = all(r.get("match", False) for r in test_results.get("trials", {}))
                 code_trial["test_passed"] = test_passed
+                if test_passed: overall_test_passed = True
 
             else:
                 test_results = None
@@ -273,11 +279,15 @@ class TaskStep:
                     train_results=train_results.get("trials", []) if train_results else [],
                     test_results=test_results.get("trials", []) if test_results else [],
                 )  # Pass empty list if None
-                png_file = self.dir / f"file_name.png"
+                png_file = self.dir / f"{file_name}.png"
                 results_image.save(png_file)
-        
+
             json_file = file_name + ".trial.json"
-            self._write_to_json(json_file, code_trial) 
+            self._write_to_json(json_file, code_trial)
+            self.trials[file_name] = code_trial # save to task step
+
+        trials_by_code["train_passed"] = overall_train_passed
+        trials_by_code["test_passed"] = overall_test_passed
 
         return trials_by_code
 
