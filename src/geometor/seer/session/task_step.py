@@ -1,25 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from datetime import datetime
-from pathlib import Path
-import json
 import re
-import traceback
-from PIL import Image
+from geometor.seer.session.level import Level
 
 from google.generativeai.types import GenerateContentResponse
 
 if TYPE_CHECKING:
     from geometor.seer.session.session_task import SessionTask
 
-
-from geometor.seer.trials import verifier
 from geometor.seer.trials.code_trial import CodeTrial
-from geometor.seer.trials.step_code_trials import StepCodeTrials  # Import
+from geometor.seer.trials.step_code_trials import StepCodeTrials
 
 
-class TaskStep:
+class TaskStep(Level):
     def __init__(
         self,
         title: str,
@@ -28,21 +22,19 @@ class TaskStep:
         instructions: list,
         session_task: SessionTask,
     ):
+        index = f"{len(session_task.steps):03d}"
+        super().__init__(session_task, index)
+
         self.session_task = session_task  # parent
         self.title = title
-        self.index = f"{len(session_task.steps):03d}"
-
-        self.dir = session_task.dir / self.index
-        self.dir.mkdir(parents=True, exist_ok=True)
+        self.index = index
 
         self.response = {}
         self.response_parts = []
         self.response_time = None
-        self.errors = {}
         self.codes = {}
         self.function_calls = {}
-        # self.trials = {}  # Initialize trials -- REMOVE, replaced by step_code_trials
-        self.step_code_trials = StepCodeTrials() # Use StepCodeTrials
+        self.step_code_trials = StepCodeTrials()  # Use StepCodeTrials
 
         self.history = history
         self.log_markdown("history", history)
@@ -51,33 +43,34 @@ class TaskStep:
         self.instructions = instructions
         self.log_markdown("instructions", instructions)
 
-        #  self.current_iteration = 0
-
         print(f"        {self.index} • {self.title}")
 
     def summarize(self):
-        summary = {
+        summary = super().summarize()
+        summary.update({
             "title": self.title,
             "index": self.index,
             "response": {
                 "response_time": self.response_time,
             },
-            "errors": {},
             "trials": {},
             "codes": {},
-        }
+        })
 
-        if hasattr(self.response, 'usage_metadata'):
-            summary["response"]["prompt_tokens"] = self.response.usage_metadata.prompt_token_count
-            summary["response"]["candidates_tokens"] = self.response.usage_metadata.candidates_token_count
-            summary["response"]["total_tokens"] = self.response.usage_metadata.total_token_count
+        if hasattr(self.response, "usage_metadata"):
+            summary["response"]["prompt_tokens"] = (
+                self.response.usage_metadata.prompt_token_count
+            )
+            summary["response"]["candidates_tokens"] = (
+                self.response.usage_metadata.candidates_token_count
+            )
+            summary["response"]["total_tokens"] = (
+                self.response.usage_metadata.total_token_count
+            )
         else:
             summary["response"]["prompt_tokens"] = None
             summary["response"]["candidates_tokens"] = None
             summary["response"]["total_tokens"] = None
-
-        summary["errors"]["count"] = len(self.errors)
-        summary["errors"]["types"] = list(self.errors.keys())  # List of error file names
 
         summary["codes"]["count"] = len(self.codes)
         summary["codes"]["types"] = list(self.codes.keys())
@@ -93,7 +86,9 @@ class TaskStep:
                 all_test_results.extend(code_trial.test_results.get("trials", []))
 
         if all_train_results:
-            summary["trials"]["train"] = self._summarize_trial_results(all_train_results)
+            summary["trials"]["train"] = self._summarize_trial_results(
+                all_train_results
+            )
         if all_test_results:
             summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
@@ -129,50 +124,6 @@ class TaskStep:
                 "avg": sum(percent_correct_values) / len(percent_correct_values),
             }
         return summary
-
-
-    def log_error(self, e: Exception, context: str = ""):
-        # TODO: refactor to generic function
-        error_content = {
-            "context": context,
-            "datetime": datetime.now().isoformat(),
-            "stack_trace": traceback.format_exc(),
-            "exception": str(e),
-        }
-        error_index = len(self.errors) + 1
-
-        error_log_file = f"error_{error_index:03d}.json"
-
-        print("ERROR")
-        print(context)
-        print(str(e))
-        print(error_content["stack_trace"])
-
-        self._write_to_json(error_log_file, error_content)
-
-        self.errors[error_log_file] = error_content
-
-    def log_markdown(
-        self,
-        name: str,
-        content: list,
-    ):
-        markdown_file = self.dir / f"{name}.md"
-        try:
-            with open(markdown_file, "w") as f:
-                for i, part in enumerate(content):
-                    if isinstance(part, Image.Image):
-                        #  image_filename = f"{name}_{i}.png"  # Use name and index
-                        image_filename = f"{name}_{i:03d}.png"  # Use name and index
-                        image_path = self.dir / image_filename
-                        part.save(image_path)
-                        f.write(f"!\\[image {i}]({image_filename})\n")  # Correct markdown
-                    else:
-                        f.write(str(part))
-        except Exception as e:
-            # TODO: print not supported in textual
-            print(f"Error writing prompt to file: {e}")
-            self.log_error(f"Error writing prompt to file: {e}")
 
     def log_response(self, response: GenerateContentResponse, response_time: float):
         self.response = response
@@ -231,7 +182,7 @@ class TaskStep:
                 self.function_calls[part.function_call.name] = part.function_call
 
         self.response_parts = response_parts
-        
+
         return response_parts
 
     def _parse_code_text(self, text: str):
@@ -256,24 +207,6 @@ class TaskStep:
                 self.codes[file_type] = {}
 
             self.codes[file_type][file_name] = content
-
-    def _write_to_file(self, file_name: str, content: str):
-        """Writes content to a file in the task directory."""
-        file_path = self.dir / file_name
-        try:
-            with open(file_path, "w") as f:
-                f.write(content)
-        except Exception as e:
-            self.log_error(e, f"Error writing to file: {file_path}")
-
-    def _write_to_json(self, file_name: str, content: object):
-        """Writes content to a file in the task directory."""
-        file_path = self.dir / file_name
-        try:
-            with open(file_path, "w") as f:
-                json.dump(content, f, indent=2)
-        except Exception as e:
-            self.log_error(e, f"Error writing to json: {file_path}")
 
     def run_functions(self, functions):
         # TODO: complete implementation
@@ -302,7 +235,7 @@ class TaskStep:
         function_args = function_call.args
 
         #  if function_name not in functions:
-            #  raise UnknownFunctionError(f"Unknown function: {function_name}")
+        #  raise UnknownFunctionError(f"Unknown function: {function_name}")
 
         #  # TODO: log errors
         #  try:
@@ -324,7 +257,7 @@ class TaskStep:
             code_trial = CodeTrial(self, code_filename, code, task)
             code_trial.execute_and_save_results()
             # self.trials[code_filename] = code_trial  # No longer storing directly in TaskStep
-            self.step_code_trials.add_code_trial(code_filename, code_trial) # Add to StepCodeTrials
+            self.step_code_trials.add_code_trial(code_filename, code_trial)  # Add to StepCodeTrials
 
     def get_first_code_trial(self) -> CodeTrial | None:
         """Retrieves the first CodeTrial object, if any."""

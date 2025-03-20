@@ -1,60 +1,34 @@
-"""
-Manages a session for interacting with the Seer, handling logging, and task execution.
-
-The Session class encapsulates a single run of the Seer, including configuration,
-task management, output directory handling, and interaction with the Seer instance.
-It also provides methods for saving images, logging prompts and responses, and
-handling errors.
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
-from datetime import datetime
 import json
-import re  
-import contextlib
-import traceback
+from datetime import datetime
 
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from geometor.seer.session.session_task import SessionTask
-
-#  import geometor.seer.verifier as verifier
+from geometor.seer.session.level import Level
 
 
-class Session:
+class Session(Level):
     def __init__(self, config: dict):
         self.config = config
         self.tasks = {}
 
-        self.output_dir = Path(config["output_dir"])
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-
-        self.timestamp = datetime.now().strftime("%y.%j.%H%M")  
-
-        self.dir = self.output_dir / self.timestamp
-        self.dir.mkdir(parents=True, exist_ok=True)
+        output_dir = Path(config["output_dir"])
+        output_dir.mkdir(parents=True, exist_ok=True)
+        timestamp = datetime.now().strftime("%y.%j.%H%M")
+        super().__init__(None, str(output_dir / timestamp))
 
         self._write_context_files()
 
-        print(self.timestamp)
+        print(timestamp)
 
     def summarize(self):
-        summary_file = self.dir / "session_summary.json"
-        # TODO: get stats from session task
-        summary = {
-                "count": len(self.tasks),
-                }
-        try:
-            with open(summary_file, "w") as f:
-                json.dump(summary, f, indent=2)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing response JSON to file: {e}")
-            self.log_error(f"Error writing response JSON to file: {e}")
+        summary = super().summarize()
+        summary["count"] = len(self.tasks)
+        self._write_to_json("session_summary.json", summary)
 
     def add_task(self, task):
         from geometor.seer.session.session_task import SessionTask
+
         session_task = SessionTask(self, task)
         self.tasks[task.id] = session_task
         return session_task
@@ -83,31 +57,3 @@ class Session:
         with open(self.config["task_context_file"], "r") as f:
             task_context = f.read().strip()
         (self.dir / "task_context.md").write_text(task_context)
-
-    def log_error(self, e: Exception, context: str = ""):
-        # TODO: refactor to generic function
-        error_content = {
-                "context": context,
-                "datetime": datetime.now().isoformat(),
-                "stack_trace": traceback.format_exc(),
-                "exception": str(e),
-                }
-        error_index = len(self.errors) + 1
-
-        error_log_file = self.dir / f"error_{error_index:03d}.json"
-
-        print("ERROR")
-        print(context)
-        print(str(e))
-        print(error_content["stack_trace"])
-
-        try:
-            with open(error_log_file, "w") as f:
-                json.dump(error_content, f, indent=2)
-        except Exception as e:
-            # TODO: print not supported in textual
-            print(f"FATAL: Error writing to error log: {e}")
-            print(f"Attempted to log: {e=}, {context=}")
-
-        self.errors[error_log_file.name] = error_content
-
