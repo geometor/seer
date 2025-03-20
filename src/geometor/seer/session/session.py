@@ -24,8 +24,19 @@ class Session(Level):
     def summarize(self):
         summary = super().summarize()
         summary["count"] = len(self.tasks)
-        summary["train_passed"] = self.train_passed  # Add here
-        summary["test_passed"] = self.test_passed  # Add here
+        summary["train_passed"] = self.train_passed_count  # Use count property
+        summary["test_passed"] = self.test_passed_count    # Use count property
+
+        # Aggregate trial counts from each SessionTask
+        task_trials = {}
+        for task_id, session_task in self.tasks.items():
+            task_summary = session_task.summarize() # Get the latest summary
+            task_trials[task_id] = {
+                "train": task_summary.get("trials", {}).get("train", {}).get("total", 0) if task_summary.get("trials") else 0,
+                "test": task_summary.get("trials", {}).get("test", {}).get("total", 0) if task_summary.get("trials") else 0,
+            }
+        summary["task_trials"] = task_trials
+
         self._write_to_json("session_summary.json", summary)
 
     def add_task(self, task):
@@ -68,3 +79,10 @@ class Session(Level):
     def test_passed(self):
         return any(task.test_passed for task in self.tasks.values())
 
+    @property
+    def train_passed_count(self):
+        return sum(1 for task in self.tasks.values() if task.train_passed)
+
+    @property
+    def test_passed_count(self):
+        return sum(1 for task in self.tasks.values() if task.test_passed)
