@@ -24,6 +24,8 @@ class Session(Level):
     def summarize(self):
         summary = super().summarize()
         summary["count"] = len(self.tasks)
+        summary["train_passed"] = self.train_passed  # Add here
+        summary["test_passed"] = self.test_passed  # Add here
         self._write_to_json("session_summary.json", summary)
 
     def add_task(self, task):
@@ -57,3 +59,12 @@ class Session(Level):
         with open(self.config["task_context_file"], "r") as f:
             task_context = f.read().strip()
         (self.dir / "task_context.md").write_text(task_context)
+
+    @property
+    def train_passed(self):
+        return any(task.train_passed for task in self.tasks.values())
+
+    @property
+    def test_passed(self):
+        return any(task.test_passed for task in self.tasks.values())
+

@@ -55,6 +55,8 @@ class TaskStep(Level):
             },
             "trials": {},
             "codes": {},
+            "train_passed": self.train_passed,  # Add here
+            "test_passed": self.test_passed,  # Add here
         })
 
         if hasattr(self.response, "usage_metadata"):
@@ -259,7 +261,7 @@ class TaskStep(Level):
             # self.trials[code_filename] = code_trial  # No longer storing directly in TaskStep
             self.step_code_trials.add_code_trial(code_filename, code_trial)  # Add to StepCodeTrials
 
-    # TODO: 
+    # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:
         """Retrieves the first CodeTrial object, if any."""
         return self.step_code_trials.get_first_code_trial()
@@ -271,3 +273,12 @@ class TaskStep(Level):
         elif set_type == "test":
             return self.step_code_trials.any_test_passed
         return False
+
+    @property
+    def train_passed(self):
+        return self.step_code_trials.any_train_passed
+
+    @property
+    def test_passed(self):
+        return self.step_code_trials.any_test_passed
+

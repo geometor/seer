@@ -35,6 +35,8 @@ class SessionTask(Level):
                 "steps": len(self.steps),
                 "trials": None,  # Filled in by TaskStep
                 "matches": None,  # Filled in by TaskStep
+                "train_passed": self.train_passed,  # Add here
+                "test_passed": self.test_passed,  # Add here
             }
         )
         self._write_to_json("task_summary.json", summary)
@@ -45,3 +47,12 @@ class SessionTask(Level):
         task_step = TaskStep(title, history, prompt, instructions, self)
         self.steps.append(task_step)
         return task_step
+
+    @property
+    def train_passed(self):
+        return any(step.train_passed for step in self.steps)
+
+    @property
+    def test_passed(self):
+        return any(step.test_passed for step in self.steps)
+
