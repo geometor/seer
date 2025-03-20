@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 
 from geometor.seer import verifier
+from geometor.seer.trial_result import CodeTrial
 
 class TaskStep:
     def __init__(
@@ -49,6 +50,22 @@ class TaskStep:
 
         self.current_iteration = 0
 
+    def summarize(self):
+        # TODO: construct summary
+        summary = {
+                "title": self.title,
+                "index": self.index,
+                "prompt": self.response.usage_metadata.prompt_token_count,
+                "candidates": self.response.usage_metadata.candidates_token_count,
+                "total": self.response.usage_metadata.total_token_count,
+                "errors": len(self.errors),
+                "codes": len(self.codes),
+                "trials": len(self.trials),
+                
+                "title": self.title,
+                }
+        self._write_to_json("step_summary.json", summary)
+
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function
         error_content = {
@@ -69,11 +86,6 @@ class TaskStep:
         self._write_to_json(error_log_file, error_content)
 
         self.errors[error_log_file] = error_content
-
-    def summarize(self):
-        # TODO: construct summary
-        summary = {}
-        self._write_to_json("step_summary.json", summary)
 
     def log_markdown(
         self,
@@ -238,65 +250,24 @@ class TaskStep:
             #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
     def run_trials(self, task):
-        trials_by_code = {
-                "train_passed": False, # overall
-                "test_passed": False,  # overall
-                "code": {},
+        # TODO: step_code_trials should be an object like code trials
+        step_code_trials = {
+                "any_train_passed": False, # overall
+                "any_test_passed": False,  # overall
+                "code_trials": {},
                 }
 
         if "py" not in self.codes:
             #  self.log_error(Exception("No python code to run"), "run_trials")
-            return trials_by_code
+            return step_code_trials
 
-        overall_train_passed = False
-        overall_test_passed = False
+        for code_filename, code in self.codes["py"].items():
+            code_trial = CodeTrial(self, code_filename, code, task)
+            step_code_trials["code_trials"][code_filename] = code_trial
 
-        for file_name, code in self.codes["py"].items():
-            code_trial = trials_by_code["code"][file_name] = {}
-            train_results = self.run_trial(code, task.train)
-            code_trial["train"] = train_results
+        step_code_trials["any_train_passed"] = overall_train_passed
+        step_code_trials["any_test_passed"] = overall_test_passed
 
-            train_passed = all(r.get("match", False ) for r in train_results.get("trials", {}))
-            code_trial["train_passed"] = train_passed
-            if train_passed: overall_train_passed = True
+        return step_code_trials
 
 
-            if train_passed:
-                test_results = self.run_trial(code, task.test)
-                code_trial["test"] = test_results
-
-                test_passed = all(r.get("match", False) for r in test_results.get("trials", {}))
-                code_trial["test_passed"] = test_passed
-                if test_passed: overall_test_passed = True
-
-            else:
-                test_results = None
-
-
-            # Save combined image
-            if train_results or test_results:  # Check if results exist
-                results_image = task.to_image(
-                    train_results=train_results.get("trials", []) if train_results else [],
-                    test_results=test_results.get("trials", []) if test_results else [],
-                )  # Pass empty list if None
-                png_file = self.dir / f"{file_name}.png"
-                results_image.save(png_file)
-
-            json_file = file_name + ".trial.json"
-            self._write_to_json(json_file, code_trial)
-            self.trials[file_name] = code_trial # save to task step
-
-        trials_by_code["train_passed"] = overall_train_passed
-        trials_by_code["test_passed"] = overall_test_passed
-
-        return trials_by_code
-
-
-    def run_trial(self, code, task_pairs) -> dict:
-
-        code_results = verifier.test_code_with_timeout(
-            code,
-            task_pairs,
-        )
-
-        return code_results # return the results

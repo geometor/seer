@@ -55,6 +55,7 @@ def test_code_with_timeout(code, task_pairs, timeout=10):
         return result_queue.get()
 
 
+
 def test_code(code, task_pairs):
     """Executes and validates the generated code, returning results as a list of dicts."""
     results = {}
@@ -157,70 +158,3 @@ def test_code(code, task_pairs):
 
 
 
-def write_test_results(test_results, task_dir, base_filename):
-    """Formats test results as Markdown and writes to file, including saving images."""
-    test_results_str = ""
-
-    # Write JSON results
-    test_results_json_file = task_dir / f"{base_filename}.json"
-    with open(test_results_json_file, "w") as f:
-        json.dump(test_results, f, indent=2)
-
-    if "trials" in test_results:
-        for result in test_results["trials"]:
-            if "example" in result:  # It's an example result
-                test_results_str += f"\n## example {result['example']}\n"
-                test_results_str += f"*input:*\n```\n{result['input']}\n```\n"
-                test_results_str += (
-                    f"*expected output:*\n```\n{result['expected_output']}\n```\n"
-                )
-
-                if "transformed_output" in result:
-                    test_results_str += f"*transformed output:*\n```\n{result['transformed_output']}\n```\n"
-
-                    # Generate and save image of transformed output
-                    try:
-                        transformed_output_str = result["transformed_output"]  # NEW KEY
-                        transformed_grid = string_to_grid(transformed_output_str)
-                        transformed_image = transformed_grid.to_image()
-                        image_filename = (
-                            f"{base_filename}-example_{result['example']}.png"
-                        )
-                        image_path = task_dir / image_filename
-                        transformed_image.save(image_path)
-
-                    except ValueError as e:
-                        test_results_str += f"**ERROR**: Could not create grid from transformed output: {e}\n"
-                        continue  # Skip image creation and go to the next result
-                    except Exception as e:  # Catch the PIL error
-                        test_results_str += f"**ERROR**: Could not save image: {e}\n"
-                        continue
-
-                test_results_str += f"size: {result.get('size_correct')}\n"
-                test_results_str += f"palette: {result.get('color_palette_correct')}\n"
-                test_results_str += (
-                    f"color count: {result.get('correct_pixel_counts')}\n"
-                )
-                test_results_str += f"pixels off: {result.get('pixels_off')}\n"
-
-                if result["match"] is True:
-                    test_results_str += "PASSED\n"
-                elif result["match"] is False:
-                    test_results_str += "**FAILED!**\n"
-                else:  # Error case
-                    test_results_str += f"**ERROR**: {result['match']}\n"
-
-            elif "captured_output" in result:
-                test_results_str += (
-                    f"*captured output:*\n```\n{result['captured_output']}\n```\n"
-                )
-            elif "code_execution_error" in result:
-                test_results_str += f"\n*code_execution_error:*\n```\n{result['code_execution_error']}\n```\n"
-
-            # Write Markdown results
-            test_results_md_file = task_dir / f"{base_filename}.md"
-            with open(test_results_md_file, "w") as f:
-                f.write(test_results_str)
-
-
-    return test_results_str

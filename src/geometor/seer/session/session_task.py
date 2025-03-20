@@ -38,6 +38,22 @@ class SessionTask:
         except Exception as e:
             self.log_error(e)
 
+    def summarize(self):
+        summary_file = self.dir / "task_summary.json"
+        summary = {
+                "steps": len(self.steps),
+                "errors": len(self.errors),
+                "trials": None,
+                "matches": None,
+
+                }
+        try:
+            with open(summary_file, "w") as f:
+                json.dump(summary, f, indent=2)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing response JSON to file: {e}")
+            self.log_error(f"Error writing response JSON to file: {e}")
+
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function
         error_content = {
@@ -72,12 +88,3 @@ class SessionTask:
         self.steps.append(task_step)
         return task_step
 
-    def summarize(self):
-        summary_file = self.dir / "task_summary.json"
-        summary = {}
-        try:
-            with open(summary_file, "w") as f:
-                json.dump(summary, f, indent=2)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing response JSON to file: {e}")
-            self.log_error(f"Error writing response JSON to file: {e}")

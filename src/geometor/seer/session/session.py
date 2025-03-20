@@ -40,6 +40,19 @@ class Session:
 
         #  self.display_config()  
 
+    def summarize(self):
+        summary_file = self.dir / "session_summary.json"
+        # TODO: get stats from session task
+        summary = {
+                "count": len(self.tasks),
+                }
+        try:
+            with open(summary_file, "w") as f:
+                json.dump(summary, f, indent=2)
+        except (IOError, PermissionError) as e:
+            print(f"Error writing response JSON to file: {e}")
+            self.log_error(f"Error writing response JSON to file: {e}")
+
     def add_task(self, task):
         from geometor.seer.session.session_task import SessionTask
         session_task = SessionTask(self, task)
@@ -70,16 +83,6 @@ class Session:
         with open(self.config["task_context_file"], "r") as f:
             task_context = f.read().strip()
         (self.dir / "task_context.md").write_text(task_context)
-
-    def summarize(self):
-        summary_file = self.dir / "session_summary.json"
-        summary = {}
-        try:
-            with open(summary_file, "w") as f:
-                json.dump(summary, f, indent=2)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing response JSON to file: {e}")
-            self.log_error(f"Error writing response JSON to file: {e}")
 
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function

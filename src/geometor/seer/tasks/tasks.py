@@ -150,12 +150,13 @@ class Task:
             images.append(output_row)
 
 
-            if result_set and "examples" in result_set:
+            if result_set and "trials" in result_set:
                 result_row = []
-                for result in result_set["examples"]:
+                for result in result_set["trials"]:
                     if "transformed_output" in result:
                         try:
                             result_grid_str = result["transformed_output"]
+                            # TODO: this function should be on the grid object
                             result_grid = verifier.string_to_grid(result_grid_str)
                             result_row.append(result_grid.to_image(add_text=False))
                         except Exception as e:
