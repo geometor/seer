@@ -134,7 +134,7 @@ class TaskStep(Level):
         response_dict["response_time"] = response_time
 
         self._write_to_json("response.json", response_dict)
-        self.log_markdown("response", response.text)
+        self.log_markdown("response", [response.text])
 
     def process_response(self, response: GenerateContentResponse):
         """Processes the response from the Gemini model."""
@@ -259,6 +259,7 @@ class TaskStep(Level):
             # self.trials[code_filename] = code_trial  # No longer storing directly in TaskStep
             self.step_code_trials.add_code_trial(code_filename, code_trial)  # Add to StepCodeTrials
 
+    # TODO: 
     def get_first_code_trial(self) -> CodeTrial | None:
         """Retrieves the first CodeTrial object, if any."""
         return self.step_code_trials.get_first_code_trial()
