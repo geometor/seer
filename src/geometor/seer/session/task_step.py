@@ -48,7 +48,9 @@ class TaskStep:
         self.instructions = instructions
         self.log_markdown("instructions", instructions)
 
-        self.current_iteration = 0
+        #  self.current_iteration = 0
+
+        print(f"        {self.index} • {self.title}")
 
     def summarize(self):
         # TODO: construct summary
@@ -118,6 +120,7 @@ class TaskStep:
         response_dict["response_time"] = response_time
 
         self._write_to_json("response.json", response_dict)
+        self.log_markdown("response", response.text)
 
     def process_response(self, response: GenerateContentResponse):
         """Processes the response from the Gemini model."""
@@ -156,7 +159,7 @@ class TaskStep:
                 output = part.code_execution_result.output
                 response_parts.append(f"outcome: {outcome}\n")
                 response_parts.append(f"```\n{output}\n```\n")
-                self.session._write_to_file(f"code_result.txt", output)
+                #  self.session._write_to_file(f"code_result.txt", output)
 
             if part.function_call:
                 response_parts.append("\n*function_call:*\n")
@@ -265,8 +268,14 @@ class TaskStep:
             code_trial = CodeTrial(self, code_filename, code, task)
             step_code_trials["code_trials"][code_filename] = code_trial
 
-        step_code_trials["any_train_passed"] = overall_train_passed
-        step_code_trials["any_test_passed"] = overall_test_passed
+        any_train_passed = any(
+            trial.train_passed for trial in step_code_trials["code_trials"].values()
+        )
+        any_test_passed = any(
+            trial.test_passed for trial in step_code_trials["code_trials"].values()
+        )
+        step_code_trials["any_train_passed"] = any_train_passed
+        step_code_trials["any_test_passed"] = any_test_passed
 
         return step_code_trials
 

@@ -38,7 +38,7 @@ class Session:
 
         self._write_context_files()
 
-        #  self.display_config()  
+        print(self.timestamp)
 
     def summarize(self):
         summary_file = self.dir / "session_summary.json"

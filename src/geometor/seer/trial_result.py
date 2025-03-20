@@ -13,28 +13,42 @@ class CodeTrial:
         code,
         task: Task,
     ):
-        self.task_step = task_step
+        #  self.task_step = task_step
         self.code_filename = code_filename
         self.code = code
         self.task = task
         self.train_results = self.run_trial(code, task.train)
         self.test_results = []
 
-        if self.train_passed():
+        if self.train_passed:
             self.test_results = self.run_trial(code, task.test)
 
         if self.train_results:
-            train_trials = train_results.get("trials", [])
-            test_trials = test_results.get("trials", [])
+            #  train_trials = train_results.get("trials", [])
+            #  test_trials = test_results.get("trials", [])
+            #  results_image = task.to_image(
+                #  train_results=train_trials,
+                #  test_results=test_trials,
+            #  )
+            if self.test_results:
+                show_test = True
+            else:
+                show_test = False
+
             results_image = task.to_image(
-                train_results=train_trials,
-                test_results=test_trials,
+                train_results=self.train_results,
+                test_results=self.test_results,
+                show_test=show_test,
             )
             png_file = task_step.dir / f"{code_filename}.trial.png"
             results_image.save(png_file)
 
         json_file = code_filename + ".trial.json"
-        task_step._write_to_json(json_file, code_trial)
+        results_json = {
+                "train": self.train_results,
+                "test": self.test_results,
+                }
+        task_step._write_to_json(json_file, results_json)
 
     def run_trial(self, code, task_pairs) -> dict:
 
@@ -57,7 +71,7 @@ class CodeTrial:
             r.get("match", False) for r in self.test_results.get("trials", [])
         )
 
-    def generate_report(self, task: Task) -> str:
+    def generate_report(self) -> str:
         report = f"Results for {self.code_filename}:\n"
 
         if self.train_results:
@@ -71,7 +85,7 @@ class CodeTrial:
                 if "transformed_output" in result:
                     report += f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
                     # Add images - construct filename based on task and step
-                    image_filename = f"{task.id}-{i+1}.png"  # simplified name
+                    image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
                     report += f"![Transformed Image]({image_filename})\n"
 
                 report += f"match: {result.get('match')}\n"
@@ -93,7 +107,7 @@ class CodeTrial:
                 if "transformed_output" in result:
                     report += f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
                     # Add images - construct filename based on task and step
-                    image_filename = f"{task.id}-{i+1}.png"  # simplified name
+                    image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
                     report += f"![Transformed Image]({image_filename})\n"
                 if result.get("expected_output"):
                     report += (

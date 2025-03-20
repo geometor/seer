@@ -98,11 +98,11 @@ class Seer:
 
         task_step.summarize()
 
-        if task_results.get("train_solved"):
+        if task_results.get("any_train_passed"):
             return
 
         # STEP: coder prompt *********************************
-        title = (f"all training • investigate_coder",)
+        title = f"all training • investigate_coder"
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
         task_step = self._generate(
@@ -122,25 +122,29 @@ class Seer:
 
         task_step.summarize()
 
-        if task_results.get("overall_train_solved"):
+        # TODO: task results should be an object
+        if task_results.get("any_train_passed"):
             # this means a test was run as well
             return
-
 
         current_iteration = 0
         while current_iteration < self.max_iterations:
 
-            # TODO: refine must create task steps
-            #  extract best trial results and code
+            code_filename = next(iter(task_results["code_trials"]))
+            code_trial = task_results["code_trials"][code_filename]
+            code = code_trial.code
+
             task_results = self.refine(
                 session_task,
                 task,
                 code,
-                code_results,
+                code_trial,
                 current_iteration,
             )
-            if task_results.get("train_solved"):
+
+            if task_results.get("any_train_passed"):
                 return
+
             current_iteration += 1
 
     def _generate(
@@ -178,34 +182,35 @@ class Seer:
         session_task: SessionTask,
         task: Task,
         code,
-        trial_results, 
+        code_trial, 
         current_iteration,
     ):
         """
         Refines the generated code based on test results, using the dreamer/coder pattern.
         """
 
-        # get previous step
-        previous_step = session_task.steps[-1]
+        # TODO: compare results from previous tests
+        #  previous_step = session_task.steps[-1]
 
-        history = previous_step.response_parts.copy()
+        history = []
 
         # --- Dreamer ---
         dreamer_prompt = []
         instructions = [self.instructions["refine_dreamer"]]
 
         # Gather reports from ALL code files in the previous step
-        all_reports = ""
-        for file_name, code in previous_step.codes.get("py", {}).items():
-            trial_result = TrialResult(
-                file_name,
-                previous_step.trials.get(file_name, {}).get("train"),
-                previous_step.trials.get(file_name, {}).get("test"),
-            )
-            all_reports += trial_result.generate_report(task)
-            dreamer_prompt.extend(["\nPrevious Code:\n", f"```python\n{code}\n```\n"])
+        #  all_reports = ""
+        #  for file_name, code in previous_step.codes.get("py", {}).items():
+            #  trial_result = TrialResult(
+                #  file_name,
+                #  previous_step.trials.get(file_name, {}).get("train"),
+                #  previous_step.trials.get(file_name, {}).get("test"),
+            #  )
+            #  all_reports += trial_result.generate_report(task)
 
-        dreamer_prompt.append(all_reports)
+        dreamer_prompt.append("\nPrevious Code:\n")
+        dreamer_prompt.append(f"```python\n{code}\n```\n")
+        dreamer_prompt.append(code_trial.generate_report())
 
         task_step = self._generate(
             session_task,
@@ -220,18 +225,18 @@ class Seer:
 
         task_step.summarize()
 
-        if task_results.get("train_solved"):
+        if task_results["any_train_passed"]:
             return
 
         history.extend(dreamer_prompt)
-        history.extend(task_step_dreamer.response_parts)
+        history.extend(task_step.response_parts)
 
 
         # --- Coder ---
         coder_prompt = [""]  # Coder prompt might be minimal
         instructions = [self.instructions["refine_coder"]]
 
-        task_step_coder = self._generate(
+        task_step = self._generate(
             session_task,
             "coder",
             f"refine_coder • iteration {current_iteration}",
@@ -242,20 +247,10 @@ class Seer:
         )
 
         history.extend(coder_prompt)
-        history.extend(task_step_coder.response_parts)
+        history.extend(task_step.response_parts)
 
         # Run trials and check for success
-        task_results = task_step_coder.run_trials(task)
-        task_step_coder.summarize()
+        task_results = task_step.run_trials(task)
+        task_step.summarize()
 
-        # Check if all train and test cases passed for ANY code file
-        success = False
-        for code_file_results in task_results["code"].values():
-            if code_file_results.get("train_passed") and code_file_results.get("test_passed"):
-                success = True
-                break  # Exit loop if any code file succeeds
-
-        if success:
-            return  # Exit refinement loop if successful
-
-        previous_step = task_step_coder # prepare for next loop
+        return task_results

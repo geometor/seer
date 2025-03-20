@@ -38,6 +38,8 @@ class SessionTask:
         except Exception as e:
             self.log_error(e)
 
+        print(f"    {task.id}")
+
     def summarize(self):
         summary_file = self.dir / "task_summary.json"
         summary = {
