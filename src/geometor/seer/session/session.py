@@ -31,9 +31,10 @@ class Session(Level):
         task_trials = {}
         for task_id, session_task in self.tasks.items():
             task_summary = session_task.summarize() # Get the latest summary
+            trials = task_summary.get("trials", {})  # Get trials safely with a default
             task_trials[task_id] = {
-                "train": task_summary.get("trials", {}).get("train", {}).get("total", 0) if task_summary.get("trials") else 0,
-                "test": task_summary.get("trials", {}).get("test", {}).get("total", 0) if task_summary.get("trials") else 0,
+                "train": trials.get("train", {}).get("total", 0),
+                "test": trials.get("test", {}).get("total", 0),
             }
         summary["task_trials"] = task_trials
 
