@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 
 from geometor.seer import verifier
 from geometor.seer.trial_result import CodeTrial
+from geometor.seer.step_code_trials import StepCodeTrials  # Import
+
 
 class TaskStep:
     def __init__(
@@ -39,7 +41,8 @@ class TaskStep:
         self.errors = {}
         self.codes = {}
         self.function_calls = {}
-        self.trials = {}  # Initialize trials
+        # self.trials = {}  # Initialize trials -- REMOVE, replaced by step_code_trials
+        self.step_code_trials = StepCodeTrials() # Use StepCodeTrials
 
         self.history = history
         self.log_markdown("history", history)
@@ -82,7 +85,8 @@ class TaskStep:
         # --- Trial Summary ---
         all_train_results = []
         all_test_results = []
-        for code_filename, code_trial in self.trials.items():
+        # Iterate through CodeTrial objects in StepCodeTrials
+        for code_trial in self.step_code_trials.get_all_trials():
             if code_trial.train_results:
                 all_train_results.extend(code_trial.train_results.get("trials", []))
             if code_trial.test_results:
@@ -311,30 +315,25 @@ class TaskStep:
         #  except Exception as e:
             #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
-    def run_trials(self, task):
-        # TODO: step_code_trials should be an object like code trials
-        step_code_trials = {
-                "any_train_passed": False, # overall
-                "any_test_passed": False,  # overall
-                "code_trials": {},
-                }
-
+    def execute_trials(self, task):
+        """Executes trials for all available code."""
         if "py" not in self.codes:
-            #  self.log_error(Exception("No python code to run"), "run_trials")
-            return step_code_trials
+            return  # Nothing to do
 
         for code_filename, code in self.codes["py"].items():
             code_trial = CodeTrial(self, code_filename, code, task)
-            self.trials[code_filename] = code_trial  # Store CodeTrial
-            step_code_trials["code_trials"][code_filename] = code_trial
+            code_trial.execute_and_save_results()
+            # self.trials[code_filename] = code_trial  # No longer storing directly in TaskStep
+            self.step_code_trials.add_code_trial(code_filename, code_trial) # Add to StepCodeTrials
 
-        any_train_passed = any(
-            trial.train_passed for trial in step_code_trials["code_trials"].values()
-        )
-        any_test_passed = any(
-            trial.test_passed for trial in step_code_trials["code_trials"].values()
-        )
-        step_code_trials["any_train_passed"] = any_train_passed
-        step_code_trials["any_test_passed"] = any_test_passed
+    def get_first_code_trial(self) -> CodeTrial | None:
+        """Retrieves the first CodeTrial object, if any."""
+        return self.step_code_trials.get_first_code_trial()
 
-        return step_code_trials
+    def any_trials_successful(self, set_type="train"):
+        """Checks if any trials of the given type were successful."""
+        if set_type == "train":
+            return self.step_code_trials.any_train_passed
+        elif set_type == "test":
+            return self.step_code_trials.any_test_passed
+        return False

@@ -17,38 +17,34 @@ class CodeTrial:
         self.code_filename = code_filename
         self.code = code
         self.task = task
-        self.train_results = self.run_trial(code, task.train)
+        self.train_results = None  # Initialize
+        self.test_results = None   # Initialize
+        self.task_step = task_step # store
+
+    def execute_and_save_results(self):
+        """Executes the trial and saves results (image and JSON)."""
+        self.train_results = self.run_trial(self.code, self.task.train)
         self.test_results = []
 
         if self.train_passed:
-            self.test_results = self.run_trial(code, task.test)
+            self.test_results = self.run_trial(self.code, self.task.test)
 
-        if self.train_results:
-            #  train_trials = train_results.get("trials", [])
-            #  test_trials = test_results.get("trials", [])
-            #  results_image = task.to_image(
-                #  train_results=train_trials,
-                #  test_results=test_trials,
-            #  )
-            if self.test_results:
-                show_test = True
-            else:
-                show_test = False
+        show_test = bool(self.test_results)
+        results_image = self.task.to_image(
+            train_results=self.train_results,
+            test_results=self.test_results,
+            show_test=show_test,
+        )
+        png_file = self.task_step.dir / f"{self.code_filename}.trial.png"
+        results_image.save(png_file)
 
-            results_image = task.to_image(
-                train_results=self.train_results,
-                test_results=self.test_results,
-                show_test=show_test,
-            )
-            png_file = task_step.dir / f"{code_filename}.trial.png"
-            results_image.save(png_file)
-
-        json_file = code_filename + ".trial.json"
+        json_file = self.code_filename + ".trial.json"
         results_json = {
-                "train": self.train_results,
-                "test": self.test_results,
-                }
-        task_step._write_to_json(json_file, results_json)
+            "train": self.train_results,
+            "test": self.test_results,
+        }
+        self.task_step._write_to_json(json_file, results_json)
+
 
     def run_trial(self, code, task_pairs) -> dict:
 

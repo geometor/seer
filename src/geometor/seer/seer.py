@@ -79,7 +79,6 @@ class Seer:
 
         instructions = [self.instructions["investigate_dreamer"]]
 
-        # TODO: set config for `code_execution`
         task_step = self._generate(
             session_task,
             "dreamer",
@@ -93,12 +92,10 @@ class Seer:
         history.extend(prompt)
         history.extend(task_step.response_parts)
 
-        # TODO: results can be for more than one file
-        task_results = task_step.run_trials(task)
-
+        task_step.execute_trials(task)
         task_step.summarize()
 
-        if task_results.get("any_train_passed"):
+        if task_step.any_trials_successful("train"):
             return
 
         # STEP: coder prompt *********************************
@@ -117,24 +114,24 @@ class Seer:
         history.extend(prompt)
         history.extend(task_step.response_parts)
 
-        # TODO: results can be for more than one file
-        task_results = task_step.run_trials(task)
-
+        task_step.execute_trials(task)
         task_step.summarize()
 
-        # TODO: task results should be an object
-        if task_results.get("any_train_passed"):
-            # this means a test was run as well
+        if task_step.any_trials_successful("train"):
             return
 
         current_iteration = 0
         while current_iteration < self.max_iterations:
+            # Get the first (and presumably only) CodeTrial
+            code_trial = task_step.get_first_code_trial()
+            if not code_trial:
+                # Handle the case where there's no code trial (shouldn't normally happen)
+                session_task.log_error(Exception("No code trial found in refine step."))
+                return
 
-            code_filename = next(iter(task_results["code_trials"]))
-            code_trial = task_results["code_trials"][code_filename]
             code = code_trial.code
 
-            task_results = self.refine(
+            self.refine(
                 session_task,
                 task,
                 code,
@@ -142,7 +139,7 @@ class Seer:
                 current_iteration,
             )
 
-            if task_results.get("any_train_passed"):
+            if task_step.any_trials_successful("train"):
                 return
 
             current_iteration += 1
@@ -182,7 +179,7 @@ class Seer:
         session_task: SessionTask,
         task: Task,
         code,
-        code_trial, 
+        code_trial,
         current_iteration,
     ):
         """
@@ -219,13 +216,12 @@ class Seer:
             history,
             dreamer_prompt,
             instructions,
-            tools="code_execution" # Consider if tools are needed
+            tools="code_execution"  # Consider if tools are needed
         )
-        task_results = task_step.run_trials(task)
-
+        task_step.execute_trials(task)
         task_step.summarize()
 
-        if task_results["any_train_passed"]:
+        if task_step.any_trials_successful("train"):
             return
 
         history.extend(dreamer_prompt)
@@ -250,7 +246,7 @@ class Seer:
         history.extend(task_step.response_parts)
 
         # Run trials and check for success
-        task_results = task_step.run_trials(task)
+        task_step.execute_trials(task)
         task_step.summarize()
 
-        return task_results
+        return task_step.step_code_trials # return StepCodeTrials
