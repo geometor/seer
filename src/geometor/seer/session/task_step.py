@@ -39,7 +39,7 @@ class TaskStep:
         self.errors = {}
         self.codes = {}
         self.function_calls = {}
-        self.trials = {}
+        self.trials = {}  # Initialize trials
 
         self.history = history
         self.log_markdown("history", history)
@@ -53,20 +53,79 @@ class TaskStep:
         print(f"        {self.index} • {self.title}")
 
     def summarize(self):
-        # TODO: construct summary
         summary = {
-                "title": self.title,
-                "index": self.index,
-                "prompt": self.response.usage_metadata.prompt_token_count,
-                "candidates": self.response.usage_metadata.candidates_token_count,
-                "total": self.response.usage_metadata.total_token_count,
-                "errors": len(self.errors),
-                "codes": len(self.codes),
-                "trials": len(self.trials),
-                
-                "title": self.title,
-                }
+            "title": self.title,
+            "index": self.index,
+            "response": {
+                "response_time": self.response_time,
+            },
+            "errors": {},
+            "trials": {},
+            "codes": {},
+        }
+
+        if hasattr(self.response, 'usage_metadata'):
+            summary["response"]["prompt_tokens"] = self.response.usage_metadata.prompt_token_count
+            summary["response"]["candidates_tokens"] = self.response.usage_metadata.candidates_token_count
+            summary["response"]["total_tokens"] = self.response.usage_metadata.total_token_count
+        else:
+            summary["response"]["prompt_tokens"] = None
+            summary["response"]["candidates_tokens"] = None
+            summary["response"]["total_tokens"] = None
+
+        summary["errors"]["count"] = len(self.errors)
+        summary["errors"]["types"] = list(self.errors.keys())  # List of error file names
+
+        summary["codes"]["count"] = len(self.codes)
+        summary["codes"]["types"] = list(self.codes.keys())
+
+        # --- Trial Summary ---
+        all_train_results = []
+        all_test_results = []
+        for code_filename, code_trial in self.trials.items():
+            if code_trial.train_results:
+                all_train_results.extend(code_trial.train_results.get("trials", []))
+            if code_trial.test_results:
+                all_test_results.extend(code_trial.test_results.get("trials", []))
+
+        if all_train_results:
+            summary["trials"]["train"] = self._summarize_trial_results(all_train_results)
+        if all_test_results:
+            summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
+
         self._write_to_json("step_summary.json", summary)
+
+    def _summarize_trial_results(self, results):
+        """Helper function to summarize trial results."""
+        num_trials = len(results)
+        num_passed = sum(1 for r in results if r.get("match", False))
+        num_failed = num_trials - num_passed
+
+        summary = {
+            "total": num_trials,
+            "passed": num_passed,
+            "failed": num_failed,
+        }
+
+        pixels_off_values = [r.get("pixels_off") for r in results if "pixels_off" in r]
+        if pixels_off_values:
+            summary["pixels_off"] = {
+                "min": min(pixels_off_values),
+                "max": max(pixels_off_values),
+                "avg": sum(pixels_off_values) / len(pixels_off_values),
+            }
+
+        percent_correct_values = [
+            r.get("percent_correct") for r in results if "percent_correct" in r
+        ]
+        if percent_correct_values:
+            summary["percent_correct"] = {
+                "min": min(percent_correct_values),
+                "max": max(percent_correct_values),
+                "avg": sum(percent_correct_values) / len(percent_correct_values),
+            }
+        return summary
+
 
     def log_error(self, e: Exception, context: str = ""):
         # TODO: refactor to generic function
@@ -266,6 +325,7 @@ class TaskStep:
 
         for code_filename, code in self.codes["py"].items():
             code_trial = CodeTrial(self, code_filename, code, task)
+            self.trials[code_filename] = code_trial  # Store CodeTrial
             step_code_trials["code_trials"][code_filename] = code_trial
 
         any_train_passed = any(
@@ -278,5 +338,3 @@ class TaskStep:
         step_code_trials["any_test_passed"] = any_test_passed
 
         return step_code_trials
-
-
