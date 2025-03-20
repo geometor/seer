@@ -10,7 +10,7 @@ from collections import Counter
 from PIL import Image, ImageDraw
 
 from geometor.seer.tasks.grid import Grid
-from geometor.seer import verifier
+#  from geometor.seer import verifier
 
 
 class TaskPair(dict):

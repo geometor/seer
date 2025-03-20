@@ -14,9 +14,9 @@ if TYPE_CHECKING:
     from geometor.seer.session.session_task import SessionTask
 
 
-from geometor.seer import verifier
-from geometor.seer.trial_result import CodeTrial
-from geometor.seer.step_code_trials import StepCodeTrials  # Import
+from geometor.seer.trials import verifier
+from geometor.seer.trials.code_trial import CodeTrial
+from geometor.seer.trials.step_code_trials import StepCodeTrials  # Import
 
 
 class TaskStep:

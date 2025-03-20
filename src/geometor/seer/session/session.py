@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from geometor.seer.session.session_task import SessionTask
 
-import geometor.seer.verifier as verifier
+#  import geometor.seer.verifier as verifier
 
 
 class Session:

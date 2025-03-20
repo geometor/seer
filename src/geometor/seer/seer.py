@@ -18,12 +18,8 @@ from geometor.seer.tasks.grid import Grid
 from geometor.seer.prompts import get_pair_prompt
 
 from geometor.seer.gemini_client import GeminiClient as Client
-import geometor.seer.verifier as verifier
 
-#  from geometor.seer.response_handler import ResponseHandler
-
-
-from geometor.seer.trial_result import CodeTrial
+from geometor.seer.trials.code_trial import CodeTrial
 
 
 

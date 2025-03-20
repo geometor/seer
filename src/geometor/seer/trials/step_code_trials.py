@@ -1,5 +1,5 @@
 from typing import Dict
-from geometor.seer.trial_result import CodeTrial
+from geometor.seer.trials.code_trial import CodeTrial
 
 class StepCodeTrials:
     """

@@ -1,4 +1,4 @@
-from geometor.seer import verifier
+from geometor.seer.trials import verifier
 from geometor.seer.tasks.tasks import Task
 
 
