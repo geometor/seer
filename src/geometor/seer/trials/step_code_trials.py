@@ -135,7 +135,7 @@ class StepCodeTrials:
 
     def execute_trials(self, task_step, task):
         """Executes trials for all available code."""
-        for code_filename, code in task_step.codes["py"].items():
+        for code_filename, code in task_step.get_python.items():  # Use get_python here
             code_trial = self.get_code_trial(code_filename)
             if code_trial is None:
                 code_trial = CodeTrial(task_step, code_filename, code, task)
