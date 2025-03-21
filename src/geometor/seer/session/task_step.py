@@ -274,3 +274,9 @@ class TaskStep(Level):
     @property
     def test_passed(self):
         return self.step_code_trials.any_test_passed
+
+    @property
+    def get_python(self):
+        """Safely returns the Python code dictionary or an empty dictionary."""
+        return self.codes.get("py", {})
+
