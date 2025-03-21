@@ -196,7 +196,7 @@ class TaskStep(Level):
         matches = re.findall(r"```(\w+)\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
             file_type = file_type.lower() if file_type else "txt"
-            if file_type == "python":
+            if file_type == "py":
                 file_type = "py"
 
             index = get_code_file_count()
@@ -252,14 +252,7 @@ class TaskStep(Level):
 
     def execute_trials(self, task):
         """Executes trials for all available code."""
-        if "py" not in self.codes:
-            return  # Nothing to do
-
-        for code_filename, code in self.codes["py"].items():
-            code_trial = CodeTrial(self, code_filename, code, task)
-            code_trial.execute_and_save_results()
-            # self.trials[code_filename] = code_trial  # No longer storing directly in TaskStep
-            self.step_code_trials.add_code_trial(code_filename, code_trial)  # Add to StepCodeTrials
+        self.step_code_trials.execute_trials(task)  # Delegate to StepCodeTrials
 
     # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:
@@ -281,4 +274,3 @@ class TaskStep(Level):
     @property
     def test_passed(self):
         return self.step_code_trials.any_test_passed
-

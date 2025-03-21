@@ -1,11 +1,17 @@
-from geometor.seer.trials import verifier
+import ast
+import contextlib
+import io
+import numpy as np
+
 from geometor.seer.tasks.tasks import Task
+from geometor.seer.tasks.grid import Grid
 
 
 class CodeTrial:
     """
     trial for one code and task
     """
+
     def __init__(
         self,
         task_step,
@@ -13,21 +19,21 @@ class CodeTrial:
         code,
         task: Task,
     ):
-        #  self.task_step = task_step
+        # self.task_step = task_step
         self.code_filename = code_filename
         self.code = code
         self.task = task
         self.train_results = None  # Initialize
-        self.test_results = None   # Initialize
-        self.task_step = task_step # store
+        self.test_results = None  # Initialize
+        self.task_step = task_step  # store
 
     def execute_and_save_results(self):
         """Executes the trial and saves results (image and JSON)."""
-        self.train_results = self.run_trial(self.code, self.task.train)
-        self.test_results = []
+        # self.train_results = self.run_trial(self.code, self.task.train)
+        # self.test_results = []
 
-        if self.train_passed:
-            self.test_results = self.run_trial(self.code, self.task.test)
+        # if self.train_passed:
+        #     self.test_results = self.run_trial(self.code, self.task.test)
 
         show_test = bool(self.test_results)
         results_image = self.task.to_image(
@@ -45,15 +51,13 @@ class CodeTrial:
         }
         self.task_step._write_to_json(json_file, results_json)
 
+    # def run_trial(self, code, task_pairs) -> dict:
+    #     code_results = verifier.test_code_with_timeout(
+    #         code,
+    #         task_pairs,
+    #     )
 
-    def run_trial(self, code, task_pairs) -> dict:
-
-        code_results = verifier.test_code_with_timeout(
-            code,
-            task_pairs,
-        )
-
-        return code_results  # return the results
+    #     return code_results  # return the results
 
     @property
     def train_passed(self) -> bool:
@@ -79,7 +83,9 @@ class CodeTrial:
                     f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
                 )
                 if "transformed_output" in result:
-                    report += f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    report += (
+                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    )
                     # Add images - construct filename based on task and step
                     image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
                     report += f"![Transformed Image]({image_filename})\n"
@@ -101,7 +107,9 @@ class CodeTrial:
                 report += f"\n## Example {i+1}:\n"
                 report += f"Input:\n```\n{result.get('input')}\n```\n"
                 if "transformed_output" in result:
-                    report += f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    report += (
+                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
+                    )
                     # Add images - construct filename based on task and step
                     image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
                     report += f"![Transformed Image]({image_filename})\n"
@@ -121,3 +129,17 @@ class CodeTrial:
                 )
 
         return report
+
+    @staticmethod
+    def get_transform_function(code):
+        """Parses the code, finds the 'transform' function, and returns it."""
+        try:
+            tree = ast.parse(code)
+            namespace = {}
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef) and node.name == "transform":
+                    exec(compile(tree, filename="<string>", mode="exec"), namespace)
+                    return namespace.get("transform")  # Returns None if not found
+            return None  # Explicitly return None if no transform function
+        except SyntaxError as e:
+            raise  # Re-raise SyntaxError to be handled by caller
