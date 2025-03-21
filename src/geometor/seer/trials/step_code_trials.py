@@ -133,12 +133,12 @@ class StepCodeTrials:
         ]  # Convert to dicts for output
         return results
 
-    def execute_trials(self, task):
+    def execute_trials(self, task_step, task):
         """Executes trials for all available code."""
-        for code_filename, code in self.task_step.codes["py"].items():
+        for code_filename, code in task_step.codes["py"].items():
             code_trial = self.get_code_trial(code_filename)
             if code_trial is None:
-                code_trial = CodeTrial(self.task_step, code_filename, code, task)
+                code_trial = CodeTrial(task_step, code_filename, code, task)
                 self.add_code_trial(code_filename, code_trial)
 
             # Run and store results directly in CodeTrial

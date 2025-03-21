@@ -252,7 +252,7 @@ class TaskStep(Level):
 
     def execute_trials(self, task):
         """Executes trials for all available code."""
-        self.step_code_trials.execute_trials(task)  # Delegate to StepCodeTrials
+        self.step_code_trials.execute_trials(self, task)  # Delegate to StepCodeTrials
 
     # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:
