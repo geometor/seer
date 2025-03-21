@@ -32,6 +32,11 @@ class StepCodeTrials:
         """Checks if any test trials passed."""
         return any(trial.test_passed for trial in self.code_trials.values())
 
+    @property
+    def count_trials(self) -> int:
+        """Checks if any test trials passed."""
+        return len(self.code_trials)
+
     def get_all_trials(self):
         """Returns a list of all CodeTrial objects."""
         return list(self.code_trials.values())
