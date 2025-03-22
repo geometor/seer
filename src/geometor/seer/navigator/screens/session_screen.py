@@ -38,7 +38,7 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("TASKS", "MATCH", "STEPS")
+        self.table.add_columns("TASKS", "STEPS", "TRAIN", "TEST")
         yield Header()
         with Vertical():
             yield self.table

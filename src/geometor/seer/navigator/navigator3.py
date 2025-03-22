@@ -30,6 +30,11 @@ class SessionNavigator(App):
         session_dirs = sorted(self.sessions_root.iterdir(), key=lambda x: x.name)
         for session_dir in session_dirs:
             if session_dir.is_dir():
+                summary_path = session_dir / "session_summary.json"
+                # TODO handle errors
+                with open(summary_path, 'r') as f:
+                    summary = json.load(f)
+
                 tasks = {}
                 task_dirs = sorted(session_dir.iterdir(), key=lambda x: x.name)
                 for task_dir in task_dirs:
