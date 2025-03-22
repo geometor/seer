@@ -81,8 +81,27 @@ class SessionsScreen(Screen):
 
     def update_summary(self):
         summary = self.query_one("#summary", Static)
-        num_sessions = sum(1 for _ in self.sessions_root.iterdir() if _.is_dir())
-        summary.update(f"count: {num_sessions}")
+        num_sessions = 0
+        train_passed_count = 0
+        test_passed_count = 0
+
+        for session_dir in self.sessions_root.iterdir():
+            if session_dir.is_dir():
+                num_sessions += 1
+                summary_path = session_dir / "session_summary.json"
+                try:
+                    with open(summary_path, "r") as f:
+                        session_summary = json.load(f)
+                    if session_summary.get("train_passed"):
+                        train_passed_count += 1
+                    if session_summary.get("test_passed"):
+                        test_passed_count += 1
+                except (FileNotFoundError, json.JSONDecodeError):
+                    pass  # Ignore errors, already handled in load_sessions
+
+        summary.update(
+            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
+        )
 
     def action_move_up(self):
         row = self.table.cursor_row - 1
