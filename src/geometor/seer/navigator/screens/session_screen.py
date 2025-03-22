@@ -52,6 +52,10 @@ class SessionScreen(Screen):
         self.update_tasks_list()
 
     def update_tasks_list(self):
+        self.app.task_dirs = sorted(
+            [d for d in self.session_path.iterdir() if d.is_dir()]
+        )
+        self.app.task_index = 0
         for task_dir in sorted(self.session_path.iterdir()):
             if task_dir.is_dir():
                 summary_path = task_dir / "task_summary.json"
@@ -76,6 +80,8 @@ class SessionScreen(Screen):
                     self.table.add_row(task_dir.name, "Error: No summary", "-", "-")
                 except json.JSONDecodeError:
                     self.table.add_row(task_dir.name, "Error: Invalid JSON", "-", "-")
+        if self.app.task_dirs:
+            self.select_task_by_index(self.app.task_index)
 
         self.update_summary()
 
@@ -85,13 +91,21 @@ class SessionScreen(Screen):
         num_tasks = sum(1 for _ in self.session_path.iterdir() if _.is_dir())
         summary.update(f"count: {num_tasks}")
 
+    def select_task_by_index(self, index: int) -> None:
+        """Selects a task by its index in the sorted list."""
+        if self.app.task_dirs:
+            self.table.move_cursor(row=index)
+
+
     def action_move_up(self):
         row = self.table.cursor_row - 1
         self.table.move_cursor(row=row)
+        self.app.task_index = self.table.cursor_row
 
     def action_move_down(self):
         row = self.table.cursor_row + 1
         self.table.move_cursor(row=row)
+        self.app.task_index = self.table.cursor_row
 
     def action_select_row(self):
         row_id = self.table.cursor_row

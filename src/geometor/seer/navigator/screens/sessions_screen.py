@@ -55,6 +55,10 @@ class SessionsScreen(Screen):
         self.update_summary()
 
     def load_sessions(self):
+        self.app.session_dirs = sorted(
+            [d for d in self.sessions_root.iterdir() if d.is_dir()]
+        )
+        self.app.session_index = 0  # Reset index
         for session_dir in sorted(self.sessions_root.iterdir()):
             if session_dir.is_dir():
                 summary_path = session_dir / "session_summary.json"
@@ -78,6 +82,8 @@ class SessionsScreen(Screen):
                     self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
                 except json.JSONDecodeError:
                     self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
+        if self.app.session_dirs:
+            self.select_session_by_index(self.app.session_index)
 
     def update_summary(self):
         summary = self.query_one("#summary", Static)
@@ -103,13 +109,21 @@ class SessionsScreen(Screen):
             f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
         )
 
+    def select_session_by_index(self, index: int) -> None:
+        """Selects a session by its index in the sorted list."""
+        if self.app.session_dirs:
+            self.table.move_cursor(row=index)
+
+
     def action_move_up(self):
         row = self.table.cursor_row - 1
         self.table.move_cursor(row=row)
+        self.app.session_index = self.table.cursor_row
 
     def action_move_down(self):
         row = self.table.cursor_row + 1
         self.table.move_cursor(row=row)
+        self.app.session_index = self.table.cursor_row
 
     def action_select_row(self):
         row_id = self.table.cursor_row

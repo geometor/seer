@@ -28,7 +28,7 @@ class TaskScreen(Screen):
         Binding("h", "app.pop_screen", "back", show=False),
     ]
 
-    def __init__(self, session_path: Path, task_path: Path) -> None: # Accept Paths
+    def __init__(self, session_path: Path, task_path: Path) -> None:  # Accept Paths
         super().__init__()
         self.session_path = session_path  # Store Paths
         self.task_path = task_path
@@ -50,11 +50,17 @@ class TaskScreen(Screen):
         self.update_summary()
 
     def load_steps(self):
+        self.app.step_dirs = sorted(
+            [d for d in self.task_path.iterdir() if d.is_dir()]
+        )
+        self.app.step_index = 0
         for step_dir in sorted(self.task_path.iterdir()):
             if step_dir.is_dir():
                 num_files = sum(1 for _ in step_dir.iterdir())
                 # TODO: check for matches
                 self.table.add_row(step_dir.name, num_files, "-")
+        if self.app.step_dirs:
+            self.select_step_by_index(self.app.step_index)
 
     def update_summary(self):
         """Updates the summary panel."""
@@ -62,13 +68,21 @@ class TaskScreen(Screen):
         num_steps = sum(1 for _ in self.task_path.iterdir() if _.is_dir())
         summary.update(f"steps: {num_steps}")
 
+    def select_step_by_index(self, index: int) -> None:
+        """Selects a step by its index in the sorted list."""
+        if self.app.step_dirs:
+            self.table.move_cursor(row=index)
+
+
     def action_move_up(self):
         row = self.table.cursor_row - 1
         self.table.move_cursor(row=row)
+        self.app.step_index = self.table.cursor_row
 
     def action_move_down(self):
         row = self.table.cursor_row + 1
         self.table.move_cursor(row=row)
+        self.app.step_index = self.table.cursor_row
 
     def action_select_row(self):
         row_id = self.table.cursor_row
