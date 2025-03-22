@@ -29,11 +29,15 @@ class SessionsScreen(Screen):
         Binding("j", "move_down", "Cursor down", show=True),
         Binding("k", "move_up", "Cursor up", show=True),
         Binding("l", "select_row", "Select", show=True),
+        # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
+        # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
 
-    def __init__(self, sessions_root: Path) -> None:  # Accept Path
+    def __init__(self, sessions_root: Path) -> None:
         super().__init__()
-        self.sessions_root = sessions_root  # Store Path
+        self.sessions_root = sessions_root
+        self.session_dirs = []  # Store sibling dirs here
+        self.session_index = 0
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -55,35 +59,35 @@ class SessionsScreen(Screen):
         self.update_summary()
 
     def load_sessions(self):
-        self.app.session_dirs = sorted(
+        self.session_dirs = sorted(
             [d for d in self.sessions_root.iterdir() if d.is_dir()]
         )
-        self.app.session_index = 0  # Reset index
-        for session_dir in sorted(self.sessions_root.iterdir()):
-            if session_dir.is_dir():
-                summary_path = session_dir / "session_summary.json"
-                try:
-                    with open(summary_path, 'r') as f:
-                        summary = json.load(f)
-                    num_tasks = Text(str(summary.get("num_tasks", 0)), style="", justify="right")
-                    train_passed = (
-                        Text("✔", style="green", justify="center")
-                        if summary.get("train_passed")
-                        else Text("✘", style="red", justify="center")
-                    )
-                    test_passed = (
-                        Text("✔", style="green", justify="center")
-                        if summary.get("test_passed")
-                        else Text("✘", style="red", justify="center")
-                    )
+        self.session_index = 0
+        self.table.clear() # Clear existing rows
+        for session_dir in self.session_dirs:
+            summary_path = session_dir / "session_summary.json"
+            try:
+                with open(summary_path, 'r') as f:
+                    summary = json.load(f)
+                num_tasks = Text(str(summary.get("num_tasks", 0)), style="", justify="right")
+                train_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("train_passed")
+                    else Text("✘", style="red", justify="center")
+                )
+                test_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("test_passed")
+                    else Text("✘", style="red", justify="center")
+                )
 
-                    self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
-                except FileNotFoundError:
-                    self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
-                except json.JSONDecodeError:
-                    self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
-        if self.app.session_dirs:
-            self.select_session_by_index(self.app.session_index)
+                self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
+            except FileNotFoundError:
+                self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
+            except json.JSONDecodeError:
+                self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
+        if self.session_dirs:
+            self.select_session_by_index(self.session_index)
 
     def update_summary(self):
         summary = self.query_one("#summary", Static)
@@ -91,7 +95,7 @@ class SessionsScreen(Screen):
         train_passed_count = 0
         test_passed_count = 0
 
-        for session_dir in self.sessions_root.iterdir():
+        for session_dir in self.sessions_root.iterdir():  # Iterate over sessions_root
             if session_dir.is_dir():
                 num_sessions += 1
                 summary_path = session_dir / "session_summary.json"
@@ -103,37 +107,46 @@ class SessionsScreen(Screen):
                     if session_summary.get("test_passed"):
                         test_passed_count += 1
                 except (FileNotFoundError, json.JSONDecodeError):
-                    pass  # Ignore errors, already handled in load_sessions
+                    pass
 
         summary.update(
             f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
         )
 
     def select_session_by_index(self, index: int) -> None:
-        """Selects a session by its index in the sorted list."""
-        if self.app.session_dirs:
+        if self.session_dirs:
+            self.session_index = index
             self.table.move_cursor(row=index)
 
+    def previous_sibling(self):
+        if self.session_dirs:
+            self.select_session_by_index((self.session_index - 1) % len(self.session_dirs))
+
+    def next_sibling(self):
+        if self.session_dirs:
+            self.select_session_by_index((self.session_index + 1) % len(self.session_dirs))
 
     def action_move_up(self):
         row = self.table.cursor_row - 1
         self.table.move_cursor(row=row)
-        self.app.session_index = self.table.cursor_row
+        self.session_index = self.table.cursor_row  # Update index
 
     def action_move_down(self):
         row = self.table.cursor_row + 1
         self.table.move_cursor(row=row)
-        self.app.session_index = self.table.cursor_row
+        self.session_index = self.table.cursor_row  # Update index
 
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
         session_name = row[0]
         session_path = self.sessions_root / session_name
-        self.app.push_screen(SessionScreen(session_path))  # Pass Path
+
+        # Get task directories for the selected session
+        task_dirs = sorted([d for d in session_path.iterdir() if d.is_dir()])
+
+        self.app.push_screen(SessionScreen(session_path, task_dirs))
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
-        row = self.table.get_row(event.row_key)
-        session_name = row[0]
-        session_path = self.sessions_root / session_name
-        self.app.push_screen(SessionScreen(session_path))  # Pass Path
+        # This method is kept for compatibility, but the core logic is in action_select_row
+        self.action_select_row()

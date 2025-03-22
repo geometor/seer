@@ -6,8 +6,8 @@ import json
 import re
 
 from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
-from geometor.seer.navigator.screens.session_screen import SessionScreen  # Import SessionScreen
-from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
+from geometor.seer.navigator.screens.session_screen import SessionScreen
+from geometor.seer.navigator.screens.task_screen import TaskScreen
 
 
 class SessionNavigator(App):
@@ -21,44 +21,26 @@ class SessionNavigator(App):
     def __init__(self, sessions_root: str = "./sessions"):
         super().__init__()
         self.sessions_root = Path(sessions_root)
-        self.session_index = 0
-        self.task_index = 0
-        self.step_index = 0
-        self.session_dirs = []
-        self.task_dirs = []
-        self.step_dirs = []
+        # Removed index and dir lists from App level
 
     def compose(self) -> ComposeResult:
         yield Static("Loading...")
 
     def on_mount(self) -> None:
-        self.push_screen(SessionsScreen(self.sessions_root))  # Pass sessions_root
+        self.push_screen(SessionsScreen(self.sessions_root))
 
     def action_previous_sibling(self) -> None:
         """Navigate to the previous sibling directory."""
         current_screen = self.screen
-        if isinstance(current_screen, SessionsScreen):
-            self.session_index = (self.session_index - 1) % len(self.session_dirs)
-            current_screen.select_session_by_index(self.session_index)
-        elif isinstance(current_screen, SessionScreen):
-            self.task_index = (self.task_index - 1) % len(self.task_dirs)
-            current_screen.select_task_by_index(self.task_index)
-        elif isinstance(current_screen, TaskScreen):
-            self.step_index = (self.step_index - 1) % len(self.step_dirs)
-            current_screen.select_step_by_index(self.step_index)
+        if hasattr(current_screen, "previous_sibling"):
+            current_screen.previous_sibling()
+
 
     def action_next_sibling(self) -> None:
         """Navigate to the next sibling directory."""
         current_screen = self.screen
-        if isinstance(current_screen, SessionsScreen):
-            self.session_index = (self.session_index + 1) % len(self.session_dirs)
-            current_screen.select_session_by_index(self.session_index)
-        elif isinstance(current_screen, SessionScreen):
-            self.task_index = (self.task_index + 1) % len(self.task_dirs)
-            current_screen.select_task_by_index(self.task_index)
-        elif isinstance(current_screen, TaskScreen):
-            self.step_index = (self.step_index + 1) % len(self.step_dirs)
-            current_screen.select_step_by_index(self.step_index)
+        if hasattr(current_screen, "next_sibling"):
+            current_screen.next_sibling()
 
     def action_quit(self) -> None:
         """Quits the application"""

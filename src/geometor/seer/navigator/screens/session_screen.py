@@ -30,11 +30,15 @@ class SessionScreen(Screen):
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
+        # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
+        # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
 
-    def __init__(self, session_path: Path) -> None:  # Accept Path
+    def __init__(self, session_path: Path, task_dirs: list[Path]) -> None:
         super().__init__()
-        self.session_path = session_path  # Store Path
+        self.session_path = session_path
+        self.task_dirs = task_dirs  # Receive task_dirs
+        self.task_index = 0
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -52,70 +56,73 @@ class SessionScreen(Screen):
         self.update_tasks_list()
 
     def update_tasks_list(self):
-        self.app.task_dirs = sorted(
-            [d for d in self.session_path.iterdir() if d.is_dir()]
-        )
-        self.app.task_index = 0
-        for task_dir in sorted(self.session_path.iterdir()):
-            if task_dir.is_dir():
-                summary_path = task_dir / "task_summary.json"
-                try:
-                    with open(summary_path, "r") as f:
-                        summary = json.load(f)
+        self.table.clear()  # Clear table before adding
+        for task_dir in self.task_dirs:  # Use self.task_dirs
+            summary_path = task_dir / "task_summary.json"
+            try:
+                with open(summary_path, "r") as f:
+                    summary = json.load(f)
 
-                    num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
-                    train_passed = (
-                        Text("✔", style="green", justify="center")
-                        if summary.get("train_passed")
-                        else Text("✘", style="red", justify="center")
-                    )
-                    test_passed = (
-                        Text("✔", style="green", justify="center")
-                        if summary.get("test_passed")
-                        else Text("✘", style="red", justify="center")
-                    )
-                    self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
+                num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
+                train_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("train_passed")
+                    else Text("✘", style="red", justify="center")
+                )
+                test_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("test_passed")
+                    else Text("✘", style="red", justify="center")
+                )
+                self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
 
-                except FileNotFoundError:
-                    self.table.add_row(task_dir.name, "Error: No summary", "-", "-")
-                except json.JSONDecodeError:
-                    self.table.add_row(task_dir.name, "Error: Invalid JSON", "-", "-")
-        if self.app.task_dirs:
-            self.select_task_by_index(self.app.task_index)
+            except FileNotFoundError:
+                self.table.add_row(task_dir.name, "Error: No summary", "-", "-")
+            except json.JSONDecodeError:
+                self.table.add_row(task_dir.name, "Error: Invalid JSON", "-", "-")
+        if self.task_dirs:
+            self.select_task_by_index(self.task_index)
 
         self.update_summary()
 
     def update_summary(self):
-        """Updates the summary panel."""
         summary = self.query_one("#summary", Static)
-        num_tasks = sum(1 for _ in self.session_path.iterdir() if _.is_dir())
+        num_tasks = len(self.task_dirs)  # Use len(self.task_dirs)
         summary.update(f"count: {num_tasks}")
 
     def select_task_by_index(self, index: int) -> None:
-        """Selects a task by its index in the sorted list."""
-        if self.app.task_dirs:
+        if self.task_dirs:
+            self.task_index = index
             self.table.move_cursor(row=index)
 
+    def previous_sibling(self):
+        if self.task_dirs:
+            self.select_task_by_index((self.task_index - 1) % len(self.task_dirs))
+
+    def next_sibling(self):
+        if self.task_dirs:
+            self.select_task_by_index((self.task_index + 1) % len(self.task_dirs))
 
     def action_move_up(self):
         row = self.table.cursor_row - 1
         self.table.move_cursor(row=row)
-        self.app.task_index = self.table.cursor_row
+        self.task_index = self.table.cursor_row  # Update index
 
     def action_move_down(self):
         row = self.table.cursor_row + 1
         self.table.move_cursor(row=row)
-        self.app.task_index = self.table.cursor_row
+        self.task_index = self.table.cursor_row  # Update index
 
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
         task_name = row[0]
         task_path = self.session_path / task_name
-        self.app.push_screen(TaskScreen(self.session_path, task_path))  # Pass Paths
+
+        # Get step directories for the selected task
+        step_dirs = sorted([d for d in task_path.iterdir() if d.is_dir()])
+        self.app.push_screen(TaskScreen(self.session_path, task_path, step_dirs))
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
-        row = self.table.get_row(event.row_key)
-        task_name = row[0]
-        task_path = self.session_path / task_name
-        self.app.push_screen(TaskScreen(self.session_path, task_path))  # Pass Paths
+        # This method is kept for compatibility, but the core logic is in action_select_row
+        self.action_select_row()
