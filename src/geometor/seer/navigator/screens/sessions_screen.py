@@ -31,7 +31,7 @@ class SessionsScreen(Screen):
         Binding("l", "select_row", "Select", show=True),
     ]
 
-    def __init__(self, sessions_root: Path) -> None: # Accept Path
+    def __init__(self, sessions_root: Path) -> None:  # Accept Path
         super().__init__()
         self.sessions_root = sessions_root  # Store Path
 
@@ -62,14 +62,22 @@ class SessionsScreen(Screen):
                     with open(summary_path, 'r') as f:
                         summary = json.load(f)
                     num_tasks = Text(str(summary.get("num_tasks", 0)), style="", justify="right")
-                    train_passed = Text(str(summary.get("train_passed", 0)), style="", justify="right")
-                    test_passed = Text(str(summary.get("test_passed", 0)), style="", justify="right")
+                    train_passed = (
+                        Text("✔", style="green")
+                        if summary.get("train_passed")
+                        else Text("✘", style="red")
+                    )
+                    test_passed = (
+                        Text("✔", style="green")
+                        if summary.get("test_passed")
+                        else Text("✘", style="red")
+                    )
+
                     self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
                 except FileNotFoundError:
                     self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
                 except json.JSONDecodeError:
                     self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
-
 
     def update_summary(self):
         summary = self.query_one("#summary", Static)
@@ -89,10 +97,10 @@ class SessionsScreen(Screen):
         row = self.table.get_row_at(row_id)
         session_name = row[0]
         session_path = self.sessions_root / session_name
-        self.app.push_screen(SessionScreen(session_path)) # Pass Path
+        self.app.push_screen(SessionScreen(session_path))  # Pass Path
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
         session_name = row[0]
         session_path = self.sessions_root / session_name
-        self.app.push_screen(SessionScreen(session_path)) # Pass Path
+        self.app.push_screen(SessionScreen(session_path))  # Pass Path

@@ -32,7 +32,7 @@ class SessionScreen(Screen):
         Binding("h", "app.pop_screen", "back", show=False),
     ]
 
-    def __init__(self, session_path: Path) -> None: # Accept Path
+    def __init__(self, session_path: Path) -> None:  # Accept Path
         super().__init__()
         self.session_path = session_path  # Store Path
 
@@ -60,8 +60,16 @@ class SessionScreen(Screen):
                         summary = json.load(f)
 
                     num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
-                    train_passed = Text(str(summary.get("train_passed", False)), justify="right")
-                    test_passed = Text(str(summary.get("test_passed", False)), justify="right")
+                    train_passed = (
+                        Text("✔", style="green")
+                        if summary.get("train_passed")
+                        else Text("✘", style="red")
+                    )
+                    test_passed = (
+                        Text("✔", style="green")
+                        if summary.get("test_passed")
+                        else Text("✘", style="red")
+                    )
                     self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
 
                 except FileNotFoundError:
@@ -90,7 +98,7 @@ class SessionScreen(Screen):
         row = self.table.get_row_at(row_id)
         task_name = row[0]
         task_path = self.session_path / task_name
-        self.app.push_screen(TaskScreen(self.session_path, task_path)) # Pass Paths
+        self.app.push_screen(TaskScreen(self.session_path, task_path))  # Pass Paths
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
