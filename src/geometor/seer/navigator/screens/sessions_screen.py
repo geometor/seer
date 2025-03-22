@@ -29,9 +29,9 @@ class SessionsScreen(Screen):
         Binding("l", "select_row", "Select", show=True),
     ]
 
-    def __init__(self) -> None:
+    def __init__(self, sessions_root: Path) -> None: # Accept Path
         super().__init__()
-        self.sessions = self.app.sessions
+        self.sessions_root = sessions_root  # Store Path
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -48,17 +48,30 @@ class SessionsScreen(Screen):
 
     def on_mount(self) -> None:
         self.title = "Session Navigator"
-        for session_key, session in self.sessions.items():
-            num_tasks = Text(str(len(session)), style="", justify="right")
-            self.table.add_row(session_key, num_tasks)
-
+        self.load_sessions()
         self.table.focus()
-
         self.update_summary()
+
+    def load_sessions(self):
+        for session_dir in sorted(self.sessions_root.iterdir()):
+            if session_dir.is_dir():
+                summary_path = session_dir / "session_summary.json"
+                try:
+                    with open(summary_path, 'r') as f:
+                        summary = json.load(f)
+                    num_tasks = Text(str(summary.get("num_tasks", 0)), style="", justify="right")
+                    train_passed = Text(str(summary.get("train_passed", 0)), style="", justify="right")
+                    test_passed = Text(str(summary.get("test_passed", 0)), style="", justify="right")
+                    self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
+                except FileNotFoundError:
+                    self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
+                except json.JSONDecodeError:
+                    self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
+
 
     def update_summary(self):
         summary = self.query_one("#summary", Static)
-        num_sessions = len(self.sessions)  # Use the length of the sessions list
+        num_sessions = sum(1 for _ in self.sessions_root.iterdir() if _.is_dir())
         summary.update(f"count: {num_sessions}")
 
     def action_move_up(self):
@@ -72,10 +85,12 @@ class SessionsScreen(Screen):
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
-        session_key = row[0]
-        self.app.push_screen(SessionScreen(session_key))
+        session_name = row[0]
+        session_path = self.sessions_root / session_name
+        self.app.push_screen(SessionScreen(session_path)) # Pass Path
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
-        session_key = row[0]
-        self.app.push_screen(SessionScreen(session_key))
+        session_name = row[0]
+        session_path = self.sessions_root / session_name
+        self.app.push_screen(SessionScreen(session_path)) # Pass Path

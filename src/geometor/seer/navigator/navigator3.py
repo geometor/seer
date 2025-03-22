@@ -22,35 +22,7 @@ class SessionNavigator(App):
         yield Static("Loading...")
 
     def on_mount(self) -> None:
-        self.sessions = self._load_sessions()
-        self.push_screen(SessionsScreen())
-
-    def _load_sessions(self) -> dict:
-        sessions = {}
-        session_dirs = sorted(self.sessions_root.iterdir(), key=lambda x: x.name)
-        for session_dir in session_dirs:
-            if session_dir.is_dir():
-                summary_path = session_dir / "session_summary.json"
-                # TODO handle errors
-                with open(summary_path, 'r') as f:
-                    summary = json.load(f)
-
-                tasks = {}
-                task_dirs = sorted(session_dir.iterdir(), key=lambda x: x.name)
-                for task_dir in task_dirs:
-                    if task_dir.is_dir():
-                        steps = {}
-                        step_dirs = sorted(task_dir.iterdir(), key=lambda x: x.name)
-                        for step_dir in step_dirs:
-                            step = {}
-                            if step_dir.is_dir():
-                                for file in step_dir.iterdir():
-                                    step[file] = ""
-
-                            steps[step_dir.name] = step
-                        tasks[task_dir.name] = steps  
-                sessions[session_dir.name] = tasks
-        return sessions
+        self.push_screen(SessionsScreen(self.sessions_root)) # Pass sessions_root
 
     def action_quit(self) -> None:
         """Quits the application"""

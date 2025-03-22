@@ -12,10 +12,11 @@ from textual.containers import (
     Vertical,
     Grid,
     ScrollableContainer,
-)  
+)
 from textual.binding import Binding
+import json
 
-from geometor.seer.navigator.screens.task_screen import TaskScreen  
+from geometor.seer.navigator.screens.task_screen import TaskScreen
 
 
 class SessionScreen(Screen):
@@ -31,10 +32,9 @@ class SessionScreen(Screen):
         Binding("h", "app.pop_screen", "back", show=False),
     ]
 
-    def __init__(self, session_key: str) -> None:
+    def __init__(self, session_path: Path) -> None: # Accept Path
         super().__init__()
-        self.session_key = session_key
-        self.session = self.app.sessions[session_key]
+        self.session_path = session_path  # Store Path
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -46,30 +46,35 @@ class SessionScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.title = self.session_key
+        self.title = self.session_path.name
         self.table.cursor_type = "row"
         self.table.focus()
         self.update_tasks_list()
 
     def update_tasks_list(self):
-        if not self.session:
-            print(f"Error: Session directory not found: {self.session_path}")
-            self.update_summary()  # Update summary with 0 tasks
-            return
+        for task_dir in sorted(self.session_path.iterdir()):
+            if task_dir.is_dir():
+                summary_path = task_dir / "task_summary.json"
+                try:
+                    with open(summary_path, "r") as f:
+                        summary = json.load(f)
 
-        for task_key, task in self.session.items():
-            #TODO: determine if there is match in task
-            num_steps = Text(
-                str(len(task)), justify="right"
-            )
-            self.table.add_row(task_key, 0, num_steps)
+                    num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
+                    train_passed = Text(str(summary.get("train_passed", False)), justify="right")
+                    test_passed = Text(str(summary.get("test_passed", False)), justify="right")
+                    self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
+
+                except FileNotFoundError:
+                    self.table.add_row(task_dir.name, "Error: No summary", "-", "-")
+                except json.JSONDecodeError:
+                    self.table.add_row(task_dir.name, "Error: Invalid JSON", "-", "-")
 
         self.update_summary()
 
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#summary", Static)
-        num_tasks = len(self.session)
+        num_tasks = sum(1 for _ in self.session_path.iterdir() if _.is_dir())
         summary.update(f"count: {num_tasks}")
 
     def action_move_up(self):
@@ -83,11 +88,12 @@ class SessionScreen(Screen):
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
-        task_key = row[0]
-        self.app.push_screen(TaskScreen(self.session_key, task_key))
+        task_name = row[0]
+        task_path = self.session_path / task_name
+        self.app.push_screen(TaskScreen(self.session_path, task_path)) # Pass Paths
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
-        task_key = row[0]
-        self.app.push_screen(TaskScreen(self.session_key, task_key))
-
+        task_name = row[0]
+        task_path = self.session_path / task_name
+        self.app.push_screen(TaskScreen(self.session_path, task_path))  # Pass Paths

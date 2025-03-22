@@ -12,6 +12,7 @@ from textual.containers import (
 from textual.binding import Binding
 
 from pathlib import Path
+import json
 
 
 class TaskScreen(Screen):
@@ -27,11 +28,10 @@ class TaskScreen(Screen):
         Binding("h", "app.pop_screen", "back", show=False),
     ]
 
-    def __init__(self, session_key: str, task_key: str) -> None:
+    def __init__(self, session_path: Path, task_path: Path) -> None: # Accept Paths
         super().__init__()
-        self.session_key = session_key
-        self.task_key = task_key
-        self.current_task = self.app.sessions[session_key][task_key]
+        self.session_path = session_path  # Store Paths
+        self.task_path = task_path
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -43,22 +43,23 @@ class TaskScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.title = f"{self.session_key } • {self.task_key}"
-        for step_key, step in self.current_task.items():
-            #  total_tokens = Text(
-                #  str(step.usage_metadata["total_token_count"]), justify="right"
-            #  )
-            self.table.add_row(step_key, len(step))
-
+        self.title = f"{self.session_path.name} • {self.task_path.name}"
+        self.load_steps()
         self.table.cursor_type = "row"
         self.table.focus()
-
         self.update_summary()
+
+    def load_steps(self):
+        for step_dir in sorted(self.task_path.iterdir()):
+            if step_dir.is_dir():
+                num_files = sum(1 for _ in step_dir.iterdir())
+                # TODO: check for matches
+                self.table.add_row(step_dir.name, num_files, "-")
 
     def update_summary(self):
         """Updates the summary panel."""
         summary = self.query_one("#summary")
-        num_steps = len(self.current_task)
+        num_steps = sum(1 for _ in self.task_path.iterdir() if _.is_dir())
         summary.update(f"steps: {num_steps}")
 
     def action_move_up(self):
@@ -74,7 +75,7 @@ class TaskScreen(Screen):
         row = self.table.get_row_at(row_id)
         key = row[0]
         # TODO: implement StepScreen
-        #  self.app.push_screen(StepScreen(key))
+        # self.app.push_screen(StepScreen(key))
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         row = self.table.get_row(event.row_key)
