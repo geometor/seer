@@ -6,6 +6,8 @@ import json
 import re
 
 from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+from geometor.seer.navigator.screens.session_screen import SessionScreen  # Import SessionScreen
+from geometor.seer.navigator.screens.task_screen import TaskScreen  # Import TaskScreen
 
 
 class SessionNavigator(App):
