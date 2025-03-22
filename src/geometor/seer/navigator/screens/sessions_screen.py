@@ -37,7 +37,8 @@ class SessionsScreen(Screen):
         self.table = DataTable()
         self.table.add_column("SESSION")
         self.table.add_column("TASKS")
-        self.table.add_column("MATCHES")
+        self.table.add_column("TRAIN")
+        self.table.add_column("TEST")
         self.table.cursor_type = "row"
         yield Header()
         with Vertical():
@@ -48,8 +49,8 @@ class SessionsScreen(Screen):
     def on_mount(self) -> None:
         self.title = "Session Navigator"
         for session_key, session in self.sessions.items():
-            num_sessions = Text(str(len(session)), style="", justify="right")
-            self.table.add_row(session_key, num_sessions)
+            num_tasks = Text(str(len(session)), style="", justify="right")
+            self.table.add_row(session_key, num_tasks)
 
         self.table.focus()
 

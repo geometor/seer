@@ -88,10 +88,13 @@ class Seer:
         history.extend(prompt)
         history.extend(task_step.response_parts)
 
-        task_step.execute_trials(task)
+        task_step.run_trials()
         task_step.summarize()
 
         if task_step.any_trials_successful("train"):
+            print("            train passed")
+            if task_step.any_trials_successful("test"):
+                print("            test passed")
             return
 
         # STEP: coder prompt *********************************
@@ -110,10 +113,13 @@ class Seer:
         history.extend(prompt)
         history.extend(task_step.response_parts)
 
-        task_step.execute_trials(task)
+        task_step.run_trials()
         task_step.summarize()
 
         if task_step.any_trials_successful("train"):
+            print("            train passed")
+            if task_step.any_trials_successful("test"):
+                print("            test passed")
             return
 
         current_iteration = 0
@@ -127,7 +133,7 @@ class Seer:
 
             code = code_trial.code
 
-            self.refine(
+            train_solved = self.refine(
                 session_task,
                 task,
                 code,
@@ -135,7 +141,10 @@ class Seer:
                 current_iteration,
             )
 
-            if task_step.any_trials_successful("train"):
+            if train_solved:
+                print("            train passed")
+                if task_step.any_trials_successful("test"):
+                    print("            test passed")
                 return
 
             current_iteration += 1
@@ -182,24 +191,11 @@ class Seer:
         Refines the generated code based on test results, using the dreamer/coder pattern.
         """
 
-        # TODO: compare results from previous tests
-        #  previous_step = session_task.steps[-1]
-
         history = []
 
         # --- Dreamer ---
         dreamer_prompt = []
         instructions = [self.instructions["refine_dreamer"]]
-
-        # Gather reports from ALL code files in the previous step
-        #  all_reports = ""
-        #  for file_name, code in previous_step.codes.get("py", {}).items():
-            #  trial_result = TrialResult(
-                #  file_name,
-                #  previous_step.trials.get(file_name, {}).get("train"),
-                #  previous_step.trials.get(file_name, {}).get("test"),
-            #  )
-            #  all_reports += trial_result.generate_report(task)
 
         dreamer_prompt.append("\nPrevious Code:\n")
         dreamer_prompt.append(f"```python\n{code}\n```\n")
@@ -214,11 +210,14 @@ class Seer:
             instructions,
             tools="code_execution"  # Consider if tools are needed
         )
-        task_step.execute_trials(task)
+        task_step.run_trials()
         task_step.summarize()
 
         if task_step.any_trials_successful("train"):
-            return
+            print("            train passed")
+            if task_step.any_trials_successful("test"):
+                print("            test passed")
+            return True
 
         history.extend(dreamer_prompt)
         history.extend(task_step.response_parts)
@@ -242,7 +241,10 @@ class Seer:
         history.extend(task_step.response_parts)
 
         # Run trials and check for success
-        task_step.execute_trials(task)
+        task_step.run_trials()
         task_step.summarize()
 
-        return task_step.step_code_trials # return StepCodeTrials
+        if task_step.any_trials_successful("train"):
+            return True
+
+        return False

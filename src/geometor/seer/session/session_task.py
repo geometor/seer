@@ -14,6 +14,7 @@ class SessionTask(Level):
         self.session = session  # parent
         self.task = task
         self.steps = []
+        self.trials = {}
 
         try:
             task_image = task.to_image()

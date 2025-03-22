@@ -34,7 +34,7 @@ class TaskStep(Level):
         self.response_time = None
         self.codes = {}
         self.function_calls = {}
-        self.step_code_trials = StepCodeTrials()  # Use StepCodeTrials
+        self.step_code_trials = StepCodeTrials(self)  # Use StepCodeTrials
 
         self.history = history
         self.log_markdown("history", history)
@@ -196,7 +196,7 @@ class TaskStep(Level):
         matches = re.findall(r"```(\w+)\n(.*?)\n```", text, re.DOTALL)
         for file_type, content in matches:
             file_type = file_type.lower() if file_type else "txt"
-            if file_type == "py":
+            if file_type == "python":
                 file_type = "py"
 
             index = get_code_file_count()
@@ -250,9 +250,9 @@ class TaskStep(Level):
         #  except Exception as e:
             #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
 
-    def execute_trials(self, task):
+    def run_trials(self):
         """Executes trials for all available code."""
-        self.step_code_trials.execute_trials(self, task)  # Delegate to StepCodeTrials
+        self.step_code_trials.run_trials()  
 
     # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:

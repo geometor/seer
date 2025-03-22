@@ -2,9 +2,12 @@ import ast
 import contextlib
 import io
 import numpy as np
+import multiprocessing
 
 from geometor.seer.tasks.tasks import Task
 from geometor.seer.tasks.grid import Grid
+
+from geometor.seer.trials.task_pair_trial import TaskPairTrial
 
 
 class CodeTrial:
@@ -19,21 +22,18 @@ class CodeTrial:
         code,
         task: Task,
     ):
-        # self.task_step = task_step
         self.code_filename = code_filename
         self.code = code
         self.task = task
-        self.train_results = None  # Initialize
-        self.test_results = None  # Initialize
         self.task_step = task_step  # store
 
-    def execute_and_save_results(self):
-        """Executes the trial and saves results (image and JSON)."""
-        # self.train_results = self.run_trial(self.code, self.task.train)
-        # self.test_results = []
-
-        # if self.train_passed:
-        #     self.test_results = self.run_trial(self.code, self.task.test)
+        # Run and store results directly in CodeTrial
+        self.train_results = self.test_code_with_timeout(
+            code, task.train
+        )
+        self.test_results = None  # Initialize
+        if self.train_passed:
+            self.test_results = self.test_code_with_timeout(code, task.test)
 
         show_test = bool(self.test_results)
         results_image = self.task.to_image(
@@ -50,14 +50,6 @@ class CodeTrial:
             "test": self.test_results,
         }
         self.task_step._write_to_json(json_file, results_json)
-
-    # def run_trial(self, code, task_pairs) -> dict:
-    #     code_results = verifier.test_code_with_timeout(
-    #         code,
-    #         task_pairs,
-    #     )
-
-    #     return code_results  # return the results
 
     @property
     def train_passed(self) -> bool:
@@ -143,3 +135,86 @@ class CodeTrial:
             return None  # Explicitly return None if no transform function
         except SyntaxError as e:
             raise  # Re-raise SyntaxError to be handled by caller
+
+
+
+    def test_code_with_timeout(self, code, task_pairs, timeout=10) -> dict:
+        """Executes and validates the generated code with a timeout."""
+
+        def worker(code, task_pairs, result_queue):
+            """Worker function to execute the code."""
+            try:
+                test_results = self.test_code(code, task_pairs)  # Use self.test_code
+                result_queue.put(test_results)
+            except Exception as e:
+                result_queue.put({"error": str(e)})
+
+        result_queue = multiprocessing.Queue()
+        process = multiprocessing.Process(
+            target=worker, args=(code, task_pairs, result_queue)
+        )
+        process.start()
+
+        process.join(timeout)
+
+        if process.is_alive():
+            process.terminate()
+            process.join()  # Ensure termination
+            return [
+                {
+                    "error": f"Timeout: Code execution exceeded {timeout} seconds"
+                }
+            ]
+
+        else:
+            return result_queue.get()
+
+    def test_code(self, code, task_pairs) -> dict:
+        """Executes and validates the generated code, returning results as a list of dicts."""
+        results = {}
+        trials = []  # List to store TaskPairTrial objects
+
+        try:
+            transform_function = CodeTrial.get_transform_function(
+                code
+            )  # Use CodeTrial's method
+            if transform_function is None:
+                results["error"] = "transform function not found"
+                return results
+
+        except SyntaxError as e:
+            # TODO: log error
+            results["error"] = "syntax error:\n" + str(e)
+            return results
+
+        except Exception as e:
+            # TODO: log error
+            results["error"] = "error:\n" + str(e)
+            return results
+
+        # Capture stdout - still needed for print statements in code
+        output_capture = io.StringIO()
+        with contextlib.redirect_stdout(output_capture):
+            for i, pair in enumerate(task_pairs):
+                input_grid = pair.input.grid
+                expected_output = pair.output.grid
+
+                try:
+                    transformed_output = transform_function(input_grid)
+                    if transformed_output is not None:
+                        transformed_output = np.array(transformed_output)
+                    trial = TaskPairTrial(
+                        pair, transformed_output=transformed_output
+                    )
+
+                except Exception as e:
+                    trial = TaskPairTrial(
+                        pair, error=str(e), function_output=output_capture.getvalue()
+                    )
+
+                trials.append(trial)
+
+        results["trials"] = [
+            t.to_dict() for t in trials
+        ]  # Convert to dicts for output
+        return results

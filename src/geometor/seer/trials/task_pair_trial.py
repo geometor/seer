@@ -55,7 +55,7 @@ class TaskPairTrial:
         return transformed_colors.issubset(expected_colors)
 
     @property
-    def correct_pixel_counts(self) -> bool:
+    def color_count_correct(self) -> bool:
         if self.transformed_output is None:
             return False
         transformed_counts = dict(
@@ -81,13 +81,13 @@ class TaskPairTrial:
             / self.task_pair.output.grid.size
         )
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """Converts the trial results to a dictionary."""
         data = {
-            "id": self.task_pair.index + 1,
+            #  "id": self.task_pair.index + 1,
+            "match": self.match,
             "input": self.input_string,
             "expected_output": self.expected_output_string,
-            "match": self.match,
         }
         if self.transformed_output_string is not None:
             data["transformed_output"] = self.transformed_output_string
@@ -99,8 +99,8 @@ class TaskPairTrial:
             data["size_correct"] = self.size_correct
         if self.color_palette_correct is not None:
             data["color_palette_correct"] = self.color_palette_correct
-        if self.correct_pixel_counts is not None:
-            data["correct_pixel_counts"] = self.correct_pixel_counts
+        if self.color_count_correct is not None:
+            data["color_count_correct"] = self.color_count_correct
         if self.pixels_off is not None:
             data["pixels_off"] = self.pixels_off
         if self.percent_correct is not None:

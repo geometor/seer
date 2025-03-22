@@ -9,8 +9,9 @@ from pathlib import Path
 from collections import Counter
 from PIL import Image, ImageDraw
 
-from geometor.seer.tasks.grid import Grid
-#  from geometor.seer import verifier
+from geometor.seer.tasks.grid import Grid, string_to_grid
+#  from geometor.seer.trials import verifier
+
 
 
 class TaskPair(dict):
@@ -157,7 +158,7 @@ class Task:
                         try:
                             result_grid_str = result["transformed_output"]
                             # TODO: this function should be on the grid object
-                            result_grid = verifier.string_to_grid(result_grid_str)
+                            result_grid = string_to_grid(result_grid_str)
                             result_row.append(result_grid.to_image(add_text=False))
                         except Exception as e:
                             print(f"Error processing train result image: {e}")
