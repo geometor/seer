@@ -81,6 +81,29 @@ class TaskPairTrial:
             / self.task_pair.output.grid.size
         )
 
+    @property
+    def score(self) -> float | None:
+        """Calculates a score representing the difference between transformed and expected output."""
+        if self.transformed_output is None or self.error is not None:
+            return None  # No score if no transformation or error
+
+        if not self.size_correct:
+            return 10000  # Large penalty for incorrect size.  Could be grid.size
+
+        if not self.color_palette_correct:
+            return 5000  # Large penalty for incorrect color palette
+
+        if self.pixels_off is None:  # Should not happen, but handle for safety
+            return None
+
+        # Base score is the number of pixels off.
+        score = self.pixels_off
+
+        # if not self.color_count_correct:
+        #    score *= 2  # Double the score if color counts are incorrect
+
+        return float(score)
+
     def to_dict(self) -> dict:
         """Converts the trial results to a dictionary."""
         data = {
@@ -88,6 +111,7 @@ class TaskPairTrial:
             "match": self.match,
             "input": self.input_string,
             "expected_output": self.expected_output_string,
+            "score": self.score, # NEW
         }
         if self.transformed_output_string is not None:
             data["transformed_output"] = self.transformed_output_string
