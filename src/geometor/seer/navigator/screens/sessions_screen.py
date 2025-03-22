@@ -16,6 +16,8 @@ from textual.binding import Binding
 
 from geometor.seer.navigator.screens.session_screen import SessionScreen
 
+import json  # Import the json module
+
 
 class SessionsScreen(Screen):
     CSS = """
