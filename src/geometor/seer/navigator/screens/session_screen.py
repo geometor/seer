@@ -61,14 +61,14 @@ class SessionScreen(Screen):
 
                     num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
                     train_passed = (
-                        Text("✔", style="green")
+                        Text("✔", style="green", justify="center")
                         if summary.get("train_passed")
-                        else Text("✘", style="red")
+                        else Text("✘", style="red", justify="center")
                     )
                     test_passed = (
-                        Text("✔", style="green")
+                        Text("✔", style="green", justify="center")
                         if summary.get("test_passed")
-                        else Text("✘", style="red")
+                        else Text("✘", style="red", justify="center")
                     )
                     self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
 
