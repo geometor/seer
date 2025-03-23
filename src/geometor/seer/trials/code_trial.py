@@ -56,7 +56,7 @@ class CodeTrial:
             trial["score"]
             for trial in self.test_results.get("trials", [])
             if trial["score"] is not None
-        ]
+        ] if self.test_results else []  # Handle None test_results
 
         total_score = sum(train_scores) + sum(test_scores)
         num_scores = len(train_scores) + len(test_scores)
