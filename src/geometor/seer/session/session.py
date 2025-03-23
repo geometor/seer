@@ -29,17 +29,19 @@ class Session(Level):
 
         # Aggregate trial counts from each SessionTask
         task_trials = {}
+        total_steps = 0  # Initialize total steps
         for task_id, session_task in self.tasks.items():
-            # TODO: the summarize functions don't return anything
-            #  task_summary = session_task.summarize() # Get the latest summary
-            #  trials = task_summary.get("trials", {})  # Get trials safely with a default
-            #  task_trials[task_id] = {
-                #  "train": trials.get("train", {}).get("total", 0),
-                #  "test": trials.get("test", {}).get("total", 0),
-            #  }
-            pass
+            task_summary = session_task.summarize() # Get the latest summary
+            total_steps += task_summary.get("steps", 0) # Accumulate steps
+            trials = task_summary.get("trials", {})  # Get trials safely with a default
+            task_trials[task_id] = {
+                "train": trials.get("train", {}).get("total", 0),
+                "test": trials.get("test", {}).get("total", 0),
+            }
+
 
         summary["task_trials"] = task_trials
+        summary["total_steps"] = total_steps  # Add total_steps to the summary
 
         self._write_to_json("index.json", summary)
 

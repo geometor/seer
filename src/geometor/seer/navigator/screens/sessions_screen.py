@@ -43,6 +43,7 @@ class SessionsScreen(Screen):
         self.table = DataTable()
         self.table.add_column("SESSION")
         self.table.add_column("TASKS")
+        self.table.add_column("STEPS")  # Add the STEPS column
         self.table.add_column("TRAIN")
         self.table.add_column("TEST")
         self.table.cursor_type = "row"
@@ -70,6 +71,7 @@ class SessionsScreen(Screen):
                 with open(summary_path, 'r') as f:
                     summary = json.load(f)
                 num_tasks = Text(str(summary.get("count", 0)), style="", justify="right")
+                num_steps = Text(str(summary.get("total_steps", 0)), style="", justify="right") # Get total_steps
                 train_passed = (
                     Text(str(summary.get("train_passed")), style="bold green", justify="center")
                     if summary.get("train_passed")
@@ -81,11 +83,11 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="center")
                 )
 
-                self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
+                self.table.add_row(session_dir.name, num_tasks, num_steps, train_passed, test_passed) # Add num_steps
             except FileNotFoundError:
-                self.table.add_row(session_dir.name, "-", "-", "-")  # Use "-" for missing summary
+                self.table.add_row(session_dir.name, "-", "-", "-", "-")  # Use "-" for missing summary
             except json.JSONDecodeError:
-                self.table.add_row(session_dir.name, "-", "-", "-")  # Use "-" for invalid JSON
+                self.table.add_row(session_dir.name, "-", "-", "-", "-")  # Use "-" for invalid JSON
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 
@@ -94,6 +96,7 @@ class SessionsScreen(Screen):
         num_sessions = 0
         train_passed_count = 0
         test_passed_count = 0
+        total_steps = 0  # Add total_steps for summary
 
         for session_dir in self.sessions_root.iterdir():  # Iterate over sessions_root
             if session_dir.is_dir():
@@ -106,11 +109,12 @@ class SessionsScreen(Screen):
                         train_passed_count += 1
                     if session_summary.get("test_passed"):
                         test_passed_count += 1
+                    total_steps += session_summary.get("total_steps", 0)  # Accumulate steps
                 except (FileNotFoundError, json.JSONDecodeError):
                     pass
 
         summary.update(
-            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
+            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, steps: {total_steps}" # Include in summary
         )
 
     def select_session_by_index(self, index: int) -> None:
