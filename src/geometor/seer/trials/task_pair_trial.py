@@ -7,6 +7,7 @@ from geometor.seer.tasks.grid import Grid
 if TYPE_CHECKING:
     from geometor.seer.tasks.tasks import TaskPair
 
+
 class TaskPairTrial:
     def __init__(
         self,
@@ -83,7 +84,8 @@ class TaskPairTrial:
 
     @property
     def score(self) -> float | None:
-        """Calculates a score representing the difference between transformed and expected output."""
+        """Calculates a score representing the difference between
+        transformed and expected output."""
         if self.match:
             return 0
 
@@ -96,13 +98,13 @@ class TaskPairTrial:
         score = 100 - self.percent_correct
 
         if not self.color_count_correct:
-            score *= 2  
+            score *= 2
 
         if not self.color_palette_correct:
-            score *= 2  
+            score *= 2
 
         if not self.size_correct:
-            score *= 2  
+            score *= 2
 
         return float(score)
 
@@ -111,7 +113,7 @@ class TaskPairTrial:
         data = {
             #  "id": self.task_pair.index + 1,
             "match": self.match,
-            "score": self.score, 
+            "score": self.score,
             "input": self.input_string,
             "expected_output": self.expected_output_string,
         }
