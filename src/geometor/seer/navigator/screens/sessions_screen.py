@@ -69,16 +69,16 @@ class SessionsScreen(Screen):
             try:
                 with open(summary_path, 'r') as f:
                     summary = json.load(f)
-                num_tasks = Text(str(summary.get("num_tasks", 0)), style="", justify="right")
+                num_tasks = Text(str(summary.get("count", 0)), style="", justify="right")
                 train_passed = (
-                    Text("✔", style="green", justify="center")
+                    Text(str(summary.get("train_passed")), style="bold green", justify="center")
                     if summary.get("train_passed")
-                    else Text("✘", style="red", justify="center")
+                    else Text("0", style="red", justify="center")
                 )
                 test_passed = (
-                    Text("✔", style="green", justify="center")
+                    Text(str(summary.get("test_passed")), style="bold green", justify="center")
                     if summary.get("test_passed")
-                    else Text("✘", style="red", justify="center")
+                    else Text("0", style="red", justify="center")
                 )
 
                 self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)

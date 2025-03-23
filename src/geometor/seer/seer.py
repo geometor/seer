@@ -62,7 +62,7 @@ class Seer:
         investigate all training pairs
         """
 
-        # STEP: dream review all train *****************************
+        # STEP: dreamer *****************************
         title = f"all training • investigate_dreamer"
         history = []
         prompt = []
@@ -97,7 +97,7 @@ class Seer:
                 print("            test passed")
             return
 
-        # STEP: coder prompt *********************************
+        # STEP: coder *********************************
         title = f"all training • investigate_coder"
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
@@ -133,7 +133,7 @@ class Seer:
 
             code = code_trial.code
 
-            train_solved = self.refine(
+            task_step = self.refine(
                 session_task,
                 task,
                 code,
@@ -141,7 +141,7 @@ class Seer:
                 current_iteration,
             )
 
-            if train_solved:
+            if task_step.any_trials_successful("train"):
                 print("            train passed")
                 if task_step.any_trials_successful("test"):
                     print("            test passed")
@@ -193,20 +193,20 @@ class Seer:
 
         history = []
 
-        # --- Dreamer ---
-        dreamer_prompt = []
+        # STEP: refine dreamer *****************************
+        prompt = []
         instructions = [self.instructions["refine_dreamer"]]
 
-        dreamer_prompt.append("\nPrevious Code:\n")
-        dreamer_prompt.append(f"```python\n{code}\n```\n")
-        dreamer_prompt.append(code_trial.generate_report())
+        prompt.append("\nPrevious Code:\n")
+        prompt.append(f"```python\n{code}\n```\n")
+        prompt.append(code_trial.generate_report())
 
         task_step = self._generate(
             session_task,
             "dreamer",
             f"refine_dreamer • iteration {current_iteration}",
             history,
-            dreamer_prompt,
+            prompt,
             instructions,
             tools="code_execution"  # Consider if tools are needed
         )
@@ -217,14 +217,14 @@ class Seer:
             print("            train passed")
             if task_step.any_trials_successful("test"):
                 print("            test passed")
-            return True
+            return task_step
 
-        history.extend(dreamer_prompt)
+        history.extend(prompt)
         history.extend(task_step.response_parts)
 
 
-        # --- Coder ---
-        coder_prompt = [""]  # Coder prompt might be minimal
+        # STEP: refine coder *****************************
+        prompt = [""]  # Coder prompt might be minimal
         instructions = [self.instructions["refine_coder"]]
 
         task_step = self._generate(
@@ -232,19 +232,16 @@ class Seer:
             "coder",
             f"refine_coder • iteration {current_iteration}",
             history,
-            coder_prompt,
+            prompt,
             instructions,
             #  tools="code_execution"
         )
 
-        history.extend(coder_prompt)
-        history.extend(task_step.response_parts)
+        #  history.extend(prompt)
+        #  history.extend(task_step.response_parts)
 
         # Run trials and check for success
         task_step.run_trials()
         task_step.summarize()
 
-        if task_step.any_trials_successful("train"):
-            return True
-
-        return False
+        return task_step
