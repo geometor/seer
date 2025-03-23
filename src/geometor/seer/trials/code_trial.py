@@ -170,7 +170,7 @@ class CodeTrial:
 
         result_queue = multiprocessing.Queue()
         process = multiprocessing.Process(
-            target:worker, args=(code, task_pairs, result_queue)
+            target=worker, args=(code, task_pairs, result_queue)
         )
         process.start()
 
