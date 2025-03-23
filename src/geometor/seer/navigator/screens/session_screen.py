@@ -42,7 +42,7 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("TASKS", "STEPS", "TRAIN", "TEST")
+        self.table.add_columns("TASKS", "STEPS", "TRAIN", "TEST", "BEST SCORE")  # Added Best Score
         yield Header()
         with Vertical():
             yield self.table
@@ -63,7 +63,7 @@ class SessionScreen(Screen):
                 with open(summary_path, "r") as f:
                     summary = json.load(f)
 
-                num_steps = Text(str(summary.get("num_steps", 0)), justify="right")
+                num_steps = Text(str(summary.get("steps", 0)), justify="right")
                 train_passed = (
                     Text("✔", style="green", justify="center")
                     if summary.get("train_passed")
@@ -74,21 +74,51 @@ class SessionScreen(Screen):
                     if summary.get("test_passed")
                     else Text("✘", style="red", justify="center")
                 )
-                self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
+                best_score_text = (  # Handle potential None
+                    f"{summary.get('best_score'):.2f}"
+                    if summary.get("best_score") is not None
+                    else "-"
+                )
+                self.table.add_row(task_dir.name, num_steps, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:
-                self.table.add_row(task_dir.name, "-", "-", "-")  # Use "-"
+                self.table.add_row(task_dir.name, "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(task_dir.name, "-", "-", "-")  # Use "-"
+                self.table.add_row(task_dir.name, "-", "-", "-", "-")  # Use "-"
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
         self.update_summary()
 
     def update_summary(self):
-        summary = self.query_one("#summary", Static)
-        num_tasks = len(self.task_dirs)  # Use len(self.task_dirs)
-        summary.update(f"count: {num_tasks}")
+        summary_widget = self.query_one("#summary", Static)
+        num_tasks = len(self.task_dirs)
+        train_passed_count = 0
+        test_passed_count = 0
+        best_scores = []
+
+        for task_dir in self.task_dirs:
+            summary_path = task_dir / "index.json"
+            try:
+                with open(summary_path, "r") as f:
+                    task_summary = json.load(f)
+                if task_summary.get("train_passed"):
+                    train_passed_count += 1
+                if task_summary.get("test_passed"):
+                    test_passed_count += 1
+                score = task_summary.get("best_score")
+                if score is not None:
+                    best_scores.append(score)
+            except (FileNotFoundError, json.JSONDecodeError):
+                pass
+
+        best_score_summary = (
+            f"Best: {min(best_scores):.2f}" if best_scores else "Best: -"
+        )  # Handle empty list
+
+        summary_widget.update(
+            f"Tasks: {num_tasks}, Train ✔: {train_passed_count}, Test ✔: {test_passed_count}, {best_score_summary}"
+        )
 
     def select_task_by_index(self, index: int) -> None:
         if self.task_dirs:
