@@ -77,9 +77,9 @@ class SessionScreen(Screen):
                 self.table.add_row(task_dir.name, num_steps, train_passed, test_passed)
 
             except FileNotFoundError:
-                self.table.add_row(task_dir.name, "Error: No summary", "-", "-")
+                self.table.add_row(task_dir.name, "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(task_dir.name, "Error: Invalid JSON", "-", "-")
+                self.table.add_row(task_dir.name, "-", "-", "-")  # Use "-"
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 

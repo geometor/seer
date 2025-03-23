@@ -83,9 +83,9 @@ class SessionsScreen(Screen):
 
                 self.table.add_row(session_dir.name, num_tasks, train_passed, test_passed)
             except FileNotFoundError:
-                self.table.add_row(session_dir.name, "Error: No summary", "-", "-")
+                self.table.add_row(session_dir.name, "-", "-", "-")  # Use "-" for missing summary
             except json.JSONDecodeError:
-                self.table.add_row(session_dir.name, "Error: Invalid JSON", "-", "-")
+                self.table.add_row(session_dir.name, "-", "-", "-")  # Use "-" for invalid JSON
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 

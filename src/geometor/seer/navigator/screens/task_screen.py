@@ -39,7 +39,7 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("STEP", "FILES", "MATCHES")
+        self.table.add_columns("STEP", "FILES", "MATCHES", "TRAIN", "TEST")
         yield Header()
         with Vertical():
             yield self.table
@@ -56,16 +56,54 @@ class TaskScreen(Screen):
     def load_steps(self):
         self.table.clear()  # Clear before adding
         for step_dir in self.step_dirs:  # Use self.step_dirs
-            if step_dir.is_dir():
+            summary_path = step_dir / "index.json"
+            try:
+                with open(summary_path, "r") as f:
+                    summary = json.load(f)
                 num_files = sum(1 for _ in step_dir.iterdir())
-                self.table.add_row(step_dir.name, num_files, "-")
+                train_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("train_passed")
+                    else Text("✘", style="red", justify="center")
+                )
+                test_passed = (
+                    Text("✔", style="green", justify="center")
+                    if summary.get("test_passed")
+                    else Text("✘", style="red", justify="center")
+                )
+
+                matches = f"{summary.get('trials', {}).get('train', {}).get('passed', 0)}/{summary.get('trials', {}).get('train', {}).get('total', 0)}"
+
+                self.table.add_row(step_dir.name, num_files, matches, train_passed, test_passed)
+
+            except FileNotFoundError:
+                self.table.add_row(step_dir.name, "-", "-", "-", "-")  # Use "-"
+            except json.JSONDecodeError:
+                self.table.add_row(step_dir.name, "-", "-", "-", "-")  # Use "-"
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
     def update_summary(self):
         summary = self.query_one("#summary")
         num_steps = len(self.step_dirs)  # Use len(self.step_dirs)
-        summary.update(f"steps: {num_steps}")
+        train_passed_count = 0
+        test_passed_count = 0
+
+        for step_dir in self.step_dirs:
+            summary_path = step_dir / "index.json"
+            try:
+                with open(summary_path, "r") as f:
+                    step_summary = json.load(f)
+                if step_summary.get("train_passed"):
+                    train_passed_count += 1
+                if step_summary.get("test_passed"):
+                    test_passed_count += 1
+            except (FileNotFoundError, json.JSONDecodeError):
+                pass
+
+        summary.update(
+            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
+        )
 
     def select_step_by_index(self, index: int) -> None:
         if self.step_dirs:
