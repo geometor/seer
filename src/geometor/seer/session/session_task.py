@@ -14,7 +14,7 @@ class SessionTask(Level):
         self.session = session  # parent
         self.task = task
         self.steps = []
-        self.trials = {}
+        self.trials = {}  # Initialize trials here
 
         try:
             task_image = task.to_image()
@@ -36,53 +36,39 @@ class SessionTask(Level):
         all_train_results = []
         all_test_results = []
         for step in self.steps:
-            step_summary = step.summarize()  # Get step summary
-            if step_summary is None:  # Handle None
-                self.log_error(Exception("Step summarize returned None"), f"Step: {step.title}")
-                continue # Skip this step
-
-            train_trials = step_summary.get("trials", {}).get("train", {})
-            test_trials = step_summary.get("trials", {}).get("test", {})
-
-            # Extend with individual trial results from each step
-            if train_trials:
-                all_train_results.extend(
-                    [
-                        {"match": i < train_trials.get("passed", 0)}
-                        for i in range(train_trials.get("total", 0))
-                    ]
-                )
-            if test_trials:
-                all_test_results.extend(
-                    [
-                        {"match": i < test_trials.get("passed", 0)}
-                        for i in range(test_trials.get("total", 0))
-                    ]
-                )
+            # Access step_code_trials directly
+            for code_trial in step.step_code_trials.get_all_trials():
+                if code_trial.train_results:
+                    all_train_results.extend(code_trial.train_results.get("trials", []))
+                if code_trial.test_results:
+                    all_test_results.extend(code_trial.test_results.get("trials", []))
 
         # Calculate best_score across all steps
         best_score = None
         for step in self.steps:
-            step_best_score = step.step_code_trials.best_score
+            step_best_score = step.step_code_trials.best_score  # Access directly
             if step_best_score is not None:
                 if best_score is None or step_best_score < best_score:
                     best_score = step_best_score
 
+        # Update self.trials directly
+        self.trials = {
+            "train": self._summarize_trial_results(all_train_results)
+            if all_train_results
+            else {},
+            "test": self._summarize_trial_results(all_test_results)
+            if all_test_results
+            else {},
+        }
+
         summary.update(
             {
                 "steps": len(self.steps),
-                "trials": {  # Include aggregated trials
-                    "train": self._summarize_trial_results(all_train_results)
-                    if all_train_results
-                    else {},
-                    "test": self._summarize_trial_results(all_test_results)
-                    if all_test_results
-                    else {},
-                },
+                "trials": self.trials,  # Use self.trials
                 "matches": None,  # Filled in by TaskStep
                 "train_passed": self.train_passed,
                 "test_passed": self.test_passed,
-                "best_score": best_score,  # Add best_score
+                "best_score": best_score,
             }
         )
         self._write_to_json("index.json", summary)
@@ -114,4 +100,3 @@ class SessionTask(Level):
     @property
     def test_passed(self):
         return any(step.test_passed for step in self.steps)
-
