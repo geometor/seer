@@ -40,7 +40,7 @@ class SessionTask(Level):
                 "test_passed": self.test_passed,  # Add here
             }
         )
-        self._write_to_json("task_summary.json", summary)
+        self._write_to_json("index.json", summary)
 
     def add_step(self, title, history, prompt, instructions):
         from geometor.seer.session import TaskStep

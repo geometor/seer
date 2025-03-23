@@ -94,7 +94,7 @@ class TaskStep(Level):
         if all_test_results:
             summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
-        self._write_to_json("step_summary.json", summary)
+        self._write_to_json("index.json", summary)
 
     def _summarize_trial_results(self, results):
         """Helper function to summarize trial results."""

@@ -41,7 +41,7 @@ class Session(Level):
 
         summary["task_trials"] = task_trials
 
-        self._write_to_json("session_summary.json", summary)
+        self._write_to_json("index.json", summary)
 
     def add_task(self, task):
         from geometor.seer.session.session_task import SessionTask

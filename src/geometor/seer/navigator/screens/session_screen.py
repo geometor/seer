@@ -58,7 +58,7 @@ class SessionScreen(Screen):
     def update_tasks_list(self):
         self.table.clear()  # Clear table before adding
         for task_dir in self.task_dirs:  # Use self.task_dirs
-            summary_path = task_dir / "task_summary.json"
+            summary_path = task_dir / "index.json"
             try:
                 with open(summary_path, "r") as f:
                     summary = json.load(f)

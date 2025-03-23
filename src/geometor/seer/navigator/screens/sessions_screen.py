@@ -65,7 +65,7 @@ class SessionsScreen(Screen):
         self.session_index = 0
         self.table.clear() # Clear existing rows
         for session_dir in self.session_dirs:
-            summary_path = session_dir / "session_summary.json"
+            summary_path = session_dir / "index.json"
             try:
                 with open(summary_path, 'r') as f:
                     summary = json.load(f)
@@ -98,7 +98,7 @@ class SessionsScreen(Screen):
         for session_dir in self.sessions_root.iterdir():  # Iterate over sessions_root
             if session_dir.is_dir():
                 num_sessions += 1
-                summary_path = session_dir / "session_summary.json"
+                summary_path = session_dir / "index.json"
                 try:
                     with open(summary_path, "r") as f:
                         session_summary = json.load(f)
