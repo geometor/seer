@@ -32,6 +32,10 @@ class Session(Level):
         total_steps = 0  # Initialize total steps
         for task_id, session_task in self.tasks.items():
             task_summary = session_task.summarize() # Get the latest summary
+            if task_summary is None:  # Handle None
+                self.log_error(Exception("Task summarize returned None"), f"Task: {task_id}")
+                continue # Skip this task
+
             total_steps += task_summary.get("steps", 0) # Accumulate steps
             trials = task_summary.get("trials", {})  # Get trials safely with a default
             task_trials[task_id] = {
