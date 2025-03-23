@@ -39,7 +39,7 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("STEP", "FILES", "MATCHES", "TRAIN", "TEST")
+        self.table.add_columns("STEP", "FILES", "MATCHES", "TRAIN", "TEST", "BEST SCORE") # Add best score column
         yield Header()
         with Vertical():
             yield self.table
@@ -74,12 +74,17 @@ class TaskScreen(Screen):
 
                 matches = f"{summary.get('trials', {}).get('train', {}).get('passed', 0)}/{summary.get('trials', {}).get('train', {}).get('total', 0)}"
 
-                self.table.add_row(step_dir.name, num_files, matches, train_passed, test_passed)
+                best_score_text = (
+                    f"{summary.get('best_score'):.2f}"
+                    if summary.get("best_score") is not None
+                    else "-"
+                )
+                self.table.add_row(step_dir.name, num_files, matches, train_passed, test_passed, best_score_text) # Add best score
 
             except FileNotFoundError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 

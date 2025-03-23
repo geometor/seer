@@ -55,8 +55,9 @@ class TaskStep(Level):
             },
             "trials": {},
             "codes": {},
-            "train_passed": self.train_passed,  # Add here
-            "test_passed": self.test_passed,  # Add here
+            "train_passed": self.train_passed,
+            "test_passed": self.test_passed,
+            "best_score": self.step_code_trials.best_score,  # Add best score
         })
 
         if hasattr(self.response, "usage_metadata"):
@@ -279,4 +280,3 @@ class TaskStep(Level):
     def get_python(self):
         """Safely returns the Python code dictionary or an empty dictionary."""
         return self.codes.get("py", {})
-

@@ -45,9 +45,28 @@ class CodeTrial:
         results_image.save(png_file)
 
         json_file = self.code_filename + ".trial.json"
+
+        # Calculate total and average scores
+        train_scores = [
+            trial["score"]
+            for trial in self.train_results.get("trials", [])
+            if trial["score"] is not None
+        ]
+        test_scores = [
+            trial["score"]
+            for trial in self.test_results.get("trials", [])
+            if trial["score"] is not None
+        ]
+
+        total_score = sum(train_scores) + sum(test_scores)
+        num_scores = len(train_scores) + len(test_scores)
+        average_score = total_score / num_scores if num_scores > 0 else None
+
         results_json = {
             "train": self.train_results,
             "test": self.test_results,
+            "total_score": total_score,
+            "average_score": average_score,
         }
         self.task_step._write_to_json(json_file, results_json)
 
