@@ -60,13 +60,13 @@ class CodeTrial:
 
         total_score = sum(train_scores) + sum(test_scores)
         num_scores = len(train_scores) + len(test_scores)
-        average_score = total_score / num_scores if num_scores > 0 else None
+        self.average_score = total_score / num_scores if num_scores > 0 else None
 
         results_json = {
             "train": self.train_results,
             "test": self.test_results,
             "total_score": total_score,
-            "average_score": average_score,
+            "average_score": self.average_score,
         }
         self.task_step._write_to_json(json_file, results_json)
 
@@ -170,7 +170,7 @@ class CodeTrial:
 
         result_queue = multiprocessing.Queue()
         process = multiprocessing.Process(
-            target=worker, args=(code, task_pairs, result_queue)
+            target:worker, args=(code, task_pairs, result_queue)
         )
         process.start()
 
