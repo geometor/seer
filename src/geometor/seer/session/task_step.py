@@ -46,56 +46,62 @@ class TaskStep(Level):
         print(f"        {self.index} • {self.title}")
 
     def summarize(self):
-        summary = super().summarize()
-        summary.update({
-            "title": self.title,
-            "index": self.index,
-            "response": {
-                "response_time": self.response_time,
-            },
-            "trials": {},
-            "codes": {},
-            "train_passed": self.train_passed,
-            "test_passed": self.test_passed,
-            "best_score": self.step_code_trials.best_score,  # Add best score
-        })
+        try:
+            summary = super().summarize()
+            summary.update({
+                "title": self.title,
+                "index": self.index,
+                "response": {
+                    "response_time": self.response_time,
+                },
+                "trials": {},
+                "codes": {},
+                "train_passed": self.train_passed,
+                "test_passed": self.test_passed,
+                "best_score": self.step_code_trials.best_score,  # Add best score
+            })
 
-        if hasattr(self.response, "usage_metadata"):
-            summary["response"]["prompt_tokens"] = (
-                self.response.usage_metadata.prompt_token_count
-            )
-            summary["response"]["candidates_tokens"] = (
-                self.response.usage_metadata.candidates_token_count
-            )
-            summary["response"]["total_tokens"] = (
-                self.response.usage_metadata.total_token_count
-            )
-        else:
-            summary["response"]["prompt_tokens"] = None
-            summary["response"]["candidates_tokens"] = None
-            summary["response"]["total_tokens"] = None
+            if hasattr(self.response, "usage_metadata"):
+                summary["response"]["prompt_tokens"] = (
+                    self.response.usage_metadata.prompt_token_count
+                )
+                summary["response"]["candidates_tokens"] = (
+                    self.response.usage_metadata.candidates_token_count
+                )
+                summary["response"]["total_tokens"] = (
+                    self.response.usage_metadata.total_token_count
+                )
+            else:
+                summary["response"]["prompt_tokens"] = None
+                summary["response"]["candidates_tokens"] = None
+                summary["response"]["total_tokens"] = None
 
-        summary["codes"]["count"] = len(self.codes)
-        summary["codes"]["types"] = list(self.codes.keys())
+            summary["codes"]["count"] = len(self.codes)
+            summary["codes"]["types"] = list(self.codes.keys())
 
-        # --- Trial Summary ---
-        all_train_results = []
-        all_test_results = []
-        # Iterate through CodeTrial objects in StepCodeTrials
-        for code_trial in self.step_code_trials.get_all_trials():
-            if code_trial.train_results:
-                all_train_results.extend(code_trial.train_results.get("trials", []))
-            if code_trial.test_results:
-                all_test_results.extend(code_trial.test_results.get("trials", []))
+            # --- Trial Summary ---
+            all_train_results = []
+            all_test_results = []
+            # Iterate through CodeTrial objects in StepCodeTrials
+            for code_trial in self.step_code_trials.get_all_trials():
+                if code_trial.train_results:
+                    all_train_results.extend(code_trial.train_results.get("trials", []))
+                if code_trial.test_results:
+                    all_test_results.extend(code_trial.test_results.get("trials", []))
 
-        if all_train_results:
-            summary["trials"]["train"] = self._summarize_trial_results(
-                all_train_results
-            )
-        if all_test_results:
-            summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
+            if all_train_results:
+                summary["trials"]["train"] = self._summarize_trial_results(
+                    all_train_results
+                )
+            if all_test_results:
+                summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
-        self._write_to_json("index.json", summary)
+            self._write_to_json("index.json", summary)
+            return summary  # Ensure summary is returned
+
+        except Exception as e:
+            self.log_error(e, f"Error during summarization of TaskStep: {self.title}")
+            return None  # Return None on error
 
     def _summarize_trial_results(self, results):
         """Helper function to summarize trial results."""

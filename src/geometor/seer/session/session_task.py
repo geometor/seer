@@ -37,6 +37,10 @@ class SessionTask(Level):
         all_test_results = []
         for step in self.steps:
             step_summary = step.summarize()  # Get step summary
+            if step_summary is None:  # Handle None
+                self.log_error(Exception("Step summarize returned None"), f"Step: {step.title}")
+                continue # Skip this step
+
             train_trials = step_summary.get("trials", {}).get("train", {})
             test_trials = step_summary.get("trials", {}).get("test", {})
 
