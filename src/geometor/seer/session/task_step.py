@@ -49,19 +49,19 @@ class TaskStep(Level):
         try:
             summary = super().summarize()
 
-            # Initialize train_passed and test_passed to True, and set to False if any trial fails
-            train_passed = True
-            test_passed = True
+            # Initialize train_passed and test_passed to False.  Only set to True if trials exist *and* pass.
+            train_passed = False
+            test_passed = False
 
             # --- Trial Summary ---
             all_train_results = []
             all_test_results = []
             # Iterate through CodeTrial objects in StepCodeTrials
             for code_trial in self.step_code_trials.get_all_trials():
-                if not code_trial.train_passed:
-                    train_passed = False
-                if code_trial.test_results and not code_trial.test_passed:
-                    test_passed = False
+                if code_trial.train_passed:  # Check if this specific trial passed
+                    train_passed = True  # Set to True if *any* trial passes
+                if code_trial.test_results and code_trial.test_passed: # Check if test results exist and passed
+                    test_passed = True # Set to True if *any* trial passes
 
                 if code_trial.train_results:
                     all_train_results.extend(code_trial.train_results.get("trials", []))
