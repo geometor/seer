@@ -45,7 +45,7 @@ class SessionScreen(Screen):
         self.table = DataTable()
         # Add columns, setting justify="right" for "BEST SCORE"
         self.table.add_columns(
-            "TASKS", "STEPS", "DURATION", "TRAIN", "TEST", ("BEST SCORE", {"justify": "right"})
+            "TASKS", "STEPS", "DURATION", "TRAIN", "TEST", "BEST SCORE", 
         )
         yield Header()
         with Vertical():
@@ -75,21 +75,30 @@ class SessionScreen(Screen):
                     else "-"
                 )
 
-                train_passed = (
-                    Text("✔", style="green", justify="center")
-                    if summary.get("train_passed")
-                    else Text("✘", style="red", justify="center")
-                )
-                test_passed = (
-                    Text("✔", style="green", justify="center")
-                    if summary.get("test_passed")
-                    else Text("✘", style="red", justify="center")
-                )
-                best_score_text = (  # Handle potential None
+                if "train_passed" in summary and summary["train_passed"] is not None:
+                    train_passed = (
+                        Text("✔", style="green", justify="center")
+                        if summary["train_passed"]
+                        else Text("✘", style="red", justify="center")
+                    )
+                else:
+                    train_passed = Text("✔", style="", justify="center")
+
+                if "test_passed" in summary and summary["test_passed"] is not None:
+                    test_passed = (
+                        Text("✔", style="green", justify="center")
+                        if summary["test_passed"]
+                        else Text("✘", style="red", justify="center")
+                    )
+                else:
+                    test_passed = Text("✔", style="", justify="center")
+
+                best_score_text = (
                     f"{summary.get('best_score'):.2f}"
                     if summary.get("best_score") is not None
                     else "-"
                 )
+                best_score_text = Text(best_score_text, justify="right")
                 # Add the row, with best_score_text already a string
                 self.table.add_row(task_dir.name, num_steps, duration_str, train_passed, test_passed, best_score_text)
 

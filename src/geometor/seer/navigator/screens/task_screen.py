@@ -43,7 +43,7 @@ class TaskScreen(Screen):
         self.table = DataTable()
         # Add columns, setting justify="right" for "BEST SCORE"
         self.table.add_columns(
-            "STEP", "FILES", "MATCHES", "DURATION", "TRAIN", "TEST", ("BEST SCORE", {"justify": "right"})
+            "STEP", "FILES", "DURATION", "TRAIN", "TEST", "BEST SCORE", 
         )
         yield Header()
         with Vertical():
@@ -73,27 +73,35 @@ class TaskScreen(Screen):
                     else "-"
                 )
 
-                # Use .get() with default values for train_passed and test_passed
-                train_passed = (
-                    Text("✔", style="green", justify="center")
-                    if summary.get("train_passed", "-") == True  # Check for True explicitly
-                    else Text("✘", style="red", justify="center")
-                )
-                test_passed = (
-                    Text("✔", style="green", justify="center")
-                    if summary.get("test_passed", "-") == True  # Check for True explicitly
-                    else Text("✘", style="red", justify="center")
-                )
+                if "train_passed" in summary and summary["train_passed"] is not None:
+                    train_passed = (
+                        Text("✔", style="green", justify="center")
+                        if summary["train_passed"]
+                        else Text("✘", style="red", justify="center")
+                    )
+                else:
+                    train_passed = Text("-", style="", justify="center")
 
-                matches = f"{summary.get('trials', {}).get('train', {}).get('passed', 0)}/{summary.get('trials', {}).get('train', {}).get('total', 0)}"
+                if "test_passed" in summary and summary["test_passed"] is not None:
+                    test_passed = (
+                        Text("✔", style="green", justify="center")
+                        if summary["test_passed"]
+                        else Text("✘", style="red", justify="center")
+                    )
+                else:
+                    test_passed = Text("-", style="", justify="center")
+
+
+                #  matches = f"{summary.get('trials', {}).get('train', {}).get('passed', 0)}/{summary.get('trials', {}).get('train', {}).get('total', 0)}"
 
                 best_score_text = (
                     f"{summary.get('best_score'):.2f}"
                     if summary.get("best_score") is not None
                     else "-"
                 )
+                best_score_text = Text(best_score_text, justify="right")
                 # Add the row, with best_score_text already a string
-                self.table.add_row(step_dir.name, num_files, matches, duration_str, train_passed, test_passed, best_score_text)
+                self.table.add_row(step_dir.name, num_files, duration_str, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:
                 self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"

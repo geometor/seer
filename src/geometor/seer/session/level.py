@@ -42,14 +42,23 @@ class Level:
 
         error_log_file = f"error_{error_index:03d}.json"
 
-        print("ERROR")
-        print(context)
-        print(str(e))
-        print(error_content["stack_trace"])
+        txt_content = f"""
+ERROR
+
+{ context }
+{ str(e) }
+{ error_content["stack_trace"] }
+"""
+        print(txt_content)
 
         self._write_to_json(error_log_file, error_content)
 
         self.errors[error_log_file] = error_content
+
+
+        error_log_file = f"error_{error_index:03d}.txt"
+        self._write_to_file(error_log_file, txt_content)
+        
 
     def _write_to_file(self, file_name: str, content: str):
         """Writes content to a file in the task directory."""

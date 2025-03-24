@@ -294,8 +294,8 @@ class CodeTrial:
                             # Case: Single row (list, but not list of lists)
                             transformed_output = [transformed_output]
                     # Ensure it's a NumPy array
-                    if transformed_output is not None:
-                        transformed_output = np.array(transformed_output)
+                    #  if transformed_output is not None:
+                        #  transformed_output = np.array(transformed_output)
 
                     trial = TaskPairTrial(
                         pair, transformed_output=transformed_output

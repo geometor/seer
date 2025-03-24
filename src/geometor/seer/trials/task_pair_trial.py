@@ -48,7 +48,7 @@ class TaskPairTrial:
     def size_correct(self) -> bool:
         if self.transformed_output is None:
             return False
-        return self.transformed_output.shape == self.task_pair.output.grid.shape # Use Grid's shape
+        return self.transformed_output.grid.shape == self.task_pair.output.grid.shape # Use Grid's shape
 
     @property
     def color_palette_correct(self) -> bool:

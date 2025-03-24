@@ -86,7 +86,7 @@ class SessionTask(Level):
     def _summarize_trial_results(self, results):
         """Helper function to summarize trial results (moved from TaskStep)."""
         num_trials = len(results)
-        num_passed = sum(1 for r in results if r.get("match", False))
+        num_passed = sum(1 for r in results if r.match)
         num_failed = num_trials - num_passed
 
         summary = {

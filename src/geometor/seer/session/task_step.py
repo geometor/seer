@@ -50,14 +50,14 @@ class TaskStep(Level):
             summary = super().summarize()
 
             # --- Trial Summary ---
-            all_train_results = []
-            all_test_results = []
-            # Iterate through CodeTrial objects in StepCodeTrials
-            for code_trial in self.step_code_trials.get_all_trials():
-                if code_trial.train_results:
-                    all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
-                if code_trial.test_results:
-                    all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
+            #  all_train_results = []
+            #  all_test_results = []
+            #  # Iterate through CodeTrial objects in StepCodeTrials
+            #  for code_trial in self.step_code_trials.get_all_trials():
+                #  if code_trial.train_results:
+                    #  all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
+                #  if code_trial.test_results:
+                    #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
 
             summary.update({
                 "title": self.title,
@@ -96,12 +96,12 @@ class TaskStep(Level):
             summary["codes"]["count"] = len(self.codes)
             summary["codes"]["types"] = list(self.codes.keys())
 
-            if all_train_results:
-                summary["trials"]["train"] = self._summarize_trial_results(
-                    all_train_results
-                )
-            if all_test_results:
-                summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
+            #  if all_train_results:
+                #  summary["trials"]["train"] = self._summarize_trial_results(
+                    #  all_train_results
+                #  )
+            #  if all_test_results:
+                #  summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
             self._write_to_json("index.json", summary)
             return summary  # Ensure summary is returned
