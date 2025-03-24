@@ -49,18 +49,11 @@ class TaskStep(Level):
         try:
             summary = super().summarize()
 
-            # Do NOT initialize train_passed and test_passed.
-
             # --- Trial Summary ---
             all_train_results = []
             all_test_results = []
             # Iterate through CodeTrial objects in StepCodeTrials
             for code_trial in self.step_code_trials.get_all_trials():
-                if code_trial.train_passed:  # Check if this specific trial passed
-                    train_passed = True  # Set to True if *any* trial passes
-                if code_trial.test_results and code_trial.test_passed: # Check if test results exist and passed
-                    test_passed = True # Set to True if *any* trial passes
-
                 if code_trial.train_results:
                     all_train_results.extend(code_trial.train_results.get("trials", []))
                 if code_trial.test_results:
@@ -74,20 +67,16 @@ class TaskStep(Level):
                 },
                 "trials": {},
                 "codes": {},
-                # "train_passed": train_passed,  # Removed
-                # "test_passed": test_passed,    # Removed
                 "best_score": self.step_code_trials.best_score,  # Add best score
             })
 
             # Conditionally add train_passed and test_passed
-            if all_train_results:
-                summary["train_passed"] = any(
-                    trial.train_passed for trial in self.step_code_trials.get_all_trials()
-                )
-            if all_test_results:
-                summary["test_passed"] = any(
-                    trial.test_passed for trial in self.step_code_trials.get_all_trials()
-                )
+            train_passed = self.step_code_trials.any_train_passed  # Get from StepCodeTrials
+            if train_passed is not None:  # Only add if not None
+                summary["train_passed"] = train_passed
+            test_passed = self.step_code_trials.any_test_passed  # Get from StepCodeTrials
+            if test_passed is not None:  # Only add if not None
+                summary["test_passed"] = test_passed
 
             if hasattr(self.response, "usage_metadata"):
                 summary["response"]["prompt_tokens"] = (
@@ -277,9 +266,8 @@ class TaskStep(Level):
 
     def run_trials(self):
         """Executes trials for all available code."""
-        self.step_code_trials.run_trials()  
+        self.step_code_trials.run_trials()
 
-    # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:
         """Retrieves the first CodeTrial object, if any."""
         return self.step_code_trials.get_first_code_trial()
@@ -294,11 +282,11 @@ class TaskStep(Level):
 
     @property
     def train_passed(self):
-        return self.step_code_trials.any_train_passed
+        return self.step_code_trials.any_train_passed  # Consistent with summarize
 
     @property
     def test_passed(self):
-        return self.step_code_trials.any_test_passed
+        return self.step_code_trials.any_test_passed  # Consistent with summarize
 
     @property
     def get_python(self):

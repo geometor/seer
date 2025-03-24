@@ -22,7 +22,7 @@ class StepCodeTrials:
 
     def run_trials(self):
         task = self.task_step.session_task.task
-        for code_filename, code in self.task_step.get_python.items():  
+        for code_filename, code in self.task_step.get_python.items():
             code_trial = CodeTrial(self.task_step, code_filename, code, task)
             self.code_trials[code_filename] = code_trial
 
@@ -36,14 +36,24 @@ class StepCodeTrials:
         return None
 
     @property
-    def any_train_passed(self) -> bool:
+    def any_train_passed(self) -> bool | None:
         """Checks if any train trials passed."""
-        return any(trial.train_passed for trial in self.code_trials.values())
+        if not self.code_trials:
+            return None  # No CodeTrials, return None
+        for trial in self.code_trials.values():
+            if trial.train_passed is True:
+                return True  # Found at least one True
+        return False  # No True found, but CodeTrials exist
 
     @property
-    def any_test_passed(self) -> bool:
+    def any_test_passed(self) -> bool | None:
         """Checks if any test trials passed."""
-        return any(trial.test_passed for trial in self.code_trials.values())
+        if not self.code_trials:
+            return None  # No CodeTrials, return None
+        for trial in self.code_trials.values():
+            if trial.test_passed is True:
+                return True  # Found at least one True
+        return False  # No True found, but CodeTrials exist
 
     @property
     def count_trials(self) -> int:
@@ -75,4 +85,3 @@ class StepCodeTrials:
     def best_score(self):
         best_trial = self.get_best_trial()
         return best_trial.average_score if best_trial else None
-

@@ -54,9 +54,10 @@ class SessionTask(Level):
                         best_score = step_best_score
 
 
-        # Correct train_passed and test_passed logic
-        train_passed = all(step.train_passed is True for step in self.steps)  # Explicitly check for True
-        test_passed = all(step.test_passed is True for step in self.steps)  # Explicitly check for True
+        # Correct train_passed and test_passed logic using any() and explicit True check
+        train_passed = any(step.train_passed is True for step in self.steps)
+        test_passed = any(step.test_passed is True for step in self.steps)
+
 
         summary.update(
             {
@@ -104,8 +105,8 @@ class SessionTask(Level):
 
     @property
     def train_passed(self):
-        return any(step.train_passed for step in self.steps)  # Keep for Seer
+        return any(step.train_passed is True for step in self.steps)  # Check for True
 
     @property
     def test_passed(self):
-        return any(step.test_passed for step in self.steps)    # Keep for Seer
+        return any(step.test_passed is True for step in self.steps)  # Check for True
