@@ -14,7 +14,6 @@ class SessionTask(Level):
         self.session = session  # parent
         self.task = task
         self.steps = []
-        # self.trials = {}  # Initialize trials here -- REMOVE initialization
         self.trials = {}
 
         try:
@@ -45,7 +44,6 @@ class SessionTask(Level):
                     all_test_results.extend(code_trial.test_results.get("trials", []))
 
         # Calculate best_score across all steps
-        # best_score = None  # REMOVE initialization
         # Only calculate if there are steps
         if self.steps:
             best_score = None
@@ -55,28 +53,17 @@ class SessionTask(Level):
                     if best_score is None or step_best_score < best_score:
                         best_score = step_best_score
 
-        # Update self.trials directly
-        # self.trials = {  # REMOVE initialization
-        #     "train": self._summarize_trial_results(all_train_results)
-        #     if all_train_results
-        #     else {},
-        #     "test": self._summarize_trial_results(all_test_results)
-        #     if all_test_results
-        #     else {},
-        # }
 
         # Correct train_passed and test_passed logic
-        train_passed = all(step.train_passed for step in self.steps)
-        test_passed = all(step.test_passed for step in self.steps)
+        train_passed = all(step.train_passed is True for step in self.steps)  # Explicitly check for True
+        test_passed = all(step.test_passed is True for step in self.steps)  # Explicitly check for True
 
         summary.update(
             {
                 "steps": len(self.steps),
-                # "trials": self.trials,  # Use self.trials -- REMOVED
                 "matches": None,  # Filled in by TaskStep
                 "train_passed": train_passed,  # Use calculated values
                 "test_passed": test_passed,  # Use calculated values
-                # "best_score": best_score, -- REMOVED
             }
         )
 
