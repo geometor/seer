@@ -228,8 +228,19 @@ class CodeTrial:
 
                 try:
                     transformed_output = transform_function(input_grid)
+
+                    # --- Validation and Repair Logic ---
+                    if not isinstance(transformed_output, np.ndarray):
+                        if not isinstance(transformed_output, list):
+                            # Case: Single element (not a list)
+                            transformed_output = [[transformed_output]]
+                        elif not isinstance(transformed_output[0], list):
+                            # Case: Single row (list, but not list of lists)
+                            transformed_output = [transformed_output]
+                    # Ensure it's a NumPy array
                     if transformed_output is not None:
                         transformed_output = np.array(transformed_output)
+
                     trial = TaskPairTrial(
                         pair, transformed_output=transformed_output
                     )
