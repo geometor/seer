@@ -154,17 +154,9 @@ class Task:
             if result_set and "trials" in result_set:
                 result_row = []
                 for result in result_set["trials"]:
-                    if "transformed_output" in result:
-                        try:
-                            result_grid_str = result["transformed_output"]
-                            # TODO: this function should be on the grid object
-                            result_grid = string_to_grid(result_grid_str)
-                            result_row.append(result_grid.to_image(add_text=False))
-                        except Exception as e:
-                            print(f"Error processing train result image: {e}")
-                            result_row.append(None)
-                    else:
-                        result_row.append(None)
+                    #  result_grid_str = result["transformed_output"]
+                    # result_grid = Grid(result.transformed_output) # NO! already a Grid
+                    result_row.append(result.transformed_output.to_image(add_text=False))
                 images.append(result_row)
 
             return images

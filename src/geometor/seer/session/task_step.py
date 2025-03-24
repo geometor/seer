@@ -48,6 +48,17 @@ class TaskStep(Level):
     def summarize(self):
         try:
             summary = super().summarize()
+
+            # --- Trial Summary ---
+            #  all_train_results = []
+            #  all_test_results = []
+            #  # Iterate through CodeTrial objects in StepCodeTrials
+            #  for code_trial in self.step_code_trials.get_all_trials():
+                #  if code_trial.train_results:
+                    #  all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
+                #  if code_trial.test_results:
+                    #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
+
             summary.update({
                 "title": self.title,
                 "index": self.index,
@@ -56,10 +67,16 @@ class TaskStep(Level):
                 },
                 "trials": {},
                 "codes": {},
-                "train_passed": self.train_passed,
-                "test_passed": self.test_passed,
                 "best_score": self.step_code_trials.best_score,  # Add best score
             })
+
+            # Conditionally add train_passed and test_passed
+            train_passed = self.step_code_trials.any_train_passed  # Get from StepCodeTrials
+            if train_passed is not None:  # Only add if not None
+                summary["train_passed"] = train_passed
+            test_passed = self.step_code_trials.any_test_passed  # Get from StepCodeTrials
+            if test_passed is not None:  # Only add if not None
+                summary["test_passed"] = test_passed
 
             if hasattr(self.response, "usage_metadata"):
                 summary["response"]["prompt_tokens"] = (
@@ -79,22 +96,12 @@ class TaskStep(Level):
             summary["codes"]["count"] = len(self.codes)
             summary["codes"]["types"] = list(self.codes.keys())
 
-            # --- Trial Summary ---
-            all_train_results = []
-            all_test_results = []
-            # Iterate through CodeTrial objects in StepCodeTrials
-            for code_trial in self.step_code_trials.get_all_trials():
-                if code_trial.train_results:
-                    all_train_results.extend(code_trial.train_results.get("trials", []))
-                if code_trial.test_results:
-                    all_test_results.extend(code_trial.test_results.get("trials", []))
-
-            if all_train_results:
-                summary["trials"]["train"] = self._summarize_trial_results(
-                    all_train_results
-                )
-            if all_test_results:
-                summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
+            #  if all_train_results:
+                #  summary["trials"]["train"] = self._summarize_trial_results(
+                    #  all_train_results
+                #  )
+            #  if all_test_results:
+                #  summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
             self._write_to_json("index.json", summary)
             return summary  # Ensure summary is returned
@@ -106,7 +113,7 @@ class TaskStep(Level):
     def _summarize_trial_results(self, results):
         """Helper function to summarize trial results."""
         num_trials = len(results)
-        num_passed = sum(1 for r in results if r.get("match", False))
+        num_passed = sum(1 for r in results if r.match)  # Use .match directly
         num_failed = num_trials - num_passed
 
         summary = {
@@ -115,7 +122,7 @@ class TaskStep(Level):
             "failed": num_failed,
         }
 
-        pixels_off_values = [r.get("pixels_off") for r in results if "pixels_off" in r]
+        pixels_off_values = [r.pixels_off for r in results if r.pixels_off is not None]  # Use .pixels_off
         if pixels_off_values:
             summary["pixels_off"] = {
                 "min": min(pixels_off_values),
@@ -123,9 +130,7 @@ class TaskStep(Level):
                 "avg": sum(pixels_off_values) / len(pixels_off_values),
             }
 
-        percent_correct_values = [
-            r.get("percent_correct") for r in results if "percent_correct" in r
-        ]
+        percent_correct_values = [r.percent_correct for r in results if r.percent_correct is not None]  # Use .percent_correct
         if percent_correct_values:
             summary["percent_correct"] = {
                 "min": min(percent_correct_values),
@@ -259,9 +264,8 @@ class TaskStep(Level):
 
     def run_trials(self):
         """Executes trials for all available code."""
-        self.step_code_trials.run_trials()  
+        self.step_code_trials.run_trials()
 
-    # TODO:
     def get_first_code_trial(self) -> CodeTrial | None:
         """Retrieves the first CodeTrial object, if any."""
         return self.step_code_trials.get_first_code_trial()
@@ -276,11 +280,11 @@ class TaskStep(Level):
 
     @property
     def train_passed(self):
-        return self.step_code_trials.any_train_passed
+        return self.step_code_trials.any_train_passed  # Consistent with summarize
 
     @property
     def test_passed(self):
-        return self.step_code_trials.any_test_passed
+        return self.step_code_trials.any_test_passed  # Consistent with summarize
 
     @property
     def get_python(self):

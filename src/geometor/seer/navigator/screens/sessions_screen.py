@@ -15,6 +15,7 @@ from textual.containers import (
 from textual.binding import Binding
 
 from geometor.seer.navigator.screens.session_screen import SessionScreen
+from geometor.seer.session.level import Level  # Import Level
 
 import json  # Import the json module
 
@@ -44,6 +45,7 @@ class SessionsScreen(Screen):
         self.table.add_column("SESSION")
         self.table.add_column("TASKS")
         self.table.add_column("STEPS")  # Add the STEPS column
+        self.table.add_column("DURATION")  # NEW
         self.table.add_column("TRAIN")
         self.table.add_column("TEST")
         self.table.cursor_type = "row"
@@ -72,6 +74,13 @@ class SessionsScreen(Screen):
                     summary = json.load(f)
                 num_tasks = Text(str(summary.get("count", 0)), style="", justify="right")
                 num_steps = Text(str(summary.get("total_steps", 0)), style="", justify="right") # Get total_steps
+
+                duration_str = (
+                    Level._format_duration(summary.get("duration_seconds"))
+                    if summary.get("duration_seconds") is not None
+                    else "-"
+                )
+
                 train_passed = (
                     Text(str(summary.get("train_passed")), style="bold green", justify="center")
                     if summary.get("train_passed")
@@ -83,11 +92,11 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="center")
                 )
 
-                self.table.add_row(session_dir.name, num_tasks, num_steps, train_passed, test_passed) # Add num_steps
+                self.table.add_row(session_dir.name, num_tasks, num_steps, duration_str, train_passed, test_passed) # Add num_steps
             except FileNotFoundError:
-                self.table.add_row(session_dir.name, "-", "-", "-", "-")  # Use "-" for missing summary
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-")  # Use "-" for missing summary
             except json.JSONDecodeError:
-                self.table.add_row(session_dir.name, "-", "-", "-", "-")  # Use "-" for invalid JSON
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-")  # Use "-" for invalid JSON
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 

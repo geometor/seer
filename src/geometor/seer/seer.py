@@ -63,7 +63,7 @@ class Seer:
         """
 
         # STEP: dreamer *****************************
-        title = f"all training • investigate_dreamer"
+        title = f"investigate • dreamer • all training"
         history = []
         prompt = []
         for i, pair in enumerate(task.train, 1):
@@ -98,7 +98,8 @@ class Seer:
             return
 
         # STEP: coder *********************************
-        title = f"all training • investigate_coder"
+        title = f"investigate • coder • all training"
+        #  title = f"all training • investigate_coder"
         instructions = [self.instructions["investigate_coder"]]
         prompt = [""]
         task_step = self._generate(
@@ -204,7 +205,7 @@ class Seer:
         task_step = self._generate(
             session_task,
             "dreamer",
-            f"refine_dreamer • iteration {current_iteration}",
+            f"refine • {current_iteration} • dreamer",
             history,
             prompt,
             instructions,
@@ -230,7 +231,7 @@ class Seer:
         task_step = self._generate(
             session_task,
             "coder",
-            f"refine_coder • iteration {current_iteration}",
+            f"refine • {current_iteration} • coder",
             history,
             prompt,
             instructions,

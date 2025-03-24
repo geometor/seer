@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import json
 import traceback
@@ -20,6 +20,10 @@ class Level:
         self.dir = self._get_dir()
         self.dir.mkdir(parents=True, exist_ok=True)
         self.errors = {}
+        self.start_time = datetime.now()  # Store start time
+        self.end_time = None  # Initialize end_time
+        self.duration_seconds = None  # Initialize
+        # self.duration = None # REMOVE
 
     def _get_dir(self) -> Path:
         if self.parent:
@@ -38,14 +42,23 @@ class Level:
 
         error_log_file = f"error_{error_index:03d}.json"
 
-        print("ERROR")
-        print(context)
-        print(str(e))
-        print(error_content["stack_trace"])
+        txt_content = f"""
+ERROR
+
+{ context }
+{ str(e) }
+{ error_content["stack_trace"] }
+"""
+        print(txt_content)
 
         self._write_to_json(error_log_file, error_content)
 
         self.errors[error_log_file] = error_content
+
+
+        error_log_file = f"error_{error_index:03d}.txt"
+        self._write_to_file(error_log_file, txt_content)
+        
 
     def _write_to_file(self, file_name: str, content: str):
         """Writes content to a file in the task directory."""
@@ -85,10 +98,32 @@ class Level:
             print(f"Error writing prompt to file: {e}")
             self.log_error(f"Error writing prompt to file: {e}")
 
+    @staticmethod
+    def _format_duration(seconds: float) -> str:
+        """Formats duration in H:M:S format."""
+        delta = timedelta(seconds=seconds)
+        hours, remainder = divmod(delta.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f"{hours:02}:{minutes:02}:{seconds:02}"
+
     def summarize(self):
         # Base implementation.  Subclasses should override and call super().summarize()
+        self.end_time = datetime.now()  # Store end time
+        self.duration_seconds = (
+            (self.end_time - self.start_time).total_seconds()
+            if self.start_time
+            else None
+        )
+        # self.duration = (
+        #     self._format_duration(self.duration_seconds)
+        #     if self.duration_seconds is not None
+        #     else None
+        # )
+
         summary = {
             "errors": {},
+            "duration_seconds": self.duration_seconds,  # Add duration in seconds
+            # "duration": self.duration,  # Add formatted duration # REMOVE
         }
         summary["errors"]["count"] = len(self.errors)
         summary["errors"]["types"] = list(self.errors.keys())

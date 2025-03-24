@@ -48,7 +48,17 @@ def string_to_grid(grid_string, row_delimiter="\n", cell_delimiter=" "):
 
 
 class Grid:
-    def __init__(self, grid, puzzle_id, set_type, index, io_type):
+    def __init__(self, grid, puzzle_id="", set_type="", index="", io_type=""):
+        # Defensive check: If 'grid' is already a Grid object, return it directly
+        if isinstance(grid, Grid):
+            self.grid = grid.grid
+            self.puzzle_id = grid.puzzle_id
+            self.set_type = grid.set_type
+            self.index = grid.index
+            self.io_type = grid.io_type
+            self._model = grid._model  # Consider if you really need to copy _model
+            return
+
         self.grid = np.array(grid, dtype=int)
         self.puzzle_id = puzzle_id
         self.set_type = set_type  # 'train' or 'test'

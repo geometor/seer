@@ -22,7 +22,7 @@ class StepCodeTrials:
 
     def run_trials(self):
         task = self.task_step.session_task.task
-        for code_filename, code in self.task_step.get_python.items():  
+        for code_filename, code in self.task_step.get_python.items():
             code_trial = CodeTrial(self.task_step, code_filename, code, task)
             self.code_trials[code_filename] = code_trial
 
@@ -36,14 +36,24 @@ class StepCodeTrials:
         return None
 
     @property
-    def any_train_passed(self) -> bool:
+    def any_train_passed(self) -> bool | None:
         """Checks if any train trials passed."""
-        return any(trial.train_passed for trial in self.code_trials.values())
+        if not self.code_trials:
+            return None  # No CodeTrials, return None
+        for trial in self.code_trials.values():
+            if trial.train_passed is True:
+                return True  # Found at least one True
+        return False  # No True found, but CodeTrials exist
 
     @property
-    def any_test_passed(self) -> bool:
+    def any_test_passed(self) -> bool | None:
         """Checks if any test trials passed."""
-        return any(trial.test_passed for trial in self.code_trials.values())
+        if not self.code_trials:
+            return None  # No CodeTrials, return None
+        for trial in self.code_trials.values():
+            if trial.test_passed is True:
+                return True  # Found at least one True
+        return False  # No True found, but CodeTrials exist
 
     @property
     def count_trials(self) -> int:
@@ -61,18 +71,19 @@ class StepCodeTrials:
             #  code_trial.execute_and_save_results()
 
     def get_best_trial(self):
-        """Returns the CodeTrial with the lowest average score."""
+        """Returns the CodeTrial with the lowest total score."""
         best_trial = None
         best_score = float('inf')  # Initialize with a high score
 
         for trial in self.code_trials.values():
-            if trial.average_score is not None and trial.average_score < best_score:
-                best_score = trial.average_score
+            # Use total_score and handle None values
+            if trial.total_score is not None and trial.total_score < best_score:
+                best_score = trial.total_score
                 best_trial = trial
         return best_trial
 
     @property
     def best_score(self):
         best_trial = self.get_best_trial()
-        return best_trial.average_score if best_trial else None
-
+        # Return total_score of the best trial
+        return best_trial.total_score if best_trial else None
