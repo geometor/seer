@@ -134,3 +134,22 @@ class TaskPairTrial:
         if self.percent_correct is not None:
             data["percent_correct"] = self.percent_correct
         return data
+
+    def generate_report(self) -> str:
+        """Generates a report for this specific task pair trial."""
+        report = ""
+        if self.error:
+            report += f"Error: {self.error}\n"
+            if self.function_output:
+                report += f"Function Output:\n```\n{self.function_output}\n```\n"
+        else:
+            report += f"Input:\n```\n{self.input_string}\n```\n"
+            report += f"Expected Output:\n```\n{self.expected_output_string}\n```\n"
+            report += f"Transformed Output:\n```\n{self.transformed_output_string}\n```\n"
+            report += f"Match: {self.match}\n"
+            report += f"Pixels Off: {self.pixels_off}\n"
+            report += f"Size Correct: {self.size_correct}\n"
+            report += f"Color Palette Correct: {self.color_palette_correct}\n"
+            report += f"Color Count Correct: {self.color_count_correct}\n"
+            report += f"Score: {self.score}\n"
+        return report
