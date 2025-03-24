@@ -48,7 +48,7 @@ def string_to_grid(grid_string, row_delimiter="\n", cell_delimiter=" "):
 
 
 class Grid:
-    def __init__(self, grid, puzzle_id, set_type, index, io_type):
+    def __init__(self, grid, puzzle_id="", set_type="", index="", io_type=""):
         self.grid = np.array(grid, dtype=int)
         self.puzzle_id = puzzle_id
         self.set_type = set_type  # 'train' or 'test'
