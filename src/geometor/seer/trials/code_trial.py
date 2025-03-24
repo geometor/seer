@@ -49,15 +49,15 @@ class CodeTrial:
 
         # Calculate total and average scores
         train_scores = [
-            trial["score"]
+            trial.score
             for trial in self.train_results.get("trials", [])
-            if trial["score"] is not None
-        ]
+            if trial.score is not None
+        ]  # Access score directly
         test_scores = [
-            trial["score"]
+            trial.score
             for trial in self.test_results.get("trials", [])
-            if trial["score"] is not None
-        ] if self.test_results else []  # Handle None test_results
+            if trial.score is not None
+        ] if self.test_results else []  # Handle None test_results, access score
 
         # Initialize to None
         self.total_score = None
@@ -82,13 +82,20 @@ class CodeTrial:
             results_image.save(png_file)
 
         json_file = self.code_filename + ".trial.json"
-
+        # Convert TaskPairTrial objects to dicts before serialization
         results_json = {
-            "train": self.train_results,
-            "test": self.test_results,
+            "train": {
+                "trials": [t.to_dict() for t in self.train_results.get("trials", [])] if self.train_results else None,
+                "error": self.train_results.get("error") if self.train_results else None,
+            } if self.train_results else None,
+            "test": {
+                "trials": [t.to_dict() for t in self.test_results.get("trials", [])] if self.test_results else None,
+                "error": self.test_results.get("error") if self.test_results else None,
+            } if self.test_results else None,
             "total_score": self.total_score,
             "average_score": self.average_score,
         }
+
         self.task_step._write_to_json(json_file, results_json)
 
     @property
@@ -107,9 +114,9 @@ class CodeTrial:
         if self.train_results.get("error"):
             return None  # Error in the overall results
         trials = self.train_results.get("trials", [])
-        if any(trial.get("error") for trial in trials):
+        if any(trial.error for trial in trials):  # Check for error directly
             return None  # Error in any individual trial
-        if all(trial.get("match") for trial in trials):
+        if all(trial.match for trial in trials):  # Check for match directly
             return True  # All trials passed
         return False  # No errors, but not all passed
 
@@ -129,9 +136,9 @@ class CodeTrial:
         if self.test_results.get("error"):
             return None  # Error in overall results
         trials = self.test_results.get("trials", [])
-        if any(trial.get("error") for trial in trials):
+        if any(trial.error for trial in trials):  # Check for error directly
             return None  # Error in any individual trial
-        if all(trial.get("match") for trial in trials):
+        if all(trial.match for trial in trials):   # Check for match directly
             return True  # All trials passed
         return False  # No errors, but not all passed
 
@@ -145,7 +152,7 @@ class CodeTrial:
             trials = results.get("trials")
             if not trials:
                 return False
-            return any("transformed_output" in trial for trial in trials)
+            return any(trial.transformed_output is not None for trial in trials) # Check for transformed_output
 
         return has_valid_output(self.train_results) or has_valid_output(
             self.test_results
@@ -156,58 +163,22 @@ class CodeTrial:
         report = f"Results for {self.code_filename}:\n"
 
         if self.train_results:
-            report += "\nTrain Set Results:\n"
-            for i, result in enumerate(self.train_results.get("trials", [])):
-                report += f"\n## Example {i+1}:\n"
-                report += f"Input:\n```\n{result.get('input')}\n```\n"
-                report += (
-                    f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
-                )
-                if "transformed_output" in result:
-                    report += (
-                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
-                    )
-                    # Add images - construct filename based on task and step
-                    image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
-                    report += f"![Transformed Image]({image_filename})\n"
-
-                report += f"match: {result.get('match')}\n"
-                report += f"pixels_off: {result.get('pixels_off')}\n"
-                report += f"size_correct: {result.get('size_correct')}\n"
-                report += (
-                    f"color_palette_correct: {result.get('color_palette_correct')}\n"
-                )
-                report += (
-                    f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
-                )
+            if "error" in self.train_results:
+                report += f"Train Set Error: {self.train_results['error']}\n"
+            else:
+                report += "\nTrain Set Results:\n"
+                for i, trial in enumerate(self.train_results.get("trials", [])):
+                    report += f"\n## Example {i+1}:\n"
+                    report += trial.generate_report()  # Use TaskPairTrial's report
 
         if self.test_results:
-            report += "\nTest Set Results:\n"
-            # ... (Similar formatting for test results, if available) ...
-            for i, result in enumerate(self.test_results.get("trials", [])):
-                report += f"\n## Example {i+1}:\n"
-                report += f"Input:\n```\n{result.get('input')}\n```\n"
-                if "transformed_output" in result:
-                    report += (
-                        f"Transformed Output:\n```\n{result.get('transformed_output')}\n```\n"
-                    )
-                    # Add images - construct filename based on task and step
-                    image_filename = f"{self.task.id}-{i+1}.png"  # simplified name
-                    report += f"![Transformed Image]({image_filename})\n"
-                if result.get("expected_output"):
-                    report += (
-                        f"Expected Output:\n```\n{result.get('expected_output')}\n```\n"
-                    )
-
-                report += f"match: {result.get('match')}\n"
-                report += f"pixels_off: {result.get('pixels_off')}\n"
-                report += f"size_correct: {result.get('size_correct')}\n"
-                report += (
-                    f"color_palette_correct: {result.get('color_palette_correct')}\n"
-                )
-                report += (
-                    f"correct_pixel_counts: {result.get('correct_pixel_counts')}\n"
-                )
+            if "error" in self.test_results:
+                report += f"Test Set Error: {self.test_results['error']}\n"
+            else:
+                report += "\nTest Set Results:\n"
+                for i, trial in enumerate(self.test_results.get("trials", [])):
+                    report += f"\n## Example {i+1}:\n"
+                    report += trial.generate_report()   # Use TaskPairTrial's report
 
         return report
 
@@ -280,7 +251,8 @@ class CodeTrial:
             dict: A dictionary containing the results of the code execution.  If
             an error occurs during parsing or execution, the dictionary will
             contain an "error" key with a description of the error.  Otherwise,
-            it contains a "trials" key, with a list of per-pair trial results.
+            it contains a "trials" key, with a list of per-pair trial results,
+            which are now TaskPairTrial objects.
         """
         results = {}
         trials = []  # List to store TaskPairTrial objects
@@ -336,7 +308,5 @@ class CodeTrial:
 
                 trials.append(trial)
 
-        results["trials"] = [
-            t.to_dict() for t in trials
-        ]  # Convert to dicts for output
+        results["trials"] = trials  # Store TaskPairTrial objects directly
         return results

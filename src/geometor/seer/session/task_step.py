@@ -55,9 +55,9 @@ class TaskStep(Level):
             # Iterate through CodeTrial objects in StepCodeTrials
             for code_trial in self.step_code_trials.get_all_trials():
                 if code_trial.train_results:
-                    all_train_results.extend(code_trial.train_results.get("trials", []))
+                    all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
                 if code_trial.test_results:
-                    all_test_results.extend(code_trial.test_results.get("trials", []))
+                    all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
 
             summary.update({
                 "title": self.title,
@@ -113,7 +113,7 @@ class TaskStep(Level):
     def _summarize_trial_results(self, results):
         """Helper function to summarize trial results."""
         num_trials = len(results)
-        num_passed = sum(1 for r in results if r.get("match", False))
+        num_passed = sum(1 for r in results if r.match)  # Use .match directly
         num_failed = num_trials - num_passed
 
         summary = {
@@ -122,7 +122,7 @@ class TaskStep(Level):
             "failed": num_failed,
         }
 
-        pixels_off_values = [r.get("pixels_off") for r in results if "pixels_off" in r]
+        pixels_off_values = [r.pixels_off for r in results if r.pixels_off is not None]  # Use .pixels_off
         if pixels_off_values:
             summary["pixels_off"] = {
                 "min": min(pixels_off_values),
@@ -130,9 +130,7 @@ class TaskStep(Level):
                 "avg": sum(pixels_off_values) / len(pixels_off_values),
             }
 
-        percent_correct_values = [
-            r.get("percent_correct") for r in results if "percent_correct" in r
-        ]
+        percent_correct_values = [r.percent_correct for r in results if r.percent_correct is not None]  # Use .percent_correct
         if percent_correct_values:
             summary["percent_correct"] = {
                 "min": min(percent_correct_values),
