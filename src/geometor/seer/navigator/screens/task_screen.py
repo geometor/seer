@@ -70,14 +70,15 @@ class TaskScreen(Screen):
                     else "-"
                 )
 
+                # Use .get() with default values for train_passed and test_passed
                 train_passed = (
                     Text("✔", style="green", justify="center")
-                    if summary.get("train_passed")
+                    if summary.get("train_passed", "-") == True  # Check for True explicitly
                     else Text("✘", style="red", justify="center")
                 )
                 test_passed = (
                     Text("✔", style="green", justify="center")
-                    if summary.get("test_passed")
+                    if summary.get("test_passed", "-") == True  # Check for True explicitly
                     else Text("✘", style="red", justify="center")
                 )
 

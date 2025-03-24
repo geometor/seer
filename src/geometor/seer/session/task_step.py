@@ -49,9 +49,7 @@ class TaskStep(Level):
         try:
             summary = super().summarize()
 
-            # Initialize train_passed and test_passed to False.  Only set to True if trials exist *and* pass.
-            train_passed = False
-            test_passed = False
+            # Do NOT initialize train_passed and test_passed.
 
             # --- Trial Summary ---
             all_train_results = []
@@ -76,10 +74,20 @@ class TaskStep(Level):
                 },
                 "trials": {},
                 "codes": {},
-                "train_passed": train_passed,  # Use calculated values
-                "test_passed": test_passed,    # Use calculated values
+                # "train_passed": train_passed,  # Removed
+                # "test_passed": test_passed,    # Removed
                 "best_score": self.step_code_trials.best_score,  # Add best score
             })
+
+            # Conditionally add train_passed and test_passed
+            if all_train_results:
+                summary["train_passed"] = any(
+                    trial.train_passed for trial in self.step_code_trials.get_all_trials()
+                )
+            if all_test_results:
+                summary["test_passed"] = any(
+                    trial.test_passed for trial in self.step_code_trials.get_all_trials()
+                )
 
             if hasattr(self.response, "usage_metadata"):
                 summary["response"]["prompt_tokens"] = (
