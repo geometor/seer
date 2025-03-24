@@ -23,7 +23,7 @@ class Level:
         self.start_time = datetime.now()  # Store start time
         self.end_time = None  # Initialize end_time
         self.duration_seconds = None  # Initialize
-        self.duration = None
+        # self.duration = None # REMOVE
 
     def _get_dir(self) -> Path:
         if self.parent:
@@ -89,7 +89,8 @@ class Level:
             print(f"Error writing prompt to file: {e}")
             self.log_error(f"Error writing prompt to file: {e}")
 
-    def _format_duration(self, seconds: float) -> str:
+    @staticmethod
+    def _format_duration(seconds: float) -> str:
         """Formats duration in H:M:S format."""
         delta = timedelta(seconds=seconds)
         hours, remainder = divmod(delta.seconds, 3600)
@@ -104,16 +105,16 @@ class Level:
             if self.start_time
             else None
         )
-        self.duration = (
-            self._format_duration(self.duration_seconds)
-            if self.duration_seconds is not None
-            else None
-        )
+        # self.duration = (
+        #     self._format_duration(self.duration_seconds)
+        #     if self.duration_seconds is not None
+        #     else None
+        # )
 
         summary = {
             "errors": {},
             "duration_seconds": self.duration_seconds,  # Add duration in seconds
-            "duration": self.duration,  # Add formatted duration
+            # "duration": self.duration,  # Add formatted duration # REMOVE
         }
         summary["errors"]["count"] = len(self.errors)
         summary["errors"]["types"] = list(self.errors.keys())

@@ -14,6 +14,8 @@ from textual.binding import Binding
 from pathlib import Path
 import json
 
+from geometor.seer.session.level import Level  # Import Level
+
 
 class TaskScreen(Screen):
     CSS = """
@@ -39,7 +41,7 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("STEP", "FILES", "MATCHES", "TRAIN", "TEST", "BEST SCORE") # Add best score column
+        self.table.add_columns("STEP", "FILES", "MATCHES", "DURATION", "TRAIN", "TEST", "BEST SCORE") # Add best score column, duration
         yield Header()
         with Vertical():
             yield self.table
@@ -61,6 +63,13 @@ class TaskScreen(Screen):
                 with open(summary_path, "r") as f:
                     summary = json.load(f)
                 num_files = sum(1 for _ in step_dir.iterdir())
+
+                duration_str = (
+                    Level._format_duration(summary.get("duration_seconds"))
+                    if summary.get("duration_seconds") is not None
+                    else "-"
+                )
+
                 train_passed = (
                     Text("✔", style="green", justify="center")
                     if summary.get("train_passed")
@@ -79,12 +88,12 @@ class TaskScreen(Screen):
                     if summary.get("best_score") is not None
                     else "-"
                 )
-                self.table.add_row(step_dir.name, num_files, matches, train_passed, test_passed, best_score_text) # Add best score
+                self.table.add_row(step_dir.name, num_files, matches, duration_str, train_passed, test_passed, best_score_text) # Add best score
 
             except FileNotFoundError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 

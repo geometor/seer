@@ -17,6 +17,7 @@ from textual.binding import Binding
 import json
 
 from geometor.seer.navigator.screens.task_screen import TaskScreen
+from geometor.seer.session.level import Level  # Import Level
 
 
 class SessionScreen(Screen):
@@ -42,7 +43,7 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("TASKS", "STEPS", "TRAIN", "TEST", "BEST SCORE")  # Added Best Score
+        self.table.add_columns("TASKS", "STEPS", "DURATION", "TRAIN", "TEST", "BEST SCORE")  # Added Best Score and Duration
         yield Header()
         with Vertical():
             yield self.table
@@ -64,6 +65,13 @@ class SessionScreen(Screen):
                     summary = json.load(f)
 
                 num_steps = Text(str(summary.get("steps", 0)), justify="right")
+
+                duration_str = (
+                    Level._format_duration(summary.get("duration_seconds"))
+                    if summary.get("duration_seconds") is not None
+                    else "-"
+                )
+
                 train_passed = (
                     Text("✔", style="green", justify="center")
                     if summary.get("train_passed")
@@ -79,12 +87,12 @@ class SessionScreen(Screen):
                     if summary.get("best_score") is not None
                     else "-"
                 )
-                self.table.add_row(task_dir.name, num_steps, train_passed, test_passed, best_score_text)
+                self.table.add_row(task_dir.name, num_steps, duration_str, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:
-                self.table.add_row(task_dir.name, "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(task_dir.name, "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-")  # Use "-"
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
