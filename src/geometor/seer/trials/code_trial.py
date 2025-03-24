@@ -35,17 +35,6 @@ class CodeTrial:
         if self.train_passed:
             self.test_results = self.test_code_with_timeout(code, task.test)
 
-        show_test = bool(self.test_results)
-        results_image = self.task.to_image(
-            train_results=self.train_results,
-            test_results=self.test_results,
-            show_test=show_test,
-        )
-        png_file = self.task_step.dir / f"{self.code_filename}.trial.png"
-        results_image.save(png_file)
-
-        json_file = self.code_filename + ".trial.json"
-
         # Calculate total and average scores
         train_scores = [
             trial["score"]
@@ -69,6 +58,18 @@ class CodeTrial:
                 self.total_score = total_score
                 self.average_score = total_score / num_scores
 
+        # --- Conditional Image Generation ---
+        if self.has_valid_transformed_output:
+            show_test = bool(self.test_results)
+            results_image = self.task.to_image(
+                train_results=self.train_results,
+                test_results=self.test_results,
+                show_test=show_test,
+            )
+            png_file = self.task_step.dir / f"{self.code_filename}.trial.png"
+            results_image.save(png_file)
+
+        json_file = self.code_filename + ".trial.json"
 
         results_json = {
             "train": self.train_results,
@@ -88,6 +89,22 @@ class CodeTrial:
     def test_passed(self) -> bool:
         return self.test_results and not self.test_results.get("error") and all(
             r.get("match", False) for r in self.test_results.get("trials", [])
+        )
+
+    @property
+    def has_valid_transformed_output(self) -> bool:
+        """Checks for at least one valid transformed output in train or test."""
+
+        def has_valid_output(results):
+            if not results or results.get("error"):
+                return False
+            trials = results.get("trials")
+            if not trials:
+                return False
+            return any("transformed_output" in trial for trial in trials)
+
+        return has_valid_output(self.train_results) or has_valid_output(
+            self.test_results
         )
 
     def generate_report(self) -> str:
@@ -178,7 +195,7 @@ class CodeTrial:
 
         result_queue = multiprocessing.Queue()
         process = multiprocessing.Process(
-            target=worker, args=(code, task_pairs, result_queue)
+            target:worker, args=(code, task_pairs, result_queue)
         )
         process.start()
 
