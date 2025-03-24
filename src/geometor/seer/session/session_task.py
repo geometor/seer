@@ -61,13 +61,17 @@ class SessionTask(Level):
             else {},
         }
 
+        # Correct train_passed and test_passed logic
+        train_passed = all(step.train_passed for step in self.steps)
+        test_passed = all(step.test_passed for step in self.steps)
+
         summary.update(
             {
                 "steps": len(self.steps),
                 "trials": self.trials,  # Use self.trials
                 "matches": None,  # Filled in by TaskStep
-                "train_passed": self.train_passed,
-                "test_passed": self.test_passed,
+                "train_passed": train_passed,  # Use calculated values
+                "test_passed": test_passed,  # Use calculated values
                 "best_score": best_score,
             }
         )
@@ -95,8 +99,8 @@ class SessionTask(Level):
 
     @property
     def train_passed(self):
-        return any(step.train_passed for step in self.steps)
+        return any(step.train_passed for step in self.steps)  # Keep for Seer
 
     @property
     def test_passed(self):
-        return any(step.test_passed for step in self.steps)
+        return any(step.test_passed for step in self.steps)    # Keep for Seer

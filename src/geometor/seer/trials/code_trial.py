@@ -58,27 +58,35 @@ class CodeTrial:
             if trial["score"] is not None
         ] if self.test_results else []  # Handle None test_results
 
-        total_score = sum(train_scores) + sum(test_scores)
-        num_scores = len(train_scores) + len(test_scores)
-        self.average_score = total_score / num_scores if num_scores > 0 else None
+        # Initialize to None
+        self.total_score = None
+        self.average_score = None
+
+        if not self.train_results.get("error") and not (self.test_results and self.test_results.get("error")):
+            total_score = sum(train_scores) + sum(test_scores)
+            num_scores = len(train_scores) + len(test_scores)
+            if num_scores > 0:
+                self.total_score = total_score
+                self.average_score = total_score / num_scores
+
 
         results_json = {
             "train": self.train_results,
             "test": self.test_results,
-            "total_score": total_score,
+            "total_score": self.total_score,
             "average_score": self.average_score,
         }
         self.task_step._write_to_json(json_file, results_json)
 
     @property
     def train_passed(self) -> bool:
-        return self.train_results and all(
+        return self.train_results and not self.train_results.get("error") and all(
             r.get("match", False) for r in self.train_results.get("trials", [])
         )
 
     @property
     def test_passed(self) -> bool:
-        return self.test_results and all(
+        return self.test_results and not self.test_results.get("error") and all(
             r.get("match", False) for r in self.test_results.get("trials", [])
         )
 
@@ -184,7 +192,7 @@ class CodeTrial:
                     "error": f"Timeout: Code execution exceeded {timeout} seconds"
                 }
             ]
-
+        # FIX: return dict - not list
         else:
             return result_queue.get()
 

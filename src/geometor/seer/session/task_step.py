@@ -48,6 +48,26 @@ class TaskStep(Level):
     def summarize(self):
         try:
             summary = super().summarize()
+
+            # Initialize train_passed and test_passed to True, and set to False if any trial fails
+            train_passed = True
+            test_passed = True
+
+            # --- Trial Summary ---
+            all_train_results = []
+            all_test_results = []
+            # Iterate through CodeTrial objects in StepCodeTrials
+            for code_trial in self.step_code_trials.get_all_trials():
+                if not code_trial.train_passed:
+                    train_passed = False
+                if code_trial.test_results and not code_trial.test_passed:
+                    test_passed = False
+
+                if code_trial.train_results:
+                    all_train_results.extend(code_trial.train_results.get("trials", []))
+                if code_trial.test_results:
+                    all_test_results.extend(code_trial.test_results.get("trials", []))
+
             summary.update({
                 "title": self.title,
                 "index": self.index,
@@ -56,8 +76,8 @@ class TaskStep(Level):
                 },
                 "trials": {},
                 "codes": {},
-                "train_passed": self.train_passed,
-                "test_passed": self.test_passed,
+                "train_passed": train_passed,  # Use calculated values
+                "test_passed": test_passed,    # Use calculated values
                 "best_score": self.step_code_trials.best_score,  # Add best score
             })
 
@@ -78,16 +98,6 @@ class TaskStep(Level):
 
             summary["codes"]["count"] = len(self.codes)
             summary["codes"]["types"] = list(self.codes.keys())
-
-            # --- Trial Summary ---
-            all_train_results = []
-            all_test_results = []
-            # Iterate through CodeTrial objects in StepCodeTrials
-            for code_trial in self.step_code_trials.get_all_trials():
-                if code_trial.train_results:
-                    all_train_results.extend(code_trial.train_results.get("trials", []))
-                if code_trial.test_results:
-                    all_test_results.extend(code_trial.test_results.get("trials", []))
 
             if all_train_results:
                 summary["trials"]["train"] = self._summarize_trial_results(
