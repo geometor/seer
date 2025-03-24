@@ -155,8 +155,8 @@ class Task:
                 result_row = []
                 for result in result_set["trials"]:
                     #  result_grid_str = result["transformed_output"]
-                    result_grid = Grid(result.transformed_output)
-                    result_row.append(result_grid.to_image(add_text=False))
+                    # result_grid = Grid(result.transformed_output) # NO! already a Grid
+                    result_row.append(result.transformed_output.to_image(add_text=False))
                 images.append(result_row)
 
             return images
