@@ -43,7 +43,10 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("TASKS", "STEPS", "DURATION", "TRAIN", "TEST", "BEST SCORE")  # Added Best Score and Duration
+        # Add columns, setting justify="right" for "BEST SCORE"
+        self.table.add_columns(
+            "TASKS", "STEPS", "DURATION", "TRAIN", "TEST", ("BEST SCORE", {"justify": "right"})
+        )
         yield Header()
         with Vertical():
             yield self.table
@@ -87,6 +90,7 @@ class SessionScreen(Screen):
                     if summary.get("best_score") is not None
                     else "-"
                 )
+                # Add the row, with best_score_text already a string
                 self.table.add_row(task_dir.name, num_steps, duration_str, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:

@@ -41,7 +41,10 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_columns("STEP", "FILES", "MATCHES", "DURATION", "TRAIN", "TEST", "BEST SCORE") # Add best score column, duration
+        # Add columns, setting justify="right" for "BEST SCORE"
+        self.table.add_columns(
+            "STEP", "FILES", "MATCHES", "DURATION", "TRAIN", "TEST", ("BEST SCORE", {"justify": "right"})
+        )
         yield Header()
         with Vertical():
             yield self.table
@@ -89,7 +92,8 @@ class TaskScreen(Screen):
                     if summary.get("best_score") is not None
                     else "-"
                 )
-                self.table.add_row(step_dir.name, num_files, matches, duration_str, train_passed, test_passed, best_score_text) # Add best score
+                # Add the row, with best_score_text already a string
+                self.table.add_row(step_dir.name, num_files, matches, duration_str, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:
                 self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"
