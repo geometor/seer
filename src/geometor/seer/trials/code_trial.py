@@ -12,7 +12,10 @@ from geometor.seer.trials.task_pair_trial import TaskPairTrial
 
 class CodeTrial:
     """
-    trial for one code and task
+    Represents a single trial of running a piece of code against a task.
+
+    This class encapsulates the execution of the code, the comparison of the
+    output with the expected output, and the calculation of a score.
     """
 
     def __init__(
@@ -22,6 +25,15 @@ class CodeTrial:
         code,
         task: Task,
     ):
+        """
+        Initializes a CodeTrial.
+
+        Args:
+            task_step: The TaskStep object this trial belongs to.
+            code_filename: The name of the file containing the code.
+            code: The Python code string.
+            task: The Task object this trial is run against.
+        """
         self.code_filename = code_filename
         self.code = code
         self.task = task
@@ -32,7 +44,7 @@ class CodeTrial:
             code, task.train
         )
         self.test_results = None  # Initialize
-        if self.train_passed:
+        if self.train_passed is True:  # Only run tests if train passed
             self.test_results = self.test_code_with_timeout(code, task.test)
 
         # Calculate total and average scores
@@ -80,16 +92,48 @@ class CodeTrial:
         self.task_step._write_to_json(json_file, results_json)
 
     @property
-    def train_passed(self) -> bool:
-        return self.train_results and not self.train_results.get("error") and all(
-            r.get("match", False) for r in self.train_results.get("trials", [])
-        )
+    def train_passed(self) -> bool | None:
+        """
+        Checks if the training trials passed.
+
+        Returns:
+            bool | None: True if all training trials passed, False if some
+            failed (but no errors occurred), and None if any error occurred
+            during the trials (either in the overall execution or in
+            individual trials).
+        """
+        if not self.train_results:
+            return None
+        if self.train_results.get("error"):
+            return None  # Error in the overall results
+        trials = self.train_results.get("trials", [])
+        if any(trial.get("error") for trial in trials):
+            return None  # Error in any individual trial
+        if all(trial.get("match") for trial in trials):
+            return True  # All trials passed
+        return False  # No errors, but not all passed
 
     @property
-    def test_passed(self) -> bool:
-        return self.test_results and not self.test_results.get("error") and all(
-            r.get("match", False) for r in self.test_results.get("trials", [])
-        )
+    def test_passed(self) -> bool | None:
+        """
+        Checks if the test trials passed.
+
+        Returns:
+            bool | None: True if all test trials passed, False if some
+            failed (but no errors occurred), and None if any error occurred
+            during the trials (either in the overall execution or in
+            individual trials).
+        """
+        if not self.test_results:
+            return None
+        if self.test_results.get("error"):
+            return None  # Error in overall results
+        trials = self.test_results.get("trials", [])
+        if any(trial.get("error") for trial in trials):
+            return None  # Error in any individual trial
+        if all(trial.get("match") for trial in trials):
+            return True  # All trials passed
+        return False  # No errors, but not all passed
 
     @property
     def has_valid_transformed_output(self) -> bool:
@@ -108,6 +152,7 @@ class CodeTrial:
         )
 
     def generate_report(self) -> str:
+        """Generates a textual report of the trial results."""
         report = f"Results for {self.code_filename}:\n"
 
         if self.train_results:
@@ -183,7 +228,20 @@ class CodeTrial:
 
 
     def test_code_with_timeout(self, code, task_pairs, timeout=10) -> dict:
-        """Executes and validates the generated code with a timeout."""
+        """
+        Executes and validates the generated code with a timeout.
+
+        Args:
+            code: The Python code to execute.
+            task_pairs: A list of TaskPair objects to test the code against.
+            timeout: The maximum execution time in seconds.
+
+        Returns:
+            dict: A dictionary containing the results of the code execution.
+                If an error occurs, the dictionary will contain an "error" key
+                with a description of the error.  Otherwise, it contains a
+                "trials" key, with a list of trial results.
+        """
 
         def worker(code, task_pairs, result_queue):
             """Worker function to execute the code."""
@@ -204,17 +262,26 @@ class CodeTrial:
         if process.is_alive():
             process.terminate()
             process.join()  # Ensure termination
-            return [
-                {
-                    "error": f"Timeout: Code execution exceeded {timeout} seconds"
-                }
-            ]
-        # FIX: return dict - not list
+            return {  # Return a dict, not a list
+                "error": f"Timeout: Code execution exceeded {timeout} seconds"
+            }
         else:
             return result_queue.get()
 
     def test_code(self, code, task_pairs) -> dict:
-        """Executes and validates the generated code, returning results as a list of dicts."""
+        """
+        Executes and validates the generated code.
+
+        Args:
+            code: The Python code to execute.
+            task_pairs: A list of TaskPair objects to test the code against.
+
+        Returns:
+            dict: A dictionary containing the results of the code execution.  If
+            an error occurs during parsing or execution, the dictionary will
+            contain an "error" key with a description of the error.  Otherwise,
+            it contains a "trials" key, with a list of per-pair trial results.
+        """
         results = {}
         trials = []  # List to store TaskPairTrial objects
 
