@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import re
+from datetime import datetime # Added for log_warning timestamp
 from geometor.seer.session.level import Level
 
 from google.generativeai.types import GenerateContentResponse
@@ -46,6 +47,25 @@ class TaskStep(Level):
         self.log_markdown("instructions", instructions)
 
         print(f"        {self.index} • {self.title}")
+
+    # --- Start of added method ---
+    def log_warning(self, message: str, context: str = ""):
+        """Logs a warning message to warnings.txt."""
+        timestamp = datetime.now().isoformat()
+        log_entry = f"[{timestamp}]"
+        if context:
+            log_entry += f" Context: {context}"
+        log_entry += f"\nWarning: {message}\n---\n"
+
+        try:
+            # Append warning to the file
+            self._write_to_file("warnings.txt", log_entry, mode="a")
+            # Also print the warning for immediate visibility
+            print(f"        WARNING: {message}" + (f" (Context: {context})" if context else ""))
+        except Exception as e:
+            # Fallback if logging fails
+            print(f"        CRITICAL: Failed to log warning: {message}. Error: {e}")
+    # --- End of added method ---
 
     def summarize(self):
         try:
@@ -209,7 +229,7 @@ class TaskStep(Level):
         # Check if response is None (could happen if _generate failed all retries)
         if response is None:
             error_msg = "Cannot process response: Response object is None."
-            self.log_error(error_msg)
+            self.log_error(Exception(error_msg), "Process Response") # Log as error
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             return response_parts
@@ -219,7 +239,7 @@ class TaskStep(Level):
             block_reason = response.prompt_feedback.block_reason
             block_reason_str = getattr(block_reason, 'name', str(block_reason))
             error_msg = f"Prompt blocked. Reason: {block_reason_str}"
-            self.log_error(error_msg) # Log the blocking reason
+            self.log_error(Exception(error_msg), "Prompt Blocked") # Log the blocking reason as error
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             # Optionally log safety ratings associated with the prompt feedback
@@ -230,8 +250,7 @@ class TaskStep(Level):
 
         if not response.candidates:
             error_msg = "No candidates returned in response."
-            #  print(f"\nERROR: {error_msg}")
-            self.log_error(error_msg)
+            self.log_error(Exception(error_msg), "Process Response - No Candidates") # Log as error
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             return response_parts
@@ -243,9 +262,11 @@ class TaskStep(Level):
 
         # Log a warning if finish reason is not STOP, but still attempt to process parts
         if finish_reason != 1: # Not STOP
+             # Use the newly added log_warning method
              self.log_warning(f"Response generation finished with reason: {finish_reason_str}. Processing available parts.")
              if candidate.safety_ratings:
-                 self.log_warning(f"Safety Ratings: {candidate.safety_ratings}")
+                 # Log safety ratings as part of the warning context or separately
+                 self.log_warning(f"Safety Ratings: {candidate.safety_ratings}", context=f"Finish Reason: {finish_reason_str}")
 
 
         # Attempt to access content parts, handling potential errors
@@ -253,7 +274,7 @@ class TaskStep(Level):
             if not hasattr(candidate.content, "parts"):
                 # This might happen if finish_reason is e.g., SAFETY
                 error_msg = f"No content parts in response candidate. Finish Reason: {finish_reason_str}."
-                self.log_error(error_msg)
+                self.log_error(Exception(error_msg), f"Process Response - No Parts (Finish Reason: {finish_reason_str})") # Log as error
                 response_parts.append("\n*error:*\n")
                 response_parts.append(error_msg + "\n")
                 if candidate.safety_ratings:
@@ -287,7 +308,7 @@ class TaskStep(Level):
         except ValueError as ve:
             # Catch errors accessing parts, often due to safety blocks after generation started
             error_msg = f"Error accessing response parts, potentially due to safety settings or other issues. Finish Reason: {finish_reason_str}. Detail: {ve}"
-            self.log_error(error_msg)
+            self.log_error(ve, f"Process Response - Access Error (Finish Reason: {finish_reason_str})") # Log as error
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
             if candidate.safety_ratings:
@@ -295,7 +316,7 @@ class TaskStep(Level):
         except Exception as e:
             # Catch any other unexpected errors during part processing
             error_msg = f"Unexpected error processing response parts: {e}"
-            self.log_error(error_msg)
+            self.log_error(e, "Process Response - Unexpected Error") # Log as error
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
 
