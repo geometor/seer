@@ -5,6 +5,8 @@ import re
 from geometor.seer.session.level import Level
 
 from google.generativeai.types import GenerateContentResponse
+# Import FinishReason enum if needed for direct comparison, or rely on integer values
+# from google.generativeai.types import FinishReason
 
 if TYPE_CHECKING:
     from geometor.seer.session.session_task import SessionTask
@@ -148,11 +150,83 @@ class TaskStep(Level):
         response_dict["response_time"] = response_time
 
         self._write_to_json("response.json", response_dict)
-        self.log_markdown("response", [response.text])
+
+        # --- Start of changes ---
+        # Robustly log response text or reason for absence
+        response_log_content = []
+        try:
+            if response.candidates:
+                candidate = response.candidates[0]
+                finish_reason = candidate.finish_reason
+                # Use the enum value name if possible, otherwise the raw value
+                # FinishReason(1) is STOP
+                finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
+
+                if finish_reason == 1: # STOP
+                    try:
+                        # Attempt to access text, might raise ValueError if blocked (e.g., safety)
+                        response_log_content.append(response.text)
+                    except ValueError as e:
+                        response_log_content.append(f"Error: Response finished normally (STOP) but text could not be accessed. Detail: {e}")
+                        # Optionally log safety ratings if available
+                        if hasattr(candidate, 'safety_ratings') and candidate.safety_ratings:
+                             response_log_content.append(f"Safety Ratings: {candidate.safety_ratings}")
+                else:
+                    response_log_content.append(f"Warning: Response generation stopped. Finish Reason: {finish_reason_str} ({finish_reason})")
+                    # Optionally include safety ratings if available and relevant
+                    if hasattr(candidate, 'safety_ratings') and candidate.safety_ratings:
+                         response_log_content.append(f"Safety Ratings: {candidate.safety_ratings}")
+                    # Log text if available even if finish reason != STOP (e.g. MAX_TOKENS might have partial text)
+                    try:
+                        partial_text = response.text
+                        if partial_text:
+                            response_log_content.append("\nPartial text available:\n---\n")
+                            response_log_content.append(partial_text)
+                            response_log_content.append("\n---\n")
+                    except ValueError:
+                         response_log_content.append("(No text available to log)")
+
+
+            else:
+                response_log_content.append("Error: No candidates found in the response.")
+                # Check for prompt feedback if available
+                if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
+                    response_log_content.append(f"Prompt Feedback: {response.prompt_feedback}")
+
+
+        except Exception as e:
+            # Catch any unexpected errors during response analysis
+            response_log_content.append(f"Error: Unexpected issue processing response for logging: {e}")
+
+        self.log_markdown("response", response_log_content)
+        # --- End of changes ---
+
 
     def process_response(self, response: GenerateContentResponse):
         """Processes the response from the Gemini model."""
         response_parts = []
+
+        # Check if response is None (could happen if _generate failed all retries)
+        if response is None:
+            error_msg = "Cannot process response: Response object is None."
+            self.log_error(error_msg)
+            response_parts.append("\n*error:*\n")
+            response_parts.append(error_msg + "\n")
+            return response_parts
+
+        # Check for prompt feedback first (indicates blocking before generation)
+        if hasattr(response, 'prompt_feedback') and response.prompt_feedback.block_reason:
+            block_reason = response.prompt_feedback.block_reason
+            block_reason_str = getattr(block_reason, 'name', str(block_reason))
+            error_msg = f"Prompt blocked. Reason: {block_reason_str}"
+            self.log_error(error_msg) # Log the blocking reason
+            response_parts.append("\n*error:*\n")
+            response_parts.append(error_msg + "\n")
+            # Optionally log safety ratings associated with the prompt feedback
+            if response.prompt_feedback.safety_ratings:
+                response_parts.append(f"Prompt Safety Ratings: {response.prompt_feedback.safety_ratings}\n")
+            return response_parts # Stop processing if prompt was blocked
+
 
         if not response.candidates:
             error_msg = "No candidates returned in response."
@@ -162,42 +236,73 @@ class TaskStep(Level):
             response_parts.append(error_msg + "\n")
             return response_parts
 
-        if not hasattr(response.candidates[0].content, "parts"):
-            error_msg = "No content parts in response."
-            #  print(f"\nERROR: {error_msg}")
+        # Check finish reason and safety ratings of the first candidate
+        candidate = response.candidates[0]
+        finish_reason = candidate.finish_reason
+        finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
+
+        # Log a warning if finish reason is not STOP, but still attempt to process parts
+        if finish_reason != 1: # Not STOP
+             self.log_warning(f"Response generation finished with reason: {finish_reason_str}. Processing available parts.")
+             if candidate.safety_ratings:
+                 self.log_warning(f"Safety Ratings: {candidate.safety_ratings}")
+
+
+        # Attempt to access content parts, handling potential errors
+        try:
+            if not hasattr(candidate.content, "parts"):
+                # This might happen if finish_reason is e.g., SAFETY
+                error_msg = f"No content parts in response candidate. Finish Reason: {finish_reason_str}."
+                self.log_error(error_msg)
+                response_parts.append("\n*error:*\n")
+                response_parts.append(error_msg + "\n")
+                if candidate.safety_ratings:
+                    response_parts.append(f"Safety Ratings: {candidate.safety_ratings}\n")
+                return response_parts
+
+            for part in candidate.content.parts:
+                if hasattr(part, 'text') and part.text:
+                    response_parts.append(part.text + "\n")
+                    self._parse_code_text(part.text)
+
+                if hasattr(part, 'executable_code') and part.executable_code:
+                    response_parts.append("\n*code_execution:*\n")
+                    code = part.executable_code.code
+                    response_parts.append(f"```python\n{code}\n```\n")
+
+                if hasattr(part, 'code_execution_result') and part.code_execution_result:
+                    response_parts.append("\n*code_execution_result:*\n")
+                    outcome = part.code_execution_result.outcome
+                    outcome_str = getattr(outcome, 'name', str(outcome)) # Get enum name
+                    output = part.code_execution_result.output
+                    response_parts.append(f"outcome: {outcome_str}\n")
+                    response_parts.append(f"```\n{output}\n```\n")
+                    #  self.session._write_to_file(f"code_result.txt", output)
+
+                if hasattr(part, 'function_call') and part.function_call:
+                    response_parts.append("\n*function_call:*\n")
+                    response_parts.append(part.function_call.name + "\n")
+                    self.function_calls[part.function_call.name] = part.function_call
+
+        except ValueError as ve:
+            # Catch errors accessing parts, often due to safety blocks after generation started
+            error_msg = f"Error accessing response parts, potentially due to safety settings or other issues. Finish Reason: {finish_reason_str}. Detail: {ve}"
             self.log_error(error_msg)
             response_parts.append("\n*error:*\n")
             response_parts.append(error_msg + "\n")
-            return response_parts
+            if candidate.safety_ratings:
+                response_parts.append(f"Safety Ratings: {candidate.safety_ratings}\n")
+        except Exception as e:
+            # Catch any other unexpected errors during part processing
+            error_msg = f"Unexpected error processing response parts: {e}"
+            self.log_error(error_msg)
+            response_parts.append("\n*error:*\n")
+            response_parts.append(error_msg + "\n")
 
-        for part in response.candidates[0].content.parts:
-            if part.text:
-                response_parts.append(part.text + "\n")
-
-                self._parse_code_text(part.text)
-
-            if part.executable_code:
-                response_parts.append("\n*code_execution:*\n")
-                code = part.executable_code.code
-                response_parts.append(f"```python\n{code}\n```\n")
-
-            if part.code_execution_result:
-                response_parts.append("\n*code_execution_result:*\n")
-                outcome = part.code_execution_result.outcome
-                output = part.code_execution_result.output
-                response_parts.append(f"outcome: {outcome}\n")
-                response_parts.append(f"```\n{output}\n```\n")
-                #  self.session._write_to_file(f"code_result.txt", output)
-
-            if part.function_call:
-                response_parts.append("\n*function_call:*\n")
-                response_parts.append(part.function_call.name + "\n")
-
-                self.function_calls[part.function_call.name] = part.function_call
 
         self.response_parts = response_parts
-
         return response_parts
+
 
     def _parse_code_text(self, text: str):
         """Extracts code blocks, writes them, and returns file info."""

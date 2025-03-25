@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from datetime import datetime
+import time # Added for retry delay
 
 from geometor.seer.session import Session, SessionTask
 
@@ -162,23 +163,77 @@ class Seer:
         functions=None,
     ):
         """
-        Generate content from the model, handling logging.
+        Generate content from the model, handling logging and retries.
         """
 
         # init step
         task_step = session_task.add_step(title, history, prompt, instructions)
 
+        # --- Start of changes ---
         client = self.roles[role_name]
-        start_time = datetime.now()
-        total_prompt = history + prompt + instructions
-        response = client.generate_content(total_prompt, tools=tools)
+        max_retries = 3
+        attempts = 0
+        response = None
+        start_time = datetime.now() # Start timer before loop
+
+        while attempts < max_retries:
+            attempts += 1
+            total_prompt = history + prompt + instructions
+            try:
+                response = client.generate_content(total_prompt, tools=tools)
+
+                # Check for valid response
+                # FinishReason(1) is STOP
+                if response.candidates and response.candidates[0].finish_reason == 1:
+                    # Check if text is accessible (might still fail for safety/other reasons even with STOP)
+                    try:
+                        _ = response.text # Attempt access
+                        # Valid response received
+                        break
+                    except ValueError as ve:
+                        # Finish reason is STOP, but text is not accessible
+                        finish_reason = response.candidates[0].finish_reason if response.candidates else 'UNKNOWN'
+                        finish_reason_str = getattr(finish_reason, 'name', str(finish_reason)) # Get enum name
+                        print(f"        WARNING: Attempt {attempts}/{max_retries} - Response finished (Reason: {finish_reason_str}), but text not accessible: {ve}")
+                        # Decide if this specific error is retryable. For now, we retry.
+                        # If it shouldn't be retried, you might 'break' here or raise an exception.
+
+                else:
+                    # Handle cases with no candidates or non-STOP finish reasons
+                    finish_reason = response.candidates[0].finish_reason if response.candidates else 'NO_CANDIDATES'
+                    finish_reason_str = getattr(finish_reason, 'name', str(finish_reason)) # Get enum name
+                    print(f"        WARNING: Attempt {attempts}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
+
+            except Exception as e:
+                print(f"        ERROR: Attempt {attempts}/{max_retries} - Exception during API call: {e}")
+                # Log the exception potentially? For now, just print and retry.
+
+            # If not successful, wait a bit before retrying
+            if attempts < max_retries:
+                time.sleep(1) # Wait 1 second before next retry
+
         end_time = datetime.now()
         response_time = (end_time - start_time).total_seconds()
 
+        if response is None:
+            # Handle case where all retries failed to even get a response object
+            error_msg = f"ERROR: Failed to get response from API after {max_retries} attempts."
+            print(f"        {error_msg}")
+            # You might want to raise an exception here or log it more formally
+            # For now, we'll create a placeholder response or skip logging
+            # Let's skip logging response if it's None, but log the step error
+            task_step.log_error(Exception(error_msg), "API Call Failure")
+            return task_step # Or raise an exception depending on desired flow
+
+        # Proceed with logging the (potentially invalid) response if one was received
         task_step.log_response(response, response_time)
+        # --- End of changes ---
+
+        # The rest of the function remains the same:
         reponse_parts = task_step.process_response(response)
 
         return task_step
+
 
     def refine(
         self,
