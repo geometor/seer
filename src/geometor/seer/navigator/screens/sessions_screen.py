@@ -42,17 +42,17 @@ class SessionsScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns, including token counts, setting justify="right" for numeric columns
+        # Add columns in the new requested order
         self.table.add_columns(
             "SESSION",
-            "TASKS",
+            "TEST",                 # MOVED
+            "TRAIN",                # MOVED
+            "TASKS",                # MOVED
             "STEPS",
             "DURATION",
-            Text("IN", justify="right"),    # ADDED
-            Text("OUT", justify="right"),   # ADDED
-            Text("TOTAL", justify="right"), # ADDED
-            "TRAIN",
-            "TEST",
+            Text("IN", justify="right"),
+            Text("OUT", justify="right"),
+            Text("TOTAL", justify="right"),
         )
         self.table.cursor_type = "row"
         yield Header()
@@ -109,24 +109,24 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="center")
                 )
 
-                # Add the row, including new token columns
+                # Add the row with arguments in the new order
                 self.table.add_row(
-                    session_dir.name,
-                    num_tasks,
-                    num_steps,
-                    duration_str,
-                    in_tokens_text,      # ADDED
-                    out_tokens_text,     # ADDED
-                    total_tokens_text,   # ADDED
-                    train_passed,
-                    test_passed
+                    session_dir.name,    # SESSION
+                    test_passed,         # TEST
+                    train_passed,        # TRAIN
+                    num_tasks,           # TASKS
+                    num_steps,           # STEPS
+                    duration_str,        # DURATION
+                    in_tokens_text,      # IN
+                    out_tokens_text,     # OUT
+                    total_tokens_text    # TOTAL
                 )
             except FileNotFoundError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling for 9 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling for 9 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 
@@ -205,7 +205,7 @@ class SessionsScreen(Screen):
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
-        session_name = row[0]
+        session_name = row[0] # Session name is still the first column
         session_path = self.sessions_root / session_name
 
         # Get task directories for the selected session
