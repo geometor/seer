@@ -148,7 +148,7 @@ class TaskScreen(Screen):
                 color_count_correct_text = format_bool_metric(metrics.get("all_color_count_correct"))
 
                 # Get TOTAL pixels off count
-                pixels_off_val = metrics.get("total_pixels_off")
+                pixels_off_val = metrics.get("pixels_off")
                 # Format as integer string
                 pixels_off_text = Text(str(pixels_off_val) if pixels_off_val is not None else "-", justify="right")
 

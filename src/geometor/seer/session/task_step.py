@@ -145,6 +145,7 @@ class TaskStep(Level):
                     best_trial_metrics["all_size_correct"] = all(size_correct_list)
                     best_trial_metrics["all_palette_correct"] = all(palette_correct_list)
                     best_trial_metrics["all_color_count_correct"] = all(color_count_correct_list)
+                    best_trial_metrics["pixels_off"] = sum(pixels_off_list) 
                     best_trial_metrics["avg_pixels_off"] = sum(pixels_off_list) / len(pixels_off_list) if pixels_off_list else None
                     best_trial_metrics["avg_percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None
                     best_trial_metrics["total_pixels_off"] = total_pixels_off # ADDED total pixels off
