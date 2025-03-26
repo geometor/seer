@@ -50,7 +50,7 @@ class TaskScreen(Screen):
             Text("SIZE", justify="center"),      # ADDED
             Text("PALETTE", justify="center"),   # ADDED
             Text("COLORS", justify="center"),    # ADDED
-            Text("PIXELS", justify="right"),     # ADDED
+            Text("PIXELS", justify="right"),     # ADDED - Now represents total pixels off
             Text("%", justify="right"),          # ADDED
             "DURATION",
             Text("IN", justify="right"),
@@ -140,8 +140,10 @@ class TaskScreen(Screen):
                 palette_correct_text = format_bool_metric(metrics.get("all_palette_correct"))
                 color_count_correct_text = format_bool_metric(metrics.get("all_color_count_correct"))
 
-                pixels_off_val = metrics.get("avg_pixels_off")
-                pixels_off_text = Text(f"{pixels_off_val:.1f}" if pixels_off_val is not None else "-", justify="right")
+                # Get TOTAL pixels off count
+                pixels_off_val = metrics.get("total_pixels_off")
+                # Format as integer string
+                pixels_off_text = Text(str(pixels_off_val) if pixels_off_val is not None else "-", justify="right")
 
                 percent_correct_val = metrics.get("avg_percent_correct")
                 percent_correct_text = Text(f"{percent_correct_val:.1f}" if percent_correct_val is not None else "-", justify="right")
@@ -157,7 +159,7 @@ class TaskScreen(Screen):
                     size_correct_text,         # SIZE (ADDED)
                     palette_correct_text,      # PALETTE (ADDED)
                     color_count_correct_text,  # COLORS (ADDED)
-                    pixels_off_text,           # PIXELS (ADDED)
+                    pixels_off_text,           # PIXELS (CHANGED to total count)
                     percent_correct_text,      # % (ADDED)
                     duration_str,              # DURATION
                     in_tokens_text,            # IN
