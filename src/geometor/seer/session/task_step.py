@@ -81,6 +81,9 @@ class TaskStep(Level):
                 #  if code_trial.test_results:
                     #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
 
+            # Retrieve retries count, default to None if not logged
+            retries_count = self.response.get("retries", None)
+
             summary.update({
                 "title": self.title,
                 "index": self.index,
@@ -90,6 +93,7 @@ class TaskStep(Level):
                 "trials": {},
                 "codes": {},
                 "best_score": self.step_code_trials.best_score,  # Add best score
+                "retries": retries_count, # ADDED retries count
             })
 
             # Conditionally add train_passed and test_passed
@@ -133,12 +137,17 @@ class TaskStep(Level):
                     color_count_correct_list = [t.color_count_correct for t in train_trials]
                     pixels_off_list = [t.pixels_off for t in train_trials if t.pixels_off is not None]
                     percent_correct_list = [t.percent_correct for t in train_trials if t.percent_correct is not None]
+                    # --- START: Add total_pixels_off calculation ---
+                    total_pixels_off = sum(pixels_off_list) if pixels_off_list else None
+                    # --- END: Add total_pixels_off calculation ---
+
 
                     best_trial_metrics["all_size_correct"] = all(size_correct_list)
                     best_trial_metrics["all_palette_correct"] = all(palette_correct_list)
                     best_trial_metrics["all_color_count_correct"] = all(color_count_correct_list)
                     best_trial_metrics["avg_pixels_off"] = sum(pixels_off_list) / len(pixels_off_list) if pixels_off_list else None
                     best_trial_metrics["avg_percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None
+                    best_trial_metrics["total_pixels_off"] = total_pixels_off # ADDED total pixels off
                 else:
                     # Handle case where train_results exists but trials list is empty
                     best_trial_metrics["all_size_correct"] = None
@@ -146,6 +155,7 @@ class TaskStep(Level):
                     best_trial_metrics["all_color_count_correct"] = None
                     best_trial_metrics["avg_pixels_off"] = None
                     best_trial_metrics["avg_percent_correct"] = None
+                    best_trial_metrics["total_pixels_off"] = None # ADDED total pixels off
 
             summary["best_trial_metrics"] = best_trial_metrics
             # --- END: Add Best Trial Metrics ---
@@ -194,62 +204,66 @@ class TaskStep(Level):
             }
         return summary
 
-    def log_response(self, response: GenerateContentResponse, response_time: float):
+    def log_response(self, response: GenerateContentResponse, response_time: float, retries: int | None = None):
         self.response = response
         self.response_time = response_time  # seconds
 
         # gemini response object cannot be dumped directly
-        response_dict = response.to_dict()
+        response_dict = response.to_dict() if response else {} # Handle None response
         response_dict["response_time"] = response_time
+        response_dict["retries"] = retries # ADDED retries count
 
         self._write_to_json("response.json", response_dict)
 
         # --- Start of changes ---
         # Robustly log response text or reason for absence
         response_log_content = []
-        try:
-            if response.candidates:
-                candidate = response.candidates[0]
-                finish_reason = candidate.finish_reason
-                # Use the enum value name if possible, otherwise the raw value
-                # FinishReason(1) is STOP
-                finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
+        if response is None:
+            response_log_content.append("Error: Response object is None (likely due to failed retries).")
+        else:
+            try:
+                if response.candidates:
+                    candidate = response.candidates[0]
+                    finish_reason = candidate.finish_reason
+                    # Use the enum value name if possible, otherwise the raw value
+                    # FinishReason(1) is STOP
+                    finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
 
-                if finish_reason == 1: # STOP
-                    try:
-                        # Attempt to access text, might raise ValueError if blocked (e.g., safety)
-                        response_log_content.append(response.text)
-                    except ValueError as e:
-                        response_log_content.append(f"Error: Response finished normally (STOP) but text could not be accessed. Detail: {e}")
-                        # Optionally log safety ratings if available
+                    if finish_reason == 1: # STOP
+                        try:
+                            # Attempt to access text, might raise ValueError if blocked (e.g., safety)
+                            response_log_content.append(response.text)
+                        except ValueError as e:
+                            response_log_content.append(f"Error: Response finished normally (STOP) but text could not be accessed. Detail: {e}")
+                            # Optionally log safety ratings if available
+                            if hasattr(candidate, 'safety_ratings') and candidate.safety_ratings:
+                                 response_log_content.append(f"Safety Ratings: {candidate.safety_ratings}")
+                    else:
+                        response_log_content.append(f"Warning: Response generation stopped. Finish Reason: {finish_reason_str} ({finish_reason})")
+                        # Optionally include safety ratings if available and relevant
                         if hasattr(candidate, 'safety_ratings') and candidate.safety_ratings:
                              response_log_content.append(f"Safety Ratings: {candidate.safety_ratings}")
+                        # Log text if available even if finish reason != STOP (e.g. MAX_TOKENS might have partial text)
+                        try:
+                            partial_text = response.text
+                            if partial_text:
+                                response_log_content.append("\nPartial text available:\n---\n")
+                                response_log_content.append(partial_text)
+                                response_log_content.append("\n---\n")
+                        except ValueError:
+                             response_log_content.append("(No text available to log)")
+
+
                 else:
-                    response_log_content.append(f"Warning: Response generation stopped. Finish Reason: {finish_reason_str} ({finish_reason})")
-                    # Optionally include safety ratings if available and relevant
-                    if hasattr(candidate, 'safety_ratings') and candidate.safety_ratings:
-                         response_log_content.append(f"Safety Ratings: {candidate.safety_ratings}")
-                    # Log text if available even if finish reason != STOP (e.g. MAX_TOKENS might have partial text)
-                    try:
-                        partial_text = response.text
-                        if partial_text:
-                            response_log_content.append("\nPartial text available:\n---\n")
-                            response_log_content.append(partial_text)
-                            response_log_content.append("\n---\n")
-                    except ValueError:
-                         response_log_content.append("(No text available to log)")
+                    response_log_content.append("Error: No candidates found in the response.")
+                    # Check for prompt feedback if available
+                    if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
+                        response_log_content.append(f"Prompt Feedback: {response.prompt_feedback}")
 
 
-            else:
-                response_log_content.append("Error: No candidates found in the response.")
-                # Check for prompt feedback if available
-                if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
-                    response_log_content.append(f"Prompt Feedback: {response.prompt_feedback}")
-
-
-        except Exception as e:
-            # Catch any unexpected errors during response analysis
-            response_log_content.append(f"Error: Unexpected issue processing response for logging: {e}")
+            except Exception as e:
+                # Catch any unexpected errors during response analysis
+                response_log_content.append(f"Error: Unexpected issue processing response for logging: {e}")
 
         self.log_markdown("response", response_log_content)
         # --- End of changes ---

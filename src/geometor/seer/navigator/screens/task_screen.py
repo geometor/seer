@@ -41,7 +41,7 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order, changing DURATION to TIME
+        # Add columns in the new requested order, including RETRIES
         self.table.add_columns(
             "STEP",
             "TEST",
@@ -53,6 +53,7 @@ class TaskScreen(Screen):
             Text("PIXELS", justify="right"),     # ADDED - Now represents total pixels off
             Text("%", justify="right"),          # ADDED
             "TIME",                 # CHANGED from DURATION
+            Text("RETRIES", justify="right"),    # ADDED
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -86,6 +87,11 @@ class TaskScreen(Screen):
                     if summary.get("duration_seconds") is not None
                     else "-"
                 )
+
+                # --- START RETRIES HANDLING ---
+                retries_val = summary.get("retries")
+                retries_text = Text(str(retries_val) if retries_val is not None else "-", justify="right")
+                # --- END RETRIES HANDLING ---
 
                 # --- START TOKEN HANDLING ---
                 prompt_tokens = summary.get("response", {}).get("prompt_tokens")
@@ -151,18 +157,19 @@ class TaskScreen(Screen):
                 # --- END BEST TRIAL METRICS HANDLING ---
 
 
-                # Add the row with arguments in the new order (14 columns total), using time_str
+                # Add the row with arguments in the new order (15 columns total)
                 self.table.add_row(
                     step_dir.name,             # STEP
                     test_passed,               # TEST
                     train_passed,              # TRAIN
                     best_score_text,           # SCORE
-                    size_correct_text,         # SIZE (ADDED)
-                    palette_correct_text,      # PALETTE (ADDED)
-                    color_count_correct_text,  # COLORS (ADDED)
-                    pixels_off_text,           # PIXELS (CHANGED to total count)
-                    percent_correct_text,      # % (ADDED)
-                    time_str,                  # TIME (CHANGED from duration_str)
+                    size_correct_text,         # SIZE
+                    palette_correct_text,      # PALETTE
+                    color_count_correct_text,  # COLORS
+                    pixels_off_text,           # PIXELS
+                    percent_correct_text,      # %
+                    time_str,                  # TIME
+                    retries_text,              # RETRIES (ADDED)
                     in_tokens_text,            # IN
                     out_tokens_text,           # OUT
                     total_tokens_text,         # TOTAL
@@ -170,11 +177,11 @@ class TaskScreen(Screen):
                 )
 
             except FileNotFoundError:
-                # Update exception handling for 14 columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 15 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 14 columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 15 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
