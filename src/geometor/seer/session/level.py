@@ -58,16 +58,18 @@ ERROR
 
         error_log_file = f"error_{error_index:03d}.txt"
         self._write_to_file(error_log_file, txt_content)
-        
 
-    def _write_to_file(self, file_name: str, content: str):
+
+    def _write_to_file(self, file_name: str, content: str, mode: str = "w"):
         """Writes content to a file in the task directory."""
         file_path = self.dir / file_name
         try:
-            with open(file_path, "w") as f:
+            # Use the provided mode when opening the file
+            with open(file_path, mode) as f:
                 f.write(content)
         except Exception as e:
-            self.log_error(e, f"Error writing to file: {file_path}")
+            # Use repr(e) for potentially more detailed error info during logging
+            self.log_error(e, f"Error writing to file: {file_path} with mode '{mode}'. Exception: {repr(e)}")
 
     def _write_to_json(self, file_name: str, content: object):
         """Writes content to a file in the task directory."""
@@ -76,7 +78,8 @@ ERROR
             with open(file_path, "w") as f:
                 json.dump(content, f, indent=2)
         except Exception as e:
-            self.log_error(e, f"Error writing to json: {file_path}")
+            # Use repr(e) for potentially more detailed error info during logging
+            self.log_error(e, f"Error writing to json: {file_path}. Exception: {repr(e)}")
 
     def log_markdown(
         self,
@@ -96,15 +99,19 @@ ERROR
                         f.write(str(part))
         except Exception as e:
             print(f"Error writing prompt to file: {e}")
-            self.log_error(f"Error writing prompt to file: {e}")
+            # Use repr(e) for potentially more detailed error info during logging
+            self.log_error(e, f"Error writing markdown to file: {markdown_file}. Exception: {repr(e)}")
 
     @staticmethod
-    def _format_duration(seconds: float) -> str:
+    def _format_duration(seconds: float | None) -> str:
         """Formats duration in H:M:S format."""
+        if seconds is None:
+            return "-"
         delta = timedelta(seconds=seconds)
-        hours, remainder = divmod(delta.seconds, 3600)
+        hours, remainder = divmod(delta.total_seconds(), 3600)
         minutes, seconds = divmod(remainder, 60)
-        return f"{hours:02}:{minutes:02}:{seconds:02}"
+        # Use int() to remove potential decimals from seconds
+        return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
     def summarize(self):
         # Base implementation.  Subclasses should override and call super().summarize()
