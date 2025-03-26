@@ -43,17 +43,17 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns, including token counts, setting justify="right" for numeric columns
+        # Add columns in the new requested order
         self.table.add_columns(
             "TASKS",
+            "TEST",
+            "TRAIN",
+            Text("SCORE", justify="right"), # Renamed from BEST SCORE
             "STEPS",
             "DURATION",
-            Text("IN", justify="right"),    # ADDED
-            Text("OUT", justify="right"),   # ADDED
-            Text("TOTAL", justify="right"), # ADDED
-            "TRAIN",
-            "TEST",
-            Text("BEST SCORE", justify="right"),
+            Text("IN", justify="right"),
+            Text("OUT", justify="right"),
+            Text("TOTAL", justify="right"),
         )
         yield Header()
         with Vertical():
@@ -83,7 +83,7 @@ class SessionScreen(Screen):
                     else "-"
                 )
 
-                # --- START ADDED TOKEN HANDLING ---
+                # --- START TOKEN HANDLING ---
                 tokens_data = summary.get("tokens", {}) # Get the tokens dict, default to empty
                 prompt_tokens = tokens_data.get("prompt_tokens")
                 candidates_tokens = tokens_data.get("candidates_tokens")
@@ -92,8 +92,9 @@ class SessionScreen(Screen):
                 in_tokens_text = Text(str(prompt_tokens) if prompt_tokens is not None else "-", justify="right")
                 out_tokens_text = Text(str(candidates_tokens) if candidates_tokens is not None else "-", justify="right")
                 total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
-                # --- END ADDED TOKEN HANDLING ---
+                # --- END TOKEN HANDLING ---
 
+                # --- START PASS/FAIL HANDLING ---
                 if "train_passed" in summary and summary["train_passed"] is not None:
                     train_passed = (
                         Text("✔", style="green", justify="center")
@@ -113,32 +114,36 @@ class SessionScreen(Screen):
                 else:
                     # Default if key is missing or None (adjust style as needed)
                     test_passed = Text("-", style="", justify="center") # Changed default from ✔ to -
+                # --- END PASS/FAIL HANDLING ---
 
+                # --- START SCORE HANDLING ---
                 best_score_text = (
                     f"{summary.get('best_score'):.2f}"
                     if summary.get("best_score") is not None
                     else "-"
                 )
                 best_score_text = Text(best_score_text, justify="right")
-                # Add the row, including new token columns
+                # --- END SCORE HANDLING ---
+
+                # Add the row with arguments in the new order (9 columns total)
                 self.table.add_row(
-                    task_dir.name,
-                    num_steps,
-                    duration_str,
-                    in_tokens_text,      # ADDED
-                    out_tokens_text,     # ADDED
-                    total_tokens_text,   # ADDED
-                    train_passed,
-                    test_passed,
-                    best_score_text
+                    task_dir.name,       # TASKS
+                    test_passed,         # TEST
+                    train_passed,        # TRAIN
+                    best_score_text,     # SCORE
+                    num_steps,           # STEPS
+                    duration_str,        # DURATION
+                    in_tokens_text,      # IN
+                    out_tokens_text,     # OUT
+                    total_tokens_text    # TOTAL
                 )
 
             except FileNotFoundError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling for 9 columns
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling for 9 columns
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
