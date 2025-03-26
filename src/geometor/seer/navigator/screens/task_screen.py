@@ -41,12 +41,17 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order
+        # Add columns in the new requested order, including best trial metrics
         self.table.add_columns(
             "STEP",
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"),
+            Text("SIZE", justify="center"),      # ADDED
+            Text("PALETTE", justify="center"),   # ADDED
+            Text("COLORS", justify="center"),    # ADDED
+            Text("PIXELS", justify="right"),     # ADDED
+            Text("%", justify="right"),          # ADDED
             "DURATION",
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
@@ -120,25 +125,53 @@ class TaskScreen(Screen):
                 best_score_text = Text(best_score_text, justify="right")
                 # --- END BEST SCORE HANDLING ---
 
-                # Add the row with arguments in the new order
+                # --- START BEST TRIAL METRICS HANDLING ---
+                metrics = summary.get("best_trial_metrics", {})
+
+                def format_bool_metric(value):
+                    if value is True:
+                        return Text("✔", style="green", justify="center")
+                    elif value is False:
+                        return Text("✘", style="red", justify="center")
+                    else:
+                        return Text("-", justify="center")
+
+                size_correct_text = format_bool_metric(metrics.get("all_size_correct"))
+                palette_correct_text = format_bool_metric(metrics.get("all_palette_correct"))
+                color_count_correct_text = format_bool_metric(metrics.get("all_color_count_correct"))
+
+                pixels_off_val = metrics.get("avg_pixels_off")
+                pixels_off_text = Text(f"{pixels_off_val:.1f}" if pixels_off_val is not None else "-", justify="right")
+
+                percent_correct_val = metrics.get("avg_percent_correct")
+                percent_correct_text = Text(f"{percent_correct_val:.1f}" if percent_correct_val is not None else "-", justify="right")
+                # --- END BEST TRIAL METRICS HANDLING ---
+
+
+                # Add the row with arguments in the new order (14 columns total)
                 self.table.add_row(
-                    step_dir.name,       # STEP
-                    test_passed,         # TEST
-                    train_passed,        # TRAIN
-                    best_score_text,     # BEST SCORE
-                    duration_str,        # DURATION
-                    in_tokens_text,      # IN
-                    out_tokens_text,     # OUT
-                    total_tokens_text,   # TOTAL
-                    num_files            # FILES
+                    step_dir.name,             # STEP
+                    test_passed,               # TEST
+                    train_passed,              # TRAIN
+                    best_score_text,           # SCORE
+                    size_correct_text,         # SIZE (ADDED)
+                    palette_correct_text,      # PALETTE (ADDED)
+                    color_count_correct_text,  # COLORS (ADDED)
+                    pixels_off_text,           # PIXELS (ADDED)
+                    percent_correct_text,      # % (ADDED)
+                    duration_str,              # DURATION
+                    in_tokens_text,            # IN
+                    out_tokens_text,           # OUT
+                    total_tokens_text,         # TOTAL
+                    num_files                  # FILES
                 )
 
             except FileNotFoundError:
-                # Update exception handling to include placeholders for new columns (9 columns total)
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 14 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling to include placeholders for new columns (9 columns total)
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 14 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 

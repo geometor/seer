@@ -118,6 +118,39 @@ class TaskStep(Level):
             summary["codes"]["count"] = len(self.codes)
             summary["codes"]["types"] = list(self.codes.keys())
 
+            # --- START: Add Best Trial Metrics ---
+            best_trial = self.step_code_trials.get_best_trial()
+            best_trial_metrics = {}
+            if (
+                best_trial
+                and best_trial.train_results
+                and best_trial.train_results.get("trials")
+            ):
+                train_trials = best_trial.train_results["trials"]
+                if train_trials: # Ensure there are trials to process
+                    size_correct_list = [t.size_correct for t in train_trials]
+                    palette_correct_list = [t.color_palette_correct for t in train_trials]
+                    color_count_correct_list = [t.color_count_correct for t in train_trials]
+                    pixels_off_list = [t.pixels_off for t in train_trials if t.pixels_off is not None]
+                    percent_correct_list = [t.percent_correct for t in train_trials if t.percent_correct is not None]
+
+                    best_trial_metrics["all_size_correct"] = all(size_correct_list)
+                    best_trial_metrics["all_palette_correct"] = all(palette_correct_list)
+                    best_trial_metrics["all_color_count_correct"] = all(color_count_correct_list)
+                    best_trial_metrics["avg_pixels_off"] = sum(pixels_off_list) / len(pixels_off_list) if pixels_off_list else None
+                    best_trial_metrics["avg_percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None
+                else:
+                    # Handle case where train_results exists but trials list is empty
+                    best_trial_metrics["all_size_correct"] = None
+                    best_trial_metrics["all_palette_correct"] = None
+                    best_trial_metrics["all_color_count_correct"] = None
+                    best_trial_metrics["avg_pixels_off"] = None
+                    best_trial_metrics["avg_percent_correct"] = None
+
+            summary["best_trial_metrics"] = best_trial_metrics
+            # --- END: Add Best Trial Metrics ---
+
+
             #  if all_train_results:
                 #  summary["trials"]["train"] = self._summarize_trial_results(
                     #  all_train_results
