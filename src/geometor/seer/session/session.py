@@ -27,9 +27,15 @@ class Session(Level):
         summary["train_passed"] = self.train_passed_count  # Use count property
         summary["test_passed"] = self.test_passed_count    # Use count property
 
-        # Aggregate trial counts from each SessionTask
+        # Aggregate trial counts and tokens from each SessionTask
         task_trials = {}
         total_steps = 0  # Initialize total steps
+        # --- START ADDED TOKEN COUNTERS ---
+        total_prompt_tokens = 0
+        total_candidates_tokens = 0
+        total_tokens_all_tasks = 0
+        # --- END ADDED TOKEN COUNTERS ---
+
         for task_id, session_task in self.tasks.items():
             # Access summary information directly from session_task
             total_steps += len(session_task.steps)  # Use len(steps)
@@ -38,8 +44,54 @@ class Session(Level):
                 "test": session_task.trials.get("test", {}).get("total", 0),
             }
 
+            # --- START ADDED TOKEN AGGREGATION ---
+            # Read from the task's index.json for robustness
+            task_summary_path = session_task.dir / "index.json"
+            try:
+                # Ensure the task summary exists before trying to read it
+                # This assumes task.summarize() is called before session.summarize()
+                if task_summary_path.exists():
+                    with open(task_summary_path, "r") as f:
+                        task_summary = json.load(f)
+
+                    tokens_data = task_summary.get("tokens", {}) # Get tokens dict
+                    prompt_tokens = tokens_data.get("prompt_tokens")
+                    candidates_tokens = tokens_data.get("candidates_tokens")
+                    total_tokens = tokens_data.get("total_tokens")
+
+                    if prompt_tokens is not None:
+                        total_prompt_tokens += prompt_tokens
+                    if candidates_tokens is not None:
+                        total_candidates_tokens += candidates_tokens
+                    if total_tokens is not None:
+                        total_tokens_all_tasks += total_tokens
+                else:
+                    # Log a warning if the task summary is missing (optional)
+                    # self.log_warning(f"Task summary file not found for token aggregation: {task_summary_path}", "Session Summarize")
+                    print(f"    WARNING (Session {self.name}): Task summary file not found for token aggregation: {task_summary_path}")
+
+
+            except (json.JSONDecodeError, TypeError) as e:
+                 # Log or handle error if task summary isn't valid JSON or structure is wrong
+                 # self.log_error(e, f"Error reading task summary for token aggregation: {session_task.name}")
+                 print(f"    ERROR (Session {self.name}): Error reading task summary for token aggregation: {session_task.name} - {e}")
+            except Exception as e:
+                 # Catch any other unexpected errors during file reading
+                 # self.log_error(e, f"Unexpected error reading task summary for token aggregation: {session_task.name}")
+                 print(f"    ERROR (Session {self.name}): Unexpected error reading task summary for token aggregation: {session_task.name} - {e}")
+            # --- END ADDED TOKEN AGGREGATION ---
+
+
         summary["task_trials"] = task_trials
         summary["total_steps"] = total_steps  # Add total_steps to the summary
+
+        # --- START ADDED TOKENS TO SUMMARY ---
+        summary["tokens"] = {
+            "prompt_tokens": total_prompt_tokens,
+            "candidates_tokens": total_candidates_tokens,
+            "total_tokens": total_tokens_all_tasks,
+        }
+        # --- END ADDED TOKENS TO SUMMARY ---
 
         self._write_to_json("index.json", summary)
 

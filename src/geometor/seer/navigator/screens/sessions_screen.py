@@ -42,12 +42,18 @@ class SessionsScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        self.table.add_column("SESSION")
-        self.table.add_column("TASKS")
-        self.table.add_column("STEPS")  # Add the STEPS column
-        self.table.add_column("DURATION")  # NEW
-        self.table.add_column("TRAIN")
-        self.table.add_column("TEST")
+        # Add columns, including token counts, setting justify="right" for numeric columns
+        self.table.add_columns(
+            "SESSION",
+            "TASKS",
+            "STEPS",
+            "DURATION",
+            Text("IN", justify="right"),    # ADDED
+            Text("OUT", justify="right"),   # ADDED
+            Text("TOTAL", justify="right"), # ADDED
+            "TRAIN",
+            "TEST",
+        )
         self.table.cursor_type = "row"
         yield Header()
         with Vertical():
@@ -81,6 +87,17 @@ class SessionsScreen(Screen):
                     else "-"
                 )
 
+                # --- START ADDED TOKEN HANDLING ---
+                tokens_data = summary.get("tokens", {}) # Get the tokens dict, default to empty
+                prompt_tokens = tokens_data.get("prompt_tokens")
+                candidates_tokens = tokens_data.get("candidates_tokens")
+                total_tokens = tokens_data.get("total_tokens")
+
+                in_tokens_text = Text(str(prompt_tokens) if prompt_tokens is not None else "-", justify="right")
+                out_tokens_text = Text(str(candidates_tokens) if candidates_tokens is not None else "-", justify="right")
+                total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
+                # --- END ADDED TOKEN HANDLING ---
+
                 train_passed = (
                     Text(str(summary.get("train_passed")), style="bold green", justify="center")
                     if summary.get("train_passed")
@@ -92,20 +109,38 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="center")
                 )
 
-                self.table.add_row(session_dir.name, num_tasks, num_steps, duration_str, train_passed, test_passed) # Add num_steps
+                # Add the row, including new token columns
+                self.table.add_row(
+                    session_dir.name,
+                    num_tasks,
+                    num_steps,
+                    duration_str,
+                    in_tokens_text,      # ADDED
+                    out_tokens_text,     # ADDED
+                    total_tokens_text,   # ADDED
+                    train_passed,
+                    test_passed
+                )
             except FileNotFoundError:
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-")  # Use "-" for missing summary
+                # Update exception handling to include placeholders for new columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-")  # Use "-" for invalid JSON
+                # Update exception handling to include placeholders for new columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 
     def update_summary(self):
-        summary = self.query_one("#summary", Static)
+        summary_widget = self.query_one("#summary", Static) # Corrected query_one usage
         num_sessions = 0
         train_passed_count = 0
         test_passed_count = 0
         total_steps = 0  # Add total_steps for summary
+        # --- START ADDED TOKEN COUNTERS ---
+        grand_total_prompt_tokens = 0
+        grand_total_candidates_tokens = 0
+        grand_total_tokens_all_sessions = 0
+        # --- END ADDED TOKEN COUNTERS ---
 
         for session_dir in self.sessions_root.iterdir():  # Iterate over sessions_root
             if session_dir.is_dir():
@@ -119,12 +154,30 @@ class SessionsScreen(Screen):
                     if session_summary.get("test_passed"):
                         test_passed_count += 1
                     total_steps += session_summary.get("total_steps", 0)  # Accumulate steps
+
+                    # --- START ADDED TOKEN ACCUMULATION ---
+                    tokens_data = session_summary.get("tokens", {})
+                    prompt_tokens = tokens_data.get("prompt_tokens")
+                    candidates_tokens = tokens_data.get("candidates_tokens")
+                    total_tokens = tokens_data.get("total_tokens")
+
+                    if prompt_tokens is not None:
+                        grand_total_prompt_tokens += prompt_tokens
+                    if candidates_tokens is not None:
+                        grand_total_candidates_tokens += candidates_tokens
+                    if total_tokens is not None:
+                        grand_total_tokens_all_sessions += total_tokens
+                    # --- END ADDED TOKEN ACCUMULATION ---
+
                 except (FileNotFoundError, json.JSONDecodeError):
                     pass
 
-        summary.update(
-            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, steps: {total_steps}" # Include in summary
+        # Update summary string to include token totals
+        summary_widget.update(
+            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, steps: {total_steps} | "
+            f"Tokens: IN={grand_total_prompt_tokens}, OUT={grand_total_candidates_tokens}, TOTAL={grand_total_tokens_all_sessions}"
         )
+
 
     def select_session_by_index(self, index: int) -> None:
         if self.session_dirs:
