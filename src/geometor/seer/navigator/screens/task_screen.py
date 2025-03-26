@@ -41,7 +41,7 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order, including best trial metrics
+        # Add columns in the new requested order, changing DURATION to TIME
         self.table.add_columns(
             "STEP",
             "TEST",
@@ -52,7 +52,7 @@ class TaskScreen(Screen):
             Text("COLORS", justify="center"),    # ADDED
             Text("PIXELS", justify="right"),     # ADDED - Now represents total pixels off
             Text("%", justify="right"),          # ADDED
-            "DURATION",
+            "TIME",                 # CHANGED from DURATION
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -80,7 +80,8 @@ class TaskScreen(Screen):
                     summary = json.load(f)
                 num_files = sum(1 for _ in step_dir.iterdir())
 
-                duration_str = (
+                # Use the updated _format_duration method
+                time_str = (
                     Level._format_duration(summary.get("duration_seconds"))
                     if summary.get("duration_seconds") is not None
                     else "-"
@@ -150,7 +151,7 @@ class TaskScreen(Screen):
                 # --- END BEST TRIAL METRICS HANDLING ---
 
 
-                # Add the row with arguments in the new order (14 columns total)
+                # Add the row with arguments in the new order (14 columns total), using time_str
                 self.table.add_row(
                     step_dir.name,             # STEP
                     test_passed,               # TEST
@@ -161,7 +162,7 @@ class TaskScreen(Screen):
                     color_count_correct_text,  # COLORS (ADDED)
                     pixels_off_text,           # PIXELS (CHANGED to total count)
                     percent_correct_text,      # % (ADDED)
-                    duration_str,              # DURATION
+                    time_str,                  # TIME (CHANGED from duration_str)
                     in_tokens_text,            # IN
                     out_tokens_text,           # OUT
                     total_tokens_text,         # TOTAL

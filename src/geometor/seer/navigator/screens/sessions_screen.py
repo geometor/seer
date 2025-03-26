@@ -42,14 +42,14 @@ class SessionsScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order
+        # Add columns in the new requested order, changing DURATION to TIME
         self.table.add_columns(
             "SESSION",
             "TEST",                 # MOVED
             "TRAIN",                # MOVED
             "TASKS",                # MOVED
             "STEPS",
-            "DURATION",
+            "TIME",                 # CHANGED from DURATION
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -81,7 +81,8 @@ class SessionsScreen(Screen):
                 num_tasks = Text(str(summary.get("count", 0)), style="", justify="right")
                 num_steps = Text(str(summary.get("total_steps", 0)), style="", justify="right") # Get total_steps
 
-                duration_str = (
+                # Use the updated _format_duration method
+                time_str = (
                     Level._format_duration(summary.get("duration_seconds"))
                     if summary.get("duration_seconds") is not None
                     else "-"
@@ -109,14 +110,14 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="center")
                 )
 
-                # Add the row with arguments in the new order
+                # Add the row with arguments in the new order, using time_str
                 self.table.add_row(
                     session_dir.name,    # SESSION
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     num_tasks,           # TASKS
                     num_steps,           # STEPS
-                    duration_str,        # DURATION
+                    time_str,            # TIME (CHANGED from duration_str)
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
                     total_tokens_text    # TOTAL

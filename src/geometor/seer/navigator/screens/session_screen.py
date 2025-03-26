@@ -43,14 +43,14 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order
+        # Add columns in the new requested order, changing DURATION to TIME
         self.table.add_columns(
             "TASKS",
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"), # Renamed from BEST SCORE
             "STEPS",
-            "DURATION",
+            "TIME",                 # CHANGED from DURATION
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -77,7 +77,8 @@ class SessionScreen(Screen):
 
                 num_steps = Text(str(summary.get("steps", 0)), justify="right")
 
-                duration_str = (
+                # Use the updated _format_duration method
+                time_str = (
                     Level._format_duration(summary.get("duration_seconds"))
                     if summary.get("duration_seconds") is not None
                     else "-"
@@ -125,14 +126,14 @@ class SessionScreen(Screen):
                 best_score_text = Text(best_score_text, justify="right")
                 # --- END SCORE HANDLING ---
 
-                # Add the row with arguments in the new order (9 columns total)
+                # Add the row with arguments in the new order (9 columns total), using time_str
                 self.table.add_row(
                     task_dir.name,       # TASKS
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     best_score_text,     # SCORE
                     num_steps,           # STEPS
-                    duration_str,        # DURATION
+                    time_str,            # TIME (CHANGED from duration_str)
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
                     total_tokens_text    # TOTAL

@@ -104,14 +104,14 @@ ERROR
 
     @staticmethod
     def _format_duration(seconds: float | None) -> str:
-        """Formats duration in H:M:S format."""
+        """Formats duration in MM:SS format."""
         if seconds is None:
             return "-"
         delta = timedelta(seconds=seconds)
-        hours, remainder = divmod(delta.total_seconds(), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        # Use int() to remove potential decimals from seconds
-        return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+        # Calculate total minutes and remaining seconds
+        minutes, seconds = divmod(delta.total_seconds(), 60)
+        # Format as MM:SS
+        return f"{int(minutes):02}:{int(seconds):02}"
 
     def summarize(self):
         # Base implementation.  Subclasses should override and call super().summarize()
