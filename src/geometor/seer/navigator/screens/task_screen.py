@@ -46,7 +46,7 @@ class TaskScreen(Screen):
             "STEP",
             "TEST",
             "TRAIN",
-            Text("BEST SCORE", justify="right"),
+            Text("SCORE", justify="right"),
             "DURATION",
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
