@@ -104,9 +104,9 @@ class TaskScreen(Screen):
                 self.table.add_row(step_dir.name, num_files, duration_str, train_passed, test_passed, best_score_text)
 
             except FileNotFoundError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-")  # Use "-"
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
