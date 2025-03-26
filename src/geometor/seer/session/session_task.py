@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 from geometor.seer.session.level import Level
 import json # Added for reading step summary
+from datetime import datetime # Added to fix NameError
 
 if TYPE_CHECKING:
     from geometor.seer.session import Session
