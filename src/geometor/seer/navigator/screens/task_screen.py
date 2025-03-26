@@ -41,9 +41,17 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns, setting justify="right" for "BEST SCORE"
+        # Add columns, including token counts, setting justify="right" for numeric columns
         self.table.add_columns(
-            "STEP", "FILES", "DURATION", "TRAIN", "TEST", "BEST SCORE", 
+            "STEP",
+            "FILES",
+            "DURATION",
+            Text("IN", justify="right"),    # ADDED
+            Text("OUT", justify="right"),   # ADDED
+            Text("TOTAL", justify="right"), # ADDED
+            "TRAIN",
+            "TEST",
+            Text("BEST SCORE", justify="right"),
         )
         yield Header()
         with Vertical():
@@ -73,6 +81,16 @@ class TaskScreen(Screen):
                     else "-"
                 )
 
+                # --- START ADDED TOKEN HANDLING ---
+                prompt_tokens = summary.get("response", {}).get("prompt_tokens")
+                candidates_tokens = summary.get("response", {}).get("candidates_tokens")
+                total_tokens = summary.get("response", {}).get("total_tokens")
+
+                in_tokens_text = Text(str(prompt_tokens) if prompt_tokens is not None else "-", justify="right")
+                out_tokens_text = Text(str(candidates_tokens) if candidates_tokens is not None else "-", justify="right")
+                total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
+                # --- END ADDED TOKEN HANDLING ---
+
                 if "train_passed" in summary and summary["train_passed"] is not None:
                     train_passed = (
                         Text("✔", style="green", justify="center")
@@ -100,21 +118,39 @@ class TaskScreen(Screen):
                     else "-"
                 )
                 best_score_text = Text(best_score_text, justify="right")
-                # Add the row, with best_score_text already a string
-                self.table.add_row(step_dir.name, num_files, duration_str, train_passed, test_passed, best_score_text)
+                # Add the row, including new token columns
+                self.table.add_row(
+                    step_dir.name,
+                    num_files,
+                    duration_str,
+                    in_tokens_text,      # ADDED
+                    out_tokens_text,     # ADDED
+                    total_tokens_text,   # ADDED
+                    train_passed,
+                    test_passed,
+                    best_score_text
+                )
 
             except FileNotFoundError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling to include placeholders for new columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
             except json.JSONDecodeError:
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling to include placeholders for new columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
     def update_summary(self):
-        summary = self.query_one("#summary")
+        summary_widget = self.query_one("#summary") # Corrected query_one usage
         num_steps = len(self.step_dirs)  # Use len(self.step_dirs)
         train_passed_count = 0
         test_passed_count = 0
+        # --- START ADDED TOKEN COUNTERS ---
+        total_prompt_tokens = 0
+        total_candidates_tokens = 0
+        total_tokens_all_steps = 0
+        # --- END ADDED TOKEN COUNTERS ---
+
 
         for step_dir in self.step_dirs:
             summary_path = step_dir / "index.json"
@@ -125,12 +161,29 @@ class TaskScreen(Screen):
                     train_passed_count += 1
                 if step_summary.get("test_passed"):
                     test_passed_count += 1
+
+                # --- START ADDED TOKEN ACCUMULATION ---
+                prompt_tokens = step_summary.get("response", {}).get("prompt_tokens")
+                candidates_tokens = step_summary.get("response", {}).get("candidates_tokens")
+                total_tokens = step_summary.get("response", {}).get("total_tokens")
+
+                if prompt_tokens is not None:
+                    total_prompt_tokens += prompt_tokens
+                if candidates_tokens is not None:
+                    total_candidates_tokens += candidates_tokens
+                if total_tokens is not None:
+                    total_tokens_all_steps += total_tokens
+                # --- END ADDED TOKEN ACCUMULATION ---
+
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
-        summary.update(
-            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}"
+        # Update summary string to include token totals
+        summary_widget.update(
+            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count} | "
+            f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_steps}"
         )
+
 
     def select_step_by_index(self, index: int) -> None:
         if self.step_dirs:

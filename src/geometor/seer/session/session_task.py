@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from geometor.seer.session.level import Level
+import json # Added for reading step summary
 
 if TYPE_CHECKING:
     from geometor.seer.session import Session
@@ -35,6 +36,12 @@ class SessionTask(Level):
         # Aggregate trial results from all steps
         all_train_results = []
         all_test_results = []
+        # --- START ADDED TOKEN COUNTERS ---
+        total_prompt_tokens = 0
+        total_candidates_tokens = 0
+        total_tokens_all_steps = 0
+        # --- END ADDED TOKEN COUNTERS ---
+
         for step in self.steps:
             # Access step_code_trials directly
             for code_trial in step.step_code_trials.get_all_trials():
@@ -43,15 +50,51 @@ class SessionTask(Level):
                 if code_trial.test_results:
                     all_test_results.extend(code_trial.test_results.get("trials", []))
 
+            # --- START ADDED TOKEN AGGREGATION ---
+            # Ensure step summary is generated first if needed, or read directly
+            # Let's read from the step's index.json for robustness
+            step_summary_path = step.dir / "index.json"
+            try:
+                # Ensure the step summary exists before trying to read it
+                # This assumes step.summarize() is called before task.summarize()
+                if step_summary_path.exists():
+                    with open(step_summary_path, "r") as f:
+                        step_summary = json.load(f)
+
+                    prompt_tokens = step_summary.get("response", {}).get("prompt_tokens")
+                    candidates_tokens = step_summary.get("response", {}).get("candidates_tokens")
+                    total_tokens = step_summary.get("response", {}).get("total_tokens")
+
+                    if prompt_tokens is not None:
+                        total_prompt_tokens += prompt_tokens
+                    if candidates_tokens is not None:
+                        total_candidates_tokens += candidates_tokens
+                    if total_tokens is not None:
+                        total_tokens_all_steps += total_tokens
+                else:
+                    # Log a warning if the step summary is missing
+                    self.log_warning(f"Step summary file not found for token aggregation: {step_summary_path}", "SessionTask Summarize")
+
+            except (json.JSONDecodeError, TypeError) as e:
+                 # Log or handle error if step summary isn't valid JSON or structure is wrong
+                 self.log_error(e, f"Error reading step summary for token aggregation: {step.dir.name}")
+            except Exception as e:
+                 # Catch any other unexpected errors during file reading
+                 self.log_error(e, f"Unexpected error reading step summary for token aggregation: {step.dir.name}")
+            # --- END ADDED TOKEN AGGREGATION ---
+
+
         # Calculate best_score across all steps
         # Only calculate if there are steps
+        best_score = None # Initialize outside the loop
         if self.steps:
-            best_score = None
-            for step in self.steps:
-                step_best_score = step.step_code_trials.best_score  # Access directly
-                if step_best_score is not None:
-                    if best_score is None or step_best_score < best_score:
-                        best_score = step_best_score
+            valid_scores = [
+                step.step_code_trials.best_score
+                for step in self.steps
+                if step.step_code_trials.best_score is not None
+            ]
+            if valid_scores:
+                best_score = min(valid_scores)
 
 
         # Correct train_passed and test_passed logic using any() and explicit True check
@@ -65,11 +108,18 @@ class SessionTask(Level):
                 "matches": None,  # Filled in by TaskStep
                 "train_passed": train_passed,  # Use calculated values
                 "test_passed": test_passed,  # Use calculated values
+                # --- START ADDED TOKENS TO SUMMARY ---
+                "tokens": {
+                    "prompt_tokens": total_prompt_tokens,
+                    "candidates_tokens": total_candidates_tokens,
+                    "total_tokens": total_tokens_all_steps,
+                }
+                # --- END ADDED TOKENS TO SUMMARY ---
             }
         )
 
         # Conditionally add best_score
-        if self.steps and any(step.step_code_trials.best_score is not None for step in self.steps):
+        if best_score is not None: # Check if best_score was calculated
             summary["best_score"] = best_score
 
         # Conditionally add trials
@@ -110,3 +160,26 @@ class SessionTask(Level):
     @property
     def test_passed(self):
         return any(step.test_passed is True for step in self.steps)  # Check for True
+
+    # --- Start of added method ---
+    def log_warning(self, message: str, context: str = ""):
+        """Logs a warning message to the task's warnings.txt."""
+        # This method might be better placed in the Level class if needed elsewhere
+        # For now, keeping it here as requested by the context of the change.
+        timestamp = datetime.now().isoformat()
+        log_entry = f"[{timestamp}]"
+        if context:
+            log_entry += f" Context: {context}"
+        log_entry += f"\nWarning: {message}\n---\n"
+
+        try:
+            # Append warning to the file in the task directory
+            warnings_file = self.dir / "warnings.txt"
+            with open(warnings_file, "a") as f:
+                f.write(log_entry)
+            # Also print the warning for immediate visibility
+            print(f"    WARNING ({self.name}): {message}" + (f" (Context: {context})" if context else ""))
+        except Exception as e:
+            # Fallback if logging fails
+            print(f"    CRITICAL ({self.name}): Failed to log warning: {message}. Error: {e}")
+    # --- End of added method ---
