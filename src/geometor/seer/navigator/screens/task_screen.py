@@ -41,17 +41,17 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns, including token counts, setting justify="right" for numeric columns
+        # Add columns in the new requested order
         self.table.add_columns(
             "STEP",
-            "FILES",
-            "DURATION",
-            Text("IN", justify="right"),    # ADDED
-            Text("OUT", justify="right"),   # ADDED
-            Text("TOTAL", justify="right"), # ADDED
-            "TRAIN",
             "TEST",
+            "TRAIN",
             Text("BEST SCORE", justify="right"),
+            "DURATION",
+            Text("IN", justify="right"),
+            Text("OUT", justify="right"),
+            Text("TOTAL", justify="right"),
+            "FILES",
         )
         yield Header()
         with Vertical():
@@ -81,7 +81,7 @@ class TaskScreen(Screen):
                     else "-"
                 )
 
-                # --- START ADDED TOKEN HANDLING ---
+                # --- START TOKEN HANDLING ---
                 prompt_tokens = summary.get("response", {}).get("prompt_tokens")
                 candidates_tokens = summary.get("response", {}).get("candidates_tokens")
                 total_tokens = summary.get("response", {}).get("total_tokens")
@@ -89,8 +89,9 @@ class TaskScreen(Screen):
                 in_tokens_text = Text(str(prompt_tokens) if prompt_tokens is not None else "-", justify="right")
                 out_tokens_text = Text(str(candidates_tokens) if candidates_tokens is not None else "-", justify="right")
                 total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
-                # --- END ADDED TOKEN HANDLING ---
+                # --- END TOKEN HANDLING ---
 
+                # --- START PASS/FAIL HANDLING ---
                 if "train_passed" in summary and summary["train_passed"] is not None:
                     train_passed = (
                         Text("✔", style="green", justify="center")
@@ -108,35 +109,36 @@ class TaskScreen(Screen):
                     )
                 else:
                     test_passed = Text("-", style="", justify="center")
+                # --- END PASS/FAIL HANDLING ---
 
-
-                #  matches = f"{summary.get('trials', {}).get('train', {}).get('passed', 0)}/{summary.get('trials', {}).get('train', {}).get('total', 0)}"
-
+                # --- START BEST SCORE HANDLING ---
                 best_score_text = (
                     f"{summary.get('best_score'):.2f}"
                     if summary.get("best_score") is not None
                     else "-"
                 )
                 best_score_text = Text(best_score_text, justify="right")
-                # Add the row, including new token columns
+                # --- END BEST SCORE HANDLING ---
+
+                # Add the row with arguments in the new order
                 self.table.add_row(
-                    step_dir.name,
-                    num_files,
-                    duration_str,
-                    in_tokens_text,      # ADDED
-                    out_tokens_text,     # ADDED
-                    total_tokens_text,   # ADDED
-                    train_passed,
-                    test_passed,
-                    best_score_text
+                    step_dir.name,       # STEP
+                    test_passed,         # TEST
+                    train_passed,        # TRAIN
+                    best_score_text,     # BEST SCORE
+                    duration_str,        # DURATION
+                    in_tokens_text,      # IN
+                    out_tokens_text,     # OUT
+                    total_tokens_text,   # TOTAL
+                    num_files            # FILES
                 )
 
             except FileNotFoundError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling to include placeholders for new columns (9 columns total)
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling to include placeholders for new columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")  # Use "-"
+                # Update exception handling to include placeholders for new columns (9 columns total)
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
@@ -211,7 +213,7 @@ class TaskScreen(Screen):
     def action_select_row(self):
         row_id = self.table.cursor_row
         row = self.table.get_row_at(row_id)
-        key = row[0]
+        key = row[0] # Step name is still the first column
         # TODO: implement StepScreen
         # self.app.push_screen(StepScreen(key))
 
