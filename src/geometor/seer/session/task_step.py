@@ -84,6 +84,9 @@ class TaskStep(Level):
             # Retrieve retries count, default to None if not logged
             retries_count = self.response.get("retries", None)
 
+            # Check if any errors were logged
+            has_errors = bool(self.errors)
+
             summary.update({
                 "title": self.title,
                 "index": self.index,
@@ -94,6 +97,7 @@ class TaskStep(Level):
                 "codes": {},
                 "best_score": self.step_code_trials.best_score,  # Add best score
                 "retries": retries_count, # ADDED retries count
+                "has_errors": has_errors, # ADDED error flag
             })
 
             # Conditionally add train_passed and test_passed
@@ -145,7 +149,7 @@ class TaskStep(Level):
                     best_trial_metrics["all_size_correct"] = all(size_correct_list)
                     best_trial_metrics["all_palette_correct"] = all(palette_correct_list)
                     best_trial_metrics["all_color_count_correct"] = all(color_count_correct_list)
-                    best_trial_metrics["pixels_off"] = sum(pixels_off_list) 
+                    best_trial_metrics["pixels_off"] = sum(pixels_off_list)
                     best_trial_metrics["avg_pixels_off"] = sum(pixels_off_list) / len(pixels_off_list) if pixels_off_list else None
                     best_trial_metrics["avg_percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None
                     best_trial_metrics["total_pixels_off"] = total_pixels_off # ADDED total pixels off
@@ -174,6 +178,10 @@ class TaskStep(Level):
 
         except Exception as e:
             self.log_error(e, f"Error during summarization of TaskStep: {self.title}")
+            # Ensure has_errors is set even if summarization fails later
+            summary = super().summarize() # Get base summary again
+            summary["has_errors"] = True # Mark as having errors
+            self._write_to_json("index.json", summary) # Try to save minimal summary
             return None  # Return None on error
 
     def _summarize_trial_results(self, results):

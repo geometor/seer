@@ -41,19 +41,20 @@ class TaskScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order, including RETRIES
+        # Add columns in the new requested order, including ERROR
         self.table.add_columns(
             "STEP",
+            Text("ERROR", justify="center"),     # ADDED
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"),
-            Text("SIZE", justify="center"),      # ADDED
-            Text("PALETTE", justify="center"),   # ADDED
-            Text("COLORS", justify="center"),    # ADDED
-            Text("PIXELS", justify="right"),     # ADDED - Now represents total pixels off
-            Text("%", justify="right"),          # ADDED
-            "TIME",                 # CHANGED from DURATION
-            Text("RETRIES", justify="right"),    # ADDED
+            Text("SIZE", justify="center"),
+            Text("PALETTE", justify="center"),
+            Text("COLORS", justify="center"),
+            Text("PIXELS", justify="right"),
+            Text("%", justify="right"),
+            "TIME",
+            Text("RETRIES", justify="right"),
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -87,6 +88,15 @@ class TaskScreen(Screen):
                     if summary.get("duration_seconds") is not None
                     else "-"
                 )
+
+                # --- START ERROR HANDLING ---
+                has_errors = summary.get("has_errors", False) # Default to False if missing
+                error_text = (
+                    Text("❗", style="bold red", justify="center")
+                    if has_errors
+                    else Text("-", justify="center")
+                )
+                # --- END ERROR HANDLING ---
 
                 # --- START RETRIES HANDLING ---
                 retries_val = summary.get("retries")
@@ -157,9 +167,10 @@ class TaskScreen(Screen):
                 # --- END BEST TRIAL METRICS HANDLING ---
 
 
-                # Add the row with arguments in the new order (15 columns total)
+                # Add the row with arguments in the new order (16 columns total)
                 self.table.add_row(
                     step_dir.name,             # STEP
+                    error_text,                # ERROR (ADDED)
                     test_passed,               # TEST
                     train_passed,              # TRAIN
                     best_score_text,           # SCORE
@@ -169,7 +180,7 @@ class TaskScreen(Screen):
                     pixels_off_text,           # PIXELS
                     percent_correct_text,      # %
                     time_str,                  # TIME
-                    retries_text,              # RETRIES (ADDED)
+                    retries_text,              # RETRIES
                     in_tokens_text,            # IN
                     out_tokens_text,           # OUT
                     total_tokens_text,         # TOTAL
@@ -177,11 +188,11 @@ class TaskScreen(Screen):
                 )
 
             except FileNotFoundError:
-                # Update exception handling for 15 columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 16 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 15 columns
-                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 16 columns
+                self.table.add_row(step_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.step_dirs:
             self.select_step_by_index(self.step_index)
 
@@ -190,6 +201,7 @@ class TaskScreen(Screen):
         num_steps = len(self.step_dirs)  # Use len(self.step_dirs)
         train_passed_count = 0
         test_passed_count = 0
+        error_count = 0 # ADDED error counter
         # --- START ADDED TOKEN COUNTERS ---
         total_prompt_tokens = 0
         total_candidates_tokens = 0
@@ -206,6 +218,8 @@ class TaskScreen(Screen):
                     train_passed_count += 1
                 if step_summary.get("test_passed"):
                     test_passed_count += 1
+                if step_summary.get("has_errors"): # ADDED check for errors
+                    error_count += 1
 
                 # --- START ADDED TOKEN ACCUMULATION ---
                 prompt_tokens = step_summary.get("response", {}).get("prompt_tokens")
@@ -223,9 +237,9 @@ class TaskScreen(Screen):
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
-        # Update summary string to include token totals
+        # Update summary string to include error count and token totals
         summary_widget.update(
-            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count} | "
+            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, errors ❗: {error_count} | "
             f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_steps}"
         )
 
