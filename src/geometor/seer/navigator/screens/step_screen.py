@@ -1,6 +1,8 @@
 from pathlib import Path
 import json
 import yaml
+import subprocess # Added for opening external programs
+import shutil # Added to check if sxiv exists
 
 from rich.text import Text
 
@@ -8,7 +10,7 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher # Added Markdown, ContentSwitcher
+from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher, Static # Added Static
 from textual.binding import Binding
 from textual import log
 
@@ -59,13 +61,18 @@ class StepScreen(Screen):
     ContentSwitcher {
         height: 1fr;
     }
-    TextArea, Markdown {
+    TextArea, Markdown, #image-viewer-placeholder { /* Added placeholder */
         height: 1fr;
         border: none; /* Remove default border if desired */
     }
     /* Ensure Markdown content is scrollable */
     Markdown {
         overflow-y: auto;
+    }
+    /* Center placeholder text */
+    #image-viewer-placeholder {
+        content-align: center middle;
+        color: $text-muted;
     }
 
 
@@ -101,6 +108,18 @@ class StepScreen(Screen):
         self.step_name = step_path.name
         self.task_name = task_path.name
         self.session_name = session_path.name
+        self._sxiv_checked = False
+        self._sxiv_path = None
+
+    def _check_sxiv(self) -> str | None:
+        """Check if sxiv exists and cache the path."""
+        if not self._sxiv_checked:
+            self._sxiv_path = shutil.which("sxiv")
+            self._sxiv_checked = True
+            if not self._sxiv_path:
+                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
+                self.app.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
+        return self._sxiv_path
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -108,7 +127,7 @@ class StepScreen(Screen):
             with Vertical(id="file-list-container"):
                 yield DataTable(id="file-list-table")
             with Vertical(id="file-content-container"):
-                # Use a ContentSwitcher to toggle between TextArea and Markdown
+                # Use a ContentSwitcher to toggle between viewers
                 with ContentSwitcher(initial="text-viewer"):
                     yield TextArea.code_editor(
                         "",
@@ -118,6 +137,7 @@ class StepScreen(Screen):
                         id="text-viewer" # ID for the TextArea
                     )
                     yield Markdown(id="markdown-viewer") # ID for the Markdown viewer
+                    yield Static("Viewing image externally...", id="image-viewer-placeholder") # Placeholder for images
 
         yield Footer()
 
@@ -169,19 +189,61 @@ class StepScreen(Screen):
         switcher = self.query_one(ContentSwitcher)
         text_viewer = self.query_one("#text-viewer", TextArea)
         markdown_viewer = self.query_one("#markdown-viewer", Markdown)
+        image_placeholder = self.query_one("#image-viewer-placeholder", Static) # Get placeholder
 
         if new_path:
-            try:
-                content = new_path.read_text()
-                file_suffix = new_path.suffix.lower()
+            file_suffix = new_path.suffix.lower()
 
-                if file_suffix == ".md":
-                    # Update and show Markdown viewer
+            if file_suffix == ".png":
+                # Handle PNG files - open externally
+                sxiv_cmd = self._check_sxiv()
+                if sxiv_cmd:
+                    try:
+                        log.info(f"Opening image with sxiv: {new_path}")
+                        subprocess.Popen([sxiv_cmd, str(new_path)])
+                        # Update placeholder text and switch
+                        image_placeholder.update(f"Viewing '{new_path.name}' externally...")
+                        switcher.current = "image-viewer-placeholder"
+                    except FileNotFoundError:
+                        # This case should be caught by _check_sxiv, but handle defensively
+                        log.error(f"'sxiv' command not found when trying to open {new_path}.")
+                        self.app.notify("sxiv not found. Cannot open image.", severity="error")
+                        # Fallback: show error in text viewer
+                        text_viewer.load_text(f"Error: 'sxiv' command not found.\nCannot open image: {new_path.name}")
+                        text_viewer.language = None
+                        switcher.current = "text-viewer"
+                    except Exception as e:
+                        log.error(f"Error opening {new_path} with sxiv: {e}")
+                        self.app.notify(f"Error opening image: {e}", severity="error")
+                        # Fallback: show error in text viewer
+                        text_viewer.load_text(f"Error opening image '{new_path.name}':\n\n{e}")
+                        text_viewer.language = None
+                        switcher.current = "text-viewer"
+                else:
+                    # sxiv not found, show error in text viewer
+                    text_viewer.load_text(f"Error: 'sxiv' command not found.\nCannot open image: {new_path.name}")
+                    text_viewer.language = None
+                    switcher.current = "text-viewer"
+
+            elif file_suffix == ".md":
+                # Handle Markdown files
+                try:
+                    content = new_path.read_text()
                     markdown_viewer.update(content)
                     switcher.current = "markdown-viewer"
                     markdown_viewer.scroll_home(animate=False) # Scroll Markdown to top
-                else:
-                    # Update and show TextArea viewer
+                except Exception as e:
+                    log.error(f"Error loading Markdown file {new_path}: {e}")
+                    # Display error in TextArea
+                    error_content = f"Error loading file:\n\n{e}"
+                    text_viewer.load_text(error_content)
+                    text_viewer.language = None
+                    switcher.current = "text-viewer"
+
+            else:
+                # Handle other text/code files
+                try:
+                    content = new_path.read_text()
                     language = LANGUAGE_MAP.get(file_suffix)
 
                     # Check if language requires the 'syntax' extra for TextArea
@@ -194,19 +256,20 @@ class StepScreen(Screen):
                     text_viewer.language = language
                     switcher.current = "text-viewer"
                     text_viewer.scroll_home(animate=False) # Scroll TextArea to top
+                except Exception as e:
+                    log.error(f"Error loading file {new_path}: {e}")
+                    # Display error in TextArea
+                    error_content = f"Error loading file:\n\n{e}"
+                    text_viewer.load_text(error_content)
+                    text_viewer.language = None
+                    switcher.current = "text-viewer"
 
-            except Exception as e:
-                log.error(f"Error loading file {new_path}: {e}")
-                # Display error in TextArea regardless of file type
-                error_content = f"Error loading file:\n\n{e}"
-                text_viewer.load_text(error_content)
-                text_viewer.language = None # Reset language on error
-                switcher.current = "text-viewer" # Ensure TextArea is visible for error
         else:
-            # Clear both viewers if no file is selected
+            # Clear all viewers if no file is selected
             text_viewer.load_text("")
             text_viewer.language = None
             markdown_viewer.update("")
+            image_placeholder.update("No file selected.") # Reset placeholder
             switcher.current = "text-viewer" # Default to text viewer when empty
 
     def action_cursor_down(self) -> None:
@@ -225,9 +288,9 @@ class StepScreen(Screen):
 
     def action_select_file(self) -> None:
         """Action triggered by pressing Enter on the table (redundant with watch)."""
-        # The watch_selected_file_path handles loading, so this might not be needed
+        # The watch_selected_file_path handles loading/opening, so this might not be needed
         # unless we want explicit confirmation or other actions on Enter.
-        # For now, it does nothing extra as selection triggers the load.
+        # For now, it does nothing extra as selection triggers the load/open.
         pass
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
