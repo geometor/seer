@@ -59,13 +59,14 @@ class SessionsScreen(Screen):
     def compose(self) -> ComposeResult:
         self.table = DataTable()
         # Add columns in the new requested order, changing DURATION to TIME
+        # Right-align TEST, TRAIN, TIME headers
         self.table.add_columns(
             "SESSION",
-            "TEST",                 # MOVED
-            "TRAIN",                # MOVED
-            "TASKS",                # MOVED
+            Text("TEST", justify="right"),                 # MOVED & ALIGNED
+            Text("TRAIN", justify="right"),                # MOVED & ALIGNED
+            "TASKS",                                       # MOVED
             "STEPS",
-            "TIME",                 # CHANGED from DURATION
+            Text("TIME", justify="right"),                 # CHANGED from DURATION & ALIGNED
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -115,15 +116,16 @@ class SessionsScreen(Screen):
                 total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
                 # --- END ADDED TOKEN HANDLING ---
 
+                # Right-align TEST and TRAIN counts
                 train_passed = (
-                    Text(str(summary.get("train_passed")), style="bold green", justify="center")
+                    Text(str(summary.get("train_passed")), style="bold green", justify="right") # ALIGNED right
                     if summary.get("train_passed")
-                    else Text("0", style="red", justify="center")
+                    else Text("0", style="red", justify="right") # ALIGNED right
                 )
                 test_passed = (
-                    Text(str(summary.get("test_passed")), style="bold green", justify="center")
+                    Text(str(summary.get("test_passed")), style="bold green", justify="right") # ALIGNED right
                     if summary.get("test_passed")
-                    else Text("0", style="red", justify="center")
+                    else Text("0", style="red", justify="right") # ALIGNED right
                 )
 
                 # Add the row with arguments in the new order, using time_str
@@ -133,7 +135,7 @@ class SessionsScreen(Screen):
                     train_passed,        # TRAIN
                     num_tasks,           # TASKS
                     num_steps,           # STEPS
-                    time_str,            # TIME (CHANGED from duration_str)
+                    time_str,            # TIME (column definition handles alignment)
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
                     total_tokens_text    # TOTAL
