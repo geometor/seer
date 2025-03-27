@@ -147,7 +147,7 @@ class TrialScreen(Screen):
 
         # Clear previous content
         self.grid_container.remove_children()
-        self.grid_container.clear_styles() # Clear grid styles like grid-size
+        # REMOVED: self.grid_container.clear_styles() # This line caused the AttributeError
 
         row_count = 0
         widgets_to_mount = []
