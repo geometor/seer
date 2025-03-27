@@ -24,7 +24,7 @@ LANGUAGE_MAP = {
     ".txt": None, # No specific language for plain text
     # Add other extensions if necessary
 }
-DEFAULT_THEME = "github_light" # Or choose another default like "vscode_dark", "monokai"
+DEFAULT_THEME = "vscode_dark" # Changed from github_light to vscode_dark
 
 class StepScreen(Screen):
     """Displays the files within a step folder and their content."""
