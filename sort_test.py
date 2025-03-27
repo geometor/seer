@@ -54,8 +54,7 @@ class FilterSortTableApp(App[None]):
     """
 
     BINDINGS = [
-        ("ctrl+q", "quit", "Quit"),
-        ("ctrl+c", "quit", "Quit"), # Added for convenience
+        ("q", "quit", "Quit"),
     ]
 
     # Store the original, unfiltered data
