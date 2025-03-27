@@ -13,6 +13,13 @@ from geometor.seer.navigator.screens.task_screen import TaskScreen
 from geometor.seer.navigator.screens.step_screen import StepScreen # Import StepScreen
 from geometor.seer.navigator.screens.trial_screen import TrialScreen # Import TrialScreen
 
+# Define DummyGrid first so it's always available
+class DummyGrid(Static):
+    """Placeholder widget used when real renderers fail to import."""
+    def __init__(self, grid_data: list, *args, **kwargs):
+        super().__init__("Renderer Import Error", *args, **kwargs)
+        log.error("DummyGrid used - real renderer import failed.")
+
 # Import renderers (adjust path if needed)
 try:
     from geometor.seer.navigator.renderers import (
@@ -30,7 +37,7 @@ try:
 except ImportError:
     log.error("Could not import grid renderers. Grid visualization will fail.")
     RENDERERS = {}
-    class DummyGrid: pass # Dummy class to avoid NameError
+    # Assign the already defined DummyGrid in case of import failure
     SolidGrid = BlockGrid = CharGrid = TinyGrid = DummyGrid
 
 
@@ -50,7 +57,7 @@ class SessionNavigator(App):
     def __init__(self, sessions_root: str = "./sessions"):
         super().__init__()
         self.sessions_root = Path(sessions_root)
-        # Initialize renderer state
+        # Initialize renderer state - DummyGrid is now guaranteed to be defined
         self.renderer = RENDERERS.get("solid", DummyGrid) # Default to SolidGrid or Dummy
         log.info(f"Initial renderer set to: {self.renderer.__name__}")
 
