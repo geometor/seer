@@ -54,7 +54,7 @@ class TaskScreen(Screen):
             Text("PIXELS", justify="right"),
             Text("%", justify="right"),
             "TIME",
-            Text("RETRIES", justify="right"),
+            Text("ATTEMPTS", justify="right"),
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
@@ -99,8 +99,8 @@ class TaskScreen(Screen):
                 # --- END ERROR HANDLING ---
 
                 # --- START RETRIES HANDLING ---
-                retries_val = summary.get("retries")
-                retries_text = Text(str(retries_val) if retries_val is not None else "-", justify="right")
+                attempts = summary.get("attempts")
+                attempts_text = Text(str(attempts) if attempts is not None else "-", justify="right")
                 # --- END RETRIES HANDLING ---
 
                 # --- START TOKEN HANDLING ---
@@ -170,7 +170,7 @@ class TaskScreen(Screen):
                 # Add the row with arguments in the new order (16 columns total)
                 self.table.add_row(
                     step_dir.name,             # STEP
-                    error_text,                # ERROR (ADDED)
+                    error_text,                # ERROR
                     test_passed,               # TEST
                     train_passed,              # TRAIN
                     best_score_text,           # SCORE
@@ -180,7 +180,7 @@ class TaskScreen(Screen):
                     pixels_off_text,           # PIXELS
                     percent_correct_text,      # %
                     time_str,                  # TIME
-                    retries_text,              # RETRIES
+                    attempts_text,             # ATTEMPTS
                     in_tokens_text,            # IN
                     out_tokens_text,           # OUT
                     total_tokens_text,         # TOTAL
