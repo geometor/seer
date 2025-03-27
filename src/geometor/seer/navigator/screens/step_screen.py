@@ -92,6 +92,7 @@ class StepScreen(Screen):
         Binding("k", "cursor_up", "Cursor Up", show=False),
         Binding("enter", "select_file", "Select File", show=False),
         Binding("h", "app.pop_screen", "Back", show=True),
+        Binding("i", "view_images", "View Images", show=True), # ADDED binding
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
@@ -137,7 +138,7 @@ class StepScreen(Screen):
                         id="text-viewer" # ID for the TextArea
                     )
                     yield Markdown(id="markdown-viewer") # ID for the Markdown viewer
-                    yield Static("Viewing image externally...", id="image-viewer-placeholder") # Placeholder for images
+                    yield Static("Select a file to view its content.", id="image-viewer-placeholder") # Placeholder for images/other
 
         yield Footer()
 
@@ -195,35 +196,9 @@ class StepScreen(Screen):
             file_suffix = new_path.suffix.lower()
 
             if file_suffix == ".png":
-                # Handle PNG files - open externally
-                sxiv_cmd = self._check_sxiv()
-                if sxiv_cmd:
-                    try:
-                        log.info(f"Opening image with sxiv: {new_path}")
-                        subprocess.Popen([sxiv_cmd, str(new_path)])
-                        # Update placeholder text and switch
-                        image_placeholder.update(f"Viewing '{new_path.name}' externally...")
-                        switcher.current = "image-viewer-placeholder"
-                    except FileNotFoundError:
-                        # This case should be caught by _check_sxiv, but handle defensively
-                        log.error(f"'sxiv' command not found when trying to open {new_path}.")
-                        self.app.notify("sxiv not found. Cannot open image.", severity="error")
-                        # Fallback: show error in text viewer
-                        text_viewer.load_text(f"Error: 'sxiv' command not found.\nCannot open image: {new_path.name}")
-                        text_viewer.language = None
-                        switcher.current = "text-viewer"
-                    except Exception as e:
-                        log.error(f"Error opening {new_path} with sxiv: {e}")
-                        self.app.notify(f"Error opening image: {e}", severity="error")
-                        # Fallback: show error in text viewer
-                        text_viewer.load_text(f"Error opening image '{new_path.name}':\n\n{e}")
-                        text_viewer.language = None
-                        switcher.current = "text-viewer"
-                else:
-                    # sxiv not found, show error in text viewer
-                    text_viewer.load_text(f"Error: 'sxiv' command not found.\nCannot open image: {new_path.name}")
-                    text_viewer.language = None
-                    switcher.current = "text-viewer"
+                # Handle PNG files - show placeholder, don't open automatically
+                image_placeholder.update(f"Selected: '{new_path.name}' (PNG)\n\nPress 'i' to view images.")
+                switcher.current = "image-viewer-placeholder"
 
             elif file_suffix == ".md":
                 # Handle Markdown files
@@ -292,6 +267,35 @@ class StepScreen(Screen):
         # unless we want explicit confirmation or other actions on Enter.
         # For now, it does nothing extra as selection triggers the load/open.
         pass
+
+    def action_view_images(self) -> None:
+        """Find and open all PNG images in the current step directory using sxiv."""
+        sxiv_cmd = self._check_sxiv()
+        if not sxiv_cmd:
+            return # sxiv not found, notification already shown
+
+        try:
+            # Find all .png files recursively within the step directory
+            image_files = sorted(list(self.step_path.rglob("*.png")))
+
+            if not image_files:
+                self.app.notify("No PNG images found in this step.", severity="information")
+                return
+
+            # Prepare the command list
+            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
+
+            log.info(f"Opening {len(image_files)} images with sxiv from {self.step_path}")
+            subprocess.Popen(command)
+
+        except FileNotFoundError:
+            # This case should be caught by _check_sxiv, but handle defensively
+            log.error(f"'sxiv' command not found when trying to execute.")
+            self.app.notify("sxiv not found. Cannot open images.", severity="error")
+        except Exception as e:
+            log.error(f"Error finding or opening images with sxiv from {self.step_path}: {e}")
+            self.app.notify(f"Error viewing images: {e}", severity="error")
+
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
         """Handle row selection in the DataTable."""

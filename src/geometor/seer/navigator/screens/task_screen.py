@@ -10,6 +10,9 @@ from textual.containers import (
     ScrollableContainer,
 )
 from textual.binding import Binding
+from textual import log # ADDED import
+import subprocess # ADDED import
+import shutil # ADDED import
 
 from pathlib import Path
 import json
@@ -29,6 +32,7 @@ class TaskScreen(Screen):
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
+        Binding("i", "view_images", "View Images", show=True), # ADDED binding
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
@@ -39,6 +43,19 @@ class TaskScreen(Screen):
         self.task_path = task_path
         self.step_dirs = step_dirs  # Receive step_dirs
         self.step_index = 0
+        self._sxiv_checked = False # ADDED sxiv check state
+        self._sxiv_path = None     # ADDED sxiv path cache
+
+    # ADDED sxiv check method
+    def _check_sxiv(self) -> str | None:
+        """Check if sxiv exists and cache the path."""
+        if not self._sxiv_checked:
+            self._sxiv_path = shutil.which("sxiv")
+            self._sxiv_checked = True
+            if not self._sxiv_path:
+                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
+                self.app.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
+        return self._sxiv_path
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -282,6 +299,34 @@ class TaskScreen(Screen):
 
         # Push the StepScreen
         self.app.push_screen(StepScreen(self.session_path, self.task_path, step_path))
+
+    # ADDED action
+    def action_view_images(self) -> None:
+        """Find and open all PNG images in the current task directory using sxiv."""
+        sxiv_cmd = self._check_sxiv()
+        if not sxiv_cmd:
+            return # sxiv not found, notification already shown
+
+        try:
+            # Find all .png files recursively within the task directory
+            image_files = sorted(list(self.task_path.rglob("*.png")))
+
+            if not image_files:
+                self.app.notify("No PNG images found in this task.", severity="information")
+                return
+
+            # Prepare the command list
+            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
+
+            log.info(f"Opening {len(image_files)} images with sxiv from {self.task_path}")
+            subprocess.Popen(command)
+
+        except FileNotFoundError:
+            log.error(f"'sxiv' command not found when trying to execute.")
+            self.app.notify("sxiv not found. Cannot open images.", severity="error")
+        except Exception as e:
+            log.error(f"Error finding or opening images with sxiv from {self.task_path}: {e}")
+            self.app.notify(f"Error viewing images: {e}", severity="error")
 
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):

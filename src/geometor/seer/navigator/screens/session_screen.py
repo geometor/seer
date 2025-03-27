@@ -6,7 +6,7 @@ from rich.text import Text
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem, DataTable, Header, Footer
-from textual import log
+from textual import log # ADDED import
 from textual.containers import (
     Horizontal,
     Vertical,
@@ -15,6 +15,8 @@ from textual.containers import (
 )
 from textual.binding import Binding
 import json
+import subprocess # ADDED import
+import shutil # ADDED import
 
 from geometor.seer.navigator.screens.task_screen import TaskScreen
 from geometor.seer.session.level import Level  # Import Level
@@ -27,10 +29,11 @@ class SessionScreen(Screen):
     Vertical {height: 100%;}
     """
     BINDINGS = [
-        Binding("l", "select_row", "Select", show=False),
+        Binding("l,enter", "select_row", "Select", show=False), # ADDED enter key
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
+        Binding("i", "view_images", "View Images", show=True), # ADDED binding
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
@@ -40,6 +43,19 @@ class SessionScreen(Screen):
         self.session_path = session_path
         self.task_dirs = task_dirs  # Receive task_dirs
         self.task_index = 0
+        self._sxiv_checked = False # ADDED sxiv check state
+        self._sxiv_path = None     # ADDED sxiv path cache
+
+    # ADDED sxiv check method
+    def _check_sxiv(self) -> str | None:
+        """Check if sxiv exists and cache the path."""
+        if not self._sxiv_checked:
+            self._sxiv_path = shutil.which("sxiv")
+            self._sxiv_checked = True
+            if not self._sxiv_path:
+                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
+                self.app.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
+        return self._sxiv_path
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
@@ -227,6 +243,8 @@ class SessionScreen(Screen):
 
     def action_select_row(self):
         row_id = self.table.cursor_row
+        if row_id is None or not (0 <= row_id < len(self.task_dirs)): # Check index validity
+            return
         row = self.table.get_row_at(row_id)
         task_name = row[0] # Get task name from the first column
         task_path = self.session_path / task_name
@@ -234,6 +252,34 @@ class SessionScreen(Screen):
         # Get step directories for the selected task
         step_dirs = sorted([d for d in task_path.iterdir() if d.is_dir()])
         self.app.push_screen(TaskScreen(self.session_path, task_path, step_dirs))
+
+    # ADDED action
+    def action_view_images(self) -> None:
+        """Find and open all PNG images in the current session directory using sxiv."""
+        sxiv_cmd = self._check_sxiv()
+        if not sxiv_cmd:
+            return # sxiv not found, notification already shown
+
+        try:
+            # Find all .png files recursively within the session directory
+            image_files = sorted(list(self.session_path.rglob("*.png")))
+
+            if not image_files:
+                self.app.notify("No PNG images found in this session.", severity="information")
+                return
+
+            # Prepare the command list
+            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
+
+            log.info(f"Opening {len(image_files)} images with sxiv from {self.session_path}")
+            subprocess.Popen(command)
+
+        except FileNotFoundError:
+            log.error(f"'sxiv' command not found when trying to execute.")
+            self.app.notify("sxiv not found. Cannot open images.", severity="error")
+        except Exception as e:
+            log.error(f"Error finding or opening images with sxiv from {self.session_path}: {e}")
+            self.app.notify(f"Error viewing images: {e}", severity="error")
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         # This method is kept for compatibility, but the core logic is in action_select_row
