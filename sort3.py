@@ -9,17 +9,16 @@ class SortableTableApp(App):
 
     def on_mount(self) -> None:
         table = self.query_one(DataTable)
-        # Add columns and mark them as sortable
-        # Provide a key for Age to sort numerically
-        table.add_column("Name", key="name")
-        table.add_column("Age", key=lambda cell: int(cell) if isinstance(cell, (int, str)) and str(cell).isdigit() else -1)
-        table.add_column("City", key="city")
+        # Add columns and capture their keys
+        # Provide a sort key for Age to sort numerically
+        name_key = table.add_column("Name", key="name")
+        age_key = table.add_column("Age", key=lambda cell: int(cell) if isinstance(cell, (int, str)) and str(cell).isdigit() else -1)
+        city_key = table.add_column("City", key="city")
 
-        # Mark columns as sortable using their keys
-        table.columns["name"].sortable = True
-        table.columns["Age"].sortable = True # Note: Accessing by label here as the key is a lambda
-        table.columns["city"].sortable = True
-
+        # Mark columns as sortable using the captured ColumnKey objects
+        table.columns[name_key].sortable = True
+        table.columns[age_key].sortable = True
+        table.columns[city_key].sortable = True
 
         table.add_rows([
             ("Alice", 30, "New York"),
