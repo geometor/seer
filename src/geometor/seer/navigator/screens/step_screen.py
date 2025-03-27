@@ -8,7 +8,7 @@ from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.reactive import reactive
 from textual.screen import Screen
-from textual.widgets import DataTable, Header, Footer, TextArea
+from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, ContentSwitcher # Added Markdown, ContentSwitcher
 from textual.binding import Binding
 from textual import log
 
@@ -17,7 +17,7 @@ from textual import log
 # Add more mappings as needed
 LANGUAGE_MAP = {
     ".py": "python",
-    ".md": "markdown",
+    ".md": "markdown", # Keep this for TextArea if needed, but Markdown widget handles .md
     ".json": "json",
     ".yaml": "yaml",
     ".yml": "yaml",
@@ -55,10 +55,19 @@ class StepScreen(Screen):
        width: 100%;
     }
 
-    TextArea {
+    /* Ensure ContentSwitcher and its children fill the container */
+    ContentSwitcher {
+        height: 1fr;
+    }
+    TextArea, Markdown {
         height: 1fr;
         border: none; /* Remove default border if desired */
     }
+    /* Ensure Markdown content is scrollable */
+    Markdown {
+        overflow-y: auto;
+    }
+
 
     /* Style the focused row in the DataTable */
     DataTable > .datatable--cursor {
@@ -99,14 +108,17 @@ class StepScreen(Screen):
             with Vertical(id="file-list-container"):
                 yield DataTable(id="file-list-table")
             with Vertical(id="file-content-container"):
-                # Use code_editor for better defaults, but override read_only
-                yield TextArea.code_editor(
-                    "",
-                    read_only=True,
-                    show_line_numbers=True,
-                    theme=DEFAULT_THEME,
-                    id="file-content-area"
-                )
+                # Use a ContentSwitcher to toggle between TextArea and Markdown
+                with ContentSwitcher(initial="text-viewer"):
+                    yield TextArea.code_editor(
+                        "",
+                        read_only=True,
+                        show_line_numbers=True,
+                        theme=DEFAULT_THEME,
+                        id="text-viewer" # ID for the TextArea
+                    )
+                    yield Markdown(id="markdown-viewer") # ID for the Markdown viewer
+
         yield Footer()
 
     def on_mount(self) -> None:
@@ -151,34 +163,51 @@ class StepScreen(Screen):
         else:
             self.selected_file_path = None # Clear selection if index is out of bounds
 
-    # Watch for changes in selected_file_path and update TextArea
+    # Watch for changes in selected_file_path and update the appropriate viewer
     def watch_selected_file_path(self, old_path: Path | None, new_path: Path | None) -> None:
         """Called when selected_file_path changes."""
-        text_area = self.query_one(TextArea)
+        switcher = self.query_one(ContentSwitcher)
+        text_viewer = self.query_one("#text-viewer", TextArea)
+        markdown_viewer = self.query_one("#markdown-viewer", Markdown)
+
         if new_path:
             try:
                 content = new_path.read_text()
-                language = LANGUAGE_MAP.get(new_path.suffix.lower())
+                file_suffix = new_path.suffix.lower()
 
-                # Check if language requires the 'syntax' extra
-                if language and language not in text_area.available_languages:
-                     # If language not available (likely missing 'syntax' extra),
-                     # log a warning and fall back to no language.
-                     log.warning(f"Language '{language}' for {new_path.name} not available. Install 'textual[syntax]' for highlighting.")
-                     language = None # Fallback
+                if file_suffix == ".md":
+                    # Update and show Markdown viewer
+                    markdown_viewer.update(content)
+                    switcher.current = "markdown-viewer"
+                    markdown_viewer.scroll_home(animate=False) # Scroll Markdown to top
+                else:
+                    # Update and show TextArea viewer
+                    language = LANGUAGE_MAP.get(file_suffix)
 
-                # Load text first, then set language
-                text_area.load_text(content)
-                text_area.language = language
-                text_area.scroll_home(animate=False) # Scroll to top
+                    # Check if language requires the 'syntax' extra for TextArea
+                    if language and language not in text_viewer.available_languages:
+                         log.warning(f"Language '{language}' for {new_path.name} not available in TextArea. Install 'textual[syntax]' for highlighting.")
+                         language = None # Fallback for TextArea
+
+                    # Load text first, then set language for TextArea
+                    text_viewer.load_text(content)
+                    text_viewer.language = language
+                    switcher.current = "text-viewer"
+                    text_viewer.scroll_home(animate=False) # Scroll TextArea to top
 
             except Exception as e:
                 log.error(f"Error loading file {new_path}: {e}")
-                text_area.load_text(f"Error loading file:\n\n{e}")
-                text_area.language = None # Reset language on error
+                # Display error in TextArea regardless of file type
+                error_content = f"Error loading file:\n\n{e}"
+                text_viewer.load_text(error_content)
+                text_viewer.language = None # Reset language on error
+                switcher.current = "text-viewer" # Ensure TextArea is visible for error
         else:
-            text_area.load_text("") # Clear text area if no file selected
-            text_area.language = None
+            # Clear both viewers if no file is selected
+            text_viewer.load_text("")
+            text_viewer.language = None
+            markdown_viewer.update("")
+            switcher.current = "text-viewer" # Default to text viewer when empty
 
     def action_cursor_down(self) -> None:
         """Move the cursor down in the DataTable."""
