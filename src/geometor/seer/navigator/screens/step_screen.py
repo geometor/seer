@@ -14,6 +14,9 @@ from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, Conte
 from textual.binding import Binding
 from textual import log
 
+# Import the new TrialScreen
+from geometor.seer.navigator.screens.trial_screen import TrialScreen
+
 
 # Mapping file extensions to tree-sitter languages and TextArea theme
 # Add more mappings as needed
@@ -61,7 +64,7 @@ class StepScreen(Screen):
     ContentSwitcher {
         height: 1fr;
     }
-    TextArea, Markdown, #image-viewer-placeholder { /* Added placeholder */
+    TextArea, Markdown, #content-placeholder { /* Renamed placeholder */
         height: 1fr;
         border: none; /* Remove default border if desired */
     }
@@ -70,7 +73,7 @@ class StepScreen(Screen):
         overflow-y: auto;
     }
     /* Center placeholder text */
-    #image-viewer-placeholder {
+    #content-placeholder { /* Renamed placeholder */
         content-align: center middle;
         color: $text-muted;
     }
@@ -90,7 +93,7 @@ class StepScreen(Screen):
     BINDINGS = [
         Binding("j", "cursor_down", "Cursor Down", show=False),
         Binding("k", "cursor_up", "Cursor Up", show=False),
-        Binding("enter", "select_file", "Select File", show=False),
+        Binding("enter", "select_file", "Select File", show=False), # Changed description
         Binding("h", "app.pop_screen", "Back", show=True),
         Binding("i", "view_images", "View Images", show=True), # ADDED binding
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
@@ -138,7 +141,8 @@ class StepScreen(Screen):
                         id="text-viewer" # ID for the TextArea
                     )
                     yield Markdown(id="markdown-viewer") # ID for the Markdown viewer
-                    yield Static("Select a file to view its content.", id="image-viewer-placeholder") # Placeholder for images/other
+                    # Renamed placeholder, used for PNG and potentially others
+                    yield Static("Select a file to view its content.", id="content-placeholder")
 
         yield Footer()
 
@@ -176,29 +180,43 @@ class StepScreen(Screen):
             table.focus() # Focus the table
 
     def select_row_index(self, index: int):
-        """Selects a row by index and loads the corresponding file."""
+        """Selects a row by index and triggers loading/display logic."""
         if 0 <= index < len(self.file_paths):
             table = self.query_one(DataTable)
-            table.move_cursor(row=index, animate=False)
+            # Check if cursor is already at the target row to avoid unnecessary updates
+            if table.cursor_row != index:
+                table.move_cursor(row=index, animate=False)
+            # Update selected_file_path which triggers the watch method
             self.selected_file_path = self.file_paths[index]
         else:
             self.selected_file_path = None # Clear selection if index is out of bounds
 
-    # Watch for changes in selected_file_path and update the appropriate viewer
+    # Watch for changes in selected_file_path and update the appropriate viewer or push screen
     def watch_selected_file_path(self, old_path: Path | None, new_path: Path | None) -> None:
-        """Called when selected_file_path changes."""
+        """Called when selected_file_path changes. Pushes TrialScreen for trial.json."""
         switcher = self.query_one(ContentSwitcher)
         text_viewer = self.query_one("#text-viewer", TextArea)
         markdown_viewer = self.query_one("#markdown-viewer", Markdown)
-        image_placeholder = self.query_one("#image-viewer-placeholder", Static) # Get placeholder
+        placeholder = self.query_one("#content-placeholder", Static) # Get placeholder
 
         if new_path:
             file_suffix = new_path.suffix.lower()
+            file_name = new_path.name
 
-            if file_suffix == ".png":
-                # Handle PNG files - show placeholder, don't open automatically
-                image_placeholder.update(f"Selected: '{new_path.name}' (PNG)\n\nPress 'i' to view images.")
-                switcher.current = "image-viewer-placeholder"
+            # Check if it's a trial file (e.g., "trial.json", "code_00_trials.json")
+            # Using ends_with for flexibility
+            if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
+                # Push the TrialScreen instead of showing content here
+                log.info(f"Pushing TrialScreen for: {new_path}")
+                # Ensure the app doesn't immediately pop the screen if TrialScreen fails to load
+                # We push first, TrialScreen handles its own loading errors
+                self.app.push_screen(TrialScreen(new_path, self.session_name, self.task_name, self.step_name))
+                # Don't switch content here, as we are navigating away
+
+            elif file_suffix == ".png":
+                # Handle PNG files - show placeholder
+                placeholder.update(f"Selected: '{new_path.name}' (PNG)\n\nPress 'i' to view images.")
+                switcher.current = "content-placeholder"
 
             elif file_suffix == ".md":
                 # Handle Markdown files
@@ -244,7 +262,7 @@ class StepScreen(Screen):
             text_viewer.load_text("")
             text_viewer.language = None
             markdown_viewer.update("")
-            image_placeholder.update("No file selected.") # Reset placeholder
+            placeholder.update("No file selected.") # Reset placeholder
             switcher.current = "text-viewer" # Default to text viewer when empty
 
     def action_cursor_down(self) -> None:
@@ -252,21 +270,29 @@ class StepScreen(Screen):
         table = self.query_one(DataTable)
         current_row = table.cursor_row
         next_row = min(len(self.file_paths) - 1, current_row + 1)
-        self.select_row_index(next_row)
+        self.select_row_index(next_row) # Use select_row_index to trigger watch
 
     def action_cursor_up(self) -> None:
         """Move the cursor up in the DataTable."""
         table = self.query_one(DataTable)
         current_row = table.cursor_row
         prev_row = max(0, current_row - 1)
-        self.select_row_index(prev_row)
+        self.select_row_index(prev_row) # Use select_row_index to trigger watch
 
     def action_select_file(self) -> None:
-        """Action triggered by pressing Enter on the table (redundant with watch)."""
-        # The watch_selected_file_path handles loading/opening, so this might not be needed
-        # unless we want explicit confirmation or other actions on Enter.
-        # For now, it does nothing extra as selection triggers the load/open.
+        """Action triggered by pressing Enter on the table."""
+        # The watch_selected_file_path handles pushing TrialScreen or updating viewers.
+        # This action might be useful if we want Enter to *always* try to open/view,
+        # even if the selection hasn't changed, but for now, it's implicitly handled.
+        # We could force a re-evaluation if needed:
+        current_path = self.selected_file_path
+        if current_path:
+             # Temporarily set to None and back to force the watch method
+             # This ensures the watch method runs even if the selection didn't change visually
+             self.selected_file_path = None
+             self.selected_file_path = current_path
         pass
+
 
     def action_view_images(self) -> None:
         """Find and open all PNG images in the current step directory using sxiv."""
@@ -298,9 +324,10 @@ class StepScreen(Screen):
 
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
-        """Handle row selection in the DataTable."""
+        """Handle row selection in the DataTable (e.g., by clicking)."""
         # Ensure the index is valid before selecting
         if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
+             # Use select_row_index to trigger the watch method consistently
              self.select_row_index(event.cursor_row)
         else:
              self.selected_file_path = None # Clear if selection is invalid
