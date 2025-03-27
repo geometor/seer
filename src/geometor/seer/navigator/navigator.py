@@ -7,9 +7,12 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer 
 from textual.widgets import Static, Button, ListView, ListItem, Label, Footer
 
-from geometor.seer.navigator.renderers.char_grid import CharGrid
-from geometor.seer.navigator.renderers.block_grid import BlockGrid
-from geometor.seer.navigator.renderers.solid_grid import SolidGrid
+from geometor.seer.navigator.renderers import (
+    CharGrid,
+    BlockGrid,
+    SolidGrid,
+    TinyGrid,  # Import the new renderer
+)
 
 from geometor.seer.tasks.tasks import Task  
 
@@ -22,6 +25,7 @@ class Navigator(App):
         ("s", "set_renderer_solid", "Solid"),
         ("c", "set_renderer_char", "Char"),
         ("b", "set_renderer_block", "Block"),
+        ("t", "set_renderer_tiny", "Tiny"),  # Add the new binding
     ]
 
     def __init__(self, tasks: list, renderer=SolidGrid, **kwargs):
@@ -110,6 +114,11 @@ class Navigator(App):
     def action_set_renderer_block(self) -> None:
         """Set the renderer to BlockGrid."""
         self.renderer = BlockGrid
+        self.display_task(self.current_task_id)
+
+    def action_set_renderer_tiny(self) -> None:
+        """Set the renderer to TinyGrid."""
+        self.renderer = TinyGrid
         self.display_task(self.current_task_id)
 
 
