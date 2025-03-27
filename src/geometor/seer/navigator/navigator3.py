@@ -1,5 +1,6 @@
 from textual.app import App, ComposeResult
 from textual.widgets import Static
+from textual.containers import Container # Import Container
 from pathlib import Path
 import argparse
 import json
@@ -63,9 +64,10 @@ class SessionNavigator(App):
 
 
     def compose(self) -> ComposeResult:
-        # Start with SessionsScreen instead of Static
-        # yield Static("Loading...") # Remove static loading message
-        pass # Compose is handled by pushing the initial screen
+        """Yield the initial container for the app's default screen."""
+        # Yield an empty container to satisfy compose requirement.
+        # The actual content is managed by pushing screens in on_mount.
+        yield Container()
 
     def on_mount(self) -> None:
         # Push the initial screen
