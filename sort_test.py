@@ -77,22 +77,29 @@ class FilterSortTableApp(App[None]):
         table.cursor_type = "row" # Highlight the whole row on hover/selection
 
         # --- Add Columns and Enable Sorting ---
-        # Add columns with headers
-        table.add_columns(*self.headers)
+        # Add columns with headers and capture the generated keys
+        column_keys = table.add_columns(*self.headers)
 
-        # Make specific columns sortable
-        # You access columns by their index or the header string
-        table.columns["ID"].sortable = True
-        table.columns["ID"].key = lambda cell: int(cell) if str(cell).isdigit() else -1 # Sort ID as integer
+        # Create a mapping from header label to ColumnKey for robust access
+        header_to_key = {header: key for header, key in zip(self.headers, column_keys)}
 
-        table.columns["Name"].sortable = True # Default string sort is fine
+        # Make specific columns sortable using the ColumnKey
+        id_key = header_to_key["ID"]
+        table.columns[id_key].sortable = True
+        table.columns[id_key].key = lambda cell: int(cell) if str(cell).isdigit() else -1 # Sort ID as integer
 
-        table.columns["City"].sortable = True
+        name_key = header_to_key["Name"]
+        table.columns[name_key].sortable = True # Default string sort is fine
 
-        table.columns["Country"].sortable = True
+        city_key = header_to_key["City"]
+        table.columns[city_key].sortable = True
 
-        table.columns["Age"].sortable = True
-        table.columns["Age"].key = lambda cell: int(cell) if str(cell).isdigit() else -1 # Sort Age as integer
+        country_key = header_to_key["Country"]
+        table.columns[country_key].sortable = True
+
+        age_key = header_to_key["Age"]
+        table.columns[age_key].sortable = True
+        table.columns[age_key].key = lambda cell: int(cell) if str(cell).isdigit() else -1 # Sort Age as integer
 
         # Add initial (unfiltered) data
         self.update_table_data(self.full_data)
