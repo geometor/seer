@@ -3,15 +3,24 @@ from textual.widgets import DataTable
 
 class SortableTableApp(App):
     BINDINGS = [("q", "quit", "Quit")]
-    _sorted_column: str | None = None
-    _sort_reverse: bool = False
 
     def compose(self) -> ComposeResult:
         yield DataTable(show_header=True)
 
     def on_mount(self) -> None:
         table = self.query_one(DataTable)
-        table.add_columns(("Name", {"key": "name"}), ("Age", {"key": "age"}), ("City", {"key": "city"}))
+        # Add columns and mark them as sortable
+        # Provide a key for Age to sort numerically
+        table.add_column("Name", key="name")
+        table.add_column("Age", key=lambda cell: int(cell) if isinstance(cell, (int, str)) and str(cell).isdigit() else -1)
+        table.add_column("City", key="city")
+
+        # Mark columns as sortable using their keys
+        table.columns["name"].sortable = True
+        table.columns["Age"].sortable = True # Note: Accessing by label here as the key is a lambda
+        table.columns["city"].sortable = True
+
+
         table.add_rows([
             ("Alice", 30, "New York"),
             ("Bob", 25, "London"),
@@ -19,19 +28,6 @@ class SortableTableApp(App):
             ("David", 40, "New York"),
             ("Eve", 28, "London"),
         ])
-
-    def on_data_table_header_selected(self, event: DataTable.HeaderSelected) -> None:
-        event.prevent_default()
-        column_key = event.column_key
-        table = event.data_table
-
-        if self._sorted_column == column_key:
-            self._sort_reverse = not self._sort_reverse
-        else:
-            self._sorted_column = column_key
-            self._sort_reverse = False
-
-        table.sort(column_key, reverse=self._sort_reverse)
 
 if __name__ == "__main__":
     app = SortableTableApp()
