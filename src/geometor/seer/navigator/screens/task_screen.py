@@ -15,6 +15,7 @@ from pathlib import Path
 import json
 
 from geometor.seer.session.level import Level  # Import Level
+from geometor.seer.navigator.screens.step_screen import StepScreen # IMPORT THE NEW SCREEN
 
 
 class TaskScreen(Screen):
@@ -24,7 +25,7 @@ class TaskScreen(Screen):
     Vertical {height: 100%;}
     """
     BINDINGS = [
-        Binding("l", "select_row", "Select", show=False),
+        Binding("l,enter", "select_row", "Select", show=False), # Added enter key
         Binding("k", "move_up", "Cursor up", show=False),
         Binding("j", "move_down", "Cursor down", show=False),
         Binding("h", "app.pop_screen", "back", show=False),
@@ -80,7 +81,7 @@ class TaskScreen(Screen):
             try:
                 with open(summary_path, "r") as f:
                     summary = json.load(f)
-                num_files = sum(1 for _ in step_dir.iterdir())
+                num_files = sum(1 for item in step_dir.iterdir() if item.is_file()) # Count only files
 
                 # Use the updated _format_duration method
                 time_str = (
@@ -268,12 +269,21 @@ class TaskScreen(Screen):
         self.step_index = self.table.cursor_row  # Update index
 
     def action_select_row(self):
+        """Called when a row is selected (Enter or 'l')."""
+        if not self.step_dirs:
+            return # No steps to select
+
         row_id = self.table.cursor_row
-        row = self.table.get_row_at(row_id)
-        key = row[0] # Step name is still the first column
-        # TODO: implement StepScreen
-        # self.app.push_screen(StepScreen(key))
+        if row_id is None or not (0 <= row_id < len(self.step_dirs)):
+             return # Invalid selection
+
+        # Get the step directory corresponding to the selected row
+        step_path = self.step_dirs[row_id]
+
+        # Push the StepScreen
+        self.app.push_screen(StepScreen(self.session_path, self.task_path, step_path))
+
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
-        # kept for compatibility
+        # kept for compatibility, triggers action_select_row
         self.action_select_row()
