@@ -32,6 +32,7 @@ class TaskStep(Level):
         self.title = title
         self.index = index
 
+        self.attempts = 0
         self.response = {}
         self.response_parts = []
         self.response_time = None
@@ -82,7 +83,7 @@ class TaskStep(Level):
                     #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
 
             # Retrieve retries count, default to None if not logged
-            retries_count = self.response.get("retries", None)
+            #  retries_count = self.response.get("retries", None)
 
             # Check if any errors were logged
             has_errors = bool(self.errors)
@@ -96,7 +97,7 @@ class TaskStep(Level):
                 "trials": {},
                 "codes": {},
                 "best_score": self.step_code_trials.best_score,  # Add best score
-                "retries": retries_count, # ADDED retries count
+                "attempts": self.attempts, # ADDED retries count
                 "has_errors": has_errors, # ADDED error flag
             })
 
@@ -469,6 +470,6 @@ class TaskStep(Level):
         return self.step_code_trials.any_test_passed  # Consistent with summarize
 
     @property
-    def get_python(self):
+    def get_python(self) -> dict:
         """Safely returns the Python code dictionary or an empty dictionary."""
         return self.codes.get("py", {})

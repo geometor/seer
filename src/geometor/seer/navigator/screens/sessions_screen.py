@@ -68,9 +68,8 @@ class SessionsScreen(Screen):
         self.update_summary()
 
     def load_sessions(self):
-        self.session_dirs = sorted(
-            [d for d in self.sessions_root.iterdir() if d.is_dir()]
-        )
+        self.session_dirs = [d for d in self.sessions_root.iterdir() if d.is_dir()]
+        #  self.session_dirs = sorted( self.session_dirs )
         self.session_index = 0
         self.table.clear() # Clear existing rows
         for session_dir in self.session_dirs:
@@ -210,7 +209,7 @@ class SessionsScreen(Screen):
         session_path = self.sessions_root / session_name
 
         # Get task directories for the selected session
-        task_dirs = sorted([d for d in session_path.iterdir() if d.is_dir()])
+        task_dirs = [d for d in session_path.iterdir() if d.is_dir()]
 
         self.app.push_screen(SessionScreen(session_path, task_dirs))
 
