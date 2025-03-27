@@ -12,9 +12,13 @@ class SortableTableApp(App):
     def on_mount(self) -> None:
         table = self.query_one(DataTable)
         table.add_columns(("Name", {"key": "name"}), ("Age", {"key": "age"}), ("City", {"key": "city"}))
-        table.add_rows(
-           
-        )
+        table.add_rows([
+            ("Alice", 30, "New York"),
+            ("Bob", 25, "London"),
+            ("Charlie", 35, "Paris"),
+            ("David", 40, "New York"),
+            ("Eve", 28, "London"),
+        ])
 
     def on_data_table_header_selected(self, event: DataTable.HeaderSelected) -> None:
         event.prevent_default()
