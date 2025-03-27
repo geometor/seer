@@ -122,7 +122,8 @@ def main():
     from geometor.seer.navigator.navigator import Navigator
 
     # --- Configuration ---
-    TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")
+    #  TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")
+    TASKS_DIR = Path("/home/phi/PROJECTS/geometor/_ARC-AGI-2/data/evaluation")
 
     # 1. Load tasks
     if not TASKS_DIR.exists():
@@ -139,6 +140,8 @@ def main():
     if not tasks:
         print("No tasks found in the 'tasks' directory.")
         return
+
+    tasks = tasks.get_ordered_tasks()
 
     # 2. Create and run the Navigator app
     app = Navigator(tasks)  # Limit to 5 tasks for demonstration
