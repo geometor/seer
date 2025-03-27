@@ -92,7 +92,7 @@ class TaskScreen(Screen):
                 # --- START ERROR HANDLING ---
                 has_errors = summary.get("has_errors", False) # Default to False if missing
                 error_text = (
-                    Text("❗", style="bold red", justify="center")
+                    Text("⚠", style="bold yellow", justify="center") # CHANGED character and style
                     if has_errors
                     else Text("-", justify="center")
                 )
@@ -239,7 +239,7 @@ class TaskScreen(Screen):
 
         # Update summary string to include error count and token totals
         summary_widget.update(
-            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, errors ❗: {error_count} | "
+            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, errors ⚠: {error_count} | " # CHANGED icon in summary
             f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_steps}"
         )
 
