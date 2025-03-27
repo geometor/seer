@@ -201,11 +201,11 @@ class SortableTableApp(App):
 
         # Add columns - no need to capture keys or set sortable=True here
         # The SortableDataTable handles sorting via header clicks internally.
-        # The 'key' argument to add_column is not directly used by the custom sort logic,
-        # but can be useful for other purposes if needed.
-        table.add_column("Name")
-        table.add_column("Age")
-        table.add_column("City")
+        # The 'key' argument helps identify the column, though the sorting comparison
+        # itself uses the `sort_function` defined in SortableDataTable.
+        table.add_column("Name", key="name")
+        table.add_column("Age", key="age")
+        table.add_column("City", key="city")
 
         # Add data rows
         table.add_rows([
