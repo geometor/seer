@@ -113,7 +113,7 @@ class SessionsScreen(Screen):
 
         # Add columns to summary tables
         summary_table = self.query_one("#summary-table", DataTable)
-        summary_table.add_columns("Metric", "Value")
+        summary_table.add_columns("Metric", "Value", "Avg") # ADDED "Avg" column
         trials_table = self.query_one("#trials-table", DataTable)
         trials_table.add_columns("Metric", "Value", "±") # Changed % to ±
         tokens_table = self.query_one("#tokens-table", DataTable)
@@ -256,12 +256,33 @@ class SessionsScreen(Screen):
         diff_str = f"{diff:+}" # Format with sign (+/-)
         # --- END Calculate difference ---
 
+        # --- START Calculate average steps per task ---
+        avg_steps_per_task = (total_steps / total_tasks_count) if total_tasks_count > 0 else 0.0
+        avg_steps_str = f"{avg_steps_per_task:.1f} avg"
+        # --- END Calculate average steps per task ---
+
         # Clear and update summary table (right-align keys and values)
         summary_table.clear()
-        summary_table.add_row(Text("sessions:", justify="right"), Text(str(num_sessions), justify="right"))
-        summary_table.add_row(Text("tasks:", justify="right"), Text(str(total_tasks_count), justify="right"))
-        summary_table.add_row(Text("steps:", justify="right"), Text(str(total_steps), justify="right"))
-        summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
+        summary_table.add_row(
+            Text("sessions:", justify="right"),
+            Text(str(num_sessions), justify="right"),
+            Text("") # Empty third column
+        )
+        summary_table.add_row(
+            Text("tasks:", justify="right"),
+            Text(str(total_tasks_count), justify="right"),
+            Text("") # Empty third column
+        )
+        summary_table.add_row(
+            Text("steps:", justify="right"),
+            Text(str(total_steps), justify="right"),
+            Text(avg_steps_str, justify="right") # ADDED average steps
+        )
+        summary_table.add_row(
+            Text("time:", justify="right"),
+            Text(formatted_total_duration, justify="right"),
+            Text("") # Empty third column
+        )
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
