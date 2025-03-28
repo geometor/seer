@@ -256,9 +256,11 @@ class SessionScreen(Screen):
         total_prompt_tokens = 0
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
+        total_weight = 0 # ADDED total weight counter
 
         for task_dir in self.task_dirs:
             summary_path = task_dir / "index.json"
+            task_json_path = task_dir / "task.json" # Path to task.json
             try:
                 with open(summary_path, "r") as f:
                     task_summary = json.load(f)
