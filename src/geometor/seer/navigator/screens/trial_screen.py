@@ -203,8 +203,8 @@ class TrialViewer(ScrollableContainer):
                     current_renderer(input_grid_data) if input_grid_data else Static("No Input"),
                     current_renderer(expected_grid_data) if expected_grid_data else Static("No Expected Output"),
                     current_renderer(actual_grid_data) if actual_grid_data else Static("No Actual Output"),
-                    classes="trial-grid",
-                    id=f"train-trial-{i}"
+                    classes="trial-grid"
+                    # id=f"train-trial-{i}" # REMOVED ID
                 )
                 widgets_to_mount.append(trial_grid)
 
@@ -223,8 +223,8 @@ class TrialViewer(ScrollableContainer):
                     current_renderer(input_grid_data) if input_grid_data else Static("No Input"),
                     current_renderer(expected_grid_data) if expected_grid_data else Static("No Expected Output"),
                     current_renderer(actual_grid_data) if actual_grid_data else Static("No Actual Output"),
-                    classes="trial-grid",
-                    id=f"test-trial-{i}"
+                    classes="trial-grid"
+                    # id=f"test-trial-{i}" # REMOVED ID
                 )
                 widgets_to_mount.append(trial_grid)
 
