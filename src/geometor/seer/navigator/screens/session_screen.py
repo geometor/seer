@@ -19,6 +19,8 @@ import json
 import subprocess # ADDED import
 import shutil # ADDED import
 
+# Import Task to calculate weight
+from geometor.seer.tasks.tasks import Task
 from geometor.seer.navigator.screens.task_screen import TaskScreen
 from geometor.seer.session.level import Level  # Import Level
 
@@ -87,6 +89,7 @@ class SessionScreen(Screen):
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"), # Renamed from BEST SCORE
+            Text("WEIGHT", justify="right"), # ADDED WEIGHT column
             "STEPS",
             "TIME",                 # CHANGED from DURATION
             Text("IN", justify="right"),
@@ -127,9 +130,23 @@ class SessionScreen(Screen):
         self.table.clear()  # Clear table before adding
         for task_dir in self.task_dirs:  # Use self.task_dirs
             summary_path = task_dir / "index.json"
+            task_json_path = task_dir / "task.json" # Path to task.json
             try:
+                # Load task summary
                 with open(summary_path, "r") as f:
                     summary = json.load(f)
+
+                # Load task data to calculate weight
+                task_weight = "-" # Default weight
+                if task_json_path.exists():
+                    try:
+                        with open(task_json_path, "r") as f_task:
+                            task_data = json.load(f_task)
+                        task_obj = Task(task_dir.name, task_data)
+                        task_weight = Text(str(task_obj.weight), justify="right")
+                    except (json.JSONDecodeError, Exception) as e_task:
+                        log.error(f"Error loading or processing {task_json_path}: {e_task}")
+                        task_weight = Text("ERR", justify="right", style="bold red") # Indicate error loading task data
 
                 num_steps = Text(str(summary.get("steps", 0)), justify="right")
 
@@ -201,6 +218,7 @@ class SessionScreen(Screen):
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     best_score_text,     # SCORE
+                    task_weight,         # WEIGHT (ADDED)
                     num_steps,           # STEPS
                     time_str,            # TIME (CHANGED from duration_str)
                     in_tokens_text,      # IN
@@ -209,11 +227,16 @@ class SessionScreen(Screen):
                 )
 
             except FileNotFoundError:
-                # Update exception handling for 10 columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 11 columns (added WEIGHT)
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 10 columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 11 columns (added WEIGHT)
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+            except Exception as e: # Catch other potential errors during loading
+                log.error(f"Error processing task row for {task_dir.name}: {e}")
+                # Update exception handling for 11 columns (added WEIGHT)
+                self.table.add_row(task_dir.name, Text("ERR", style="bold red"), "-", "-", "-", "-", "-", "-", "-", "-", "-")
+
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
@@ -305,6 +328,11 @@ class SessionScreen(Screen):
         summary_table.add_row(
             Text("best:", justify="right"),
             Text(best_score_summary, justify="right"),
+            Text("") # Empty third column
+        )
+        summary_table.add_row( # ADDED total weight row
+            Text("weight:", justify="right"),
+            Text(f"{total_weight:,}", justify="right"),
             Text("") # Empty third column
         )
 
