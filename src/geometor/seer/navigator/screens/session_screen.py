@@ -59,9 +59,10 @@ class SessionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         self.table = DataTable()
-        # Add columns in the new requested order, changing DURATION to TIME
+        # Add columns in the new requested order, including ERROR
         self.table.add_columns(
             "TASKS",
+            Text("ERROR", justify="center"), # ADDED ERROR column
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"), # Renamed from BEST SCORE
@@ -99,6 +100,18 @@ class SessionScreen(Screen):
                     if summary.get("duration_seconds") is not None
                     else "-"
                 )
+
+                # --- START ERROR HANDLING ---
+                # Check if the task itself had errors during its processing/summarization
+                task_errors = summary.get("errors", {})
+                has_errors = task_errors.get("count", 0) > 0 # Check if error count > 0
+                error_text = (
+                    Text("⚠", style="bold yellow", justify="center")
+                    if has_errors
+                    else Text("-", justify="center")
+                )
+                # --- END ERROR HANDLING ---
+
 
                 # --- START TOKEN HANDLING ---
                 tokens_data = summary.get("tokens", {}) # Get the tokens dict, default to empty
@@ -142,9 +155,10 @@ class SessionScreen(Screen):
                 best_score_text = Text(best_score_text, justify="right")
                 # --- END SCORE HANDLING ---
 
-                # Add the row with arguments in the new order (9 columns total), using time_str
+                # Add the row with arguments in the new order (10 columns total), using time_str
                 self.table.add_row(
                     task_dir.name,       # TASKS
+                    error_text,          # ERROR (ADDED)
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     best_score_text,     # SCORE
@@ -156,11 +170,11 @@ class SessionScreen(Screen):
                 )
 
             except FileNotFoundError:
-                # Update exception handling for 9 columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 10 columns
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 9 columns
-                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 10 columns
+                self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
@@ -171,6 +185,7 @@ class SessionScreen(Screen):
         num_tasks = len(self.task_dirs)
         train_passed_count = 0
         test_passed_count = 0
+        error_count = 0 # ADDED error counter
         best_scores = []
         # --- START ADDED TOKEN COUNTERS ---
         total_prompt_tokens = 0
@@ -187,6 +202,9 @@ class SessionScreen(Screen):
                     train_passed_count += 1
                 if task_summary.get("test_passed"):
                     test_passed_count += 1
+                # ADDED error count aggregation
+                if task_summary.get("errors", {}).get("count", 0) > 0:
+                    error_count += 1
                 score = task_summary.get("best_score")
                 if score is not None:
                     best_scores.append(score)
@@ -212,9 +230,9 @@ class SessionScreen(Screen):
             f"Best: {min(best_scores):.2f}" if best_scores else "Best: -"
         )  # Handle empty list
 
-        # Update summary string to include token totals
+        # Update summary string to include error count and token totals
         summary_widget.update(
-            f"Tasks: {num_tasks}, Train ✔: {train_passed_count}, Test ✔: {test_passed_count}, {best_score_summary} | "
+            f"Tasks: {num_tasks}, Train ✔: {train_passed_count}, Test ✔: {test_passed_count}, Errors ⚠: {error_count}, {best_score_summary} | " # ADDED error count
             f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_tasks}"
         )
 
