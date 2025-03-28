@@ -1,4 +1,5 @@
 from rich.text import Text
+from datetime import timedelta # Import timedelta
 
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -6,7 +7,7 @@ from textual.widgets import Static, ListView, ListItem, DataTable, Header, Foote
 from textual.containers import (
     Horizontal,
     Vertical,
-    Grid,
+    Grid, # Import Grid
     ScrollableContainer,
 )
 from textual.binding import Binding
@@ -23,8 +24,28 @@ from geometor.seer.navigator.screens.step_screen import StepScreen # IMPORT THE 
 
 class TaskScreen(Screen):
     CSS = """
-    DataTable {height: 1fr;}
-    Static {padding: 1; height: 3}
+    Screen > Vertical {
+        grid-size: 2;
+        grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+    }
+    #summary-grid {
+        grid-size: 3; /* Three columns for the summary tables */
+        grid-gutter: 1 2;
+        height: auto; /* Let the grid determine its height */
+        padding: 0 1; /* Add some horizontal padding */
+        margin-bottom: 1; /* Space below summary */
+    }
+    .summary-table {
+        height: auto; /* Fit content height */
+        border: none; /* No border for summary tables */
+    }
+    /* Ensure no focus border on summary tables */
+    .summary-table:focus {
+        border: none;
+    }
+    DataTable { /* Style for the main steps table */
+        height: 1fr;
+    }
     Vertical {height: 100%;}
     """
     BINDINGS = [
@@ -58,7 +79,7 @@ class TaskScreen(Screen):
         return self._sxiv_path
 
     def compose(self) -> ComposeResult:
-        self.table = DataTable()
+        self.table = DataTable() # Main steps table
         # Add columns in the new requested order, including ERROR
         self.table.add_columns(
             "STEP",
@@ -78,20 +99,37 @@ class TaskScreen(Screen):
             Text("TOTAL", justify="right"),
             "FILES",
         )
+        self.table.cursor_type = "row"
+
         yield Header()
         with Vertical():
-            yield Static(id="summary")
+            # Summary Grid with three DataTables
+            with Grid(id="summary-grid"):
+                yield DataTable(id="summary-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="trials-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="tokens-table", show_header=False, cursor_type=None, classes="summary-table")
+            # Main steps table
             yield self.table
         yield Footer()
 
     def on_mount(self) -> None:
         self.title = f"{self.session_path.name} • {self.task_path.name}"
-        self.load_steps()
+
+        # Add columns to summary tables
+        summary_table = self.query_one("#summary-table", DataTable)
+        summary_table.add_columns("Metric", "Value")
+        trials_table = self.query_one("#trials-table", DataTable)
+        trials_table.add_columns("Metric", "Value")
+        tokens_table = self.query_one("#tokens-table", DataTable)
+        tokens_table.add_columns("Metric", "Value")
+
+        self.load_steps() # Load main table data
         self.table.cursor_type = "row"
         self.table.focus()
-        self.update_summary()
+        self.update_summary() # Populate summary tables
 
     def load_steps(self):
+        """Loads data into the main steps DataTable."""
         self.table.clear()  # Clear before adding
         for step_dir in self.step_dirs:  # Use self.step_dirs
             summary_path = step_dir / "index.json"
@@ -215,31 +253,47 @@ class TaskScreen(Screen):
             self.select_step_by_index(self.step_index)
 
     def update_summary(self):
-        summary_widget = self.query_one("#summary") # Corrected query_one usage
-        num_steps = len(self.step_dirs)  # Use len(self.step_dirs)
+        """Updates the three summary DataTables for the current task."""
+        summary_table = self.query_one("#summary-table", DataTable)
+        trials_table = self.query_one("#trials-table", DataTable)
+        tokens_table = self.query_one("#tokens-table", DataTable)
+
+        num_steps = len(self.step_dirs)
         train_passed_count = 0
         test_passed_count = 0
-        error_count = 0 # ADDED error counter
-        # --- START ADDED TOKEN COUNTERS ---
+        error_count = 0
+        total_duration_seconds = 0.0
+        best_scores = []
         total_prompt_tokens = 0
         total_candidates_tokens = 0
         total_tokens_all_steps = 0
-        # --- END ADDED TOKEN COUNTERS ---
-
+        total_attempts = 0 # Add counter for attempts
 
         for step_dir in self.step_dirs:
             summary_path = step_dir / "index.json"
             try:
                 with open(summary_path, "r") as f:
                     step_summary = json.load(f)
+
                 if step_summary.get("train_passed"):
                     train_passed_count += 1
                 if step_summary.get("test_passed"):
                     test_passed_count += 1
-                if step_summary.get("has_errors"): # ADDED check for errors
+                if step_summary.get("has_errors"):
                     error_count += 1
 
-                # --- START ADDED TOKEN ACCUMULATION ---
+                duration = step_summary.get("duration_seconds")
+                if duration is not None:
+                    total_duration_seconds += duration
+
+                score = step_summary.get("best_score")
+                if score is not None:
+                    best_scores.append(score)
+
+                attempts = step_summary.get("attempts")
+                if attempts is not None:
+                    total_attempts += attempts
+
                 prompt_tokens = step_summary.get("response", {}).get("prompt_tokens")
                 candidates_tokens = step_summary.get("response", {}).get("candidates_tokens")
                 total_tokens = step_summary.get("response", {}).get("total_tokens")
@@ -250,16 +304,33 @@ class TaskScreen(Screen):
                     total_candidates_tokens += candidates_tokens
                 if total_tokens is not None:
                     total_tokens_all_steps += total_tokens
-                # --- END ADDED TOKEN ACCUMULATION ---
 
             except (FileNotFoundError, json.JSONDecodeError):
-                pass
+                pass # Skip steps with missing/invalid index.json
 
-        # Update summary string to include error count and token totals
-        summary_widget.update(
-            f"steps: {num_steps}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, errors ⚠: {error_count} | " # CHANGED icon in summary
-            f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_steps}"
+        best_score_summary = (
+            f"{min(best_scores):.2f}" if best_scores else "-"
         )
+        formatted_total_duration = Level._format_duration(total_duration_seconds)
+
+        # Clear and update summary table (right-align keys and values)
+        summary_table.clear()
+        summary_table.add_row(Text("steps:", justify="right"), Text(str(num_steps), justify="right"))
+        summary_table.add_row(Text("attempts:", justify="right"), Text(str(total_attempts), justify="right")) # Add attempts
+        summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
+        summary_table.add_row(Text("best:", justify="right"), Text(best_score_summary, justify="right"))
+
+        # Clear and update trials table (right-align keys and values)
+        trials_table.clear()
+        trials_table.add_row(Text("test:", justify="right"), Text(str(test_passed_count), justify="right"))
+        trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
+        trials_table.add_row(Text("errors:", justify="right"), Text(str(error_count), justify="right"))
+
+        # Clear and update tokens table (right-align keys and values)
+        tokens_table.clear()
+        tokens_table.add_row(Text("in:", justify="right"), Text(str(total_prompt_tokens), justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(str(total_candidates_tokens), justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(str(total_tokens_all_steps), justify="right"))
 
 
     def select_step_by_index(self, index: int) -> None:

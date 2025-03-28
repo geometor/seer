@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from datetime import timedelta # Import timedelta
 
 from rich.text import Text
 
@@ -10,7 +11,7 @@ from textual import log # ADDED import
 from textual.containers import (
     Horizontal,
     Vertical,
-    Grid,
+    Grid, # Import Grid
     ScrollableContainer,
 )
 from textual.binding import Binding
@@ -24,8 +25,28 @@ from geometor.seer.session.level import Level  # Import Level
 
 class SessionScreen(Screen):
     CSS = """
-    DataTable {height: 1fr;}
-    Static {padding: 1; height: 3}
+    Screen > Vertical {
+        grid-size: 2;
+        grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+    }
+    #summary-grid {
+        grid-size: 3; /* Three columns for the summary tables */
+        grid-gutter: 1 2;
+        height: auto; /* Let the grid determine its height */
+        padding: 0 1; /* Add some horizontal padding */
+        margin-bottom: 1; /* Space below summary */
+    }
+    .summary-table {
+        height: auto; /* Fit content height */
+        border: none; /* No border for summary tables */
+    }
+    /* Ensure no focus border on summary tables */
+    .summary-table:focus {
+        border: none;
+    }
+    DataTable { /* Style for the main tasks table */
+        height: 1fr;
+    }
     Vertical {height: 100%;}
     """
     BINDINGS = [
@@ -58,7 +79,7 @@ class SessionScreen(Screen):
         return self._sxiv_path
 
     def compose(self) -> ComposeResult:
-        self.table = DataTable()
+        self.table = DataTable() # Main tasks table
         # Add columns in the new requested order, including ERROR
         self.table.add_columns(
             "TASKS",
@@ -72,19 +93,37 @@ class SessionScreen(Screen):
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
         )
+        self.table.cursor_type = "row"
+
         yield Header()
         with Vertical():
-            yield Static(id="summary")
+            # Summary Grid with three DataTables
+            with Grid(id="summary-grid"):
+                yield DataTable(id="summary-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="trials-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="tokens-table", show_header=False, cursor_type=None, classes="summary-table")
+            # Main tasks table
             yield self.table
         yield Footer()
 
     def on_mount(self) -> None:
         self.title = self.session_path.name
         self.table.cursor_type = "row"
+
+        # Add columns to summary tables
+        summary_table = self.query_one("#summary-table", DataTable)
+        summary_table.add_columns("Metric", "Value")
+        trials_table = self.query_one("#trials-table", DataTable)
+        trials_table.add_columns("Metric", "Value")
+        tokens_table = self.query_one("#tokens-table", DataTable)
+        tokens_table.add_columns("Metric", "Value")
+
         self.table.focus()
-        self.update_tasks_list()
+        self.update_tasks_list() # Load main table data
+        self.update_summary() # Populate summary tables
 
     def update_tasks_list(self):
+        """Loads data into the main tasks DataTable."""
         self.table.clear()  # Clear table before adding
         for task_dir in self.task_dirs:  # Use self.task_dirs
             summary_path = task_dir / "index.json"
@@ -178,38 +217,45 @@ class SessionScreen(Screen):
         if self.task_dirs:
             self.select_task_by_index(self.task_index)
 
-        self.update_summary()
-
     def update_summary(self):
-        summary_widget = self.query_one("#summary", Static)
+        """Updates the three summary DataTables for the current session."""
+        summary_table = self.query_one("#summary-table", DataTable)
+        trials_table = self.query_one("#trials-table", DataTable)
+        tokens_table = self.query_one("#tokens-table", DataTable)
+
         num_tasks = len(self.task_dirs)
+        total_steps_count = 0
         train_passed_count = 0
         test_passed_count = 0
-        error_count = 0 # ADDED error counter
+        error_count = 0
+        total_duration_seconds = 0.0
         best_scores = []
-        # --- START ADDED TOKEN COUNTERS ---
         total_prompt_tokens = 0
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
-        # --- END ADDED TOKEN COUNTERS ---
 
         for task_dir in self.task_dirs:
             summary_path = task_dir / "index.json"
             try:
                 with open(summary_path, "r") as f:
                     task_summary = json.load(f)
+
+                total_steps_count += task_summary.get("steps", 0)
                 if task_summary.get("train_passed"):
                     train_passed_count += 1
                 if task_summary.get("test_passed"):
                     test_passed_count += 1
-                # ADDED error count aggregation
                 if task_summary.get("errors", {}).get("count", 0) > 0:
                     error_count += 1
+
+                duration = task_summary.get("duration_seconds")
+                if duration is not None:
+                    total_duration_seconds += duration
+
                 score = task_summary.get("best_score")
                 if score is not None:
                     best_scores.append(score)
 
-                # --- START ADDED TOKEN ACCUMULATION ---
                 tokens_data = task_summary.get("tokens", {})
                 prompt_tokens = tokens_data.get("prompt_tokens")
                 candidates_tokens = tokens_data.get("candidates_tokens")
@@ -221,20 +267,34 @@ class SessionScreen(Screen):
                     total_candidates_tokens += candidates_tokens
                 if total_tokens is not None:
                     total_tokens_all_tasks += total_tokens
-                # --- END ADDED TOKEN ACCUMULATION ---
 
             except (FileNotFoundError, json.JSONDecodeError):
-                pass
+                pass # Skip tasks with missing/invalid index.json
 
         best_score_summary = (
-            f"Best: {min(best_scores):.2f}" if best_scores else "Best: -"
-        )  # Handle empty list
-
-        # Update summary string to include error count and token totals
-        summary_widget.update(
-            f"Tasks: {num_tasks}, Train ✔: {train_passed_count}, Test ✔: {test_passed_count}, Errors ⚠: {error_count}, {best_score_summary} | " # ADDED error count
-            f"Tokens: IN={total_prompt_tokens}, OUT={total_candidates_tokens}, TOTAL={total_tokens_all_tasks}"
+            f"{min(best_scores):.2f}" if best_scores else "-"
         )
+        formatted_total_duration = Level._format_duration(total_duration_seconds)
+
+        # Clear and update summary table (right-align keys and values)
+        summary_table.clear()
+        summary_table.add_row(Text("tasks:", justify="right"), Text(str(num_tasks), justify="right"))
+        summary_table.add_row(Text("steps:", justify="right"), Text(str(total_steps_count), justify="right"))
+        summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
+        summary_table.add_row(Text("best:", justify="right"), Text(best_score_summary, justify="right"))
+
+        # Clear and update trials table (right-align keys and values)
+        trials_table.clear()
+        trials_table.add_row(Text("test:", justify="right"), Text(str(test_passed_count), justify="right"))
+        trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
+        trials_table.add_row(Text("errors:", justify="right"), Text(str(error_count), justify="right"))
+
+        # Clear and update tokens table (right-align keys and values)
+        tokens_table.clear()
+        tokens_table.add_row(Text("in:", justify="right"), Text(str(total_prompt_tokens), justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(str(total_candidates_tokens), justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(str(total_tokens_all_tasks), justify="right"))
+
 
     def select_task_by_index(self, index: int) -> None:
         if self.task_dirs:
