@@ -12,6 +12,8 @@ from textual import log
 
 # Import renderers (assuming they are accessible)
 # Adjust the import path if necessary based on your project structure
+from geometor.seer.tasks.grid import Grid, string_to_grid
+
 try:
     from geometor.seer.navigator.renderers import (
         SolidGrid,
@@ -134,7 +136,10 @@ class TrialViewer(ScrollableContainer):
 
     def _create_details_table(self, trial_dict: dict) -> DataTable:
         """Creates a DataTable widget for a single trial's details."""
-        table = DataTable(classes="trial-details-table", show_header=False, cursor_type=None)
+        table = DataTable(
+                #  classes="trial-details-table", 
+                show_header=False, 
+                cursor_type=None)
         table.add_columns("Metric", "Value")
 
         def format_bool(value):
@@ -207,7 +212,7 @@ class TrialViewer(ScrollableContainer):
                     current_renderer(input_grid_data), # Pass numpy array or []
                     current_renderer(expected_grid_data), # Pass numpy array or []
                     current_renderer(actual_grid_data), # Pass numpy array or []
-                    classes="trial-grid"
+                    #  classes="trial-grid"
                     # id=f"train-trial-{i}" # REMOVED ID
                 )
                 widgets_to_mount.append(trial_grid)
