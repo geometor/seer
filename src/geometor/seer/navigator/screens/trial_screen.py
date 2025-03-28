@@ -5,7 +5,8 @@ from typing import List, Tuple, Any
 from rich.text import Text
 
 from textual.app import ComposeResult
-from textual.containers import ScrollableContainer, Grid, VerticalScroll # Added VerticalScroll
+# Alias textual.containers.Grid to avoid name collision
+from textual.containers import ScrollableContainer, Grid as TextualGrid, VerticalScroll
 from textual.widgets import Static, DataTable # Removed Header, Footer, Screen
 from textual import log
 # Removed Binding import
@@ -207,7 +208,8 @@ class TrialViewer(ScrollableContainer):
                 actual_grid_obj = string_to_grid(trial.get("transformed_output", ""))
                 actual_grid_data = actual_grid_obj.grid if actual_grid_obj else []
 
-                trial_grid = Grid(
+                # Use the aliased TextualGrid for layout
+                trial_grid = TextualGrid(
                     self._create_details_table(trial),
                     current_renderer(input_grid_data), # Pass numpy array or []
                     current_renderer(expected_grid_data), # Pass numpy array or []
@@ -231,7 +233,8 @@ class TrialViewer(ScrollableContainer):
                 actual_grid_obj = string_to_grid(trial.get("transformed_output", ""))
                 actual_grid_data = actual_grid_obj.grid if actual_grid_obj else []
 
-                trial_grid = Grid(
+                # Use the aliased TextualGrid for layout
+                trial_grid = TextualGrid(
                     self._create_details_table(trial),
                     current_renderer(input_grid_data), # Pass numpy array or []
                     current_renderer(expected_grid_data), # Pass numpy array or []
