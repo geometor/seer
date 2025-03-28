@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import timedelta # Import timedelta for duration calculation
 
 from rich.text import Text
 
@@ -9,7 +10,7 @@ from textual import log # ADDED import
 from textual.containers import (
     Horizontal,
     Vertical,
-    Grid,
+    Grid, # Import Grid
     ScrollableContainer,
 )
 from textual.binding import Binding
@@ -24,8 +25,30 @@ import json  # Import the json module
 
 class SessionsScreen(Screen):
     CSS = """
-    DataTable {height: 1fr;}
-    Static {padding: 1; height: 3}
+    Screen > Vertical {
+        grid-size: 2;
+        grid-rows: auto 1fr; /* Summary auto height, table takes rest */
+    }
+    #summary-grid {
+        grid-size: 3; /* Three columns for the summary tables */
+        grid-gutter: 1 2;
+        height: auto; /* Let the grid determine its height */
+        padding: 0 1; /* Add some horizontal padding */
+        margin-bottom: 1; /* Space below summary */
+    }
+    .summary-table {
+        height: auto; /* Fit content height */
+        border: none; /* No border for summary tables */
+    }
+    /* Ensure no focus border on summary tables */
+    .summary-table:focus {
+        border: none;
+    }
+    DataTable { /* Style for the main sessions table */
+        height: 1fr;
+    }
+    /* Keep old Static style for reference or remove if not needed */
+    /* Static {padding: 1; height: 3} */
     Vertical {height: 100%;}
     """
     BINDINGS = [
@@ -57,7 +80,7 @@ class SessionsScreen(Screen):
         return self._sxiv_path
 
     def compose(self) -> ComposeResult:
-        self.table = DataTable()
+        self.table = DataTable() # Main sessions table
         # Add columns in the new requested order, changing DURATION to TIME
         # Right-align TEST, TRAIN, TIME headers
         self.table.add_columns(
@@ -72,20 +95,36 @@ class SessionsScreen(Screen):
             Text("TOTAL", justify="right"),
         )
         self.table.cursor_type = "row"
+
         yield Header()
         with Vertical():
-            yield Static("count:", id="summary")
+            # Summary Grid with three DataTables
+            with Grid(id="summary-grid"):
+                yield DataTable(id="summary-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="trials-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="tokens-table", show_header=False, cursor_type=None, classes="summary-table")
+            # Main sessions table
             yield self.table
         yield Footer()
 
     def on_mount(self) -> None:
         self.title = "SEER Navigator"
         self.sub_title = str(self.sessions_root)
-        self.load_sessions()
+
+        # Add columns to summary tables
+        summary_table = self.query_one("#summary-table", DataTable)
+        summary_table.add_columns("Metric", "Value")
+        trials_table = self.query_one("#trials-table", DataTable)
+        trials_table.add_columns("Metric", "Value")
+        tokens_table = self.query_one("#tokens-table", DataTable)
+        tokens_table.add_columns("Metric", "Value")
+
+        self.load_sessions() # Load main table data
         self.table.focus()
-        self.update_summary()
+        self.update_summary() # Populate summary tables
 
     def load_sessions(self):
+        """Loads data into the main sessions DataTable."""
         self.session_dirs = [d for d in self.sessions_root.iterdir() if d.is_dir()]
         # Sort sessions by name (directory name)
         self.session_dirs = sorted(self.session_dirs, key=lambda d: d.name)
@@ -151,11 +190,18 @@ class SessionsScreen(Screen):
             self.select_session_by_index(self.session_index)
 
     def update_summary(self):
-        summary_widget = self.query_one("#summary", Static) # Corrected query_one usage
+        """Updates the three summary DataTables."""
+        summary_table = self.query_one("#summary-table", DataTable)
+        trials_table = self.query_one("#trials-table", DataTable)
+        tokens_table = self.query_one("#tokens-table", DataTable)
+
         num_sessions = 0
+        total_tasks_count = 0 # New counter for total tasks
         train_passed_count = 0
         test_passed_count = 0
-        total_steps = 0  # Add total_steps for summary
+        total_steps = 0
+        total_duration_seconds = 0.0 # New counter for total duration
+        total_error_count = 0 # New counter for errors
         # --- START ADDED TOKEN COUNTERS ---
         grand_total_prompt_tokens = 0
         grand_total_candidates_tokens = 0
@@ -169,11 +215,17 @@ class SessionsScreen(Screen):
                 try:
                     with open(summary_path, "r") as f:
                         session_summary = json.load(f)
-                    if session_summary.get("train_passed"):
-                        train_passed_count += 1
-                    if session_summary.get("test_passed"):
-                        test_passed_count += 1
+
+                    total_tasks_count += session_summary.get("count", 0) # Sum tasks
+                    train_passed_count += session_summary.get("train_passed", 0) # Sum train passed
+                    test_passed_count += session_summary.get("test_passed", 0) # Sum test passed
                     total_steps += session_summary.get("total_steps", 0)  # Accumulate steps
+                    total_error_count += session_summary.get("errors", {}).get("count", 0) # Sum errors
+
+                    # Sum duration
+                    duration = session_summary.get("duration_seconds")
+                    if duration is not None:
+                        total_duration_seconds += duration
 
                     # --- START ADDED TOKEN ACCUMULATION ---
                     tokens_data = session_summary.get("tokens", {})
@@ -190,13 +242,29 @@ class SessionsScreen(Screen):
                     # --- END ADDED TOKEN ACCUMULATION ---
 
                 except (FileNotFoundError, json.JSONDecodeError):
-                    pass
+                    pass # Skip sessions with missing/invalid index.json
 
-        # Update summary string to include token totals
-        summary_widget.update(
-            f"sessions: {num_sessions}, train ✔: {train_passed_count}, test ✔: {test_passed_count}, steps: {total_steps} | "
-            f"Tokens: IN={grand_total_prompt_tokens}, OUT={grand_total_candidates_tokens}, TOTAL={grand_total_tokens_all_sessions}"
-        )
+        # Format total duration
+        formatted_total_duration = Level._format_duration(total_duration_seconds)
+
+        # Clear and update summary table
+        summary_table.clear()
+        summary_table.add_row("sessions:", num_sessions)
+        summary_table.add_row("tasks:", total_tasks_count)
+        summary_table.add_row("steps:", total_steps)
+        summary_table.add_row("time:", formatted_total_duration)
+
+        # Clear and update trials table
+        trials_table.clear()
+        trials_table.add_row("test:", test_passed_count)
+        trials_table.add_row("train:", train_passed_count)
+        trials_table.add_row("errors:", total_error_count)
+
+        # Clear and update tokens table
+        tokens_table.clear()
+        tokens_table.add_row("in:", grand_total_prompt_tokens)
+        tokens_table.add_row("out:", grand_total_candidates_tokens)
+        tokens_table.add_row("total:", grand_total_tokens_all_sessions)
 
 
     def select_session_by_index(self, index: int) -> None:
