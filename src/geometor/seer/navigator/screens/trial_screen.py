@@ -194,15 +194,19 @@ class TrialViewer(ScrollableContainer):
             #     classes="trial-grid-labels" # Add specific class if needed
             # ))
             for i, trial in enumerate(train_trials):
-                input_grid_data = _parse_grid_string(trial.get("input", ""))
-                expected_grid_data = _parse_grid_string(trial.get("expected_output", ""))
-                actual_grid_data = _parse_grid_string(trial.get("transformed_output", ""))
+                # Use string_to_grid and extract the numpy array or use []
+                input_grid_obj = string_to_grid(trial.get("input", ""))
+                input_grid_data = input_grid_obj.grid if input_grid_obj else []
+                expected_grid_obj = string_to_grid(trial.get("expected_output", ""))
+                expected_grid_data = expected_grid_obj.grid if expected_grid_obj else []
+                actual_grid_obj = string_to_grid(trial.get("transformed_output", ""))
+                actual_grid_data = actual_grid_obj.grid if actual_grid_obj else []
 
                 trial_grid = Grid(
                     self._create_details_table(trial),
-                    current_renderer(input_grid_data) if input_grid_data else Static("No Input"),
-                    current_renderer(expected_grid_data) if expected_grid_data else Static("No Expected Output"),
-                    current_renderer(actual_grid_data) if actual_grid_data else Static("No Actual Output"),
+                    current_renderer(input_grid_data), # Pass numpy array or []
+                    current_renderer(expected_grid_data), # Pass numpy array or []
+                    current_renderer(actual_grid_data), # Pass numpy array or []
                     classes="trial-grid"
                     # id=f"train-trial-{i}" # REMOVED ID
                 )
@@ -214,15 +218,19 @@ class TrialViewer(ScrollableContainer):
             widgets_to_mount.append(Static("Test Set", classes="trial-set-label"))
             # Optional: Add labels above the grid columns if desired
             for i, trial in enumerate(test_trials):
-                input_grid_data = _parse_grid_string(trial.get("input", ""))
-                expected_grid_data = _parse_grid_string(trial.get("expected_output", ""))
-                actual_grid_data = _parse_grid_string(trial.get("transformed_output", ""))
+                # Use string_to_grid and extract the numpy array or use []
+                input_grid_obj = string_to_grid(trial.get("input", ""))
+                input_grid_data = input_grid_obj.grid if input_grid_obj else []
+                expected_grid_obj = string_to_grid(trial.get("expected_output", ""))
+                expected_grid_data = expected_grid_obj.grid if expected_grid_obj else []
+                actual_grid_obj = string_to_grid(trial.get("transformed_output", ""))
+                actual_grid_data = actual_grid_obj.grid if actual_grid_obj else []
 
                 trial_grid = Grid(
                     self._create_details_table(trial),
-                    current_renderer(input_grid_data) if input_grid_data else Static("No Input"),
-                    current_renderer(expected_grid_data) if expected_grid_data else Static("No Expected Output"),
-                    current_renderer(actual_grid_data) if actual_grid_data else Static("No Actual Output"),
+                    current_renderer(input_grid_data), # Pass numpy array or []
+                    current_renderer(expected_grid_data), # Pass numpy array or []
+                    current_renderer(actual_grid_data), # Pass numpy array or []
                     classes="trial-grid"
                     # id=f"test-trial-{i}" # REMOVED ID
                 )
