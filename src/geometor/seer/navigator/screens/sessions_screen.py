@@ -269,11 +269,6 @@ class SessionsScreen(Screen):
             Text("") # Empty third column
         )
         summary_table.add_row(
-            Text("tasks:", justify="right"),
-            Text(str(total_tasks_count), justify="right"),
-            Text("") # Empty third column
-        )
-        summary_table.add_row(
             Text("steps:", justify="right"),
             Text(str(total_steps), justify="right"),
             Text(avg_steps_str, justify="right") # ADDED average steps
@@ -286,6 +281,11 @@ class SessionsScreen(Screen):
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
+        trials_table.add_row(
+            Text("tasks:", justify="right"),
+            Text(str(total_tasks_count), justify="right"),
+            Text("") # Empty third column
+        )
         trials_table.add_row(
             Text("test:", justify="right"),
             Text(str(test_passed_count), justify="right"),

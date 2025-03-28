@@ -351,7 +351,7 @@ class SessionScreen(Screen):
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
-        summary_table.add_row(
+        trials_table.add_row(
             Text("tasks:", justify="right"),
             Text(str(num_tasks), justify="right"),
             Text("") # Empty third column

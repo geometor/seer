@@ -138,7 +138,7 @@ class TrialViewer(ScrollableContainer):
     def _create_details_table(self, trial_dict: dict) -> DataTable:
         """Creates a DataTable widget for a single trial's details."""
         table = DataTable(
-                #  classes="trial-details-table", 
+                classes="trial-details-table", 
                 show_header=False, 
                 cursor_type=None)
         table.add_columns("Metric", "Value")
@@ -215,7 +215,7 @@ class TrialViewer(ScrollableContainer):
                     current_renderer(input_grid_data), # Pass numpy array or []
                     current_renderer(expected_grid_data), # Pass numpy array or []
                     current_renderer(actual_grid_data), # Pass numpy array or []
-                    #  classes="trial-grid"
+                    classes="trial-grid"
                     # id=f"train-trial-{i}" # REMOVED ID
                 )
                 widgets_to_mount.append(trial_grid)
