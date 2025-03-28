@@ -326,11 +326,11 @@ class TaskScreen(Screen):
         trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
         trials_table.add_row(Text("errors:", justify="right"), Text(str(error_count), justify="right"))
 
-        # Clear and update tokens table (right-align keys and values)
+        # Clear and update tokens table (right-align keys and values, format with commas)
         tokens_table.clear()
-        tokens_table.add_row(Text("in:", justify="right"), Text(str(total_prompt_tokens), justify="right"))
-        tokens_table.add_row(Text("out:", justify="right"), Text(str(total_candidates_tokens), justify="right"))
-        tokens_table.add_row(Text("total:", justify="right"), Text(str(total_tokens_all_steps), justify="right"))
+        tokens_table.add_row(Text("in:", justify="right"), Text(f"{total_prompt_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(f"{total_candidates_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(f"{total_tokens_all_steps:,}", justify="right"))
 
 
     def select_step_by_index(self, index: int) -> None:

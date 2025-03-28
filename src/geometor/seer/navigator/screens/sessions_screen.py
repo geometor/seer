@@ -260,11 +260,11 @@ class SessionsScreen(Screen):
         trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
         trials_table.add_row(Text("errors:", justify="right"), Text(str(total_error_count), justify="right"))
 
-        # Clear and update tokens table (right-align keys and values)
+        # Clear and update tokens table (right-align keys and values, format with commas)
         tokens_table.clear()
-        tokens_table.add_row(Text("in:", justify="right"), Text(str(grand_total_prompt_tokens), justify="right"))
-        tokens_table.add_row(Text("out:", justify="right"), Text(str(grand_total_candidates_tokens), justify="right"))
-        tokens_table.add_row(Text("total:", justify="right"), Text(str(grand_total_tokens_all_sessions), justify="right"))
+        tokens_table.add_row(Text("in:", justify="right"), Text(f"{grand_total_prompt_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(f"{grand_total_candidates_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(f"{grand_total_tokens_all_sessions:,}", justify="right"))
 
 
     def select_session_by_index(self, index: int) -> None:
