@@ -9,10 +9,12 @@ from textual import log # Added log
 from textual.binding import Binding # Added Binding
 
 from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
 from geometor.seer.navigator.screens.session_screen import SessionScreen
 from geometor.seer.navigator.screens.task_screen import TaskScreen
-from geometor.seer.navigator.screens.step_screen import StepScreen # Import StepScreen
-from geometor.seer.navigator.screens.trial_screen import TrialScreen # Import TrialScreen
+from geometor.seer.navigator.screens.step_screen import StepScreen
+# Import TrialViewer instead of TrialScreen
+from geometor.seer.navigator.screens.trial_screen import TrialViewer
 
 # Define DummyGrid first so it's always available
 class DummyGrid(Static):
@@ -94,9 +96,21 @@ class SessionNavigator(App):
             self.renderer = new_renderer
             log.info(f"Renderer changed to: {renderer_name}")
             self.notify(f"Renderer: {renderer_name.capitalize()}")
-            # If the current screen is TrialScreen, refresh it
-            if isinstance(self.screen, TrialScreen):
-                self.screen.refresh_display()
+
+            # If the current screen is StepScreen, find the TrialViewer and refresh it
+            if isinstance(self.screen, StepScreen):
+                try:
+                    # Find the TrialViewer widget within the StepScreen
+                    trial_viewer = self.screen.query_one(TrialViewer)
+                    # Update its renderer attribute
+                    trial_viewer.renderer = new_renderer
+                    # Refresh its display if it's the currently active view in the switcher
+                    if self.screen.query_one("ContentSwitcher").current == "trial-viewer":
+                        trial_viewer.refresh_display()
+                except Exception as e:
+                    # Catch potential errors if TrialViewer isn't found or refresh fails
+                    log.error(f"Error refreshing TrialViewer in StepScreen: {e}")
+
         elif not new_renderer:
             log.warning(f"Unknown renderer name: {renderer_name}")
 

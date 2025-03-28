@@ -14,8 +14,8 @@ from textual.widgets import DataTable, Header, Footer, TextArea, Markdown, Conte
 from textual.binding import Binding
 from textual import log
 
-# Import the new TrialScreen
-from geometor.seer.navigator.screens.trial_screen import TrialScreen
+# Import the new TrialViewer widget
+from geometor.seer.navigator.screens.trial_screen import TrialViewer
 
 
 # Mapping file extensions to tree-sitter languages and TextArea theme
@@ -140,7 +140,8 @@ class StepScreen(Screen):
                         theme=DEFAULT_THEME,
                         id="text-viewer" # ID for the TextArea
                     )
-                    yield Markdown(id="markdown-viewer") # ID for the Markdown viewer
+                    yield Markdown(id="markdown-viewer")
+                    yield TrialViewer(id="trial-viewer") # Add TrialViewer instance
                     # Renamed placeholder, used for PNG and potentially others
                     yield Static("Select a file to view its content.", id="content-placeholder")
 
@@ -191,27 +192,27 @@ class StepScreen(Screen):
         else:
             self.selected_file_path = None # Clear selection if index is out of bounds
 
-    # Watch for changes in selected_file_path and update the appropriate viewer or push screen
+    # Watch for changes in selected_file_path and update the appropriate viewer
     def watch_selected_file_path(self, old_path: Path | None, new_path: Path | None) -> None:
-        """Called when selected_file_path changes. Pushes TrialScreen for trial.json."""
+        """Called when selected_file_path changes. Updates the content viewer."""
         switcher = self.query_one(ContentSwitcher)
         text_viewer = self.query_one("#text-viewer", TextArea)
         markdown_viewer = self.query_one("#markdown-viewer", Markdown)
-        placeholder = self.query_one("#content-placeholder", Static) # Get placeholder
+        trial_viewer = self.query_one("#trial-viewer", TrialViewer) # Get TrialViewer
+        placeholder = self.query_one("#content-placeholder", Static)
 
         if new_path:
             file_suffix = new_path.suffix.lower()
             file_name = new_path.name
 
-            # Check if it's a trial file (e.g., "trial.json", "code_00_trials.json")
-            # Using ends_with for flexibility
+            # Check if it's a trial file
             if file_name.endswith("trial.json") or file_name.endswith("trials.json"):
-                # Push the TrialScreen instead of showing content here
-                log.info(f"Pushing TrialScreen for: {new_path}")
-                # Ensure the app doesn't immediately pop the screen if TrialScreen fails to load
-                # We push first, TrialScreen handles its own loading errors
-                self.app.push_screen(TrialScreen(new_path, self.session_name, self.task_name, self.step_name))
-                # Don't switch content here, as we are navigating away
+                log.info(f"Loading TrialViewer for: {new_path}")
+                # Update TrialViewer's path and renderer, then load data
+                trial_viewer.trial_path = new_path
+                trial_viewer.renderer = self.app.renderer # Get current renderer from app
+                trial_viewer.load_and_display()
+                switcher.current = "trial-viewer" # Switch to the trial viewer
 
             elif file_suffix == ".png":
                 # Handle PNG files - show placeholder
