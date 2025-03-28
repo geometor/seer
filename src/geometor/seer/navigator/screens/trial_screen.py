@@ -188,7 +188,8 @@ class TrialViewer(ScrollableContainer):
         widgets_to_mount = []
 
         # Process Train trials
-        train_trials = self.trial_data.get("train", {}).get("trials", [])
+        # Use `or {}` to handle cases where the key exists but the value is None
+        train_trials = (self.trial_data.get("train") or {}).get("trials", [])
         if train_trials:
             widgets_to_mount.append(Static("Train Set", classes="trial-set-label"))
             # Optional: Add labels above the grid columns if desired
@@ -220,7 +221,8 @@ class TrialViewer(ScrollableContainer):
                 widgets_to_mount.append(trial_grid)
 
         # Process Test trials
-        test_trials = self.trial_data.get("test", {}).get("trials", [])
+        # Use `or {}` to handle cases where the key exists but the value is None
+        test_trials = (self.trial_data.get("test") or {}).get("trials", [])
         if test_trials:
             widgets_to_mount.append(Static("Test Set", classes="trial-set-label"))
             # Optional: Add labels above the grid columns if desired
