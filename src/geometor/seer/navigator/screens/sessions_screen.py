@@ -74,12 +74,13 @@ class SessionsScreen(Screen):
         self.table.cursor_type = "row"
         yield Header()
         with Vertical():
-            yield self.table
             yield Static("count:", id="summary")
+            yield self.table
         yield Footer()
 
     def on_mount(self) -> None:
-        self.title = "Session Navigator"
+        self.title = "SEER Navigator"
+        self.sub_title = str(self.sessions_root)
         self.load_sessions()
         self.table.focus()
         self.update_summary()

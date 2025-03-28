@@ -74,8 +74,8 @@ class SessionScreen(Screen):
         )
         yield Header()
         with Vertical():
-            yield self.table
             yield Static(id="summary")
+            yield self.table
         yield Footer()
 
     def on_mount(self) -> None:

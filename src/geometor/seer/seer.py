@@ -175,8 +175,17 @@ class Seer:
         start_time = datetime.now()  # Start timer before loop
 
         while task_step.attempts < max_retries:
-            task_step.attempts += 1
             total_prompt = history + prompt + instructions
+
+            # If not successful, wait a bit before retrying
+            if task_step.attempts > 0:
+                #  timeout = 10 * task_step.attempts
+                timeout = 10
+                print( f"        ...waiting  {timeout} seconds before retry ")
+                time.sleep(timeout)  
+
+            task_step.attempts += 1
+
             try:
                 response = client.generate_content(total_prompt, tools=tools)
 
@@ -199,10 +208,13 @@ class Seer:
                             finish_reason, "name", str(finish_reason)
                         )  # Get enum name
                         print(
-                            f"        WARNING: Attempt {task_step.attempts}/{max_retries} - Response finished (Reason: {finish_reason_str}), but text not accessible: {ve}"
+                            f"        Attempt {task_step.attempts}/{max_retries} - Response finished (Reason: {finish_reason_str}), but text not accessible: {ve}"
                         )
-                        # Decide if this specific error is retryable. For now, we retry.
-                        # If it shouldn't be retried, you might 'break' here or raise an exception.
+
+                        if task_step.attempts == max_retries:
+                            exc = Exception("Could not complete step - exit task")
+                            raise exc
+
 
                 else:
                     # Handle cases with no candidates or non-STOP finish reasons
@@ -215,18 +227,18 @@ class Seer:
                         finish_reason, "name", str(finish_reason)
                     )  # Get enum name
                     print(
-                        f"        WARNING: Attempt {task_step.attempts}/{max_retries} - Invalid response or finish reason: {finish_reason_str}"
+                        f"        Attempt {task_step.attempts}/{max_retries} - Invalid response or finish reason: {finish_reason_str}"
                     )
+                    if task_step.attempts == max_retries:
+                        exc = Exception("Could not complete step - exit task")
+                        raise exc
 
             except Exception as e:
                 print(
-                    f"        ERROR: Attempt {task_step.attempts}/{max_retries} - Exception during API call: {e}"
+                    f"        Attempt {task_step.attempts}/{max_retries} - ERROR: {e}"
                 )
                 # Log the exception potentially? For now, just print and retry.
 
-            # If not successful, wait a bit before retrying
-            if task_step.attempts < max_retries:
-                time.sleep(1)  # Wait 1 second before next retry
 
         end_time = datetime.now()
         response_time = (end_time - start_time).total_seconds()
@@ -240,8 +252,10 @@ class Seer:
             # You might want to raise an exception here or log it more formally
             # For now, we'll create a placeholder response or skip logging
             # Let's skip logging response if it's None, but log the step error
-            task_step.log_error(Exception(error_msg), "API Call Failure")
-            return task_step  # Or raise an exception depending on desired flow
+            exc = Exception(error_msg)
+            task_step.log_error(e, "API Call Failure")
+            #  return task_step  # Or raise an exception depending on desired flow
+            raise exc
 
         # Proceed with logging the (potentially invalid) response if one was received
         task_step.log_response(response, response_time)
