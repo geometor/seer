@@ -115,7 +115,7 @@ class SessionsScreen(Screen):
         summary_table = self.query_one("#summary-table", DataTable)
         summary_table.add_columns("Metric", "Value")
         trials_table = self.query_one("#trials-table", DataTable)
-        trials_table.add_columns("Metric", "Value")
+        trials_table.add_columns("Metric", "Value", "%") # Added % column
         tokens_table = self.query_one("#tokens-table", DataTable)
         tokens_table.add_columns("Metric", "Value")
 
@@ -247,6 +247,10 @@ class SessionsScreen(Screen):
         # Format total duration
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
+        # Calculate test percentage
+        test_percent = (test_passed_count / num_sessions * 100) if num_sessions > 0 else 0.0
+        test_percent_str = f"{test_percent:.1f}%"
+
         # Clear and update summary table (right-align keys and values)
         summary_table.clear()
         summary_table.add_row(Text("sessions:", justify="right"), Text(str(num_sessions), justify="right"))
@@ -256,9 +260,21 @@ class SessionsScreen(Screen):
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
-        trials_table.add_row(Text("test:", justify="right"), Text(str(test_passed_count), justify="right"))
-        trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
-        trials_table.add_row(Text("errors:", justify="right"), Text(str(total_error_count), justify="right"))
+        trials_table.add_row(
+            Text("test:", justify="right"),
+            Text(str(test_passed_count), justify="right"),
+            Text(test_percent_str, justify="right") # Add percentage
+        )
+        trials_table.add_row(
+            Text("train:", justify="right"),
+            Text(str(train_passed_count), justify="right"),
+            Text("") # Empty third column for train
+        )
+        trials_table.add_row(
+            Text("errors:", justify="right"),
+            Text(str(total_error_count), justify="right"),
+            Text("") # Empty third column for errors
+        )
 
         # Clear and update tokens table (right-align keys and values, format with commas)
         tokens_table.clear()
