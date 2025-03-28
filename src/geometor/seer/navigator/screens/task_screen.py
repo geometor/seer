@@ -313,6 +313,23 @@ class TaskScreen(Screen):
         )
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
+        # Determine overall pass/fail status
+        if num_steps > 0:
+            overall_train_status = (
+                Text("✔", style="green", justify="right")
+                if train_passed_count == num_steps
+                else Text("✘", style="red", justify="right")
+            )
+            overall_test_status = (
+                Text("✔", style="green", justify="right")
+                if test_passed_count == num_steps
+                else Text("✘", style="red", justify="right")
+            )
+        else:
+            overall_train_status = Text("-", justify="right")
+            overall_test_status = Text("-", justify="right")
+
+
         # Clear and update summary table (right-align keys and values)
         summary_table.clear()
         summary_table.add_row(Text("steps:", justify="right"), Text(str(num_steps), justify="right"))
@@ -322,8 +339,9 @@ class TaskScreen(Screen):
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
-        trials_table.add_row(Text("test:", justify="right"), Text(str(test_passed_count), justify="right"))
-        trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
+        # Use overall status instead of counts
+        trials_table.add_row(Text("test:", justify="right"), overall_test_status)
+        trials_table.add_row(Text("train:", justify="right"), overall_train_status)
         trials_table.add_row(Text("errors:", justify="right"), Text(str(error_count), justify="right"))
 
         # Clear and update tokens table (right-align keys and values, format with commas)
