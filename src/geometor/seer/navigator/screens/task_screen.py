@@ -259,26 +259,37 @@ class TaskScreen(Screen):
         tokens_table = self.query_one("#tokens-table", DataTable)
 
         num_steps = len(self.step_dirs)
-        train_passed_count = 0
-        test_passed_count = 0
+        # train_passed_count = 0 # No longer needed for summary display
+        # test_passed_count = 0  # No longer needed for summary display
         error_count = 0
         total_duration_seconds = 0.0
         best_scores = []
         total_prompt_tokens = 0
         total_candidates_tokens = 0
         total_tokens_all_steps = 0
-        total_attempts = 0 # Add counter for attempts
+        total_attempts = 0
 
+        # --- Read overall task summary ---
+        task_summary_path = self.task_path / "index.json"
+        task_train_passed = None
+        task_test_passed = None
+        try:
+            with open(task_summary_path, "r") as f:
+                task_summary_data = json.load(f)
+            task_train_passed = task_summary_data.get("train_passed")
+            task_test_passed = task_summary_data.get("test_passed")
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            log.error(f"Could not read task summary {task_summary_path}: {e}")
+            # Keep task_train_passed and task_test_passed as None
+
+        # --- Aggregate step details ---
         for step_dir in self.step_dirs:
             summary_path = step_dir / "index.json"
             try:
                 with open(summary_path, "r") as f:
                     step_summary = json.load(f)
 
-                if step_summary.get("train_passed"):
-                    train_passed_count += 1
-                if step_summary.get("test_passed"):
-                    test_passed_count += 1
+                # Aggregate errors, duration, score, attempts, tokens
                 if step_summary.get("has_errors"):
                     error_count += 1
 
@@ -313,21 +324,21 @@ class TaskScreen(Screen):
         )
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
-        # Determine overall pass/fail status
-        if num_steps > 0:
-            overall_train_status = (
-                Text("✔", style="green", justify="right")
-                if train_passed_count == num_steps
-                else Text("✘", style="red", justify="right")
-            )
-            overall_test_status = (
-                Text("✔", style="green", justify="right")
-                if test_passed_count == num_steps
-                else Text("✘", style="red", justify="right")
-            )
-        else:
+        # --- Determine overall pass/fail status from task summary ---
+        if task_train_passed is True:
+            overall_train_status = Text("✔", style="green", justify="right")
+        elif task_train_passed is False:
+            overall_train_status = Text("✘", style="red", justify="right")
+        else: # None or missing
             overall_train_status = Text("-", justify="right")
+
+        if task_test_passed is True:
+            overall_test_status = Text("✔", style="green", justify="right")
+        elif task_test_passed is False:
+            overall_test_status = Text("✘", style="red", justify="right")
+        else: # None or missing
             overall_test_status = Text("-", justify="right")
+        # --- End pass/fail status determination ---
 
 
         # Clear and update summary table (right-align keys and values)
@@ -339,7 +350,7 @@ class TaskScreen(Screen):
 
         # Clear and update trials table (right-align keys and values)
         trials_table.clear()
-        # Use overall status instead of counts
+        # Use overall status from task summary
         trials_table.add_row(Text("test:", justify="right"), overall_test_status)
         trials_table.add_row(Text("train:", justify="right"), overall_train_status)
         trials_table.add_row(Text("errors:", justify="right"), Text(str(error_count), justify="right"))
