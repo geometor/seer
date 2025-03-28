@@ -293,6 +293,17 @@ class SessionScreen(Screen):
                 if total_tokens is not None:
                     total_tokens_all_tasks += total_tokens
 
+                # ADDED: Calculate and add task weight
+                if task_json_path.exists():
+                    try:
+                        with open(task_json_path, "r") as f_task:
+                            task_data = json.load(f_task)
+                        task_obj = Task(task_dir.name, task_data)
+                        total_weight += task_obj.weight
+                    except (json.JSONDecodeError, Exception) as e_task:
+                        log.error(f"Error loading or processing {task_json_path} for summary weight: {e_task}")
+
+
             except (FileNotFoundError, json.JSONDecodeError):
                 pass # Skip tasks with missing/invalid index.json
 
