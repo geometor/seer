@@ -248,7 +248,7 @@ class SessionsScreen(Screen):
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
         # Calculate test percentage
-        test_percent = (test_passed_count / num_sessions * 100) if num_sessions > 0 else 0.0
+        test_percent = (test_passed_count / total_tasks_count) * 100 if num_sessions > 0 else 0.0
         test_percent_str = f"{test_percent:.1f}%"
 
         # Clear and update summary table (right-align keys and values)
