@@ -114,7 +114,7 @@ class SessionScreen(Screen):
         summary_table = self.query_one("#summary-table", DataTable)
         summary_table.add_columns("Metric", "Value")
         trials_table = self.query_one("#trials-table", DataTable)
-        trials_table.add_columns("Metric", "Value", "%") # Added % column
+        trials_table.add_columns("Metric", "Value", "±") # Changed % to ±
         tokens_table = self.query_one("#tokens-table", DataTable)
         tokens_table.add_columns("Metric", "Value")
 
@@ -280,6 +280,11 @@ class SessionScreen(Screen):
         test_percent = (test_passed_count / num_tasks * 100) if num_tasks > 0 else 0.0
         test_percent_str = f"{test_percent:.1f}%"
 
+        # --- START Calculate difference ---
+        diff = test_passed_count - train_passed_count
+        diff_str = f"{diff:+}" # Format with sign (+/-)
+        # --- END Calculate difference ---
+
         # Clear and update summary table (right-align keys and values)
         summary_table.clear()
         summary_table.add_row(Text("tasks:", justify="right"), Text(str(num_tasks), justify="right"))
@@ -297,7 +302,7 @@ class SessionScreen(Screen):
         trials_table.add_row(
             Text("train:", justify="right"),
             Text(str(train_passed_count), justify="right"),
-            Text("") # Empty third column for train
+            Text(diff_str, justify="right") # ADDED difference
         )
         trials_table.add_row(
             Text("errors:", justify="right"),
