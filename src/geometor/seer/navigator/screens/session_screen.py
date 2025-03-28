@@ -89,12 +89,12 @@ class SessionScreen(Screen):
             "TEST",
             "TRAIN",
             Text("SCORE", justify="right"), # Renamed from BEST SCORE
-            Text("WEIGHT", justify="right"), # ADDED WEIGHT column
             "STEPS",
             "TIME",                 # CHANGED from DURATION
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
+            Text("WEIGHT", justify="right"), # MOVED WEIGHT column to end
         )
         self.table.cursor_type = "row"
 
@@ -218,23 +218,23 @@ class SessionScreen(Screen):
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     best_score_text,     # SCORE
-                    task_weight,         # WEIGHT (ADDED)
                     num_steps,           # STEPS
                     time_str,            # TIME (CHANGED from duration_str)
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
-                    total_tokens_text    # TOTAL
+                    total_tokens_text,   # TOTAL
+                    task_weight          # WEIGHT (MOVED to end)
                 )
 
             except FileNotFoundError:
-                # Update exception handling for 11 columns (added WEIGHT)
+                # Update exception handling for 11 columns (WEIGHT is last)
                 self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 11 columns (added WEIGHT)
+                # Update exception handling for 11 columns (WEIGHT is last)
                 self.table.add_row(task_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except Exception as e: # Catch other potential errors during loading
                 log.error(f"Error processing task row for {task_dir.name}: {e}")
-                # Update exception handling for 11 columns (added WEIGHT)
+                # Update exception handling for 11 columns (WEIGHT is last)
                 self.table.add_row(task_dir.name, Text("ERR", style="bold red"), "-", "-", "-", "-", "-", "-", "-", "-", "-")
 
         if self.task_dirs:
