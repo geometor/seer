@@ -247,24 +247,24 @@ class SessionsScreen(Screen):
         # Format total duration
         formatted_total_duration = Level._format_duration(total_duration_seconds)
 
-        # Clear and update summary table
+        # Clear and update summary table (right-align keys and values)
         summary_table.clear()
-        summary_table.add_row("sessions:", num_sessions)
-        summary_table.add_row("tasks:", total_tasks_count)
-        summary_table.add_row("steps:", total_steps)
-        summary_table.add_row("time:", formatted_total_duration)
+        summary_table.add_row(Text("sessions:", justify="right"), Text(str(num_sessions), justify="right"))
+        summary_table.add_row(Text("tasks:", justify="right"), Text(str(total_tasks_count), justify="right"))
+        summary_table.add_row(Text("steps:", justify="right"), Text(str(total_steps), justify="right"))
+        summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
 
-        # Clear and update trials table
+        # Clear and update trials table (right-align keys and values)
         trials_table.clear()
-        trials_table.add_row("test:", test_passed_count)
-        trials_table.add_row("train:", train_passed_count)
-        trials_table.add_row("errors:", total_error_count)
+        trials_table.add_row(Text("test:", justify="right"), Text(str(test_passed_count), justify="right"))
+        trials_table.add_row(Text("train:", justify="right"), Text(str(train_passed_count), justify="right"))
+        trials_table.add_row(Text("errors:", justify="right"), Text(str(total_error_count), justify="right"))
 
-        # Clear and update tokens table
+        # Clear and update tokens table (right-align keys and values)
         tokens_table.clear()
-        tokens_table.add_row("in:", grand_total_prompt_tokens)
-        tokens_table.add_row("out:", grand_total_candidates_tokens)
-        tokens_table.add_row("total:", grand_total_tokens_all_sessions)
+        tokens_table.add_row(Text("in:", justify="right"), Text(str(grand_total_prompt_tokens), justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(str(grand_total_candidates_tokens), justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(str(grand_total_tokens_all_sessions), justify="right"))
 
 
     def select_session_by_index(self, index: int) -> None:
