@@ -17,6 +17,8 @@ from geometor.seer.navigator.screens.task_screen import TaskScreen
 from geometor.seer.navigator.screens.step_screen import StepScreen
 # Import TrialViewer instead of TrialScreen
 from geometor.seer.navigator.screens.trial_screen import TrialViewer
+# Import the modal screen
+from geometor.seer.navigator.screens.image_view_modal import ImageViewModal
 
 # Define DummyGrid first so it's always available
 class DummyGrid(Static):
