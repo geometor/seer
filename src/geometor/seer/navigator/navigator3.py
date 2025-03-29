@@ -5,10 +5,12 @@ from pathlib import Path
 import argparse
 import json
 import re
+import subprocess # ADDED import
+import shutil # ADDED import
 from textual import log # Added log
 from textual.binding import Binding # Added Binding
 
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+# Import screens
 from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
 from geometor.seer.navigator.screens.session_screen import SessionScreen
 from geometor.seer.navigator.screens.task_screen import TaskScreen
@@ -53,9 +55,10 @@ class SessionNavigator(App):
         # Add renderer bindings
         Binding("s", "set_renderer('solid')", "Solid", show=False), # Hide from footer
         Binding("c", "set_renderer('char')", "Char", show=False),   # Hide from footer
-        Binding("b", "set_renderer('block')", "Block", show=False), # Hide from footer
-        Binding("t", "set_renderer('tiny')", "Tiny", show=False),   # Hide from footer
-        Binding("r", "refresh_screen", "Refresh", show=True),      # ADDED Refresh binding
+        Binding("b", "set_renderer('block')", "Block", show=False),
+        Binding("t", "set_renderer('tiny')", "Tiny", show=False),
+        Binding("r", "refresh_screen", "Refresh", show=True),
+        Binding("i", "view_images", "View Images", show=True), # ADDED binding
     ]
 
     def __init__(self, sessions_root: str = "./sessions"):
@@ -64,6 +67,8 @@ class SessionNavigator(App):
         # Initialize renderer state - DummyGrid is now guaranteed to be defined
         self.renderer = RENDERERS.get("solid", DummyGrid) # Default to SolidGrid or Dummy
         log.info(f"Initial renderer set to: {self.renderer.__name__}")
+        self._sxiv_checked = False # ADDED sxiv check state
+        self._sxiv_path = None     # ADDED sxiv path cache
 
 
     def compose(self) -> ComposeResult:
@@ -75,6 +80,18 @@ class SessionNavigator(App):
     def on_mount(self) -> None:
         # Push the initial screen
         self.push_screen(SessionsScreen(self.sessions_root))
+
+    # --- START ADDED SXIV CHECK ---
+    def _check_sxiv(self) -> str | None:
+        """Check if sxiv exists and cache the path."""
+        if not self._sxiv_checked:
+            self._sxiv_path = shutil.which("sxiv")
+            self._sxiv_checked = True
+            if not self._sxiv_path:
+                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
+                self.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
+        return self._sxiv_path
+    # --- END ADDED SXIV CHECK ---
 
     def action_previous_sibling(self) -> None:
         """Navigate to the previous sibling directory."""
@@ -125,6 +142,75 @@ class SessionNavigator(App):
         else:
             log.warning(f"Screen {current_screen.__class__.__name__} has no refresh_content method.")
             self.notify("Refresh not supported on this screen", severity="warning")
+
+    # --- START ADDED IMAGE VIEWING ACTIONS ---
+    def action_view_images(self) -> None:
+        """Pushes the image view modal screen."""
+        current_screen = self.screen
+        context_path = None
+
+        # Determine context path based on the current screen
+        if isinstance(current_screen, SessionsScreen):
+            context_path = current_screen.sessions_root
+        elif isinstance(current_screen, SessionScreen):
+            context_path = current_screen.session_path
+        elif isinstance(current_screen, TaskScreen):
+            context_path = current_screen.task_path
+        elif isinstance(current_screen, StepScreen):
+            context_path = current_screen.step_path
+        else:
+            log.warning(f"Image viewing not supported on screen: {current_screen.__class__.__name__}")
+            self.notify("Image viewing not supported here.", severity="warning")
+            return
+
+        if context_path:
+            log.info(f"Pushing ImageViewModal with context: {context_path}")
+            self.push_screen(ImageViewModal(context_path=context_path))
+        else:
+            log.error("Could not determine context path for image viewing.")
+            self.notify("Error determining context for image viewing.", severity="error")
+
+    def launch_sxiv(self, context_path: Path, filter_type: str) -> None:
+        """Finds images based on filter and launches sxiv."""
+        sxiv_cmd = self._check_sxiv()
+        if not sxiv_cmd:
+            return # sxiv not found, notification already shown
+
+        image_files = []
+        try:
+            log.info(f"Searching for images in {context_path} with filter: {filter_type}")
+            if filter_type == "all":
+                image_files = sorted(list(context_path.rglob("*.png")))
+            elif filter_type == "tasks":
+                # Find task.png files recursively
+                image_files = sorted(list(context_path.rglob("task.png")))
+            elif filter_type == "trials":
+                # Find *trial.png files recursively
+                image_files = sorted(list(context_path.rglob("*trial.png")))
+            else:
+                log.warning(f"Unknown image filter type: {filter_type}")
+                self.notify(f"Unknown image filter: {filter_type}", severity="warning")
+                return
+
+            if not image_files:
+                self.notify(f"No images found for filter '{filter_type}' in {context_path.name}.", severity="information")
+                log.info(f"No images found for filter '{filter_type}' in {context_path}")
+                return
+
+            # Prepare the command list
+            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
+
+            log.info(f"Opening {len(image_files)} images with sxiv (filter: {filter_type})")
+            subprocess.Popen(command)
+
+        except FileNotFoundError:
+            # This case should be caught by _check_sxiv, but handle defensively
+            log.error(f"'sxiv' command not found when trying to execute.")
+            self.notify("sxiv not found. Cannot open images.", severity="error")
+        except Exception as e:
+            log.error(f"Error finding or opening images with sxiv from {context_path}: {e}")
+            self.notify(f"Error viewing images: {e}", severity="error")
+    # --- END ADDED IMAGE VIEWING ACTIONS ---
 
 
     def action_quit(self) -> None:

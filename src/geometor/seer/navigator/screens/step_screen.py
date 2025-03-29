@@ -1,8 +1,8 @@
 from pathlib import Path
 import json
 import yaml
-import subprocess # Added for opening external programs
-import shutil # Added to check if sxiv exists
+# REMOVED subprocess import
+# REMOVED shutil import
 
 from rich.text import Text
 
@@ -95,7 +95,7 @@ class StepScreen(Screen):
         Binding("k", "cursor_up", "Cursor Up", show=False),
         Binding("enter", "select_file", "Select File", show=False), # Changed description
         Binding("h", "app.pop_screen", "Back", show=True),
-        Binding("i", "view_images", "View Images", show=True), # ADDED binding
+        # REMOVED Binding("i", "view_images", "View Images", show=True),
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
@@ -112,18 +112,9 @@ class StepScreen(Screen):
         self.step_name = step_path.name
         self.task_name = task_path.name
         self.session_name = session_path.name
-        self._sxiv_checked = False
-        self._sxiv_path = None
+        # REMOVED sxiv check state attributes
 
-    def _check_sxiv(self) -> str | None:
-        """Check if sxiv exists and cache the path."""
-        if not self._sxiv_checked:
-            self._sxiv_path = shutil.which("sxiv")
-            self._sxiv_checked = True
-            if not self._sxiv_path:
-                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
-                self.app.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
-        return self._sxiv_path
+    # REMOVED _check_sxiv method
 
     def compose(self) -> ComposeResult:
         yield Header()

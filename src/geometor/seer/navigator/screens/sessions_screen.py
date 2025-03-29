@@ -14,8 +14,8 @@ from textual.containers import (
     ScrollableContainer,
 )
 from textual.binding import Binding
-import subprocess # ADDED import
-import shutil # ADDED import
+# REMOVED subprocess import
+# REMOVED shutil import
 
 from geometor.seer.navigator.screens.session_screen import SessionScreen
 from geometor.seer.session.level import Level  # Import Level
@@ -56,7 +56,7 @@ class SessionsScreen(Screen):
         Binding("j", "move_down", "Cursor down", show=True),
         Binding("k", "move_up", "Cursor up", show=True),
         Binding("l,enter", "select_row", "Select", show=True), # ADDED enter key
-        Binding("i", "view_images", "View Images", show=True), # ADDED binding
+        # REMOVED Binding("i", "view_images", "View Images", show=True),
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
     ]
@@ -66,19 +66,9 @@ class SessionsScreen(Screen):
         self.sessions_root = sessions_root
         self.session_dirs = []  # Store sibling dirs here
         self.session_index = 0
-        self._sxiv_checked = False # ADDED sxiv check state
-        self._sxiv_path = None     # ADDED sxiv path cache
+        # REMOVED sxiv check state attributes
 
-    # ADDED sxiv check method
-    def _check_sxiv(self) -> str | None:
-        """Check if sxiv exists and cache the path."""
-        if not self._sxiv_checked:
-            self._sxiv_path = shutil.which("sxiv")
-            self._sxiv_checked = True
-            if not self._sxiv_path:
-                log.warning("'sxiv' command not found in PATH. Cannot open images externally.")
-                self.app.notify("sxiv not found. Cannot open images.", severity="warning", timeout=5)
-        return self._sxiv_path
+    # REMOVED _check_sxiv method
 
     def compose(self) -> ComposeResult:
         self.table = DataTable() # Main sessions table
@@ -416,33 +406,7 @@ class SessionsScreen(Screen):
 
         self.app.push_screen(SessionScreen(session_path, task_dirs))
 
-    # ADDED action
-    def action_view_images(self) -> None:
-        """Find and open all PNG images in the sessions root directory using sxiv."""
-        sxiv_cmd = self._check_sxiv()
-        if not sxiv_cmd:
-            return # sxiv not found, notification already shown
-
-        try:
-            # Find all .png files recursively within the sessions root directory
-            image_files = sorted(list(self.sessions_root.rglob("*.png")))
-
-            if not image_files:
-                self.app.notify("No PNG images found in sessions root.", severity="information")
-                return
-
-            # Prepare the command list
-            command = [sxiv_cmd] + [str(img_path) for img_path in image_files]
-
-            log.info(f"Opening {len(image_files)} images with sxiv from {self.sessions_root}")
-            subprocess.Popen(command)
-
-        except FileNotFoundError:
-            log.error(f"'sxiv' command not found when trying to execute.")
-            self.app.notify("sxiv not found. Cannot open images.", severity="error")
-        except Exception as e:
-            log.error(f"Error finding or opening images with sxiv from {self.sessions_root}: {e}")
-            self.app.notify(f"Error viewing images: {e}", severity="error")
+    # REMOVED action_view_images method
 
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         # This method is kept for compatibility, but the core logic is in action_select_row
