@@ -19,6 +19,7 @@ import shutil # ADDED import
 
 from geometor.seer.navigator.screens.session_screen import SessionScreen
 from geometor.seer.session.level import Level  # Import Level
+from geometor.seer.tasks.tasks import Task # ADDED Task import for weight calculation
 
 import json  # Import the json module
 
@@ -94,6 +95,7 @@ class SessionsScreen(Screen):
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
+            Text("WEIGHT", justify="right"), # ADDED WEIGHT column
         )
         self.table.cursor_type = "row"
 
@@ -179,6 +181,29 @@ class SessionsScreen(Screen):
                     else Text("0", style="red", justify="right") # ALIGNED right
                 )
 
+                # --- START ADDED WEIGHT CALCULATION ---
+                session_total_weight = 0
+                try:
+                    for item in session_dir.iterdir():
+                        if item.is_dir(): # Check if it's a task directory
+                            task_json_path = item / "task.json"
+                            if task_json_path.exists():
+                                try:
+                                    with open(task_json_path, "r") as f_task:
+                                        task_data = json.load(f_task)
+                                    task_obj = Task(item.name, task_data)
+                                    session_total_weight += task_obj.weight
+                                except (json.JSONDecodeError, Exception) as e_task:
+                                    log.error(f"Error loading/processing task {item.name} for weight: {e_task}")
+                                    # Optionally mark weight as error? For now, just skip adding its weight.
+                except Exception as e_session:
+                    log.error(f"Error iterating tasks for weight in session {session_dir.name}: {e_session}")
+                    # Indicate error in the weight column?
+                    session_weight_text = Text("ERR", style="bold red", justify="right")
+                else:
+                    session_weight_text = Text(f"{session_total_weight:,}", justify="right") # Format with comma
+                # --- END ADDED WEIGHT CALCULATION ---
+
                 # Add the row with arguments in the new order, using time_str
                 self.table.add_row(
                     session_dir.name,    # SESSION
@@ -190,14 +215,15 @@ class SessionsScreen(Screen):
                     time_str,            # TIME (column definition handles alignment)
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
-                    total_tokens_text    # TOTAL
+                    total_tokens_text,   # TOTAL
+                    session_weight_text  # WEIGHT (ADDED)
                 )
             except FileNotFoundError:
-                # Update exception handling for 10 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 11 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 10 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 11 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 
@@ -219,6 +245,7 @@ class SessionsScreen(Screen):
         grand_total_candidates_tokens = 0
         grand_total_tokens_all_sessions = 0
         # --- END ADDED TOKEN COUNTERS ---
+        grand_total_weight = 0 # ADDED grand total weight counter
 
         for session_dir in self.sessions_root.iterdir():  # Iterate over sessions_root
             if session_dir.is_dir():
@@ -252,6 +279,27 @@ class SessionsScreen(Screen):
                     if total_tokens is not None:
                         grand_total_tokens_all_sessions += total_tokens
                     # --- END ADDED TOKEN ACCUMULATION ---
+
+                    # --- START ADDED WEIGHT ACCUMULATION ---
+                    try:
+                        session_weight = 0
+                        for item in session_dir.iterdir():
+                            if item.is_dir():
+                                task_json_path = item / "task.json"
+                                if task_json_path.exists():
+                                    try:
+                                        with open(task_json_path, "r") as f_task:
+                                            task_data = json.load(f_task)
+                                        task_obj = Task(item.name, task_data)
+                                        session_weight += task_obj.weight
+                                    except (json.JSONDecodeError, Exception):
+                                        # Error logged during row creation, ignore here for summary
+                                        pass
+                        grand_total_weight += session_weight
+                    except Exception as e_weight_sum:
+                        log.error(f"Error summing weight for session {session_dir.name} in summary: {e_weight_sum}")
+                    # --- END ADDED WEIGHT ACCUMULATION ---
+
 
                 except (FileNotFoundError, json.JSONDecodeError):
                     pass # Skip sessions with missing/invalid index.json
@@ -288,6 +336,11 @@ class SessionsScreen(Screen):
         summary_table.add_row(
             Text("time:", justify="right"),
             Text(formatted_total_duration, justify="right"),
+            Text("") # Empty third column
+        )
+        summary_table.add_row( # ADDED total weight row
+            Text("weight:", justify="right"),
+            Text(f"{grand_total_weight:,}", justify="right"),
             Text("") # Empty third column
         )
 
