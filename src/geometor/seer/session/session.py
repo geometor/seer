@@ -35,6 +35,7 @@ class Session(Level):
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
         # --- END ADDED TOKEN COUNTERS ---
+        total_error_count = summary["errors"]["count"] # Start with session's own errors
 
         for task_id, session_task in self.tasks.items():
             # Access summary information directly from session_task
@@ -70,6 +71,10 @@ class Session(Level):
                     # self.log_warning(f"Task summary file not found for token aggregation: {task_summary_path}", "Session Summarize")
                     print(f"    WARNING (Session {self.name}): Task summary file not found for token aggregation: {task_summary_path}")
 
+                # --- START ADDED ERROR AGGREGATION ---
+                task_errors_data = task_summary.get("errors", {}) # Get errors dict, default empty
+                total_error_count += task_errors_data.get("count", 0) # Add task's error count
+                # --- END ADDED ERROR AGGREGATION ---
 
             except (json.JSONDecodeError, TypeError) as e:
                  # Log or handle error if task summary isn't valid JSON or structure is wrong
@@ -92,6 +97,7 @@ class Session(Level):
             "total_tokens": total_tokens_all_tasks,
         }
         # --- END ADDED TOKENS TO SUMMARY ---
+        summary["errors"]["count"] = total_error_count # Update with aggregated count
 
         self._write_to_json("index.json", summary)
 
