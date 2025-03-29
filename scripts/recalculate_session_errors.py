@@ -118,26 +118,26 @@ def recalculate_errors(sessions_root_path: Path, dry_run: bool = False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Recalculate the 'errors.count' in session index.json files."
-    )
-    parser.add_argument(
-        "--sessions-dir",
-        type=str,
-        default="./sessions",
-        help="Path to the root directory containing session folders (default: ./sessions)",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Print changes without modifying files.",
-    )
-    args = parser.parse_args()
+    #  parser = argparse.ArgumentParser(
+        #  description="Recalculate the 'errors.count' in session index.json files."
+    #  )
+    #  parser.add_argument(
+        #  "--sessions-dir",
+        #  type=str,
+        #  default="./sessions",
+        #  help="Path to the root directory containing session folders (default: ./sessions)",
+    #  )
+    #  parser.add_argument(
+        #  "--dry-run",
+        #  action="store_true",
+        #  help="Print changes without modifying files.",
+    #  )
+    #  args = parser.parse_args()
 
-    sessions_root = Path(args.sessions_dir)
+    sessions_root = Path("../../seer_sessions/sessions")
 
     if not sessions_root.is_dir():
         print(f"Error: Sessions directory not found or not a directory: {sessions_root}")
         sys.exit(1)
 
-    recalculate_errors(sessions_root, args.dry_run)
+    recalculate_errors(sessions_root, dry_run=False)

@@ -313,11 +313,6 @@ class SessionsScreen(Screen):
             Text(str(total_error_count), justify="right"),
             Text("") # Empty third column for errors
         )
-        trials_table.add_row(
-            Text("errors:", justify="right"),
-            Text(str(total_error_count), justify="right"),
-            Text("") # Empty third column for errors
-        )
 
         # Clear and update tokens table (right-align keys and values, format with commas)
         tokens_table.clear()
