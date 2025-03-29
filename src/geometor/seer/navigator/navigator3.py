@@ -48,8 +48,8 @@ class SessionNavigator(App):
 
     BINDINGS = [
         Binding("q", "quit", "Quit"),
-        Binding("[", "previous_sibling", "Previous Sibling"),
-        Binding("]", "next_sibling", "Next Sibling"),
+        #  Binding("[", "previous_sibling", "Previous Sibling"),
+        #  Binding("]", "next_sibling", "Next Sibling"),
         # Add renderer bindings
         Binding("s", "set_renderer('solid')", "Solid", show=False), # Hide from footer
         Binding("c", "set_renderer('char')", "Char", show=False),   # Hide from footer

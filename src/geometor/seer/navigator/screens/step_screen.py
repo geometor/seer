@@ -343,38 +343,38 @@ class StepScreen(Screen):
         # Re-list files
         try:
                 self.file_paths = sorted([f for f in self.step_path.iterdir() if f.is_file()])
-            except Exception as e:
-                log.error(f"Error re-listing files in {self.step_path}: {e}")
-                self.app.notify(f"Error refreshing file list: {e}", severity="error")
-                # Optionally clear table or show error state
-                table.clear()
-                table.add_row("Error refreshing list.")
-                self.selected_file_path = None # Clear selection
-                return
-
-            # Clear and repopulate table
+        except Exception as e:
+            log.error(f"Error re-listing files in {self.step_path}: {e}")
+            self.app.notify(f"Error refreshing file list: {e}", severity="error")
+            # Optionally clear table or show error state
             table.clear()
-            if not self.file_paths:
-                table.add_row("No files found.")
-                self.selected_file_path = None # Clear selection
+            table.add_row("Error refreshing list.")
+            self.selected_file_path = None # Clear selection
+            return
+
+        # Clear and repopulate table
+        table.clear()
+        if not self.file_paths:
+            table.add_row("No files found.")
+            self.selected_file_path = None # Clear selection
+        else:
+            for file_path in self.file_paths:
+                table.add_row(file_path.name)
+
+            # Try to re-select the previously selected file by name
+            new_index = -1
+            if previously_selected_filename:
+                try:
+                    new_index = [f.name for f in self.file_paths].index(previously_selected_filename)
+                except ValueError:
+                    new_index = -1 # File no longer exists
+
+            # Select the found index, or the previous row index if valid, or the first row
+            if new_index != -1:
+                self.select_row_index(new_index)
+            elif current_cursor_row is not None and 0 <= current_cursor_row < len(self.file_paths):
+                self.select_row_index(current_cursor_row) # Fallback to previous index if still valid
             else:
-                for file_path in self.file_paths:
-                    table.add_row(file_path.name)
-
-                # Try to re-select the previously selected file by name
-                new_index = -1
-                if previously_selected_filename:
-                    try:
-                        new_index = [f.name for f in self.file_paths].index(previously_selected_filename)
-                    except ValueError:
-                        new_index = -1 # File no longer exists
-
-                # Select the found index, or the previous row index if valid, or the first row
-                if new_index != -1:
-                    self.select_row_index(new_index)
-                elif current_cursor_row is not None and 0 <= current_cursor_row < len(self.file_paths):
-                    self.select_row_index(current_cursor_row) # Fallback to previous index if still valid
-                else:
-                    self.select_row_index(0) # Fallback to first item
+                self.select_row_index(0) # Fallback to first item
 
         table.focus() # Ensure table has focus
