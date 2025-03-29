@@ -61,11 +61,3 @@ class ImageViewModal(Screen):
         button = self.query_one(f"#{filter_type}", Button)
         self.on_button_pressed(Button.Pressed(button))
 
-```
-
-**2. Update the screens `__init__.py`:**
-
-```python
-src/geometor/seer/navigator/screens/__init__.py
-<<<<<<< SEARCH
-# This file intentionally left blank.  It's a package marker.
