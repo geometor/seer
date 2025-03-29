@@ -253,7 +253,7 @@ class Seer:
             # For now, we'll create a placeholder response or skip logging
             # Let's skip logging response if it's None, but log the step error
             exc = Exception(error_msg)
-            task_step.log_error(e, "API Call Failure")
+            task_step.log_error(exc, "API Call Failure") # Use exc instead of e
             #  return task_step  # Or raise an exception depending on desired flow
             raise exc
 
