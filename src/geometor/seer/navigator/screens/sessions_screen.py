@@ -96,6 +96,7 @@ class SessionsScreen(Screen):
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
             Text("WEIGHT", justify="right"), # ADDED WEIGHT column
+            "DESC",                          # ADDED DESC column
         )
         self.table.cursor_type = "row"
 
@@ -204,6 +205,10 @@ class SessionsScreen(Screen):
                     session_weight_text = Text(f"{session_total_weight:,}", justify="right") # Format with comma
                 # --- END ADDED WEIGHT CALCULATION ---
 
+                # --- START ADDED DESCRIPTION HANDLING ---
+                description = summary.get("description", "-") # Get description or default
+                # --- END ADDED DESCRIPTION HANDLING ---
+
                 # Add the row with arguments in the new order, using time_str
                 self.table.add_row(
                     session_dir.name,    # SESSION
@@ -216,14 +221,15 @@ class SessionsScreen(Screen):
                     in_tokens_text,      # IN
                     out_tokens_text,     # OUT
                     total_tokens_text,   # TOTAL
-                    session_weight_text  # WEIGHT (ADDED)
+                    session_weight_text, # WEIGHT (ADDED)
+                    description          # DESC (ADDED)
                 )
             except FileNotFoundError:
-                # Update exception handling for 11 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 12 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 11 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 12 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 

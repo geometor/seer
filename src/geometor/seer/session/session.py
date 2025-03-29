@@ -8,8 +8,9 @@ from geometor.seer.session.level import Level
 
 
 class Session(Level):
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, description: str): # ADD description parameter
         self.config = config
+        self.description = description # STORE description
         self.tasks = {}
 
         output_dir = Path(config["output_dir"])
@@ -23,6 +24,7 @@ class Session(Level):
 
     def summarize(self):
         summary = super().summarize()
+        summary["description"] = self.description # ADD description to summary
         summary["count"] = len(self.tasks)
         summary["train_passed"] = self.train_passed_count  # Use count property
         summary["test_passed"] = self.test_passed_count    # Use count property

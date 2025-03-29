@@ -39,8 +39,8 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.use_images = config.get("use_images", False)
 
-    def run(self, tasks: Tasks):
-        session = Session(self.config)
+    def run(self, tasks: Tasks, description: str): # ADD description parameter
+        session = Session(self.config, description) # PASS description to Session
 
         for task in tasks:
             self.solve(session, task)
