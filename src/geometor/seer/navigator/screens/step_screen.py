@@ -328,15 +328,15 @@ class StepScreen(Screen):
         """Handle row selection in the DataTable (e.g., by clicking)."""
         # Ensure the index is valid before selecting
         if event.cursor_row is not None and 0 <= event.cursor_row < len(self.file_paths):
-             # Use select_row_index to trigger the watch method consistently
-             self.select_row_index(event.cursor_row)
-            else:
-                 self.selected_file_path = None # Clear if selection is invalid
+            # Use select_row_index to trigger the watch method consistently
+            self.select_row_index(event.cursor_row)
+        else:
+            self.selected_file_path = None # Clear if selection is invalid
 
-        def refresh_content(self) -> None:
-            """Reloads the file list and the content of the selected file."""
-            log.info(f"Refreshing StepScreen content for {self.step_path.name}...")
-            table = self.query_one(DataTable)
+    def refresh_content(self) -> None:
+        """Reloads the file list and the content of the selected file."""
+        log.info(f"Refreshing StepScreen content for {self.step_path.name}...")
+        table = self.query_one(DataTable)
             current_cursor_row = table.cursor_row
             previously_selected_filename = self.selected_file_path.name if self.selected_file_path else None
 
@@ -373,8 +373,8 @@ class StepScreen(Screen):
                 if new_index != -1:
                     self.select_row_index(new_index)
                 elif current_cursor_row is not None and 0 <= current_cursor_row < len(self.file_paths):
-                     self.select_row_index(current_cursor_row) # Fallback to previous index if still valid
+                    self.select_row_index(current_cursor_row) # Fallback to previous index if still valid
                 else:
-                     self.select_row_index(0) # Fallback to first item
+                    self.select_row_index(0) # Fallback to first item
 
-            table.focus() # Ensure table has focus
+        table.focus() # Ensure table has focus
