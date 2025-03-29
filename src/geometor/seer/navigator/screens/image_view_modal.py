@@ -15,6 +15,7 @@ class ImageViewModal(Screen):
         Binding("a", "select_filter('all')", "All", show=False),
         Binding("t", "select_filter('tasks')", "Tasks", show=False),
         Binding("r", "select_filter('trials')", "Trials", show=False),
+        Binding("p", "select_filter('passed_trials')", "Passed Trials", show=False), # ADDED binding
         Binding("escape", "app.pop_screen", "Cancel", show=False),
     ]
 
@@ -30,6 +31,7 @@ class ImageViewModal(Screen):
             Button("All (.png)", variant="primary", id="all"),
             Button("Tasks (task.png)", variant="primary", id="tasks"),
             Button("Trials (*trial.png)", variant="primary", id="trials"),
+            Button("Passed Trials (*trial.png)", variant="success", id="passed_trials"), # ADDED button
             Button("Cancel", variant="default", id="cancel"),
             id="dialog",
         )

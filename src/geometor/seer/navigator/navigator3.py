@@ -191,6 +191,31 @@ class SessionNavigator(App):
             elif filter_type == "trials":
                 # Find *trial.png files recursively
                 image_files = sorted(list(context_path.rglob("*trial.png")))
+            elif filter_type == "passed_trials":
+                # Find *trial.png files where the corresponding .json shows test success
+                image_files = []
+                json_files = list(context_path.rglob("*trial.json")) # Find all trial json files first
+                log.info(f"Found {len(json_files)} *trial.json files for passed_trials filter.")
+                for json_file in json_files:
+                    try:
+                        with open(json_file, "r") as f:
+                            trial_data = json.load(f)
+                        # Check if 'test' trials exist and any have "match": true
+                        test_trials = (trial_data.get("test") or {}).get("trials", [])
+                        if any(trial.get("match") is True for trial in test_trials):
+                            # Construct the expected PNG filename
+                            png_filename = json_file.stem + ".png" # e.g., "code_00_trial.json" -> "code_00_trial.png"
+                            png_path = json_file.with_name(png_filename)
+                            if png_path.exists():
+                                image_files.append(png_path)
+                                log.debug(f"Adding passed trial image: {png_path}")
+                            else:
+                                log.warning(f"Passed trial JSON found ({json_file}), but corresponding PNG not found: {png_path}")
+                    except json.JSONDecodeError:
+                        log.error(f"Could not decode JSON for passed_trials filter: {json_file}")
+                    except Exception as e:
+                        log.error(f"Error processing {json_file} for passed_trials filter: {e}")
+                image_files = sorted(image_files) # Sort the found images
             else:
                 log.warning(f"Unknown image filter type: {filter_type}")
                 self.notify(f"Unknown image filter: {filter_type}", severity="warning")
