@@ -82,9 +82,10 @@ class SessionsScreen(Screen):
     def compose(self) -> ComposeResult:
         self.table = DataTable() # Main sessions table
         # Add columns in the new requested order, changing DURATION to TIME
-        # Right-align TEST, TRAIN, TIME headers
+        # Right-align TEST, TRAIN, TIME, ERROR headers
         self.table.add_columns(
             "SESSION",
+            Text("ERROR", justify="center"),               # ADDED & ALIGNED
             Text("TEST", justify="right"),                 # MOVED & ALIGNED
             Text("TRAIN", justify="right"),                # MOVED & ALIGNED
             "TASKS",                                       # MOVED
@@ -145,6 +146,16 @@ class SessionsScreen(Screen):
                     else "-"
                 )
 
+                # --- START ADDED ERROR HANDLING ---
+                errors_data = summary.get("errors", {})
+                error_count = errors_data.get("count", 0)
+                error_text = (
+                    Text(str(error_count), style="bold yellow", justify="center")
+                    if error_count > 0
+                    else Text("-", justify="center")
+                )
+                # --- END ADDED ERROR HANDLING ---
+
                 # --- START ADDED TOKEN HANDLING ---
                 tokens_data = summary.get("tokens", {}) # Get the tokens dict, default to empty
                 prompt_tokens = tokens_data.get("prompt_tokens")
@@ -171,6 +182,7 @@ class SessionsScreen(Screen):
                 # Add the row with arguments in the new order, using time_str
                 self.table.add_row(
                     session_dir.name,    # SESSION
+                    error_text,          # ERROR (ADDED)
                     test_passed,         # TEST
                     train_passed,        # TRAIN
                     num_tasks,           # TASKS
@@ -181,11 +193,11 @@ class SessionsScreen(Screen):
                     total_tokens_text    # TOTAL
                 )
             except FileNotFoundError:
-                # Update exception handling for 9 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 10 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
             except json.JSONDecodeError:
-                # Update exception handling for 9 columns
-                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-")
+                # Update exception handling for 10 columns
+                self.table.add_row(session_dir.name, "-", "-", "-", "-", "-", "-", "-", "-", "-")
         if self.session_dirs:
             self.select_session_by_index(self.session_index)
 
@@ -201,7 +213,7 @@ class SessionsScreen(Screen):
         test_passed_count = 0
         total_steps = 0
         total_duration_seconds = 0.0 # New counter for total duration
-        total_error_count = 0 # New counter for errors
+        total_error_count = 0 # Initialize error counter
         # --- START ADDED TOKEN COUNTERS ---
         grand_total_prompt_tokens = 0
         grand_total_candidates_tokens = 0
@@ -217,10 +229,10 @@ class SessionsScreen(Screen):
                         session_summary = json.load(f)
 
                     total_tasks_count += session_summary.get("count", 0) # Sum tasks
-                    train_passed_count += session_summary.get("train_passed", 0) # Sum train passed
-                    test_passed_count += session_summary.get("test_passed", 0) # Sum test passed
-                    total_steps += session_summary.get("total_steps", 0)  # Accumulate steps
-                    total_error_count += session_summary.get("errors", {}).get("count", 0) # Sum errors
+                    train_passed_count += session_summary.get("train_passed", 0)
+                    test_passed_count += session_summary.get("test_passed", 0)
+                    total_steps += session_summary.get("total_steps", 0)
+                    total_error_count += session_summary.get("errors", {}).get("count", 0) # Accumulate errors
 
                     # Sum duration
                     duration = session_summary.get("duration_seconds")
@@ -295,6 +307,11 @@ class SessionsScreen(Screen):
             Text("train:", justify="right"),
             Text(str(train_passed_count), justify="right"),
             Text(diff_str, justify="right") # ADDED difference
+        )
+        trials_table.add_row(
+            Text("errors:", justify="right"),
+            Text(str(total_error_count), justify="right"),
+            Text("") # Empty third column for errors
         )
         trials_table.add_row(
             Text("errors:", justify="right"),
