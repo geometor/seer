@@ -337,11 +337,11 @@ class StepScreen(Screen):
         """Reloads the file list and the content of the selected file."""
         log.info(f"Refreshing StepScreen content for {self.step_path.name}...")
         table = self.query_one(DataTable)
-            current_cursor_row = table.cursor_row
-            previously_selected_filename = self.selected_file_path.name if self.selected_file_path else None
+        current_cursor_row = table.cursor_row
+        previously_selected_filename = self.selected_file_path.name if self.selected_file_path else None
 
-            # Re-list files
-            try:
+        # Re-list files
+        try:
                 self.file_paths = sorted([f for f in self.step_path.iterdir() if f.is_file()])
             except Exception as e:
                 log.error(f"Error re-listing files in {self.step_path}: {e}")
