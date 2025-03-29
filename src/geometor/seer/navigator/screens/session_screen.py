@@ -445,3 +445,23 @@ class SessionScreen(Screen):
     def on_data_table_row_selected(self, event: DataTable.RowSelected):
         # This method is kept for compatibility, but the core logic is in action_select_row
         self.action_select_row()
+
+    def refresh_content(self) -> None:
+        """Reloads task data for the session and updates the screen."""
+        log.info(f"Refreshing SessionScreen content for {self.session_path.name}...")
+        # Store current cursor position
+        current_cursor_row = self.table.cursor_row
+
+        # Re-read task directories in case they changed
+        self.task_dirs = sorted([d for d in self.session_path.iterdir() if d.is_dir()])
+
+        self.update_tasks_list() # Reloads table data
+        self.update_summary() # Reloads summary data
+
+        # Restore cursor position if possible
+        if current_cursor_row is not None and 0 <= current_cursor_row < self.table.row_count:
+            self.table.move_cursor(row=current_cursor_row, animate=False)
+        elif self.table.row_count > 0:
+            self.table.move_cursor(row=0, animate=False) # Move to top if previous row is gone
+
+        self.table.focus() # Ensure table has focus

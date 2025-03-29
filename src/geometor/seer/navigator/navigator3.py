@@ -55,6 +55,7 @@ class SessionNavigator(App):
         Binding("c", "set_renderer('char')", "Char", show=False),   # Hide from footer
         Binding("b", "set_renderer('block')", "Block", show=False), # Hide from footer
         Binding("t", "set_renderer('tiny')", "Tiny", show=False),   # Hide from footer
+        Binding("r", "refresh_screen", "Refresh", show=True),      # ADDED Refresh binding
     ]
 
     def __init__(self, sessions_root: str = "./sessions"):
@@ -113,6 +114,17 @@ class SessionNavigator(App):
 
         elif not new_renderer:
             log.warning(f"Unknown renderer name: {renderer_name}")
+
+    def action_refresh_screen(self) -> None:
+        """Calls the refresh method on the current screen if it exists."""
+        current_screen = self.screen
+        if hasattr(current_screen, "refresh_content"):
+            log.info(f"Refreshing screen: {current_screen.__class__.__name__}")
+            current_screen.refresh_content()
+            self.notify("Screen refreshed")
+        else:
+            log.warning(f"Screen {current_screen.__class__.__name__} has no refresh_content method.")
+            self.notify("Refresh not supported on this screen", severity="warning")
 
 
     def action_quit(self) -> None:
