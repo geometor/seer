@@ -1,8 +1,8 @@
 from pathlib import Path
 import json
 import yaml
-# REMOVED subprocess import
-# REMOVED shutil import
+import subprocess
+import shutil # To find terminal emulator
 
 from rich.text import Text
 
@@ -95,6 +95,7 @@ class StepScreen(Screen):
         Binding("k", "cursor_up", "Cursor Up", show=False),
         Binding("enter", "select_file", "Select File", show=False), # Changed description
         Binding("h", "app.pop_screen", "Back", show=True),
+        Binding("t", "open_terminal", "Open Terminal", show=True), # Added terminal binding
         # REMOVED Binding("i", "view_images", "View Images", show=True),
         # Binding("[", "previous_sibling", "Previous Sibling", show=True), # Handled by App
         # Binding("]", "next_sibling", "Next Sibling", show=True),     # Handled by App
