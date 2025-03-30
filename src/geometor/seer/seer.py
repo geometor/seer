@@ -236,7 +236,7 @@ class Seer:
             # --- Start of improved retry logic ---
             client = self.roles[role_name]
             max_retries = 2 # TODO: Make configurable?
-        response = None
+            response = None # Correct indentation
         start_time = datetime.now()  # Start timer before loop
         valid_response_received = False # Flag to track success
 
