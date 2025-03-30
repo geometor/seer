@@ -189,8 +189,21 @@ class TasksScreen(Screen):
             data = self.tasks_summary[task_id]
             session_count = len(data['sessions'])
             error_text = Text(str(data['errors']), style="bold yellow", justify="center") if data['errors'] > 0 else Text("-", justify="center")
-            test_text = Text(str(data['test_passed']), justify="right")
-            train_text = Text(str(data['train_passed']), justify="right")
+
+            # Color TEST and TRAIN counts
+            test_passed_count = data['test_passed']
+            test_text = (
+                Text(str(test_passed_count), style="bold green", justify="right")
+                if test_passed_count > 0
+                else Text("0", style="red", justify="right")
+            )
+            train_passed_count = data['train_passed']
+            train_text = (
+                Text(str(train_passed_count), style="bold green", justify="right")
+                if train_passed_count > 0
+                else Text("0", style="red", justify="right")
+            )
+
             steps_text = Text(str(data['total_steps']), justify="right")
             # Format duration
             time_str = self._format_duration(data['total_duration'])
