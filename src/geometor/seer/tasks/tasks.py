@@ -315,3 +315,64 @@ class Tasks(list):
 
     def get_ordered_by_train_count(self, reverse=False):
         return sorted(self, key=lambda task: len(task.train), reverse=reverse)
+
+
+# --- Standalone Utility Function ---
+
+def get_unsolved_tasks(tasks_list: list[Task], sessions_root: Path) -> Tasks:
+    """
+    Scans session summaries to find tasks that have never passed the test phase.
+
+    Args:
+        tasks_list: A list of Task objects to filter.
+        sessions_root: The root directory containing session folders.
+
+    Returns:
+        A new Tasks object containing only the unsolved tasks found in the
+        original tasks_list that also exist in the sessions. Returns an empty
+        Tasks object if sessions_root is invalid or scanning fails.
+    """
+    solved_task_ids = set()
+    tasks_in_sessions = set()
+
+    # Create an empty Tasks object upfront for potential error returns
+    # Use __new__ and clear to avoid running __init__
+    empty_tasks = Tasks.__new__(Tasks)
+    empty_tasks.clear()
+
+    try:
+        if not sessions_root.is_dir():
+            print(f"Error: Sessions root directory not found: {sessions_root}")
+            return empty_tasks
+
+        for session_dir in sessions_root.iterdir():
+            if session_dir.is_dir():
+                for task_dir in session_dir.iterdir():
+                    if task_dir.is_dir():
+                        task_id = task_dir.name
+                        tasks_in_sessions.add(task_id)
+                        summary_path = task_dir / "index.json"
+                        if summary_path.exists():
+                            try:
+                                with open(summary_path, "r") as f:
+                                    summary = json.load(f)
+                                if summary.get("test_passed") is True:
+                                    solved_task_ids.add(task_id)
+                            except (json.JSONDecodeError, Exception) as e:
+                                print(f"Warning: Could not read/parse summary for {task_dir}: {e}")
+    except Exception as e:
+        print(f"Error scanning sessions directory {sessions_root}: {e}")
+        return empty_tasks
+
+    # Filter the provided tasks_list based on the findings
+    unsolved_tasks_list = [
+        task for task in tasks_list
+        if task.id in tasks_in_sessions and task.id not in solved_task_ids
+    ]
+
+    # Create a new Tasks object to hold the result
+    unsolved_tasks_obj = Tasks.__new__(Tasks)
+    unsolved_tasks_obj.clear() # Ensure it starts empty
+    unsolved_tasks_obj.extend(unsolved_tasks_list)
+
+    return unsolved_tasks_obj
