@@ -53,102 +53,164 @@ class Seer:
         try:
             self._investigate(task, session_task)
         except Exception as e:
-            session_task.log_error(e)
+            # Log the error at the SessionTask level
+            session_task.log_error(e, "Investigation failed")
 
         session_task.summarize()
 
     def _investigate(self, task: Task, session_task: SessionTask):
         """
-        investigate all training pairs
+        Investigate all training pairs, stopping if a step fails critically.
         """
+        history = [] # Define history at the start
+        task_step = None # Initialize task_step to avoid potential UnboundLocalError
 
         # STEP: dreamer *****************************
-        title = f"investigate • dreamer • all training"
-        history = []
-        prompt = []
-        for i, pair in enumerate(task.train, 1):
-            prompt.extend(get_pair_prompt(f"train_{i}", pair, self.use_images))
+        title = "investigate • dreamer • all training" # Define title here for except block
+        try:
+            prompt = []
+            for i, pair in enumerate(task.train, 1):
+                prompt.extend(get_pair_prompt(f"train_{i}", pair, self.use_images))
 
-        if self.use_images:
-            #  show full task image
-            prompt.append(task.to_image(show_test=False))
+            if self.use_images:
+                #  show full task image
+                prompt.append(task.to_image(show_test=False))
 
-        instructions = [self.instructions["investigate_dreamer"]]
+            instructions = [self.instructions["investigate_dreamer"]]
 
-        task_step = self._generate(
-            session_task,
-            "dreamer",
-            title,
-            history,
-            prompt,
-            instructions,
-            tools="code_execution",
-        )
-
-        history.extend(prompt)
-        history.extend(task_step.response_parts)
-
-        task_step.run_trials()
-        task_step.summarize()
-
-        if task_step.any_trials_successful("train"):
-            print("            train passed")
-            if task_step.any_trials_successful("test"):
-                print("            test passed")
-            return
-
-        # STEP: coder *********************************
-        title = f"investigate • coder • all training"
-        #  title = f"all training • investigate_coder"
-        instructions = [self.instructions["investigate_coder"]]
-        prompt = [""]
-        task_step = self._generate(
-            session_task,
-            "coder",
-            title,
-            history,
-            prompt,
-            instructions,
-            #  tools="code_execution",
-        )
-        history.extend(prompt)
-        history.extend(task_step.response_parts)
-
-        task_step.run_trials()
-        task_step.summarize()
-
-        if task_step.any_trials_successful("train"):
-            print("            train passed")
-            if task_step.any_trials_successful("test"):
-                print("            test passed")
-            return
-
-        current_iteration = 0
-        while current_iteration < self.max_iterations:
-            # Get the first (and presumably only) CodeTrial
-            code_trial = task_step.get_first_code_trial()
-            if not code_trial:
-                # Handle the case where there's no code trial (shouldn't normally happen)
-                session_task.log_error(Exception("No code trial found in refine step."))
-                return
-
-            code = code_trial.code
-
-            task_step = self.refine(
+            task_step = self._generate(
                 session_task,
-                task,
-                code,
-                code_trial,
-                current_iteration,
+                "dreamer",
+                title,
+                history,
+                prompt,
+                instructions,
+                tools="code_execution",
             )
+
+            history.extend(prompt)
+            history.extend(task_step.response_parts)
+
+            task_step.run_trials()
+            task_step.summarize()
 
             if task_step.any_trials_successful("train"):
                 print("            train passed")
                 if task_step.any_trials_successful("test"):
                     print("            test passed")
-                return
+                return # Success, exit investigation
+
+        except Exception as e:
+            # _generate raises Exception on failure after retries
+            print(f"        ERROR: Step '{title}' failed critically. Stopping investigation for task {task.id}.")
+            # Error is already logged within _generate or by the exception handler in SessionTask/Level
+            # We log the context of the failure here.
+            session_task.log_error(e, f"Critical failure in step: {title}. Stopping investigation.")
+            return # Stop investigation for this task
+
+        # STEP: coder *********************************
+        title = "investigate • coder • all training" # Define title here for except block
+        try:
+            instructions = [self.instructions["investigate_coder"]]
+            prompt = [""] # Minimal prompt for coder based on history
+            task_step = self._generate(
+                session_task,
+                "coder",
+                title,
+                history, # History includes dreamer prompt and response
+                prompt,
+                instructions,
+                #  tools="code_execution", # Coder might not need tools initially
+            )
+            # History update is tricky here, coder prompt is minimal, response is key
+            # history.extend(prompt) # Probably not useful to add empty prompt
+            history.extend(task_step.response_parts) # Add coder's response/code
+
+            task_step.run_trials()
+            task_step.summarize()
+
+            if task_step.any_trials_successful("train"):
+                print("            train passed")
+                if task_step.any_trials_successful("test"):
+                    print("            test passed")
+                return # Success, exit investigation
+
+        except Exception as e:
+            print(f"        ERROR: Step '{title}' failed critically. Stopping investigation for task {task.id}.")
+            session_task.log_error(e, f"Critical failure in step: {title}. Stopping investigation.")
+            return # Stop investigation for this task
+
+
+        # Refinement Loop ****************************
+        current_iteration = 0
+        while current_iteration < self.max_iterations:
+            # Get the first (and presumably only) CodeTrial from the *previous* step (coder or last refine)
+            if not task_step: # Should not happen if coder step succeeded, but safety check
+                 session_task.log_error(Exception("task_step is None before refinement loop."))
+                 return
+
+            code_trial = task_step.get_first_code_trial()
+            if not code_trial:
+                # Handle the case where there's no code trial (e.g., coder failed to produce code)
+                session_task.log_error(Exception(f"No code trial found to start refinement iteration {current_iteration}."))
+                return # Cannot proceed with refinement
+
+            code = code_trial.code
+
+            try:
+                # Call refine, which now also handles exceptions from its _generate calls
+                # Pass the current history state into refine
+                task_step = self.refine(
+                    session_task,
+                    task,
+                    code,
+                    code_trial,
+                    current_iteration,
+                    history, # Pass current history state
+                )
+
+                # Update history with the parts from the *last* step of refine (refine_coder response)
+                # refine method itself should manage its internal history flow.
+                # The task_step returned by refine contains the response_parts of its last internal step.
+                # We need to add these to the main history for the *next* iteration or if we exit here.
+                # Note: refine takes history as input, so it sees the state *before* its execution.
+                # We add its final output *after* it returns.
+                if task_step and task_step.response_parts:
+                     # Avoid adding empty lists if refine failed early or had no response parts
+                     # This assumes refine returns the last step it executed, even on partial success/failure before exception.
+                     # If refine raises an exception, task_step might be from the failed sub-step.
+                     # Let's only update history based on the *returned* task_step from a *successful* refine call.
+                     # The exception block handles the failure case.
+                     # We need the history from the *end* of the refine call for the *next* iteration.
+                     # refine doesn't explicitly return the new history state.
+                     # Let's assume the task_step.response_parts are what we need to append.
+                     # This might need refinement based on exactly what `refine` puts in response_parts.
+                     # For now, append the response parts of the step returned by refine.
+                     history.extend(task_step.response_parts)
+
+
+                # Check if the refinement step was successful
+                if task_step.any_trials_successful("train"):
+                    print("            train passed")
+                    if task_step.any_trials_successful("test"):
+                        print("            test passed")
+                    return # Success, exit investigation
+
+                # If refine completed but didn't pass, the loop continues.
+                # History has been updated with the output of the refine step.
+
+            except Exception as e:
+                # Catch critical failure from _generate within refine
+                print(f"        ERROR: Refinement iteration {current_iteration} failed critically. Stopping investigation for task {task.id}.")
+                # Error is already logged within refine's exception handler before re-raising
+                # We log the context of the failure during refinement here.
+                session_task.log_error(e, f"Critical failure during refinement iteration {current_iteration}. Stopping investigation.")
+                return # Stop investigation
 
             current_iteration += 1
+
+        print(f"        INFO: Reached max iterations ({self.max_iterations}) without solving task {task.id}.")
+
 
     def _generate(
         self,
@@ -273,61 +335,95 @@ class Seer:
         code,
         code_trial,
         current_iteration,
+        history: list, # Accept history from caller (_investigate)
     ):
         """
-        Refines the generated code based on test results, using the dreamer/coder pattern.
+        Refines the generated code based on test results, handling exceptions.
+        Returns the final task_step of this refinement iteration (coder step).
+        Raises Exception if a sub-step (_generate) fails critically.
         """
 
-        history = []
+        # Make a copy of history to avoid modifying the caller's list directly within this scope.
+        # The history for this refinement iteration starts with the state *before* this iteration.
+        current_history = list(history)
+        task_step = None # Initialize task_step
 
         # STEP: refine dreamer *****************************
-        prompt = []
-        instructions = [self.instructions["refine_dreamer"]]
+        title = f"refine • {current_iteration} • dreamer" # Define title for except block
+        try:
+            prompt = []
+            instructions = [self.instructions["refine_dreamer"]]
 
-        prompt.append("\nPrevious Code:\n")
-        prompt.append(f"```python\n{code}\n```\n")
-        prompt.append(code_trial.generate_report())
+            prompt.append("\nPrevious Code:\n")
+            prompt.append(f"```python\n{code}\n```\n")
+            prompt.append(code_trial.generate_report())
 
-        task_step = self._generate(
-            session_task,
-            "dreamer",
-            f"refine • {current_iteration} • dreamer",
-            history,
-            prompt,
-            instructions,
-            tools="code_execution",  # Consider if tools are needed
-        )
-        task_step.run_trials()
-        task_step.summarize()
+            task_step = self._generate(
+                session_task,
+                "dreamer",
+                title,
+                current_history, # Pass the history up to this point
+                prompt,
+                instructions,
+                tools="code_execution",
+            )
+            # Update history *within this refinement iteration*
+            current_history.extend(prompt)
+            current_history.extend(task_step.response_parts)
 
-        if task_step.any_trials_successful("train"):
-            print("            train passed")
-            if task_step.any_trials_successful("test"):
-                print("            test passed")
-            return task_step
+            task_step.run_trials()
+            task_step.summarize()
 
-        history.extend(prompt)
-        history.extend(task_step.response_parts)
+            # Check for immediate success after dreamer refinement
+            if task_step.any_trials_successful("train"):
+                print("            train passed")
+                if task_step.any_trials_successful("test"):
+                    print("            test passed")
+                # Return the successful dreamer step. The caller (_investigate)
+                # will handle history update based on this returned step.
+                return task_step
+
+        except Exception as e:
+            print(f"        ERROR: Step '{title}' failed critically during refinement.")
+            # Log the error context before re-raising
+            session_task.log_error(e, f"Critical failure in step: {title} during refinement iteration {current_iteration}.")
+            # Let the exception propagate up to the caller (_investigate)
+            raise e # Re-raise the exception
+
 
         # STEP: refine coder *****************************
-        prompt = [""]  # Coder prompt might be minimal
-        instructions = [self.instructions["refine_coder"]]
+        # This step only runs if the dreamer step didn't succeed but also didn't fail critically.
+        title = f"refine • {current_iteration} • coder" # Define title for except block
+        try:
+            prompt = [""]  # Coder prompt might be minimal, relies on history
+            instructions = [self.instructions["refine_coder"]]
 
-        task_step = self._generate(
-            session_task,
-            "coder",
-            f"refine • {current_iteration} • coder",
-            history,
-            prompt,
-            instructions,
-            #  tools="code_execution"
-        )
+            # Use the updated current_history (including dreamer output)
+            task_step = self._generate(
+                session_task,
+                "coder",
+                title,
+                current_history, # Pass history including dreamer's output
+                prompt,
+                instructions,
+                #  tools="code_execution" # Coder might not need tools
+            )
 
-        #  history.extend(prompt)
-        #  history.extend(task_step.response_parts)
+            # History update for the *caller* (_investigate) happens based on the
+            # task_step returned from this function. We don't need to extend
+            # current_history further here unless a subsequent step within refine needed it.
 
-        # Run trials and check for success
-        task_step.run_trials()
-        task_step.summarize()
+            # Run trials and summarize the coder step
+            task_step.run_trials()
+            task_step.summarize()
 
-        return task_step
+            # Return the final task_step (coder's step) regardless of trial success here.
+            # The caller (_investigate) will check its success and update its history.
+            return task_step
+
+        except Exception as e:
+            print(f"        ERROR: Step '{title}' failed critically during refinement.")
+            # Log the error context before re-raising
+            session_task.log_error(e, f"Critical failure in step: {title} during refinement iteration {current_iteration}.")
+            # Let the exception propagate up to the caller (_investigate)
+            raise e # Re-raise the exception
