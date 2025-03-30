@@ -319,10 +319,10 @@ class TasksScreen(Screen):
         summary_table.add_row(Text("steps:", justify="right"), Text(str(grand_total_steps), justify="right"))
         summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
 
-        # Clear and update trials table
+        # Clear and update trials table using unique task pass counts
         trials_table.clear()
-        trials_table.add_row(Text("test:", justify="right"), Text(str(total_test_passed), justify="right"))
-        trials_table.add_row(Text("train:", justify="right"), Text(str(total_train_passed), justify="right"))
+        trials_table.add_row(Text("test:", justify="right"), Text(str(unique_tasks_passed_test), justify="right"))
+        trials_table.add_row(Text("train:", justify="right"), Text(str(unique_tasks_passed_train), justify="right"))
         trials_table.add_row(Text("errors:", justify="right"), Text(str(total_errors), justify="right"))
         trials_table.add_row(Text("best:", justify="right"), Text(best_overall_score, justify="right"))
 
