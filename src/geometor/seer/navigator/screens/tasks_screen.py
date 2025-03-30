@@ -17,6 +17,9 @@ from textual import log
 # Import Grid
 from textual.containers import Vertical, Grid
 
+# Import Task for weight calculation
+from geometor.seer.tasks.tasks import Task
+
 
 class TasksScreen(Screen):
     """Displays aggregated task data across all sessions."""
