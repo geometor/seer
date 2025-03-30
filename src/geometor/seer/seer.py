@@ -399,7 +399,7 @@ class Seer:
 
             # Run trials and summarize the coder step
             task_step.run_trials()
-            task_step.summarize()
+            # task_step.summarize() # Moved to finally block in _generate
 
             # Return the final task_step (coder's step) regardless of trial success here.
             # The caller (_investigate) will check its success and update its history.
