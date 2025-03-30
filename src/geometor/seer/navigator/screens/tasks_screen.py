@@ -12,15 +12,35 @@ from textual.binding import Binding
 from textual import log
 
 
+# Import Grid
+from textual.containers import Vertical, Grid
+
+
 class TasksScreen(Screen):
     """Displays aggregated task data across all sessions."""
 
     CSS = """
     Screen > Vertical {
-        height: 1fr; /* Make Vertical fill the screen */
+        grid-size: 2;
+        grid-rows: auto 1fr; /* Summary auto height, table takes rest */
     }
-    DataTable {
-        height: 1fr; /* Make DataTable fill the Vertical container */
+    #summary-grid {
+        grid-size: 3; /* Three columns for the summary tables */
+        grid-gutter: 1 2;
+        height: auto; /* Let the grid determine its height */
+        padding: 0 1; /* Add some horizontal padding */
+        margin-bottom: 1; /* Space below summary */
+    }
+    .summary-table {
+        height: auto; /* Fit content height */
+        border: none; /* No border for summary tables */
+    }
+    /* Ensure no focus border on summary tables */
+    .summary-table:focus {
+        border: none;
+    }
+    #tasks-table { /* Style for the main tasks table */
+        height: 1fr;
     }
     """
 
@@ -46,9 +66,17 @@ class TasksScreen(Screen):
         self.sorted_task_ids = [] # To maintain table order
 
     def compose(self) -> ComposeResult:
+        self.table = DataTable(id="tasks-table") # Main tasks table
+
         yield Header()
         with Vertical():
-            yield DataTable(id="tasks-table")
+            # Summary Grid with three DataTables
+            with Grid(id="summary-grid"):
+                yield DataTable(id="summary-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="trials-table", show_header=False, cursor_type=None, classes="summary-table")
+                yield DataTable(id="tokens-table", show_header=False, cursor_type=None, classes="summary-table") # Placeholder for now
+            # Main tasks table
+            yield self.table
         yield Footer()
 
     def on_mount(self) -> None:
@@ -56,10 +84,18 @@ class TasksScreen(Screen):
         self.title = "Tasks Navigator"
         self.sub_title = f"Root: {self.sessions_root}"
 
-        table = self.query_one(DataTable)
-        table.cursor_type = "row"
+        # Add columns to summary tables
+        summary_table = self.query_one("#summary-table", DataTable)
+        summary_table.add_columns("Metric", "Value")
+        trials_table = self.query_one("#trials-table", DataTable)
+        trials_table.add_columns("Metric", "Value")
+        tokens_table = self.query_one("#tokens-table", DataTable) # Placeholder
+        tokens_table.add_columns("Metric", "Value") # Placeholder
+
+        # Setup main table
+        self.table.cursor_type = "row"
         # Add columns: TASK, SESSIONS, ERRORS, TEST, TRAIN, STEPS, TIME, BEST
-        table.add_columns(
+        self.table.add_columns(
             "TASK",
             Text("SESSIONS", justify="right"),
             Text("ERRORS", justify="center"),
@@ -70,8 +106,8 @@ class TasksScreen(Screen):
             Text("BEST", justify="right"),
         )
 
-        self.load_and_display_tasks()
-        table.focus()
+        self.load_and_display_tasks() # This will now also call update_summary
+        self.table.focus()
 
     def load_and_display_tasks(self):
         """Scans sessions, aggregates task data, and populates the DataTable."""
@@ -138,15 +174,15 @@ class TasksScreen(Screen):
             table.add_row(Text(f"Error scanning: {e}", style="bold red"))
             return
 
-        # Populate the DataTable
-        table = self.query_one(DataTable)
-        table.clear()
+        # Populate the main DataTable
+        self.table.clear()
 
         # Sort tasks by ID for consistent display order
         self.sorted_task_ids = sorted(self.tasks_summary.keys())
 
         if not self.sorted_task_ids:
-            table.add_row("No tasks found.")
+            self.table.add_row("No tasks found.")
+            self.update_summary() # Update summary even if no tasks
             return
 
         for task_id in self.sorted_task_ids:
@@ -163,7 +199,7 @@ class TasksScreen(Screen):
             best_score_text = Text(f"{best_score_val:.2f}" if best_score_val != float('inf') else "-", justify="right")
 
 
-            table.add_row(
+            self.table.add_row(
                 task_id,
                 Text(str(session_count), justify="right"),
                 error_text,
@@ -175,6 +211,7 @@ class TasksScreen(Screen):
             )
 
         log.info(f"Finished aggregating data for {len(self.sorted_task_ids)} unique tasks.")
+        self.update_summary() # Update summary after loading tasks
 
     @staticmethod
     def _format_duration(seconds: float | None) -> str:
@@ -186,15 +223,63 @@ class TasksScreen(Screen):
         from geometor.seer.session.level import Level
         return Level._format_duration(seconds)
 
+    def update_summary(self):
+        """Updates the summary DataTables with aggregated data."""
+        summary_table = self.query_one("#summary-table", DataTable)
+        trials_table = self.query_one("#trials-table", DataTable)
+        tokens_table = self.query_one("#tokens-table", DataTable) # Placeholder
+
+        total_unique_tasks = len(self.tasks_summary)
+        total_sessions_involved = set()
+        total_errors = 0
+        total_test_passed = 0
+        total_train_passed = 0
+        grand_total_steps = 0
+        grand_total_duration = 0.0
+        best_scores = []
+
+        for task_id, data in self.tasks_summary.items():
+            total_sessions_involved.update(data['sessions'])
+            total_errors += data['errors']
+            total_test_passed += data['test_passed']
+            total_train_passed += data['train_passed']
+            grand_total_steps += data['total_steps']
+            grand_total_duration += data['total_duration']
+            if data['best_score'] != float('inf'):
+                best_scores.append(data['best_score'])
+
+        num_sessions = len(total_sessions_involved)
+        best_overall_score = f"{min(best_scores):.2f}" if best_scores else "-"
+        formatted_total_duration = self._format_duration(grand_total_duration)
+
+        # Clear and update summary table
+        summary_table.clear()
+        summary_table.add_row(Text("tasks:", justify="right"), Text(str(total_unique_tasks), justify="right"))
+        summary_table.add_row(Text("sessions:", justify="right"), Text(str(num_sessions), justify="right"))
+        summary_table.add_row(Text("steps:", justify="right"), Text(str(grand_total_steps), justify="right"))
+        summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
+
+        # Clear and update trials table
+        trials_table.clear()
+        trials_table.add_row(Text("test:", justify="right"), Text(str(total_test_passed), justify="right"))
+        trials_table.add_row(Text("train:", justify="right"), Text(str(total_train_passed), justify="right"))
+        trials_table.add_row(Text("errors:", justify="right"), Text(str(total_errors), justify="right"))
+        trials_table.add_row(Text("best:", justify="right"), Text(best_overall_score, justify="right"))
+
+        # Clear and update tokens table (Placeholder - needs data aggregation)
+        tokens_table.clear()
+        tokens_table.add_row(Text("in:", justify="right"), Text("-", justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text("-", justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text("-", justify="right"))
+
+
     def action_cursor_down(self) -> None:
         """Move the cursor down in the DataTable."""
-        table = self.query_one(DataTable)
-        table.action_cursor_down()
+        self.table.action_cursor_down()
 
     def action_cursor_up(self) -> None:
         """Move the cursor up in the DataTable."""
-        table = self.query_one(DataTable)
-        table.action_cursor_up()
+        self.table.action_cursor_up()
 
     # def action_select_task(self) -> None:
     #     """Called when a task row is selected."""
@@ -209,9 +294,15 @@ class TasksScreen(Screen):
     def refresh_content(self) -> None:
         """Reloads task data and updates the screen."""
         log.info("Refreshing TasksScreen content...")
-        # Store current cursor position if needed, though simple reload might suffice
-        # current_cursor_row = self.query_one(DataTable).cursor_row
-        self.load_and_display_tasks()
-        # Restore cursor position if needed and possible
-        # ...
-        self.query_one(DataTable).focus() # Ensure table has focus
+        # Store current cursor position
+        current_cursor_row = self.table.cursor_row
+
+        self.load_and_display_tasks() # Reloads table data and updates summary
+
+        # Restore cursor position if possible
+        if current_cursor_row is not None and 0 <= current_cursor_row < self.table.row_count:
+            self.table.move_cursor(row=current_cursor_row, animate=False)
+        elif self.table.row_count > 0:
+            self.table.move_cursor(row=0, animate=False) # Move to top if previous row is gone
+
+        self.table.focus() # Ensure table has focus
