@@ -160,16 +160,19 @@ class SessionsScreen(Screen):
                 total_tokens_text = Text(str(total_tokens) if total_tokens is not None else "-", justify="right")
                 # --- END ADDED TOKEN HANDLING ---
 
-                # Right-align TEST and TRAIN counts
+                # Right-align TEST and TRAIN counts and color based on value
+                train_passed_count = summary.get("train_passed", 0)
                 train_passed = (
-                    Text(str(summary.get("train_passed")), style="bold green", justify="right") # ALIGNED right
-                    if summary.get("train_passed")
-                    else Text("0", style="red", justify="right") # ALIGNED right
+                    Text(str(train_passed_count), style="bold green", justify="right")
+                    if train_passed_count > 0
+                    else Text("0", style="red", justify="right")
                 )
+
+                test_passed_count = summary.get("test_passed", 0)
                 test_passed = (
-                    Text(str(summary.get("test_passed")), style="bold green", justify="right") # ALIGNED right
-                    if summary.get("test_passed")
-                    else Text("0", style="red", justify="right") # ALIGNED right
+                    Text(str(test_passed_count), style="bold green", justify="right")
+                    if test_passed_count > 0
+                    else Text("0", style="red", justify="right")
                 )
 
                 # --- START ADDED WEIGHT CALCULATION ---
