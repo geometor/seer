@@ -315,3 +315,64 @@ class Tasks(list):
 
     def get_ordered_by_train_count(self, reverse=False):
         return sorted(self, key=lambda task: len(task.train), reverse=reverse)
+
+    def get_unsolved_tasks(self, sessions_root: Path) -> 'Tasks':
+        """
+        Scans all sessions to find tasks that have never passed the test phase.
+
+        Args:
+            sessions_root: The root directory containing session folders.
+
+        Returns:
+            A new Tasks object containing only the unsolved tasks found in the
+            original Tasks list that also exist in the sessions.
+        """
+        solved_task_ids = set()
+        tasks_in_sessions = set()
+
+        try:
+            if not sessions_root.is_dir():
+                print(f"Error: Sessions root directory not found: {sessions_root}")
+                # Return an empty Tasks object or raise an error? Returning empty for now.
+                empty_tasks = Tasks.__new__(Tasks) # Create instance without calling __init__
+                empty_tasks.clear() # Ensure it's empty
+                return empty_tasks
+
+
+            for session_dir in sessions_root.iterdir():
+                if session_dir.is_dir():
+                    for task_dir in session_dir.iterdir():
+                        if task_dir.is_dir():
+                            task_id = task_dir.name
+                            tasks_in_sessions.add(task_id)
+                            summary_path = task_dir / "index.json"
+                            if summary_path.exists():
+                                try:
+                                    with open(summary_path, "r") as f:
+                                        summary = json.load(f)
+                                    if summary.get("test_passed") is True:
+                                        solved_task_ids.add(task_id)
+                                except (json.JSONDecodeError, Exception) as e:
+                                    # Log or print warning about corrupted summary?
+                                    print(f"Warning: Could not read/parse summary for {task_dir}: {e}")
+        except Exception as e:
+            print(f"Error scanning sessions directory {sessions_root}: {e}")
+            # Return an empty Tasks object or raise an error? Returning empty for now.
+            empty_tasks = Tasks.__new__(Tasks) # Create instance without calling __init__
+            empty_tasks.clear() # Ensure it's empty
+            return empty_tasks
+
+
+        # Filter the current Tasks list based on the findings
+        unsolved_tasks_list = [
+            task for task in self
+            if task.id in tasks_in_sessions and task.id not in solved_task_ids
+        ]
+
+        # Create a new Tasks object to hold the result
+        # Use __new__ and manually extend to avoid re-running __init__ which loads from disk
+        unsolved_tasks_obj = Tasks.__new__(Tasks)
+        unsolved_tasks_obj.clear() # Ensure it starts empty
+        unsolved_tasks_obj.extend(unsolved_tasks_list)
+
+        return unsolved_tasks_obj
