@@ -7,8 +7,10 @@ from rich.text import Text
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import DataTable, Header, Footer, Static # Added Static
+from textual.reactive import reactive # ADDED reactive
 from textual.containers import Vertical
 from textual.binding import Binding
+from textual.widgets._data_table import ColumnKey # ADDED ColumnKey
 from textual import log
 
 
@@ -62,8 +64,14 @@ class TasksScreen(Screen):
             'total_steps': 0, # Add total steps
             'total_duration': 0.0, # Add total duration
             'best_score': float('inf'), # Initialize best score to infinity (lower is better)
+            # ADDED token aggregation fields
+            'total_prompt_tokens': 0,
+            'total_candidates_tokens': 0,
+            'total_tokens': 0,
         })
         self.sorted_task_ids = [] # To maintain table order
+        self.current_sort_key: ColumnKey | None = None # ADDED sort state
+        self.current_sort_reverse: bool = False      # ADDED sort state
 
     def compose(self) -> ComposeResult:
         self.table = DataTable(id="tasks-table") # Main tasks table
@@ -104,10 +112,17 @@ class TasksScreen(Screen):
             Text("STEPS", justify="right"),
             Text("TIME", justify="right"),
             Text("BEST", justify="right"),
+            # ADDED Token Columns
+            Text("IN", justify="right"),
+            Text("OUT", justify="right"),
+            Text("TOTAL", justify="right"),
         )
 
         self.load_and_display_tasks() # This will now also call update_summary
         self.table.focus()
+        # Add sort key tracking
+        self.current_sort_key = None
+        self.current_sort_reverse = False
 
     def load_and_display_tasks(self):
         """Scans sessions, aggregates task data, and populates the DataTable."""
@@ -153,6 +168,20 @@ class TasksScreen(Screen):
                                     score = summary.get("best_score")
                                     if score is not None and score < task_data['best_score']:
                                         task_data['best_score'] = score
+
+                                    # --- START ADDED TOKEN AGGREGATION ---
+                                    tokens_data = summary.get("tokens", {})
+                                    prompt_tokens = tokens_data.get("prompt_tokens")
+                                    candidates_tokens = tokens_data.get("candidates_tokens")
+                                    total_tokens = tokens_data.get("total_tokens")
+
+                                    if prompt_tokens is not None:
+                                        task_data['total_prompt_tokens'] += prompt_tokens
+                                    if candidates_tokens is not None:
+                                        task_data['total_candidates_tokens'] += candidates_tokens
+                                    if total_tokens is not None:
+                                        task_data['total_tokens'] += total_tokens
+                                    # --- END ADDED TOKEN AGGREGATION ---
 
                                 except json.JSONDecodeError:
                                     log.warning(f"Could not decode JSON in {summary_path}")
@@ -211,16 +240,26 @@ class TasksScreen(Screen):
             best_score_val = data['best_score']
             best_score_text = Text(f"{best_score_val:.2f}" if best_score_val != float('inf') else "-", justify="right")
 
+            # --- START ADDED TOKEN TEXT ---
+            in_tokens_text = Text(f"{data['total_prompt_tokens']:,}" if data['total_prompt_tokens'] > 0 else "-", justify="right")
+            out_tokens_text = Text(f"{data['total_candidates_tokens']:,}" if data['total_candidates_tokens'] > 0 else "-", justify="right")
+            total_tokens_text = Text(f"{data['total_tokens']:,}" if data['total_tokens'] > 0 else "-", justify="right")
+            # --- END ADDED TOKEN TEXT ---
+
 
             self.table.add_row(
-                task_id,
-                Text(str(session_count), justify="right"),
-                error_text,
-                test_text,
-                train_text,
-                steps_text,
-                Text(time_str, justify="right"),
-                best_score_text,
+                task_id,                       # TASK
+                Text(str(session_count), justify="right"), # SESSIONS
+                error_text,                    # ERRORS
+                test_text,                     # TEST
+                train_text,                    # TRAIN
+                steps_text,                    # STEPS
+                Text(time_str, justify="right"), # TIME
+                best_score_text,               # BEST
+                # ADDED Token Columns
+                in_tokens_text,                # IN
+                out_tokens_text,               # OUT
+                total_tokens_text,             # TOTAL
             )
 
         log.info(f"Finished aggregating data for {len(self.sorted_task_ids)} unique tasks.")
@@ -250,6 +289,10 @@ class TasksScreen(Screen):
         grand_total_steps = 0
         grand_total_duration = 0.0
         best_scores = []
+        # ADDED token counters for summary
+        grand_total_prompt_tokens = 0
+        grand_total_candidates_tokens = 0
+        grand_total_tokens_all_tasks = 0
 
         for task_id, data in self.tasks_summary.items():
             total_sessions_involved.update(data['sessions'])
@@ -260,6 +303,10 @@ class TasksScreen(Screen):
             grand_total_duration += data['total_duration']
             if data['best_score'] != float('inf'):
                 best_scores.append(data['best_score'])
+            # ADDED token aggregation for summary
+            grand_total_prompt_tokens += data['total_prompt_tokens']
+            grand_total_candidates_tokens += data['total_candidates_tokens']
+            grand_total_tokens_all_tasks += data['total_tokens']
 
         num_sessions = len(total_sessions_involved)
         best_overall_score = f"{min(best_scores):.2f}" if best_scores else "-"
@@ -280,10 +327,11 @@ class TasksScreen(Screen):
         trials_table.add_row(Text("best:", justify="right"), Text(best_overall_score, justify="right"))
 
         # Clear and update tokens table (Placeholder - needs data aggregation)
+        # Clear and update tokens table (Placeholder - needs data aggregation)
         tokens_table.clear()
-        tokens_table.add_row(Text("in:", justify="right"), Text("-", justify="right"))
-        tokens_table.add_row(Text("out:", justify="right"), Text("-", justify="right"))
-        tokens_table.add_row(Text("total:", justify="right"), Text("-", justify="right"))
+        tokens_table.add_row(Text("in:", justify="right"), Text(f"{grand_total_prompt_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("out:", justify="right"), Text(f"{grand_total_candidates_tokens:,}", justify="right"))
+        tokens_table.add_row(Text("total:", justify="right"), Text(f"{grand_total_tokens_all_tasks:,}", justify="right"))
 
 
     def action_cursor_down(self) -> None:
@@ -319,3 +367,105 @@ class TasksScreen(Screen):
             self.table.move_cursor(row=0, animate=False) # Move to top if previous row is gone
 
         self.table.focus() # Ensure table has focus
+
+    # --- START ADDED SORT METHOD ---
+    def perform_sort(self, sort_key: ColumnKey) -> None:
+        """Sorts the DataTable by the given column key."""
+        log.info(f"Performing sort on TasksScreen by key: {sort_key}")
+
+        # Determine sort direction
+        reverse = False
+        if self.current_sort_key == sort_key:
+            reverse = not self.current_sort_reverse
+        else:
+            reverse = False # Default to ascending for new column
+
+        self.current_sort_key = sort_key
+        self.current_sort_reverse = reverse
+
+        # Define key functions for different columns
+        def get_sort_key(row_data):
+            try:
+                col_index = list(self.table.columns.keys()).index(sort_key)
+                cell_data = row_data[col_index]
+            except (ValueError, IndexError):
+                log.error(f"Could not find index for sort key '{sort_key}'")
+                return None
+
+            key_str = str(sort_key)
+
+            if key_str == "TASK":
+                return cell_data # Simple string sort
+
+            if key_str in ["SESSIONS", "ERRORS", "TEST", "TRAIN", "STEPS", "BEST", "IN", "OUT", "TOTAL"]:
+                # Handle numbers (potentially in Text objects)
+                plain_text = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+                plain_text = plain_text.replace(',', '') # Remove commas
+                if plain_text == "-": return float('-inf') # Sort '-' first
+                try:
+                    return float(plain_text)
+                except ValueError:
+                    log.warning(f"Could not convert '{plain_text}' to float for sorting key '{key_str}'")
+                    return float('-inf') # Sort errors consistently first
+
+            if key_str == "TIME":
+                # Parse HH:MM:SS string into seconds
+                time_str = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+                if time_str == "-": return -1
+                try:
+                    parts = list(map(int, time_str.split(':')))
+                    if len(parts) == 3: return parts[0] * 3600 + parts[1] * 60 + parts[2]
+                    else: return float('-inf')
+                except ValueError:
+                    log.warning(f"Could not parse time string '{time_str}' for sorting")
+                    return float('-inf')
+
+            # Fallback
+            return cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+
+        # Perform the sort
+        try:
+            # We need to sort the underlying data (self.tasks_summary) and then reload the table
+            # DataTable.sort() works on the current rows, but we aggregate data dynamically.
+
+            # 1. Get the current data into a list of tuples/dicts including the sort key value
+            data_to_sort = []
+            for task_id in self.sorted_task_ids:
+                task_details = self.tasks_summary[task_id]
+                # Create a temporary row structure similar to what get_sort_key expects
+                # This needs to match the order of columns in the table
+                row_tuple = (
+                    task_id, # TASK
+                    Text(str(len(task_details['sessions']))), # SESSIONS
+                    Text(str(task_details['errors'])) if task_details['errors'] > 0 else Text("-"), # ERRORS
+                    Text(str(task_details['test_passed'])), # TEST
+                    Text(str(task_details['train_passed'])), # TRAIN
+                    Text(str(task_details['total_steps'])), # STEPS
+                    Text(self._format_duration(task_details['total_duration'])), # TIME
+                    Text(f"{task_details['best_score']:.2f}" if task_details['best_score'] != float('inf') else "-"), # BEST
+                    Text(f"{task_details['total_prompt_tokens']:,}" if task_details['total_prompt_tokens'] > 0 else "-"), # IN
+                    Text(f"{task_details['total_candidates_tokens']:,}" if task_details['total_candidates_tokens'] > 0 else "-"), # OUT
+                    Text(f"{task_details['total_tokens']:,}" if task_details['total_tokens'] > 0 else "-"), # TOTAL
+                )
+                sort_value = get_sort_key(row_tuple)
+                data_to_sort.append((task_id, sort_value))
+
+            # 2. Sort the list based on the calculated sort_value
+            data_to_sort.sort(key=lambda item: item[1], reverse=reverse)
+
+            # 3. Update the order of task IDs
+            self.sorted_task_ids = [item[0] for item in data_to_sort]
+
+            # 4. Reload the table content using the new sorted order
+            self.load_and_display_tasks() # This already clears and repopulates
+
+            self.notify(f"Sorted by {str(self.table.columns[sort_key].label)} {'(desc)' if reverse else '(asc)'}")
+
+        except Exception as e:
+            log.error(f"Error during TasksScreen sort preparation or reload: {e}")
+            self.notify(f"Error sorting table: {e}", severity="error")
+            # Attempt to restore original sort order? Maybe just log.
+            self.sorted_task_ids = sorted(self.tasks_summary.keys()) # Restore default sort
+            self.load_and_display_tasks() # Reload with default sort
+
+    # --- END ADDED SORT METHOD ---

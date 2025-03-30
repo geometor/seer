@@ -6,8 +6,9 @@ from textual.containers import Container
 from textual.binding import Binding
 from textual import log
 
-# Import the new screen
+# Import screens
 from geometor.seer.navigator.screens.tasks_screen import TasksScreen
+from geometor.seer.navigator.screens.sort_modal import SortModal # ADDED
 
 
 class TasksNavigator(App):
@@ -16,6 +17,7 @@ class TasksNavigator(App):
     BINDINGS = [
         Binding("q", "quit", "Quit"),
         Binding("r", "refresh_screen", "Refresh", show=True),
+        Binding("s", "sort_table", "Sort Table", show=True),   # ADDED sort binding
     ]
 
     def __init__(self, sessions_root: str = "./sessions"):
@@ -42,6 +44,28 @@ class TasksNavigator(App):
         else:
             log.warning(f"Screen {current_screen.__class__.__name__} has no refresh_content method.")
             self.notify("Refresh not supported on this screen", severity="warning")
+
+    # --- START ADDED SORT ACTION ---
+    def action_sort_table(self) -> None:
+        """Pushes the sort modal screen for the current data table."""
+        current_screen = self.screen
+
+        # Check if the current screen has a sortable table (TasksScreen)
+        if isinstance(current_screen, TasksScreen) and hasattr(current_screen, "table") and hasattr(current_screen, "perform_sort"):
+            table = current_screen.table
+            columns = table.columns # Get the columns dictionary
+
+            if not columns:
+                self.notify("No columns available to sort.", severity="warning")
+                return
+
+            log.info(f"Pushing SortModal for screen: {current_screen.__class__.__name__}")
+            # Pass the parent screen instance and the columns dict
+            self.push_screen(SortModal(parent_screen=current_screen, columns=columns))
+        else:
+            log.warning(f"Sorting not supported on screen: {current_screen.__class__.__name__}")
+            self.notify("Sorting not supported on this screen.", severity="warning")
+    # --- END ADDED SORT ACTION ---
 
     def action_quit(self) -> None:
         """Quits the application"""

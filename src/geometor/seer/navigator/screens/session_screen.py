@@ -7,6 +7,7 @@ from rich.text import Text
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Static, ListView, ListItem, DataTable, Header, Footer
+from textual.reactive import reactive # ADDED reactive
 from textual import log # ADDED import
 from textual.containers import (
     Horizontal,
@@ -15,6 +16,7 @@ from textual.containers import (
     ScrollableContainer,
 )
 from textual.binding import Binding
+from textual.widgets._data_table import ColumnKey # ADDED ColumnKey
 import json
 # REMOVED subprocess import
 # REMOVED shutil import
@@ -67,6 +69,8 @@ class SessionScreen(Screen):
         self.task_dirs = task_dirs  # Receive task_dirs
         self.task_index = 0
         # REMOVED sxiv check state attributes
+        self.current_sort_key: ColumnKey | None = None # ADDED sort state
+        self.current_sort_reverse: bool = False      # ADDED sort state
 
     # REMOVED _check_sxiv method
 
@@ -114,6 +118,9 @@ class SessionScreen(Screen):
         self.table.focus()
         self.update_tasks_list() # Load main table data
         self.update_summary() # Populate summary tables
+        # Add sort key tracking
+        self.current_sort_key = None
+        self.current_sort_reverse = False
 
     def update_tasks_list(self):
         """Loads data into the main tasks DataTable."""
@@ -429,3 +436,75 @@ class SessionScreen(Screen):
             self.table.move_cursor(row=0, animate=False) # Move to top if previous row is gone
 
         self.table.focus() # Ensure table has focus
+
+    # --- START ADDED SORT METHOD ---
+    def perform_sort(self, sort_key: ColumnKey) -> None:
+        """Sorts the DataTable by the given column key."""
+        log.info(f"Performing sort on SessionScreen by key: {sort_key}")
+
+        # Determine sort direction
+        reverse = False
+        if self.current_sort_key == sort_key:
+            reverse = not self.current_sort_reverse
+        else:
+            reverse = False # Default to ascending for new column
+
+        self.current_sort_key = sort_key
+        self.current_sort_reverse = reverse
+
+        # Define key functions for different columns
+        def get_sort_key(row_data):
+            try:
+                col_index = list(self.table.columns.keys()).index(sort_key)
+                cell_data = row_data[col_index]
+            except (ValueError, IndexError):
+                log.error(f"Could not find index for sort key '{sort_key}'")
+                return None
+
+            key_str = str(sort_key)
+
+            if key_str == "TASKS":
+                return cell_data # Simple string sort
+
+            if key_str in ["ERROR", "TEST", "TRAIN"]:
+                # Handle ✔ / ✘ / -
+                plain_text = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+                if plain_text == "✔": return 1
+                if plain_text == "✘": return -1
+                if plain_text == "⚠": return -2 # Sort errors before fails
+                return 0 # Sort '-' in the middle
+
+            if key_str in ["SCORE", "STEPS", "WEIGHT", "IN", "OUT", "TOTAL"]:
+                # Handle numbers (potentially in Text objects)
+                plain_text = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+                plain_text = plain_text.replace(',', '') # Remove commas
+                if plain_text == "-": return float('-inf') # Sort '-' first
+                try:
+                    return float(plain_text)
+                except ValueError:
+                    log.warning(f"Could not convert '{plain_text}' to float for sorting key '{key_str}'")
+                    return float('-inf') # Sort errors consistently first
+
+            if key_str == "TIME":
+                # Parse HH:MM:SS string into seconds
+                time_str = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+                if time_str == "-": return -1
+                try:
+                    parts = list(map(int, time_str.split(':')))
+                    if len(parts) == 3: return parts[0] * 3600 + parts[1] * 60 + parts[2]
+                    else: return float('-inf')
+                except ValueError:
+                    log.warning(f"Could not parse time string '{time_str}' for sorting")
+                    return float('-inf')
+
+            # Fallback
+            return cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
+
+        # Perform the sort
+        try:
+            self.table.sort(sort_key, key=get_sort_key, reverse=reverse)
+            self.notify(f"Sorted by {str(self.table.columns[sort_key].label)} {'(desc)' if reverse else '(asc)'}")
+        except Exception as e:
+            log.error(f"Error during DataTable sort: {e}")
+            self.notify(f"Error sorting table: {e}", severity="error")
+    # --- END ADDED SORT METHOD ---
