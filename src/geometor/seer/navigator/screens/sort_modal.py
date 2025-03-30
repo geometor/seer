@@ -112,14 +112,3 @@ class SortModal(Screen):
                 self.app.notify("Error identifying sort column.", severity="error")
                 self.app.pop_screen()
 
-```
-
-**2. Update `navigator3.py` (SessionNavigator)**
-
-src/geometor/seer/navigator/navigator3.py
-```python
-<<<<<<< SEARCH
-# Import the modal screen
-from geometor.seer.navigator.screens.image_view_modal import ImageViewModal
-# Import the modal screen
-from geometor.seer.navigator.screens.image_view_modal import ImageViewModal
