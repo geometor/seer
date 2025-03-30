@@ -283,7 +283,8 @@ class TasksScreen(Screen):
 
         total_unique_tasks = len(self.tasks_summary)
         total_sessions_involved = set()
-        total_errors = 0
+        total_errors = 0 # Keep this for the main table column aggregation logic if needed elsewhere
+        tasks_failed_all_sessions = 0 # New counter for tasks failing in all their sessions
         # --- START: Counters for unique task passes ---
         unique_tasks_passed_test = 0
         unique_tasks_passed_train = 0
