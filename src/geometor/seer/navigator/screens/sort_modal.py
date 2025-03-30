@@ -3,7 +3,7 @@ from typing import Dict, TYPE_CHECKING
 from textual.app import ComposeResult
 from textual.containers import Grid
 from textual.screen import Screen
-from textual.widgets import Button, Label
+from textual.widgets import Label, Static # Import Static, remove Button
 from textual.binding import Binding
 from textual.widgets._data_table import ColumnKey # Import ColumnKey
 from textual import log
@@ -33,21 +33,19 @@ class SortModal(Screen):
         background: $surface;
     }
 
+    #sort-instructions { /* Style for the instructions */
+        margin: 1 2;
+        height: auto;
+    }
+
     #sort-dialog > Label {
-        column-span: 2;
         width: 100%;
         text-align: center;
         margin-bottom: 1;
     }
-
-    #sort-dialog > Button {
-        width: 100%;
-    }
     """
 
-    BINDINGS = [
-        Binding("escape", "app.pop_screen", "Cancel", show=False),
-    ]
+    # BINDINGS will be generated dynamically
 
     def __init__(
         self,
@@ -59,55 +57,61 @@ class SortModal(Screen):
         super().__init__(*args, **kwargs)
         self.parent_screen = parent_screen
         self.columns = columns
-        self.button_id_to_key_map: Dict[str, ColumnKey] = {} # Map generated ID to ColumnKey
+        self.key_to_column_map: Dict[str, ColumnKey] = {}
+        self.key_bindings_text = ""
+        bindings = [Binding("escape", "app.pop_screen", "Cancel", show=False)]
+        key_options = "123456789abcdefghijklmnopqrstuvwxyz" # Available keys for binding
+        key_index = 0
+
+        key_lines = []
+        for key, column in self.columns.items():
+            if key_index >= len(key_options):
+                log.warning("Ran out of keys for sort bindings!")
+                break
+
+            simple_key = key_options[key_index]
+            self.key_to_column_map[simple_key] = key
+
+            # Get column label safely
+            column_label = "Unknown"
+            if hasattr(column, 'label'):
+                column_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
+
+            key_lines.append(f"  Press '{simple_key}' to sort by '{column_label}'")
+            bindings.append(Binding(simple_key, f"sort_by_key('{simple_key}')", f"Sort by {column_label}", show=False))
+            key_index += 1
+
+        self.key_bindings_text = "\n".join(key_lines)
+        # Dynamically assign bindings
+        self.BINDINGS = bindings # type: ignore
+
         log.info(f"SortModal initialized for screen: {parent_screen.__class__.__name__}")
+        log.info(f"Sort bindings created: {self.key_bindings_text}")
+
 
     def compose(self) -> ComposeResult:
-        buttons = []
-        # Create buttons for all columns passed to the modal
-        # Use enumerate to get index for generating valid IDs
-        for index, (key, column) in enumerate(self.columns.items()):
-            # Generate a valid ID using the column index
-            button_id = f"sort_col_{index}"
-            self.button_id_to_key_map[button_id] = key # Store mapping
-            # Ensure column has a label attribute before accessing it
-            if hasattr(column, 'label'):
-                    # Use column label as button text
-                    button_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
-                    buttons.append(Button(button_label, id=button_id, variant="primary"))
-            else:
-                # Fallback if somehow a column object without a label is passed
-                log.warning(f"Column with key {key} has no 'label' attribute in SortModal.")
-                buttons.append(Button(f"Column {index}", id=button_id, variant="primary"))
-
-
         yield Grid(
             Label("Sort by which column?"),
-            *buttons,
-            Button("Cancel", id="cancel_sort", variant="default"),
+            Static(self.key_bindings_text, id="sort-instructions"), # Display key bindings
+            # Removed buttons
             id="sort-dialog",
         )
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        button_id = event.button.id
-        log.info(f"SortModal button pressed: {button_id}")
-        if button_id == "cancel_sort":
-            self.app.pop_screen()
-        else:
-            # Look up the ColumnKey using the generated button ID from the map
-            target_key = self.button_id_to_key_map.get(button_id)
+    def action_sort_by_key(self, key: str) -> None:
+        """Sorts the parent screen's table based on the pressed key."""
+        log.info(f"Sort key '{key}' pressed.")
+        target_key = self.key_to_column_map.get(key)
 
-            if target_key is not None:
-                # Call the parent screen's sort method
-                if hasattr(self.parent_screen, "perform_sort"):
-                    self.parent_screen.perform_sort(target_key)
-                    self.app.pop_screen() # Close modal after initiating sort
-                else:
-                    log.error(f"Parent screen {self.parent_screen.__class__.__name__} has no perform_sort method.")
-                    self.app.notify("Sort function not implemented on parent screen.", severity="error")
-                    self.app.pop_screen()
+        if target_key is not None:
+            if hasattr(self.parent_screen, "perform_sort"):
+                self.parent_screen.perform_sort(target_key)
+                self.app.pop_screen() # Close modal after initiating sort
             else:
-                log.error(f"Could not find ColumnKey for button ID: {button_id}")
-                self.app.notify("Error identifying sort column.", severity="error")
+                log.error(f"Parent screen {self.parent_screen.__class__.__name__} has no perform_sort method.")
+                self.app.notify("Sort function not implemented on parent screen.", severity="error")
                 self.app.pop_screen()
+        else:
+            log.error(f"Could not find ColumnKey for sort key: {key}")
+            self.app.notify("Error identifying sort column.", severity="error")
+            self.app.pop_screen()
 
