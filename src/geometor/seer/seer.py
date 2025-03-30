@@ -232,7 +232,7 @@ class Seer:
 
         # --- Start of improved retry logic ---
         client = self.roles[role_name]
-        max_retries = 1 # TODO: Make configurable?
+        max_retries = 2 # TODO: Make configurable?
         response = None
         start_time = datetime.now()  # Start timer before loop
         valid_response_received = False # Flag to track success
@@ -243,7 +243,7 @@ class Seer:
             # If not the first attempt, wait before retrying
             if task_step.attempts > 0:
                 timeout = 10 # TODO: Make configurable or use backoff?
-                print(f"        ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
+                print(f"            ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
                 time.sleep(timeout)
 
             task_step.attempts += 1
@@ -262,7 +262,7 @@ class Seer:
                     except ValueError as ve:
                         # Finish reason is STOP, but text is not accessible (e.g., safety)
                         finish_reason_str = getattr(response.candidates[0].finish_reason, 'name', 'STOP')
-                        print(f"        Attempt {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
+                        print(f"            retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
                         task_step.log_error(ve, f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}")
                         # Continue loop if retries remain
                 else:
