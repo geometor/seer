@@ -21,9 +21,9 @@ class SortModal(Screen):
     }
 
     #sort-dialog {
-        grid-size: 2; /* Adjust grid size if needed */
+        grid-size: 1; /* Changed to 1 column */
         grid-gutter: 1 2;
-        grid-rows: auto;
+        grid-rows: auto auto; /* Explicitly define rows for label and instructions */
         padding: 0 1;
         width: auto;
         max-width: 80%; /* Limit width */
@@ -39,7 +39,7 @@ class SortModal(Screen):
     }
 
     #sort-dialog > Label {
-        width: 100%;
+        /* width: 100%; */ /* No longer needed with grid-size: 1 */
         text-align: center;
         margin-bottom: 1;
     }
