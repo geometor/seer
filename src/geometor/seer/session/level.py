@@ -23,7 +23,6 @@ class Level:
         self.start_time = datetime.now()  # Store start time
         self.end_time = None  # Initialize end_time
         self.duration_seconds = None  # Initialize
-        # self.duration = None # REMOVE
 
     def _get_dir(self) -> Path:
         if self.parent:
@@ -131,7 +130,6 @@ ERROR
         summary = {
             "errors": {},
             "duration_seconds": self.duration_seconds,  # Add duration in seconds
-            # "duration": self.duration,  # Add formatted duration # REMOVE
         }
         summary["errors"]["count"] = len(self.errors)
         summary["errors"]["types"] = list(self.errors.keys())

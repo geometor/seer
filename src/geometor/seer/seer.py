@@ -14,13 +14,15 @@ import time  # Added for retry delay
 from geometor.seer.session import Session, SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
-from geometor.seer.tasks.grid import Grid
+# Removed unused Grid import
+# from geometor.seer.tasks.grid import Grid
 
 from geometor.seer.prompts import get_pair_prompt
 
 from geometor.seer.gemini_client import GeminiClient as Client
 
-from geometor.seer.trials.code_trial import CodeTrial
+# Removed unused CodeTrial import
+# from geometor.seer.trials.code_trial import CodeTrial
 
 
 class Seer:
@@ -244,7 +246,8 @@ class Seer:
             # If not the first attempt, wait before retrying
             if task_step.attempts > 0:
                 timeout = 10 # TODO: Make configurable or use backoff?
-                print(f"            ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
+                # Consistent indentation for print
+                print(f"        ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
                 time.sleep(timeout)
 
             task_step.attempts += 1
@@ -263,7 +266,8 @@ class Seer:
                     except ValueError as ve:
                         # Finish reason is STOP, but text is not accessible (e.g., safety)
                         finish_reason_str = getattr(response.candidates[0].finish_reason, 'name', 'STOP')
-                        print(f"            retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
+                        # Consistent indentation for print
+                        print(f"        Attempt {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
                         task_step.log_error(ve, f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}")
                         # Continue loop if retries remain
                 else:

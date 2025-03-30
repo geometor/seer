@@ -2,10 +2,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import re
-from datetime import datetime # Added for log_warning timestamp
+from datetime import datetime # Keep for log_warning
 from geometor.seer.session.level import Level
 
 from google.generativeai.types import GenerateContentResponse
+# Removed commented-out FinishReason import
 # Import FinishReason enum if needed for direct comparison, or rely on integer values
 # from google.generativeai.types import FinishReason
 
@@ -71,19 +72,6 @@ class TaskStep(Level):
     def summarize(self):
         try:
             summary = super().summarize()
-
-            # --- Trial Summary ---
-            #  all_train_results = []
-            #  all_test_results = []
-            #  # Iterate through CodeTrial objects in StepCodeTrials
-            #  for code_trial in self.step_code_trials.get_all_trials():
-                #  if code_trial.train_results:
-                    #  all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
-                #  if code_trial.test_results:
-                    #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
-
-            # Retrieve retries count, default to None if not logged
-            #  retries_count = self.response.get("retries", None)
 
             # Check if any errors were logged
             has_errors = bool(self.errors)
@@ -165,14 +153,6 @@ class TaskStep(Level):
 
             summary["best_trial_metrics"] = best_trial_metrics
             # --- END: Add Best Trial Metrics ---
-
-
-            #  if all_train_results:
-                #  summary["trials"]["train"] = self._summarize_trial_results(
-                    #  all_train_results
-                #  )
-            #  if all_test_results:
-                #  summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
 
             self._write_to_json("index.json", summary)
             return summary  # Ensure summary is returned
@@ -355,7 +335,6 @@ class TaskStep(Level):
                     output = part.code_execution_result.output
                     response_parts.append(f"outcome: {outcome_str}\n")
                     response_parts.append(f"```\n{output}\n```\n")
-                    #  self.session._write_to_file(f"code_result.txt", output)
 
                 if hasattr(part, 'function_call') and part.function_call:
                     response_parts.append("\n*function_call:*\n")
@@ -431,19 +410,8 @@ class TaskStep(Level):
         function_name = function_call.name
         function_args = function_call.args
 
-        #  if function_name not in functions:
-        #  raise UnknownFunctionError(f"Unknown function: {function_name}")
-
-        #  # TODO: log errors
-        #  try:
-            #  result = functions[function_name](**function_args)
-            #  return result
-        #  except TypeError as e:
-            #  raise FunctionArgumentError(
-                #  f"Invalid arguments for {function_name}: {str(e)}"
-            #  )
-        #  except Exception as e:
-            #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
+        # TODO: Complete implementation or remove placeholder logic
+        pass
 
     def run_trials(self):
         """Executes trials for all available code."""
