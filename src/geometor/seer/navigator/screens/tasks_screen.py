@@ -284,8 +284,10 @@ class TasksScreen(Screen):
         total_unique_tasks = len(self.tasks_summary)
         total_sessions_involved = set()
         total_errors = 0
-        total_test_passed = 0
-        total_train_passed = 0
+        # --- START: Counters for unique task passes ---
+        unique_tasks_passed_test = 0
+        unique_tasks_passed_train = 0
+        # --- END: Counters for unique task passes ---
         grand_total_steps = 0
         grand_total_duration = 0.0
         best_scores = []
@@ -297,8 +299,15 @@ class TasksScreen(Screen):
         for task_id, data in self.tasks_summary.items():
             total_sessions_involved.update(data['sessions'])
             total_errors += data['errors']
-            total_test_passed += data['test_passed']
-            total_train_passed += data['train_passed']
+            # --- START: Increment unique task pass counters ---
+            if data['test_passed'] > 0: # Check if task passed test at least once
+                unique_tasks_passed_test += 1
+            if data['train_passed'] > 0: # Check if task passed train at least once
+                unique_tasks_passed_train += 1
+            # --- END: Increment unique task pass counters ---
+            # Keep aggregating total passes if needed elsewhere, but don't use for summary display
+            total_test_passed = data['test_passed'] # Example: If you still need the raw total somewhere
+            total_train_passed = data['train_passed'] # Example: If you still need the raw total somewhere
             grand_total_steps += data['total_steps']
             grand_total_duration += data['total_duration']
             if data['best_score'] != float('inf'):
