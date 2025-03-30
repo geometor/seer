@@ -170,7 +170,7 @@ class Seer:
 
         # --- Start of changes ---
         client = self.roles[role_name]
-        max_retries = 3
+        max_retries = 1
         response = None
         start_time = datetime.now()  # Start timer before loop
 
