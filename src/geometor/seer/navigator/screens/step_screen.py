@@ -286,6 +286,49 @@ class StepScreen(Screen):
              self.selected_file_path = current_path
         pass
 
+    def action_open_terminal(self) -> None:
+        """Opens a new terminal window in the current step directory."""
+        terminal_commands = [
+            "gnome-terminal",
+            "konsole",
+            "xfce4-terminal",
+            "lxterminal",
+            "mate-terminal",
+            "terminator",
+            "xterm",
+            # Add other common Linux terminals if needed
+        ]
+        terminal_cmd = None
+        for cmd in terminal_commands:
+            if shutil.which(cmd):
+                terminal_cmd = cmd
+                break
+
+        if not terminal_cmd:
+            # Basic fallback for macOS (might need refinement)
+            if shutil.which("open"):
+                 try:
+                     # Use 'open -a Terminal .' which should open Terminal.app at the CWD
+                     subprocess.Popen(["open", "-a", "Terminal", "."], cwd=self.step_path)
+                     log.info(f"Opened macOS Terminal in {self.step_path}")
+                     return # Success
+                 except Exception as e:
+                     log.error(f"Failed to open macOS Terminal: {e}")
+                     # Fall through to notify error if 'open' failed
+
+            log.error("Could not find a suitable terminal emulator.")
+            self.app.notify("Could not find a suitable terminal emulator.", severity="error")
+            return
+
+        try:
+            log.info(f"Opening terminal '{terminal_cmd}' in {self.step_path}")
+            # Most terminals accept --working-directory= or similar, but launching
+            # with cwd set in Popen is more reliable across different terminals.
+            subprocess.Popen([terminal_cmd], cwd=self.step_path)
+        except Exception as e:
+            log.error(f"Failed to open terminal {terminal_cmd}: {e}")
+            self.app.notify(f"Failed to open terminal: {e}", severity="error")
+
 
     def action_view_images(self) -> None:
         """Find and open all PNG images in the current step directory using sxiv."""
