@@ -96,9 +96,9 @@ class TasksScreen(Screen):
         summary_table = self.query_one("#summary-table", DataTable)
         summary_table.add_columns("Metric", "Value")
         trials_table = self.query_one("#trials-table", DataTable)
-        trials_table.add_columns("Metric", "Value")
-        tokens_table = self.query_one("#tokens-table", DataTable) # Placeholder
-        tokens_table.add_columns("Metric", "Value") # Placeholder
+        trials_table.add_columns("Metric", "Value", "±") # Add third column header
+        tokens_table = self.query_one("#tokens-table", DataTable)
+        tokens_table.add_columns("Metric", "Value")
 
         # Setup main table
         self.table.cursor_type = "row"
@@ -331,6 +331,17 @@ class TasksScreen(Screen):
         best_overall_score = f"{min(best_scores):.2f}" if best_scores else "-"
         formatted_total_duration = self._format_duration(grand_total_duration)
 
+        # --- START Calculate summary percentages/diffs ---
+        test_percent = (unique_tasks_passed_test / total_unique_tasks * 100) if total_unique_tasks > 0 else 0.0
+        test_percent_str = f"{test_percent:.1f}%"
+
+        train_diff = unique_tasks_passed_test - unique_tasks_passed_train
+        train_diff_str = f"{train_diff:+}" # Format with sign (+/-)
+
+        error_percent = (tasks_failed_all_sessions / total_unique_tasks * 100) if total_unique_tasks > 0 else 0.0
+        error_percent_str = f"{error_percent:.1f}%"
+        # --- END Calculate summary percentages/diffs ---
+
         # Clear and update summary table
         summary_table.clear()
         summary_table.add_row(Text("tasks:", justify="right"), Text(str(total_unique_tasks), justify="right"))
@@ -338,13 +349,28 @@ class TasksScreen(Screen):
         summary_table.add_row(Text("steps:", justify="right"), Text(str(grand_total_steps), justify="right"))
         summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
 
-        # Clear and update trials table using unique task pass counts
+        # Clear and update trials table using unique task pass counts and calculated stats
         trials_table.clear()
-        trials_table.add_row(Text("test:", justify="right"), Text(str(unique_tasks_passed_test), justify="right"))
-        trials_table.add_row(Text("train:", justify="right"), Text(str(unique_tasks_passed_train), justify="right"))
-        # Use the new counter for the summary errors row
-        trials_table.add_row(Text("errors:", justify="right"), Text(str(tasks_failed_all_sessions), justify="right"))
-        trials_table.add_row(Text("best:", justify="right"), Text(best_overall_score, justify="right"))
+        trials_table.add_row(
+            Text("test:", justify="right"),
+            Text(str(unique_tasks_passed_test), justify="right"),
+            Text(test_percent_str, justify="right") # Add percentage
+        )
+        trials_table.add_row(
+            Text("train:", justify="right"),
+            Text(str(unique_tasks_passed_train), justify="right"),
+            Text(train_diff_str, justify="right") # Add difference
+        )
+        trials_table.add_row(
+            Text("errors:", justify="right"),
+            Text(str(tasks_failed_all_sessions), justify="right"),
+            Text(error_percent_str, justify="right") # Add percentage
+        )
+        trials_table.add_row(
+            Text("best:", justify="right"),
+            Text(best_overall_score, justify="right"),
+            Text("") # Empty third column for best score
+        )
 
         # Clear and update tokens table
         # Clear and update tokens table (Placeholder - needs data aggregation)
