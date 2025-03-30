@@ -68,6 +68,7 @@ class TasksScreen(Screen):
             'total_prompt_tokens': 0,
             'total_candidates_tokens': 0,
             'total_tokens': 0,
+            'weight': 0, # ADDED weight field
         })
         self.sorted_task_ids = [] # To maintain table order
         self.current_sort_key: ColumnKey | None = None # ADDED sort state
@@ -116,6 +117,7 @@ class TasksScreen(Screen):
             Text("IN", justify="right"),
             Text("OUT", justify="right"),
             Text("TOTAL", justify="right"),
+            Text("WEIGHT", justify="right"), # ADDED WEIGHT column
         )
 
         self.load_and_display_tasks() # This will now also call update_summary
@@ -183,6 +185,29 @@ class TasksScreen(Screen):
                                         task_data['total_tokens'] += total_tokens
                                     # --- END ADDED TOKEN AGGREGATION ---
 
+                                    # --- START ADDED WEIGHT CALCULATION ---
+                                    # Find the corresponding task.json in *any* session dir for this task
+                                    task_json_path = None
+                                    for s_dir in self.sessions_root.iterdir():
+                                        potential_path = s_dir / task_id / "task.json"
+                                        if potential_path.exists():
+                                            task_json_path = potential_path
+                                            break # Found one, no need to check others
+
+                                    if task_json_path:
+                                        try:
+                                            with open(task_json_path, "r") as f_task:
+                                                task_json_data = json.load(f_task)
+                                            task_obj = Task(task_id, task_json_data)
+                                            task_data['weight'] = task_obj.weight # Store weight
+                                        except (json.JSONDecodeError, Exception) as e_task:
+                                            log.error(f"Error loading/processing {task_json_path} for weight: {e_task}")
+                                            task_data['weight'] = -1 # Indicate error
+                                    else:
+                                        log.warning(f"Could not find task.json for task {task_id} in any session.")
+                                        task_data['weight'] = -2 # Indicate not found
+                                    # --- END ADDED WEIGHT CALCULATION ---
+
                                 except json.JSONDecodeError:
                                     log.warning(f"Could not decode JSON in {summary_path}")
                                     task_data['errors'] += 1 # Count decode error as an error
@@ -246,6 +271,15 @@ class TasksScreen(Screen):
             total_tokens_text = Text(f"{data['total_tokens']:,}" if data['total_tokens'] > 0 else "-", justify="right")
             # --- END ADDED TOKEN TEXT ---
 
+            # --- START ADDED WEIGHT TEXT ---
+            weight_val = data.get('weight', 0)
+            if weight_val == -1:
+                weight_text = Text("ERR", style="bold red", justify="right")
+            elif weight_val == -2:
+                weight_text = Text("?", style="dim", justify="right")
+            else:
+                weight_text = Text(f"{weight_val:,}", justify="right")
+            # --- END ADDED WEIGHT TEXT ---
 
             self.table.add_row(
                 task_id,                       # TASK
@@ -260,6 +294,7 @@ class TasksScreen(Screen):
                 in_tokens_text,                # IN
                 out_tokens_text,               # OUT
                 total_tokens_text,             # TOTAL
+                weight_text,                   # WEIGHT (ADDED)
             )
 
         log.info(f"Finished aggregating data for {len(self.sorted_task_ids)} unique tasks.")
@@ -296,6 +331,7 @@ class TasksScreen(Screen):
         grand_total_prompt_tokens = 0
         grand_total_candidates_tokens = 0
         grand_total_tokens_all_tasks = 0
+        grand_total_weight = 0 # ADDED total weight counter
 
         for task_id, data in self.tasks_summary.items():
             num_sessions_for_task = len(data['sessions'])
@@ -326,6 +362,10 @@ class TasksScreen(Screen):
             grand_total_prompt_tokens += data['total_prompt_tokens']
             grand_total_candidates_tokens += data['total_candidates_tokens']
             grand_total_tokens_all_tasks += data['total_tokens']
+            # ADDED weight aggregation for summary
+            weight_val = data.get('weight', 0)
+            if weight_val >= 0: # Only add valid weights
+                grand_total_weight += weight_val
 
         num_sessions = len(total_sessions_involved)
         best_overall_score = f"{min(best_scores):.2f}" if best_scores else "-"
@@ -348,6 +388,7 @@ class TasksScreen(Screen):
         summary_table.add_row(Text("sessions:", justify="right"), Text(str(num_sessions), justify="right"))
         summary_table.add_row(Text("steps:", justify="right"), Text(str(grand_total_steps), justify="right"))
         summary_table.add_row(Text("time:", justify="right"), Text(formatted_total_duration, justify="right"))
+        summary_table.add_row(Text("weight:", justify="right"), Text(f"{grand_total_weight:,}", justify="right")) # ADDED total weight
 
         # Clear and update trials table using unique task pass counts and calculated stats
         trials_table.clear()
@@ -439,10 +480,11 @@ class TasksScreen(Screen):
             if key_str == "TASK":
                 return cell_data # Simple string sort
 
-            if key_str in ["SESSIONS", "ERRORS", "TEST", "TRAIN", "STEPS", "BEST", "IN", "OUT", "TOTAL"]:
+            if key_str in ["SESSIONS", "ERRORS", "TEST", "TRAIN", "STEPS", "BEST", "IN", "OUT", "TOTAL", "WEIGHT"]: # ADDED WEIGHT
                 # Handle numbers (potentially in Text objects)
                 plain_text = cell_data.plain if hasattr(cell_data, 'plain') else str(cell_data)
                 plain_text = plain_text.replace(',', '') # Remove commas
+                if key_str == "WEIGHT" and plain_text in ["ERR", "?"]: return float('-inf') # Sort weight errors/unknown first
                 if plain_text == "-": return float('-inf') # Sort '-' first
                 try:
                     return float(plain_text)
@@ -488,6 +530,8 @@ class TasksScreen(Screen):
                     Text(f"{task_details['total_prompt_tokens']:,}" if task_details['total_prompt_tokens'] > 0 else "-"), # IN
                     Text(f"{task_details['total_candidates_tokens']:,}" if task_details['total_candidates_tokens'] > 0 else "-"), # OUT
                     Text(f"{task_details['total_tokens']:,}" if task_details['total_tokens'] > 0 else "-"), # TOTAL
+                    # ADDED WEIGHT to tuple for sorting
+                    Text(f"{task_details['weight']:,}" if task_details.get('weight', -2) >= 0 else ("ERR" if task_details.get('weight') == -1 else "?")), # WEIGHT
                 )
                 sort_value = get_sort_key(row_tuple)
                 data_to_sort.append((task_id, sort_value))
