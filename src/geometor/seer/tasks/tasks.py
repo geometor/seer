@@ -319,38 +319,46 @@ class Tasks(list):
 
 # --- Standalone Utility Function ---
 
-def get_unsolved_tasks(tasks_list: list[Task], sessions_root: Path) -> Tasks:
+def get_unsolved_tasks(sessions_root: Path) -> Tasks:
     """
-    Scans session summaries to find tasks that have never passed the test phase.
+    Scans session summaries to find all unique tasks present across sessions
+    that have never passed the test phase. Loads these tasks from their
+    task.json files.
 
     Args:
-        tasks_list: A list of Task objects to filter.
         sessions_root: The root directory containing session folders.
 
     Returns:
-        A new Tasks object containing only the unsolved tasks found in the
-        original tasks_list that also exist in the sessions. Returns an empty
-        Tasks object if sessions_root is invalid or scanning fails.
+        A new Tasks object containing only the unsolved tasks found across all
+        sessions. Returns an empty Tasks object if sessions_root is invalid,
+        no tasks are found, or scanning fails.
     """
     solved_task_ids = set()
-    tasks_in_sessions = set()
+    tasks_in_sessions = {} # Store task_id -> path to a task.json
 
-    # Create an empty Tasks object upfront for potential error returns
-    # Use __new__ and clear to avoid running __init__
-    empty_tasks = Tasks.__new__(Tasks)
-    empty_tasks.clear()
+    # Create an empty Tasks object upfront for potential error returns and final result
+    unsolved_tasks_obj = Tasks.__new__(Tasks)
+    unsolved_tasks_obj.clear()
 
     try:
         if not sessions_root.is_dir():
             print(f"Error: Sessions root directory not found: {sessions_root}")
-            return empty_tasks
+            return unsolved_tasks_obj # Return empty Tasks
 
+        # First pass: Identify all tasks and check solved status
         for session_dir in sessions_root.iterdir():
             if session_dir.is_dir():
                 for task_dir in session_dir.iterdir():
                     if task_dir.is_dir():
                         task_id = task_dir.name
-                        tasks_in_sessions.add(task_id)
+                        # Store a path to task.json if we haven't seen this task yet
+                        # or if the current one exists (prefer existing ones)
+                        task_json_path = task_dir / "task.json"
+                        if task_id not in tasks_in_sessions or task_json_path.exists():
+                             if task_json_path.exists(): # Only store if task.json actually exists
+                                tasks_in_sessions[task_id] = task_json_path
+
+                        # Check solved status from index.json
                         summary_path = task_dir / "index.json"
                         if summary_path.exists():
                             try:
@@ -360,19 +368,31 @@ def get_unsolved_tasks(tasks_list: list[Task], sessions_root: Path) -> Tasks:
                                     solved_task_ids.add(task_id)
                             except (json.JSONDecodeError, Exception) as e:
                                 print(f"Warning: Could not read/parse summary for {task_dir}: {e}")
+
     except Exception as e:
         print(f"Error scanning sessions directory {sessions_root}: {e}")
-        return empty_tasks
+        return unsolved_tasks_obj # Return empty Tasks
 
-    # Filter the provided tasks_list based on the findings
-    unsolved_tasks_list = [
-        task for task in tasks_list
-        if task.id in tasks_in_sessions and task.id not in solved_task_ids
-    ]
+    # Determine unsolved task IDs
+    unsolved_task_ids = set(tasks_in_sessions.keys()) - solved_task_ids
 
-    # Create a new Tasks object to hold the result
-    unsolved_tasks_obj = Tasks.__new__(Tasks)
-    unsolved_tasks_obj.clear() # Ensure it starts empty
+    # Load Task objects for unsolved tasks
+    unsolved_tasks_list = []
+    for task_id in sorted(list(unsolved_task_ids)): # Sort for consistent order
+        task_json_path = tasks_in_sessions.get(task_id)
+        if task_json_path and task_json_path.exists():
+            try:
+                with open(task_json_path, "r") as f:
+                    task_data = json.load(f)
+                task_obj = Task(task_id, task_data)
+                unsolved_tasks_list.append(task_obj)
+            except (json.JSONDecodeError, Exception) as e:
+                print(f"Error loading task.json for unsolved task {task_id} from {task_json_path}: {e}")
+        else:
+             print(f"Warning: Could not find or access task.json for unsolved task {task_id} (expected at {task_json_path})")
+
+
+    # Populate the final Tasks object
     unsolved_tasks_obj.extend(unsolved_tasks_list)
 
     return unsolved_tasks_obj
