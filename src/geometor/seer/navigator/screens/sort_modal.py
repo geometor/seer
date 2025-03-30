@@ -7,15 +7,9 @@ from textual.widgets import Button, Label
 from textual.binding import Binding
 from textual.widgets._data_table import ColumnKey # Import ColumnKey
 from textual import log
+from textual.screen import Screen # Import Screen directly
 
-if TYPE_CHECKING:
-    from textual.widgets import DataTable
-    # Import the screen types that will use this modal
-    from .sessions_screen import SessionsScreen
-    from .session_screen import SessionScreen
-    from .task_screen import TaskScreen
-    from .tasks_screen import TasksScreen
-    SortableScreen = SessionsScreen | SessionScreen | TaskScreen | TasksScreen
+# Removed TYPE_CHECKING block and specific screen imports
 
 
 class SortModal(Screen):
@@ -57,7 +51,7 @@ class SortModal(Screen):
 
     def __init__(
         self,
-        parent_screen: SortableScreen,
+        parent_screen: Screen, # Use the generic Screen type hint
         columns: Dict[ColumnKey, object], # Pass columns dict directly
         *args,
         **kwargs
