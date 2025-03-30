@@ -366,11 +366,7 @@ class TasksScreen(Screen):
             Text(str(tasks_failed_all_sessions), justify="right"),
             Text(error_percent_str, justify="right") # Add percentage
         )
-        trials_table.add_row(
-            Text("best:", justify="right"),
-            Text(best_overall_score, justify="right"),
-            Text("") # Empty third column for best score
-        )
+        # Removed best score row
 
         # Clear and update tokens table
         # Clear and update tokens table (Placeholder - needs data aggregation)
