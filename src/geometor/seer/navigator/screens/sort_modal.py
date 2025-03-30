@@ -59,15 +59,18 @@ class SortModal(Screen):
         super().__init__(*args, **kwargs)
         self.parent_screen = parent_screen
         self.columns = columns
+        self.button_id_to_key_map: Dict[str, ColumnKey] = {} # Map generated ID to ColumnKey
         log.info(f"SortModal initialized for screen: {parent_screen.__class__.__name__}")
 
     def compose(self) -> ComposeResult:
         buttons = []
         # Create buttons only for columns that have a label (visible columns)
-        for key, column in self.columns.items():
+        # Use enumerate to get index for generating valid IDs
+        for index, (key, column) in enumerate(self.columns.items()):
             if hasattr(column, 'label') and column.label:
-                # Use column key as button ID, ensure it's a string
-                button_id = str(key)
+                # Generate a valid ID using the column index
+                button_id = f"sort_col_{index}"
+                self.button_id_to_key_map[button_id] = key # Store mapping
                 # Use column label as button text
                 button_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
                 buttons.append(Button(button_label, id=button_id, variant="primary"))
@@ -85,12 +88,8 @@ class SortModal(Screen):
         if button_id == "cancel_sort":
             self.app.pop_screen()
         else:
-            # Find the ColumnKey corresponding to the button ID (which is the key string)
-            target_key = None
-            for key in self.columns.keys():
-                if str(key) == button_id:
-                    target_key = key
-                    break
+            # Look up the ColumnKey using the generated button ID from the map
+            target_key = self.button_id_to_key_map.get(button_id)
 
             if target_key is not None:
                 # Call the parent screen's sort method
