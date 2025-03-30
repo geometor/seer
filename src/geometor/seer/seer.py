@@ -92,7 +92,7 @@ class Seer:
             history.extend(task_step.response_parts)
 
             task_step.run_trials()
-            task_step.summarize()
+            # task_step.summarize() # Moved to finally block in _generate
 
             if task_step.any_trials_successful("train"):
                 print("            train passed")
@@ -127,7 +127,7 @@ class Seer:
             history.extend(task_step.response_parts) # Add coder's response/code
 
             task_step.run_trials()
-            task_step.summarize()
+            # task_step.summarize() # Moved to finally block in _generate
 
             if task_step.any_trials_successful("train"):
                 print("            train passed")
@@ -230,9 +230,10 @@ class Seer:
         # init step
         task_step = session_task.add_step(title, history, prompt, instructions)
 
-        # --- Start of improved retry logic ---
-        client = self.roles[role_name]
-        max_retries = 2 # TODO: Make configurable?
+        try: # Wrap core logic in try...finally
+            # --- Start of improved retry logic ---
+            client = self.roles[role_name]
+            max_retries = 2 # TODO: Make configurable?
         response = None
         start_time = datetime.now()  # Start timer before loop
         valid_response_received = False # Flag to track success
@@ -303,10 +304,13 @@ class Seer:
         # Log the successful response, including the number of attempts it took
         task_step.log_response(response, response_time, retries=task_step.attempts)
 
-        # Process the valid response
-        reponse_parts = task_step.process_response(response)
-        return task_step
-        # --- End of improved retry logic ---
+            # Process the valid response
+            reponse_parts = task_step.process_response(response)
+            return task_step
+            # --- End of improved retry logic ---
+        finally:
+            # Ensure summarize is called even if _generate fails/raises exception
+            task_step.summarize()
 
     def refine(
         self,
@@ -352,7 +356,7 @@ class Seer:
             current_history.extend(task_step.response_parts)
 
             task_step.run_trials()
-            task_step.summarize()
+            # task_step.summarize() # Moved to finally block in _generate
 
             # Check for immediate success after dreamer refinement
             if task_step.any_trials_successful("train"):
