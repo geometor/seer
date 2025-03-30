@@ -297,8 +297,17 @@ class TasksScreen(Screen):
         grand_total_tokens_all_tasks = 0
 
         for task_id, data in self.tasks_summary.items():
+            num_sessions_for_task = len(data['sessions'])
+            task_error_count = data['errors']
+
             total_sessions_involved.update(data['sessions'])
-            total_errors += data['errors']
+            total_errors += task_error_count # Keep aggregating total errors
+
+            # --- START: Check if task failed in all its sessions ---
+            if num_sessions_for_task > 0 and num_sessions_for_task == task_error_count:
+                tasks_failed_all_sessions += 1
+            # --- END: Check if task failed in all its sessions ---
+
             # --- START: Increment unique task pass counters ---
             if data['test_passed'] > 0: # Check if task passed test at least once
                 unique_tasks_passed_test += 1
@@ -332,10 +341,11 @@ class TasksScreen(Screen):
         trials_table.clear()
         trials_table.add_row(Text("test:", justify="right"), Text(str(unique_tasks_passed_test), justify="right"))
         trials_table.add_row(Text("train:", justify="right"), Text(str(unique_tasks_passed_train), justify="right"))
-        trials_table.add_row(Text("errors:", justify="right"), Text(str(total_errors), justify="right"))
+        # Use the new counter for the summary errors row
+        trials_table.add_row(Text("errors:", justify="right"), Text(str(tasks_failed_all_sessions), justify="right"))
         trials_table.add_row(Text("best:", justify="right"), Text(best_overall_score, justify="right"))
 
-        # Clear and update tokens table (Placeholder - needs data aggregation)
+        # Clear and update tokens table
         # Clear and update tokens table (Placeholder - needs data aggregation)
         tokens_table.clear()
         tokens_table.add_row(Text("in:", justify="right"), Text(f"{grand_total_prompt_tokens:,}", justify="right"))
