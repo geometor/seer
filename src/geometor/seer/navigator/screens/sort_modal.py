@@ -64,16 +64,22 @@ class SortModal(Screen):
 
     def compose(self) -> ComposeResult:
         buttons = []
-        # Create buttons only for columns that have a label (visible columns)
+        # Create buttons for all columns passed to the modal
         # Use enumerate to get index for generating valid IDs
         for index, (key, column) in enumerate(self.columns.items()):
-            if hasattr(column, 'label') and column.label:
-                # Generate a valid ID using the column index
-                button_id = f"sort_col_{index}"
-                self.button_id_to_key_map[button_id] = key # Store mapping
-                # Use column label as button text
-                button_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
-                buttons.append(Button(button_label, id=button_id, variant="primary"))
+            # Generate a valid ID using the column index
+            button_id = f"sort_col_{index}"
+            self.button_id_to_key_map[button_id] = key # Store mapping
+            # Ensure column has a label attribute before accessing it
+            if hasattr(column, 'label'):
+                    # Use column label as button text
+                    button_label = str(column.label.plain) if hasattr(column.label, 'plain') else str(column.label)
+                    buttons.append(Button(button_label, id=button_id, variant="primary"))
+            else:
+                # Fallback if somehow a column object without a label is passed
+                log.warning(f"Column with key {key} has no 'label' attribute in SortModal.")
+                buttons.append(Button(f"Column {index}", id=button_id, variant="primary"))
+
 
         yield Grid(
             Label("Sort by which column?"),
