@@ -230,103 +230,83 @@ class Seer:
         # init step
         task_step = session_task.add_step(title, history, prompt, instructions)
 
-        # --- Start of changes ---
+        # --- Start of improved retry logic ---
         client = self.roles[role_name]
-        max_retries = 1
+        max_retries = 1 # TODO: Make configurable?
         response = None
         start_time = datetime.now()  # Start timer before loop
+        valid_response_received = False # Flag to track success
 
         while task_step.attempts < max_retries:
             total_prompt = history + prompt + instructions
 
-            # If not successful, wait a bit before retrying
+            # If not the first attempt, wait before retrying
             if task_step.attempts > 0:
-                #  timeout = 10 * task_step.attempts
-                timeout = 10
-                print( f"        ...waiting  {timeout} seconds before retry ")
-                time.sleep(timeout)  
+                timeout = 10 # TODO: Make configurable or use backoff?
+                print(f"        ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
+                time.sleep(timeout)
 
             task_step.attempts += 1
+            current_attempt = task_step.attempts # For logging clarity
 
             try:
                 response = client.generate_content(total_prompt, tools=tools)
 
-                # Check for valid response
-                # FinishReason(1) is STOP
-                if response.candidates and response.candidates[0].finish_reason == 1:
-                    # Check if text is accessible (might still fail for safety/other reasons even with STOP)
+                # Check for valid response: Must have candidates, finish_reason=STOP, and accessible text
+                if response.candidates and response.candidates[0].finish_reason == 1: # STOP
                     try:
                         _ = response.text  # Attempt access
-                        # Valid response received
-                        break
+                        # Valid response received!
+                        valid_response_received = True
+                        break # Exit the retry loop successfully
                     except ValueError as ve:
-                        # Finish reason is STOP, but text is not accessible
-                        finish_reason = (
-                            response.candidates[0].finish_reason
-                            if response.candidates
-                            else "UNKNOWN"
-                        )
-                        finish_reason_str = getattr(
-                            finish_reason, "name", str(finish_reason)
-                        )  # Get enum name
-                        print(
-                            f"        Attempt {task_step.attempts}/{max_retries} - Response finished (Reason: {finish_reason_str}), but text not accessible: {ve}"
-                        )
-
-                        if task_step.attempts == max_retries:
-                            exc = Exception("Could not complete step - exit task")
-                            raise exc
-
-
+                        # Finish reason is STOP, but text is not accessible (e.g., safety)
+                        finish_reason_str = getattr(response.candidates[0].finish_reason, 'name', 'STOP')
+                        print(f"        Attempt {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
+                        task_step.log_error(ve, f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}")
+                        # Continue loop if retries remain
                 else:
                     # Handle cases with no candidates or non-STOP finish reasons
-                    finish_reason = (
-                        response.candidates[0].finish_reason
-                        if response.candidates
-                        else "NO_CANDIDATES"
-                    )
-                    finish_reason_str = getattr(
-                        finish_reason, "name", str(finish_reason)
-                    )  # Get enum name
-                    print(
-                        f"        Attempt {task_step.attempts}/{max_retries} - Invalid response or finish reason: {finish_reason_str}"
-                    )
-                    if task_step.attempts == max_retries:
-                        exc = Exception("Could not complete step - exit task")
-                        raise exc
+                    finish_reason = response.candidates[0].finish_reason if response.candidates else "NO_CANDIDATES"
+                    finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
+                    print(f"        Attempt {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
+                    task_step.log_error(Exception(f"Invalid response/finish reason ({finish_reason_str})"), f"Attempt {current_attempt}/{max_retries}")
+                    # Continue loop if retries remain
 
             except Exception as e:
-                print(
-                    f"        Attempt {task_step.attempts}/{max_retries} - ERROR: {e}"
-                )
-                # Log the exception potentially? For now, just print and retry.
+                # Catch errors during the API call itself
+                print(f"        Attempt {current_attempt}/{max_retries} - API Call ERROR: {e}")
+                task_step.log_error(e, f"API call failed on attempt {current_attempt}/{max_retries}")
+                # Ensure response is None if API call failed, important for check after loop
+                response = None
+                # Continue loop if retries remain
 
-
+        # --- After the while loop ---
         end_time = datetime.now()
         response_time = (end_time - start_time).total_seconds()
 
-        if response is None:
-            # Handle case where all retries failed to even get a response object
-            error_msg = (
-                f"ERROR: Failed to get response from API after {max_retries} attempts."
-            )
+        # Check if the loop completed without getting a valid response
+        if not valid_response_received:
+            error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} attempts."
             print(f"        {error_msg}")
-            # You might want to raise an exception here or log it more formally
-            # For now, we'll create a placeholder response or skip logging
-            # Let's skip logging response if it's None, but log the step error
+
+            # Log the final response received (even if invalid or None) before raising
+            # Pass the actual number of attempts made
+            task_step.log_response(response, response_time, retries=task_step.attempts)
+
+            # Log a final summary error indicating failure after all retries
             exc = Exception(error_msg)
-            task_step.log_error(exc, "API Call Failure") # Use exc instead of e
-            #  return task_step  # Or raise an exception depending on desired flow
-            raise exc
+            task_step.log_error(exc, "Final Generate Failure after all retries")
+            raise exc # Raise the exception to be caught by the caller (_investigate or refine)
 
-        # Proceed with logging the (potentially invalid) response if one was received
-        task_step.log_response(response, response_time)
-        # --- End of changes ---
+        # --- If we reach here, it means loop broke successfully with a valid response ---
+        # Log the successful response, including the number of attempts it took
+        task_step.log_response(response, response_time, retries=task_step.attempts)
 
-        # The rest of the function remains the same:
+        # Process the valid response
         reponse_parts = task_step.process_response(response)
-
         return task_step
+        # --- End of improved retry logic ---
 
     def refine(
         self,
