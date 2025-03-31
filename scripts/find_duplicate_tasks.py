@@ -3,6 +3,8 @@
 import sys
 from pathlib import Path
 from collections import defaultdict
+from rich.console import Console
+from rich.table import Table
 
 def find_duplicate_tasks(corpus_dirs: list[Path]) -> dict[str, list[str]]:
     """
@@ -69,11 +71,35 @@ def main():
         print("\nNo duplicate task IDs found across the specified directories.")
     else:
         print(f"\nFound {len(duplicate_tasks)} duplicate task IDs:")
-        # Sort by task ID for consistent output
+
+        # --- Create and print the rich table ---
+        console = Console()
+        table = Table(title="Duplicate Task IDs Across Corpora", show_header=True, header_style="bold magenta")
+
+        # Determine all unique corpus locations involved in duplicates
+        all_locations = set()
+        for locations in duplicate_tasks.values():
+            all_locations.update(locations)
+        sorted_locations = sorted(list(all_locations))
+
+        # Add columns to the table
+        table.add_column("Task ID", style="dim", width=12)
+        for loc in sorted_locations:
+            table.add_column(loc, justify="center")
+
+        # Add rows to the table
         for task_id in sorted(duplicate_tasks.keys()):
             locations = duplicate_tasks[task_id]
-            print(f"  - Task ID: {task_id}")
-            print(f"    Found in: {', '.join(locations)}")
+            row_data = [task_id]
+            for loc_header in sorted_locations:
+                if loc_header in locations:
+                    row_data.append("[green]X[/]") # Mark if found
+                else:
+                    row_data.append("") # Empty if not found
+            table.add_row(*row_data)
+
+        console.print(table)
+        # ---------------------------------------
 
 if __name__ == "__main__":
     main()
