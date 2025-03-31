@@ -5,10 +5,6 @@ from pathlib import Path
 from collections import defaultdict
 from rich.console import Console
 from rich.table import Table
-from rich.console import Console
-from rich.table import Table
-from rich.console import Console
-from rich.table import Table
 
 def find_duplicate_tasks(corpus_dirs: list[Path]) -> dict[str, list[str]]:
     """
@@ -84,11 +80,19 @@ def main():
         all_locations = set()
         for locations in duplicate_tasks.values():
             all_locations.update(locations)
-        sorted_locations = sorted(list(all_locations))
+        # sorted_locations = sorted(list(all_locations)) # Keep original order instead
 
-        # Add columns to the table
+        # Determine the order of columns based on the input list, filtering by those actually found
+        ordered_locations = []
+        for p_str in corpus_directory_paths:
+            p = Path(p_str).resolve()
+            identifier = f"{p.parent.name}/{p.name}"
+            if identifier in all_locations and identifier not in ordered_locations:
+                 ordered_locations.append(identifier)
+
+        # Add columns to the table in the desired order
         table.add_column("Task ID", style="dim", width=12)
-        for loc in sorted_locations:
+        for loc in ordered_locations: # Use ordered_locations
             table.add_column(loc, justify="center")
 
         # Add rows to the table
@@ -96,7 +100,7 @@ def main():
         for task_id in sorted(duplicate_tasks.keys()):
             locations = duplicate_tasks[task_id]
             row_data = [task_id]
-            for loc_header in sorted_locations:
+            for loc_header in ordered_locations: # Use ordered_locations
                 if loc_header in locations:
                     row_data.append("[green]X[/]") # Mark if found
                 else:
