@@ -2,10 +2,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import re
-from datetime import datetime # Added for log_warning timestamp
+from datetime import datetime # Keep for log_warning
 from geometor.seer.session.level import Level
 
 from google.generativeai.types import GenerateContentResponse
+# Removed commented-out FinishReason import
 # Import FinishReason enum if needed for direct comparison, or rely on integer values
 # from google.generativeai.types import FinishReason
 
@@ -72,19 +73,6 @@ class TaskStep(Level):
         try:
             summary = super().summarize()
 
-            # --- Trial Summary ---
-            #  all_train_results = []
-            #  all_test_results = []
-            #  # Iterate through CodeTrial objects in StepCodeTrials
-            #  for code_trial in self.step_code_trials.get_all_trials():
-                #  if code_trial.train_results:
-                    #  all_train_results.extend(code_trial.train_results.get("trials", []))  # Keep as TaskPairTrial
-                #  if code_trial.test_results:
-                    #  all_test_results.extend(code_trial.test_results.get("trials", []))  # Keep as TaskPairTrial
-
-            # Retrieve retries count, default to None if not logged
-            #  retries_count = self.response.get("retries", None)
-
             # Check if any errors were logged
             has_errors = bool(self.errors)
 
@@ -127,52 +115,42 @@ class TaskStep(Level):
             summary["codes"]["count"] = len(self.codes)
             summary["codes"]["types"] = list(self.codes.keys())
 
-            # --- START: Add Best Trial Metrics ---
+            # --- START: Add Best Trial Metrics Directly to Summary ---
             best_trial = self.step_code_trials.get_best_trial()
-            best_trial_metrics = {}
+            # Initialize keys expected by TaskScreen with default None
+            summary["size_correct"] = None
+            summary["palette_correct"] = None
+            summary["colors_correct"] = None
+            summary["pixels_off"] = None
+            summary["percent_correct"] = None
+
             if (
                 best_trial
-                and best_trial.train_results
-                and best_trial.train_results.get("trials")
+                and best_trial.train_results # Check if train_results exist
+                and best_trial.train_results.get("trials") # Check if 'trials' key exists within train_results
             ):
                 train_trials = best_trial.train_results["trials"]
                 if train_trials: # Ensure there are trials to process
+                    # Calculate metrics based on train_trials (list of TaskPairTrial)
                     size_correct_list = [t.size_correct for t in train_trials]
                     palette_correct_list = [t.color_palette_correct for t in train_trials]
                     color_count_correct_list = [t.color_count_correct for t in train_trials]
                     pixels_off_list = [t.pixels_off for t in train_trials if t.pixels_off is not None]
                     percent_correct_list = [t.percent_correct for t in train_trials if t.percent_correct is not None]
-                    # --- START: Add total_pixels_off calculation ---
                     total_pixels_off = sum(pixels_off_list) if pixels_off_list else None
-                    # --- END: Add total_pixels_off calculation ---
 
+                    # Add calculated metrics directly to summary using expected keys
+                    # Note: The keys here ('size_correct', 'palette_correct', etc.) should match
+                    # the keys expected by the TaskScreen DataTable.
+                    summary["size_correct"] = all(size_correct_list)
+                    summary["palette_correct"] = all(palette_correct_list)
+                    summary["colors_correct"] = all(color_count_correct_list)
+                    summary["pixels_off"] = total_pixels_off # Use total pixels off for the PIXELS column
+                    summary["percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None # Use average for % column
 
-                    best_trial_metrics["all_size_correct"] = all(size_correct_list)
-                    best_trial_metrics["all_palette_correct"] = all(palette_correct_list)
-                    best_trial_metrics["all_color_count_correct"] = all(color_count_correct_list)
-                    best_trial_metrics["pixels_off"] = sum(pixels_off_list)
-                    best_trial_metrics["avg_pixels_off"] = sum(pixels_off_list) / len(pixels_off_list) if pixels_off_list else None
-                    best_trial_metrics["avg_percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None
-                    best_trial_metrics["total_pixels_off"] = total_pixels_off # ADDED total pixels off
-                else:
-                    # Handle case where train_results exists but trials list is empty
-                    best_trial_metrics["all_size_correct"] = None
-                    best_trial_metrics["all_palette_correct"] = None
-                    best_trial_metrics["all_color_count_correct"] = None
-                    best_trial_metrics["avg_pixels_off"] = None
-                    best_trial_metrics["avg_percent_correct"] = None
-                    best_trial_metrics["total_pixels_off"] = None # ADDED total pixels off
+            # Note: best_score, train_passed, test_passed, attempts, has_errors, response_time, tokens are already added above
 
-            summary["best_trial_metrics"] = best_trial_metrics
-            # --- END: Add Best Trial Metrics ---
-
-
-            #  if all_train_results:
-                #  summary["trials"]["train"] = self._summarize_trial_results(
-                    #  all_train_results
-                #  )
-            #  if all_test_results:
-                #  summary["trials"]["test"] = self._summarize_trial_results(all_test_results)
+            # --- END: Add Best Trial Metrics Directly to Summary ---
 
             self._write_to_json("index.json", summary)
             return summary  # Ensure summary is returned
@@ -355,7 +333,6 @@ class TaskStep(Level):
                     output = part.code_execution_result.output
                     response_parts.append(f"outcome: {outcome_str}\n")
                     response_parts.append(f"```\n{output}\n```\n")
-                    #  self.session._write_to_file(f"code_result.txt", output)
 
                 if hasattr(part, 'function_call') and part.function_call:
                     response_parts.append("\n*function_call:*\n")
@@ -431,19 +408,8 @@ class TaskStep(Level):
         function_name = function_call.name
         function_args = function_call.args
 
-        #  if function_name not in functions:
-        #  raise UnknownFunctionError(f"Unknown function: {function_name}")
-
-        #  # TODO: log errors
-        #  try:
-            #  result = functions[function_name](**function_args)
-            #  return result
-        #  except TypeError as e:
-            #  raise FunctionArgumentError(
-                #  f"Invalid arguments for {function_name}: {str(e)}"
-            #  )
-        #  except Exception as e:
-            #  raise FunctionExecutionError(f"Error executing {function_name}: {str(e)}")
+        # TODO: Complete implementation or remove placeholder logic
+        pass
 
     def run_trials(self):
         """Executes trials for all available code."""

@@ -266,20 +266,20 @@ class Seer:
                     except ValueError as ve:
                         # Finish reason is STOP, but text is not accessible (e.g., safety)
                         finish_reason_str = getattr(response.candidates[0].finish_reason, 'name', 'STOP')
-                        print(f"                retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
+                        print(f"            retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
                         task_step.log_error(ve, f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}")
                         # Continue loop if retries remain
                 else:
                     # Handle cases with no candidates or non-STOP finish reasons
                     finish_reason = response.candidates[0].finish_reason if response.candidates else "NO_CANDIDATES"
                     finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
-                    print(f"                RETRY: {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
+                    print(f"            RETRY: {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
                     task_step.log_error(Exception(f"Invalid response/finish reason ({finish_reason_str})"), f"Attempt {current_attempt}/{max_retries}")
                     # Continue loop if retries remain
 
             except Exception as e:
                 # Catch errors during the API call itself
-                print(f"                RETRY: {current_attempt}/{max_retries} - API Call ERROR: {e}")
+                print(f"            RETRY: {current_attempt}/{max_retries} - API Call ERROR: {e}")
                 task_step.log_error(e, f"API call failed on attempt {current_attempt}/{max_retries}")
                 # Ensure response is None if API call failed, important for check after loop
                 response = None
@@ -292,7 +292,7 @@ class Seer:
         # Check if the loop completed without getting a valid response
         if not valid_response_received:
             error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} retries."
-            print(f"                {error_msg}")
+            print(f"            {error_msg}")
 
             # Log the final response received (even if invalid or None) before raising
             # Pass the actual number of attempts made

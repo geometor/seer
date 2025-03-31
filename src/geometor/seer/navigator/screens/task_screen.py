@@ -1,3 +1,4 @@
+import re
 from rich.text import Text
 from datetime import timedelta # Import timedelta
 

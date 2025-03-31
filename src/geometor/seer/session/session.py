@@ -69,8 +69,8 @@ class Session(Level):
                     if total_tokens is not None:
                         total_tokens_all_tasks += total_tokens
                 else:
-                    # Log a warning if the task summary is missing (optional)
-                    # self.log_warning(f"Task summary file not found for token aggregation: {task_summary_path}", "Session Summarize")
+                    # Log a warning if the task summary is missing
+                    # TODO: Implement self.log_warning or use a proper logger
                     print(f"    WARNING (Session {self.name}): Task summary file not found for token aggregation: {task_summary_path}")
 
                 # --- START ADDED ERROR AGGREGATION ---
@@ -80,11 +80,11 @@ class Session(Level):
 
             except (json.JSONDecodeError, TypeError) as e:
                  # Log or handle error if task summary isn't valid JSON or structure is wrong
-                 # self.log_error(e, f"Error reading task summary for token aggregation: {session_task.name}")
+                 # TODO: Implement self.log_error or use a proper logger
                  print(f"    ERROR (Session {self.name}): Error reading task summary for token aggregation: {session_task.name} - {e}")
             except Exception as e:
                  # Catch any other unexpected errors during file reading
-                 # self.log_error(e, f"Unexpected error reading task summary for token aggregation: {session_task.name}")
+                 # TODO: Implement self.log_error or use a proper logger
                  print(f"    ERROR (Session {self.name}): Unexpected error reading task summary for token aggregation: {session_task.name} - {e}")
             # --- END ADDED TOKEN AGGREGATION ---
 
