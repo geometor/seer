@@ -5,6 +5,10 @@ from pathlib import Path
 from collections import defaultdict
 from rich.console import Console
 from rich.table import Table
+from rich.console import Console
+from rich.table import Table
+from rich.console import Console
+from rich.table import Table
 
 def find_duplicate_tasks(corpus_dirs: list[Path]) -> dict[str, list[str]]:
     """
@@ -88,6 +92,7 @@ def main():
             table.add_column(loc, justify="center")
 
         # Add rows to the table
+        # Sort by task ID for consistent output
         for task_id in sorted(duplicate_tasks.keys()):
             locations = duplicate_tasks[task_id]
             row_data = [task_id]
