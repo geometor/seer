@@ -19,7 +19,7 @@ from textual.widgets._data_table import ColumnKey # ADDED ColumnKey
 # REMOVED subprocess import
 # REMOVED shutil import
 
-from geometor.seer.navigator.screens.session_screen import SessionScreen
+from geometor.seer_navigator.screens.session_screen import SessionScreen
 from geometor.seer.session.level import Level  # Import Level
 from geometor.seer.tasks.tasks import Task # ADDED Task import for weight calculation
 

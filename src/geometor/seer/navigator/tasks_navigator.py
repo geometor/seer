@@ -7,8 +7,8 @@ from textual.binding import Binding
 from textual import log
 
 # Import screens
-from geometor.seer.navigator.screens.tasks_screen import TasksScreen
-from geometor.seer.navigator.screens.sort_modal import SortModal # ADDED
+from geometor.seer_navigator.screens.tasks_screen import TasksScreen
+from geometor.seer_navigator.screens.sort_modal import SortModal # ADDED
 
 
 class TasksNavigator(App):

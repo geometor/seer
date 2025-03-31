@@ -7,7 +7,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, Grid, ScrollableContainer 
 from textual.widgets import Static, Button, ListView, ListItem, Label, Footer
 
-from geometor.seer.navigator.renderers import (
+from geometor.seer_navigator.renderers import (
     CharGrid,
     BlockGrid,
     SolidGrid,
@@ -128,7 +128,9 @@ def main():
     """
     from pathlib import Path
     from geometor.seer.tasks.tasks import Tasks
-    from geometor.seer.navigator.navigator import Navigator
+    # Import from the current module if this is meant to be run as a script
+    # If this becomes part of the installed package, adjust as needed.
+    from geometor.seer_navigator.navigator import Navigator
 
     # --- Configuration ---
     #  TASKS_DIR = Path("/home/phi/PROJECTS/geometor/seer_sessions/run/tasks/ARC/training")

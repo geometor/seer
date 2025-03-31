@@ -3,9 +3,9 @@ from textual.widgets import Static
 from pathlib import Path
 import argparse
 import json
-import re  
+import re
 
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
+from geometor.seer_navigator.screens.sessions_screen import SessionsScreen
 
 class Step:
     def __init__(self, step_prefix: str, task_dir: Path):

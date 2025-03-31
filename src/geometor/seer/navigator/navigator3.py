@@ -29,7 +29,7 @@ class DummyGrid(Static):
 
 # Import renderers (adjust path if needed)
 try:
-    from geometor.seer.navigator.renderers import (
+    from geometor.seer_navigator.renderers import (
         SolidGrid,
         BlockGrid,
         CharGrid,
@@ -82,6 +82,8 @@ class SessionNavigator(App):
 
     def on_mount(self) -> None:
         # Push the initial screen
+        # Import screen locally to avoid circular dependency if ScreensScreen imports App features implicitly
+        from geometor.seer_navigator.screens.sessions_screen import SessionsScreen
         self.push_screen(SessionsScreen(self.sessions_root))
 
     # --- START ADDED SXIV CHECK ---
