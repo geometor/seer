@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import csv # Add csv import
 from pathlib import Path
 from collections import defaultdict
 from rich.console import Console
@@ -60,6 +61,7 @@ def main():
         "/path/to/another/corpus/folder",
         # Add more paths as needed
     ]
+    output_csv_file = "duplicate_tasks.csv" # Define output CSV filename
     # -------------------------------------------
 
     # Convert string paths to Path objects and resolve them (optional but good practice)
@@ -108,6 +110,25 @@ def main():
             table.add_row(*row_data)
 
         console.print(table)
+
+        # --- Write data to CSV file ---
+        print(f"\nWriting duplicate task information to '{output_csv_file}'...")
+        try:
+            with open(output_csv_file, 'w', newline='', encoding='utf-8') as csvfile:
+                writer = csv.writer(csvfile)
+                # Write header
+                header = ["Task ID"] + ordered_locations
+                writer.writerow(header)
+                # Write data rows
+                for task_id in sorted(duplicate_tasks.keys()):
+                    locations = duplicate_tasks[task_id]
+                    row_data = [task_id]
+                    for loc_header in ordered_locations:
+                        row_data.append("X" if loc_header in locations else "")
+                    writer.writerow(row_data)
+            print(f"Successfully wrote CSV file: {output_csv_file}")
+        except IOError as e:
+            print(f"Error writing CSV file: {e}", file=sys.stderr)
         # ---------------------------------------
 
 if __name__ == "__main__":
