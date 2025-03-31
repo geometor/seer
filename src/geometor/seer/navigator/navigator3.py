@@ -11,14 +11,16 @@ from textual import log # Added log
 from textual.binding import Binding # Added Binding
 
 # Import screens
-from geometor.seer.navigator.screens.sessions_screen import SessionsScreen
-from geometor.seer.navigator.screens.session_screen import SessionScreen
-from geometor.seer.navigator.screens.task_screen import TaskScreen
-from geometor.seer.navigator.screens.step_screen import StepScreen
+from geometor.seer_navigator.screens.sessions_screen import SessionsScreen
+from geometor.seer_navigator.screens.session_screen import SessionScreen
+from geometor.seer_navigator.screens.task_screen import TaskScreen
+from geometor.seer_navigator.screens.step_screen import StepScreen
 # Import TrialViewer instead of TrialScreen
-from geometor.seer.navigator.screens.trial_screen import TrialViewer
+from geometor.seer_navigator.screens.trial_screen import TrialViewer
 # Import the modal screen
-from geometor.seer.navigator.screens.image_view_modal import ImageViewModal
+from geometor.seer_navigator.screens.image_view_modal import ImageViewModal
+# Import the sort modal screen - NOTE: This was added in the previous attempt, ensure it's needed or remove if not.
+# If SortModal is needed elsewhere, it should be imported there. Assuming it's NOT needed here based on the provided file content.
 
 # Define DummyGrid first so it's always available
 class DummyGrid(Static):
