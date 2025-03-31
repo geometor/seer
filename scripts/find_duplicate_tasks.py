@@ -28,14 +28,15 @@ def find_duplicate_tasks(corpus_dirs: list[Path]) -> dict[str, list[str]]:
             print(f"Warning: '{corpus_path}' is not a valid directory. Skipping.", file=sys.stderr)
             continue
 
-        corpus_name = corpus_path.name # Use the directory name as the corpus identifier
-        valid_corpus_names.append(corpus_name)
-        print(f" -> Scanning '{corpus_name}' ({corpus_path})...")
+        # Construct a two-level identifier (e.g., parent_dir/current_dir)
+        corpus_identifier = f"{corpus_path.parent.name}/{corpus_path.name}"
+        valid_corpus_names.append(corpus_identifier)
+        print(f" -> Scanning '{corpus_identifier}' ({corpus_path})...")
         found_count = 0
         for task_file in corpus_path.glob('*.json'):
             if task_file.is_file():
                 task_id = task_file.stem  # Get filename without extension
-                task_locations[task_id].append(corpus_name)
+                task_locations[task_id].append(corpus_identifier) # Use the new identifier
                 found_count += 1
         print(f"    Found {found_count} task files.")
 
