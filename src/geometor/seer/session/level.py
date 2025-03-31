@@ -49,7 +49,7 @@ ERROR
 { str(e) }
 { error_content["stack_trace"] }
 """
-        print(txt_content)
+        #  print(txt_content)
 
         self._write_to_json(error_log_file, error_content)
 

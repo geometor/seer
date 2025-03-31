@@ -71,7 +71,7 @@ class SessionNavigator(App):
         self.sessions_root = Path(sessions_root)
         # Initialize renderer state - DummyGrid is now guaranteed to be defined
         self.renderer = RENDERERS.get("solid", DummyGrid) # Default to SolidGrid or Dummy
-        log.info(f"Initial renderer set to: {self.renderer.__name__}")
+        #  log.info(f"Initial renderer set to: {self.renderer.__name__}")
         self._sxiv_checked = False # ADDED sxiv check state
         self._sxiv_path = None     # ADDED sxiv path cache
 

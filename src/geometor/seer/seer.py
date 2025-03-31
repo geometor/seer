@@ -102,10 +102,11 @@ class Seer:
 
         except Exception as e:
             # _generate raises Exception on failure after retries
-            print(f"        ERROR: Step '{title}' failed critically. Stopping investigation for task {task.id}.")
+            print(f"            ERROR: unable to get valid response. ")
+            print(f"            Stopping investigation for task {task.id}.")
             # Error is already logged within _generate or by the exception handler in SessionTask/Level
             # We log the context of the failure here.
-            session_task.log_error(e, f"Critical failure in step: {title}. Stopping investigation.")
+            session_task.log_error(e, f"Unable to get valid response. Stopping investigation.")
             return # Stop investigation for this task
 
         # STEP: coder *********************************
@@ -136,8 +137,9 @@ class Seer:
                 return # Success, exit investigation
 
         except Exception as e:
-            print(f"        ERROR: Step '{title}' failed critically. Stopping investigation for task {task.id}.")
-            session_task.log_error(e, f"Critical failure in step: {title}. Stopping investigation.")
+            print(f"            ERROR: unable to get valid response. ")
+            print(f"            Stopping investigation for task {task.id}.")
+            session_task.log_error(e, f"Unable to get valid reponse. Stopping investigation.")
             return # Stop investigation for this task
 
 
@@ -201,15 +203,16 @@ class Seer:
 
             except Exception as e:
                 # Catch critical failure from _generate within refine
-                print(f"        ERROR: Refinement iteration {current_iteration} failed critically. Stopping investigation for task {task.id}.")
+                print(f"            ERROR: unable to get valid response. ")
+                print(f"            Stopping investigation for task {task.id}.")
                 # Error is already logged within refine's exception handler before re-raising
                 # We log the context of the failure during refinement here.
-                session_task.log_error(e, f"Critical failure during refinement iteration {current_iteration}. Stopping investigation.")
+                session_task.log_error(e, f"Unable to get valid response. Stopping investigation.")
                 return # Stop investigation
 
             current_iteration += 1
 
-        print(f"        INFO: Reached max iterations ({self.max_iterations}) without solving task {task.id}.")
+        print(f"            INFO: Reached max iterations ({self.max_iterations}) without solving task {task.id}.")
 
 
     def _generate(
@@ -253,7 +256,8 @@ class Seer:
                 response = client.generate_content(total_prompt, tools=tools)
 
                 # Check for valid response: Must have candidates, finish_reason=STOP, and accessible text
-                if response.candidates and response.candidates[0].finish_reason == 1: # STOP
+                #  if response.candidates and response.candidates[0].finish_reason == 1: # STOP
+                if response.candidates:
                     try:
                         _ = response.text  # Attempt access
                         # Valid response received!
@@ -262,20 +266,20 @@ class Seer:
                     except ValueError as ve:
                         # Finish reason is STOP, but text is not accessible (e.g., safety)
                         finish_reason_str = getattr(response.candidates[0].finish_reason, 'name', 'STOP')
-                        print(f"            retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
+                        print(f"                retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}")
                         task_step.log_error(ve, f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}")
                         # Continue loop if retries remain
                 else:
                     # Handle cases with no candidates or non-STOP finish reasons
                     finish_reason = response.candidates[0].finish_reason if response.candidates else "NO_CANDIDATES"
                     finish_reason_str = getattr(finish_reason, 'name', str(finish_reason))
-                    print(f"        Attempt {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
+                    print(f"                RETRY: {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}")
                     task_step.log_error(Exception(f"Invalid response/finish reason ({finish_reason_str})"), f"Attempt {current_attempt}/{max_retries}")
                     # Continue loop if retries remain
 
             except Exception as e:
                 # Catch errors during the API call itself
-                print(f"        Attempt {current_attempt}/{max_retries} - API Call ERROR: {e}")
+                print(f"                RETRY: {current_attempt}/{max_retries} - API Call ERROR: {e}")
                 task_step.log_error(e, f"API call failed on attempt {current_attempt}/{max_retries}")
                 # Ensure response is None if API call failed, important for check after loop
                 response = None
@@ -287,8 +291,8 @@ class Seer:
 
         # Check if the loop completed without getting a valid response
         if not valid_response_received:
-            error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} attempts."
-            print(f"        {error_msg}")
+            error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} retries."
+            print(f"                {error_msg}")
 
             # Log the final response received (even if invalid or None) before raising
             # Pass the actual number of attempts made
