@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import argparse
-import hashlib
+# import argparse # Removed argparse
+# import hashlib # Removed hashlib (no longer generating dest name)
 import logging
 import shutil
 import sys
@@ -15,129 +15,41 @@ logging.basicConfig(
     stream=sys.stdout,
 )
 
-
-def find_latest_session(sessions_root: Path) -> Path | None:
-    """Finds the session directory with the latest timestamp in its name."""
-    latest_session = None
-    latest_time = None
-
-    for item in sessions_root.iterdir():
-        if item.is_dir():
-            try:
-                # Assuming format like YY.DDD.HHMM or similar sortable timestamp
-                # Attempt to parse the name or rely on lexicographical sorting
-                # A more robust approach might involve parsing specific formats
-                # For now, simple string comparison often works for ISO-like timestamps
-                if latest_session is None or item.name > latest_session.name:
-                    # Basic check: does it look like a session folder?
-                    # Check for common files or naming patterns if needed.
-                    # For now, assume any directory could be a session.
-                    # Let's refine by checking for a potential timestamp format
-                    parts = item.name.split('.')
-                    if len(parts) >= 3 and all(p.isdigit() for p in parts):
-                         # Crude check, might need adjustment based on exact naming
-                        if latest_session is None or item.name > latest_session.name:
-                            latest_session = item
-            except Exception:
-                # Ignore directories that don't match the expected naming pattern
-                # or cause errors during comparison
-                logging.debug(f"Could not parse session name for sorting: {item.name}")
-                continue
-
-    if latest_session:
-        logging.info(f"Latest session found: {latest_session.name}")
-    else:
-        logging.warning(f"Could not automatically determine the latest session in {sessions_root}")
-
-    return latest_session
-
+# Removed find_latest_session function
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Aggregate specific task trials from one session into a new session.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "--sessions-root",
-        type=Path,
-        default=Path("./sessions"),
-        help="Path to the root directory containing session folders.",
-    )
-    parser.add_argument(
-        "--source-session",
-        type=str,
-        default=None,
-        help="Name of the source session directory. If omitted, the latest session will be used.",
-    )
-    parser.add_argument(
-        "--tasks",
-        type=str,
-        nargs="+",
-        required=True,
-        help="List of task IDs (directory names) to move.",
-    )
-    parser.add_argument(
-        "--dest-name",
-        type=str,
-        default=None,
-        help="Name for the new aggregated session directory. If omitted, it will be generated.",
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be done without actually creating/moving files.",
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable debug logging."
-    )
+    # --- Hardcoded Configuration ---
+    # Set these values directly before running the script
+    SESSIONS_ROOT = Path("./sessions")
+    SOURCE_SESSION_NAME = "24.092.1100"  # Replace with the actual source session name
+    TASK_IDS_TO_MOVE = ["00576224", "009d5c81"] # Replace with the list of task IDs
+    DEST_SESSION_NAME = "aggregated-session-example" # Replace with the desired destination name
+    DRY_RUN = False # Set to False to actually move files, True to simulate
+    VERBOSE = True # Set to True for detailed logging
+    # --- End Hardcoded Configuration ---
 
-    args = parser.parse_args()
-
-    if args.verbose:
+    if VERBOSE:
         logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.INFO) # Ensure INFO level if not verbose
 
     # --- Validate sessions root ---
-    if not args.sessions_root.is_dir():
-        logging.error(f"Sessions root directory not found: {args.sessions_root}")
+    if not SESSIONS_ROOT.is_dir():
+        logging.error(f"Sessions root directory not found: {SESSIONS_ROOT}")
         sys.exit(1)
 
-    # --- Determine source session ---
-    source_session_path: Path
-    if args.source_session:
-        source_session_path = args.sessions_root / args.source_session
-        if not source_session_path.is_dir():
-            logging.error(f"Source session directory not found: {source_session_path}")
-            sys.exit(1)
-        logging.info(f"Using specified source session: {source_session_path.name}")
-    else:
-        logging.info("Attempting to find the latest session...")
-        latest_session = find_latest_session(args.sessions_root)
-        if not latest_session:
-            logging.error(
-                "Could not find the latest session. Please specify using --source-session."
-            )
-            sys.exit(1)
-        source_session_path = latest_session
-        logging.info(f"Using latest source session: {source_session_path.name}")
+    # --- Determine source session path ---
+    source_session_path = SESSIONS_ROOT / SOURCE_SESSION_NAME
+    if not source_session_path.is_dir():
+        logging.error(f"Source session directory not found: {source_session_path}")
+        sys.exit(1)
+    logging.info(f"Using source session: {source_session_path.name}")
 
-    # --- Determine destination session name and path ---
-    dest_session_name: str
-    if args.dest_name:
-        dest_session_name = args.dest_name
-    else:
-        # Generate a name
-        timestamp = datetime.now().strftime("%y.%j.%H%M%S")
-        # Create a stable hash based on sorted task IDs
-        task_hash = hashlib.sha1(
-            ",".join(sorted(args.tasks)).encode()
-        ).hexdigest()[:8]
-        dest_session_name = f"{source_session_path.name}-agg-{task_hash}-{timestamp}"
-        logging.info(f"Generated destination session name: {dest_session_name}")
-
-    dest_session_path = args.sessions_root / dest_session_name
+    # --- Determine destination session path ---
+    dest_session_path = SESSIONS_ROOT / DEST_SESSION_NAME
 
     # --- Check if destination already exists ---
-    if dest_session_path.exists():
+    if dest_session_path.exists() and not DRY_RUN: # Only error if not dry run
         logging.error(
             f"Destination session directory already exists: {dest_session_path}"
         )
@@ -146,23 +58,23 @@ def main():
 
     # --- Log planned actions ---
     logging.info("-" * 30)
-    logging.info(f"Operation Plan {'(DRY RUN)' if args.dry_run else ''}:")
+    logging.info(f"Operation Plan {'(DRY RUN)' if DRY_RUN else ''}:")
     logging.info(f"  Source Session: {source_session_path}")
     logging.info(f"  Destination Session: {dest_session_path}")
-    logging.info(f"  Tasks to Move: {', '.join(args.tasks)}")
+    logging.info(f"  Tasks to Move: {', '.join(TASK_IDS_TO_MOVE)}")
     logging.info("-" * 30)
 
     # --- Execute ---
-    if args.dry_run:
+    if DRY_RUN:
         logging.info("Dry Run: Simulating operations...")
         print(f"DRY RUN: Would create directory: {dest_session_path}")
         source_config = source_session_path / "config.json"
         if source_config.is_file():
             print(f"DRY RUN: Would copy {source_config} to {dest_session_path / source_config.name}")
         else:
-            logging.warning(f"Source config.json not found at {source_config}")
+            logging.warning(f"DRY RUN: Source config.json not found at {source_config}")
 
-        for task_id in args.tasks:
+        for task_id in TASK_IDS_TO_MOVE:
             source_task_path = source_session_path / task_id
             dest_task_path = dest_session_path / task_id
             if source_task_path.is_dir():
@@ -197,7 +109,7 @@ def main():
         # 3. Move task directories
         moved_count = 0
         error_count = 0
-        for task_id in args.tasks:
+        for task_id in TASK_IDS_TO_MOVE:
             source_task_path = source_session_path / task_id
             dest_task_path = dest_session_path / task_id
 
