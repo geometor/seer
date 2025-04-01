@@ -106,7 +106,7 @@ class SessionTask(Level):
         summary.update(
             {
                 "steps": len(self.steps),
-                "matches": None,  # Filled in by TaskStep
+                # "matches": None,  # REMOVED - Filled in by TaskStep but not used here
                 "train_passed": train_passed,  # Use calculated values
                 "test_passed": test_passed,  # Use calculated values
                 # --- START ADDED TOKENS TO SUMMARY ---

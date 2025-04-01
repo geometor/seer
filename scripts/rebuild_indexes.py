@@ -320,8 +320,8 @@ def rebuild_task_summary(task_dir: Path) -> Optional[Dict[str, Any]]:
         # Duration - keep if exists?
         existing_index = safe_load_json(task_dir / "index.json")
         summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
-        # Matches - This seems to be set by TaskStep, maybe remove from task summary?
-        summary["matches"] = None # Or read from existing if needed
+        # Matches - Removed as per request
+        # summary["matches"] = None # Or read from existing if needed
 
         # Trials - Re-aggregate if needed, or use step summaries
         # For now, leave it empty or use step summaries if sufficient
