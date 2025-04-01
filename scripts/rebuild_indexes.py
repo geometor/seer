@@ -416,8 +416,8 @@ def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
         existing_index = safe_load_json(session_dir / "index.json")
         summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
 
-        # Task trials - Session summary doesn't seem to aggregate this deeply
-        summary["task_trials"] = {} # Placeholder or read from existing if needed
+        # Task trials - Removed as per request
+        # summary["task_trials"] = {} # Placeholder or read from existing if needed
 
 
         # Write the new index

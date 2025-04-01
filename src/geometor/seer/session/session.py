@@ -30,7 +30,7 @@ class Session(Level):
         summary["test_passed"] = self.test_passed_count    # Use count property
 
         # Aggregate trial counts and tokens from each SessionTask
-        task_trials = {}
+        # task_trials = {} # REMOVED
         total_steps = 0  # Initialize total steps
         # --- START ADDED TOKEN COUNTERS ---
         total_prompt_tokens = 0
@@ -42,10 +42,11 @@ class Session(Level):
         for task_id, session_task in self.tasks.items():
             # Access summary information directly from session_task
             total_steps += len(session_task.steps)  # Use len(steps)
-            task_trials[task_id] = {
-                "train": session_task.trials.get("train", {}).get("total", 0),
-                "test": session_task.trials.get("test", {}).get("total", 0),
-            }
+            # REMOVED task_trials aggregation
+            # task_trials[task_id] = {
+            #     "train": session_task.trials.get("train", {}).get("total", 0),
+            #     "test": session_task.trials.get("test", {}).get("total", 0),
+            # }
 
             # --- START ADDED TOKEN AGGREGATION ---
             # Read from the task's index.json for robustness
@@ -89,7 +90,7 @@ class Session(Level):
             # --- END ADDED TOKEN AGGREGATION ---
 
 
-        summary["task_trials"] = task_trials
+        # summary["task_trials"] = task_trials # REMOVED
         summary["total_steps"] = total_steps  # Add total_steps to the summary
 
         # --- START ADDED TOKENS TO SUMMARY ---
