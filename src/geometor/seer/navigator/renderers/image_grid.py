@@ -1,4 +1,4 @@
-from geometor.seer.navigator.renderers.base_grid import *
+from geometor.seer_navigator.renderers.base_grid import *
 
 class ImageGrid(BaseGrid):
     """

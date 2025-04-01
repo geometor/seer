@@ -16,7 +16,7 @@ from textual import log
 from geometor.seer.tasks.grid import Grid, string_to_grid
 
 try:
-    from geometor.seer.navigator.renderers import (
+    from geometor.seer_navigator.renderers import (
         SolidGrid,
         BlockGrid,
         CharGrid,

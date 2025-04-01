@@ -1,5 +1,5 @@
-from geometor.seer.navigator.renderers.base_grid import *
-#  from geometor.seer.tasks.tasks import Task  
+from geometor.seer_navigator.renderers.base_grid import *
+#  from geometor.seer.tasks.tasks import Task
 from rich.text import Text
 
 class BlockGrid(BaseGrid):

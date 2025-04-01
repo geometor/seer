@@ -15,7 +15,7 @@ from textual.binding import Binding
 from textual import log
 
 # Import the new TrialViewer widget
-from geometor.seer.navigator.screens.trial_screen import TrialViewer
+from geometor.seer_navigator.screens.trial_screen import TrialViewer
 
 
 # Mapping file extensions to tree-sitter languages and TextArea theme

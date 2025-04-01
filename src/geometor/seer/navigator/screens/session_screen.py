@@ -23,7 +23,7 @@ import json
 
 # Import Task to calculate weight
 from geometor.seer.tasks.tasks import Task
-from geometor.seer.navigator.screens.task_screen import TaskScreen
+from geometor.seer_navigator.screens.task_screen import TaskScreen
 from geometor.seer.session.level import Level  # Import Level
 
 
