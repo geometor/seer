@@ -317,7 +317,62 @@ class Tasks(list):
         return sorted(self, key=lambda task: len(task.train), reverse=reverse)
 
 
-# --- Standalone Utility Function ---
+# --- Standalone Utility Functions ---
+
+def load_tasks_from_kaggle_json(file_path: Path) -> 'Tasks':
+    """
+    Loads tasks from a single JSON file where the top level is a dictionary
+    mapping task IDs to task data (containing 'train' and 'test' lists).
+
+    Args:
+        file_path: The path to the JSON file.
+
+    Returns:
+        A Tasks object containing the loaded tasks. Returns an empty Tasks
+        object if the file is not found, is invalid JSON, or has an
+        unexpected structure.
+    """
+    tasks_list = []
+    # Create an empty Tasks object upfront for potential error returns and final result
+    tasks_obj = Tasks.__new__(Tasks)
+    tasks_obj.clear()
+
+    try:
+        if not file_path.is_file():
+            print(f"Error: Kaggle JSON file not found: {file_path}")
+            return tasks_obj # Return empty Tasks
+
+        with file_path.open("r") as f:
+            all_task_data = json.load(f)
+
+        if not isinstance(all_task_data, dict):
+            print(f"Error: Expected top-level JSON structure to be a dictionary (task_id: task_data), but got {type(all_task_data)} in {file_path}")
+            return tasks_obj # Return empty Tasks
+
+        for task_id, task_data in all_task_data.items():
+            try:
+                # Basic validation of task_data structure
+                if isinstance(task_data, dict) and "train" in task_data and "test" in task_data:
+                    task_obj = Task(task_id, task_data)
+                    tasks_list.append(task_obj)
+                else:
+                     print(f"Warning: Skipping task '{task_id}' due to unexpected data structure: {task_data}")
+            except Exception as e:
+                print(f"Warning: Error processing task '{task_id}' from {file_path}: {e}")
+                # Optionally continue to process other tasks
+
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON format in file {file_path}: {e}")
+        return tasks_obj # Return empty Tasks
+    except Exception as e:
+        print(f"Error reading or processing Kaggle JSON file {file_path}: {e}")
+        return tasks_obj # Return empty Tasks
+
+    # Populate the final Tasks object
+    tasks_obj.extend(tasks_list)
+    print(f"Successfully loaded {len(tasks_obj)} tasks from {file_path}")
+    return tasks_obj
+
 
 def get_unsolved_tasks(sessions_root: Path) -> Tasks:
     """
