@@ -7,7 +7,7 @@ and controls the flow of execution for analyzing examples and generating solutio
 
 # Standard library imports
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Any
+from typing import TYPE_CHECKING, List, Any, Dict, Union, Callable
 from datetime import datetime
 import time
 from pathlib import Path # Ensure Path is imported
