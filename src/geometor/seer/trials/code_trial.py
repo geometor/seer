@@ -39,15 +39,15 @@ class CodeTrial:
         self.task = task
         self.task_step = task_step  # store
 
-        # Run and store results directly in CodeTrial
-        self.train_results = self.test_code_with_timeout(
-            code, task.train
-        )
-        self.test_results = None  # Initialize
-        if self.train_passed is True:  # Only run tests if train passed
-            self.test_results = self.test_code_with_timeout(code, task.test)
+        # Run train trials
+        self.train_results = self.test_code_with_timeout(code, task.train)
 
-        # Calculate total and average scores
+        # Run test trials (always run, even if train didn't pass perfectly,
+        # as partial train success might still yield test results)
+        # Note: test_code_with_timeout handles pairs where pair.output is None
+        self.test_results = self.test_code_with_timeout(code, task.test)
+
+        # Calculate total and average scores, handling potential None scores
         train_scores = [
             trial.score
             for trial in self.train_results.get("trials", [])
@@ -57,18 +57,30 @@ class CodeTrial:
             trial.score
             for trial in self.test_results.get("trials", [])
             if trial.score is not None
-        ] if self.test_results else []  # Handle None test_results, access score
+        ] if self.test_results and "trials" in self.test_results else [] # More robust check
 
         # Initialize to None
         self.total_score = None
         self.average_score = None
 
-        if not self.train_results.get("error") and not (self.test_results and self.test_results.get("error")):
-            total_score = sum(train_scores) + sum(test_scores)
-            num_scores = len(train_scores) + len(test_scores)
-            if num_scores > 0:
-                self.total_score = total_score
-                self.average_score = total_score / num_scores
+        # Only calculate scores if there were no execution errors in either set
+        # and if there are scores to aggregate
+        train_error = self.train_results.get("error")
+        test_error = self.test_results.get("error") if self.test_results else None
+
+        if not train_error and not test_error:
+            all_scores = train_scores + test_scores
+            valid_scores = [s for s in all_scores if s is not None] # Filter out None scores
+            if valid_scores: # Check if there are any valid scores
+                self.total_score = sum(valid_scores)
+                self.average_score = self.total_score / len(valid_scores)
+            else:
+                 # Handle case where all trials resulted in None scores (e.g., all test pairs had no output)
+                 # We can set total_score to 0 or keep it None depending on desired behavior.
+                 # Let's keep it None to indicate no comparable results.
+                 self.total_score = None
+                 self.average_score = None
+
 
         # --- Conditional Image Generation ---
         if self.has_valid_transformed_output:
@@ -111,14 +123,17 @@ class CodeTrial:
         """
         if not self.train_results:
             return None
-        if self.train_results.get("error"):
-            return None  # Error in the overall results
+        if not self.train_results or self.train_results.get("error"):
+            return None  # Error in overall execution or no results
         trials = self.train_results.get("trials", [])
-        if any(trial.error for trial in trials):  # Check for error directly
+        if not trials: # Handle case with no trials (shouldn't happen for train)
+             return None
+        if any(trial.error for trial in trials):
             return None  # Error in any individual trial
-        if all(trial.match for trial in trials):  # Check for match directly
-            return True  # All trials passed
-        return False  # No errors, but not all passed
+        # All trials must have an expected output and match it
+        if all(trial.task_pair.output is not None and trial.match for trial in trials):
+            return True
+        return False # Some didn't match, or had no expected output, or had errors handled above
 
     @property
     def test_passed(self) -> bool | None:
@@ -131,16 +146,25 @@ class CodeTrial:
             during the trials (either in the overall execution or in
             individual trials).
         """
-        if not self.test_results:
-            return None
-        if self.test_results.get("error"):
-            return None  # Error in overall results
+        if not self.test_results or self.test_results.get("error"):
+            return None # Error in overall execution or no results
         trials = self.test_results.get("trials", [])
-        if any(trial.error for trial in trials):  # Check for error directly
-            return None  # Error in any individual trial
-        if all(trial.match for trial in trials):   # Check for match directly
-            return True  # All trials passed
-        return False  # No errors, but not all passed
+        if not trials: # Handle case with no trials
+             return None # Or True/False depending on definition? None seems safest.
+        if any(trial.error for trial in trials):
+            return None # Error in any individual trial
+
+        # Check if *all* test pairs that *have* an expected output match.
+        # Pairs without expected output are ignored for the 'passed' status.
+        relevant_trials = [t for t in trials if t.task_pair.output is not None]
+        if not relevant_trials:
+            # If there are no test pairs with expected output, what does "passed" mean?
+            # Let's return True, as no required comparisons failed.
+            # Alternatively, return None if this state is ambiguous. Let's stick with True for now.
+            return True
+        if all(trial.match for trial in relevant_trials):
+            return True
+        return False # At least one relevant trial did not match
 
     @property
     def has_valid_transformed_output(self) -> bool:
@@ -280,10 +304,13 @@ class CodeTrial:
         with contextlib.redirect_stdout(output_capture):
             for i, pair in enumerate(task_pairs):
                 input_grid = pair.input.grid
-                expected_output = pair.output.grid
+                # Expected output grid might be None
+                expected_output_grid = pair.output.grid if pair.output else None
 
                 try:
-                    transformed_output = transform_function(input_grid)
+                    # Make a copy to prevent modification by the transform function
+                    input_grid_copy = np.copy(input_grid)
+                    transformed_output = transform_function(input_grid_copy)
 
                     # --- Validation and Repair Logic ---
                     if not isinstance(transformed_output, np.ndarray):

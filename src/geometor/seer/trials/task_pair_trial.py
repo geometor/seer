@@ -29,7 +29,10 @@ class TaskPairTrial:
         return self.task_pair.input.to_string()
 
     @property
-    def expected_output_string(self) -> str:
+    def expected_output_string(self) -> str | None:
+        # Return None if there is no expected output
+        if self.task_pair.output is None:
+            return None
         return self.task_pair.output.to_string()
 
     @property
@@ -40,28 +43,35 @@ class TaskPairTrial:
 
     @property
     def match(self) -> bool:
-        if self.transformed_output is None or self.error is not None:
+        # Cannot match if there is no expected output, no transformed output, or an error occurred
+        if self.task_pair.output is None or self.transformed_output is None or self.error is not None:
+            return False
+        # Check shape first for efficiency and to avoid errors with array_equal on different shapes
+        if self.transformed_output.grid.shape != self.task_pair.output.grid.shape:
             return False
         return np.array_equal(self.transformed_output.grid, self.task_pair.output.grid) # Compare NumPy arrays
 
     @property
-    def size_correct(self) -> bool:
-        if self.transformed_output is None:
-            return False
+    def size_correct(self) -> bool | None:
+        # Cannot compare size if expected or transformed output is missing
+        if self.task_pair.output is None or self.transformed_output is None:
+            return None
         return self.transformed_output.grid.shape == self.task_pair.output.grid.shape # Use Grid's shape
 
     @property
-    def color_palette_correct(self) -> bool:
-        if self.transformed_output is None:
-            return False
+    def color_palette_correct(self) -> bool | None:
+        # Cannot compare palettes if expected or transformed output is missing
+        if self.task_pair.output is None or self.transformed_output is None:
+            return None
         transformed_colors = set(np.unique(self.transformed_output.grid)) # Use Grid's grid
         expected_colors = set(np.unique(self.task_pair.output.grid))
         return transformed_colors.issubset(expected_colors)
 
     @property
-    def color_count_correct(self) -> bool:
-        if self.transformed_output is None:
-            return False
+    def color_count_correct(self) -> bool | None:
+        # Cannot compare counts if expected or transformed output is missing
+        if self.task_pair.output is None or self.transformed_output is None:
+            return None
         transformed_counts = dict(
             zip(*np.unique(self.transformed_output.grid, return_counts=True)) # Use Grid's grid
         )
@@ -72,15 +82,19 @@ class TaskPairTrial:
 
     @property
     def pixels_off(self) -> int | None:
-        if self.transformed_output is None or not self.size_correct:
+        # Cannot calculate pixels off if expected output is missing,
+        # transformed output is missing, or sizes don't match
+        if self.task_pair.output is None or self.transformed_output is None or not self.size_correct:
             return None
         return int(np.sum(self.transformed_output.grid != self.task_pair.output.grid)) # Use Grid's grid
 
     @property
     def percent_correct(self) -> float | None:
-        if self.pixels_off is None:
+        # Cannot calculate percent correct if pixels_off is None (due to missing grids or size mismatch)
+        # or if expected output grid size is zero.
+        if self.pixels_off is None or self.task_pair.output is None or self.task_pair.output.grid.size == 0:
             return None
-        return 100 * (
+        return 100.0 * ( # Use float division
             (self.task_pair.output.grid.size - self.pixels_off)
             / self.task_pair.output.grid.size
         )
@@ -89,16 +103,18 @@ class TaskPairTrial:
     def score(self) -> float | None:
         """Calculates a score representing the difference between
         transformed and expected output."""
-        if self.match:
-            return 0
-
-        if self.transformed_output is None or self.error is not None:
-            return None  # No score if no transformation or error
-
-        if self.pixels_off is None:  # Should not happen, but handle for safety
+        # No score if there's no expected output to compare against
+        if self.task_pair.output is None:
             return None
 
-        score = 100 - self.percent_correct
+        if self.match:
+            return 0.0 # Return float
+
+        # No score if no transformation, error occurred, or basic metrics are unavailable
+        if self.transformed_output is None or self.error is not None or self.pixels_off is None or self.percent_correct is None:
+            return None
+
+        score = 100.0 - self.percent_correct # Start with float
 
         if not self.color_count_correct:
             score *= 2
@@ -118,8 +134,11 @@ class TaskPairTrial:
             "match": self.match,
             "score": self.score,
             "input": self.input_string,
-            "expected_output": self.expected_output_string,
+            # Only include expected_output if it exists
+            # "expected_output": self.expected_output_string,
         }
+        if self.expected_output_string is not None:
+             data["expected_output"] = self.expected_output_string
         if self.transformed_output_string is not None:
             data["transformed_output"] = self.transformed_output_string
         if self.error is not None:
@@ -147,12 +166,24 @@ class TaskPairTrial:
                 report += f"Function Output:\n```\n{self.function_output}\n```\n"
         else:
             report += f"Input:\n```\n{self.input_string}\n```\n"
-            report += f"Expected Output:\n```\n{self.expected_output_string}\n```\n"
-            report += f"Transformed Output:\n```\n{self.transformed_output_string}\n```\n"
-            report += f"Match: {self.match}\n"
-            report += f"Pixels Off: {self.pixels_off}\n"
-            report += f"Size Correct: {self.size_correct}\n"
-            report += f"Color Palette Correct: {self.color_palette_correct}\n"
-            report += f"Color Count Correct: {self.color_count_correct}\n"
-            report += f"Score: {self.score}\n"
+            if self.expected_output_string is not None:
+                report += f"Expected Output:\n```\n{self.expected_output_string}\n```\n"
+            else:
+                report += "Expected Output: None\n" # Indicate no expected output
+
+            if self.transformed_output_string is not None:
+                report += f"Transformed Output:\n```\n{self.transformed_output_string}\n```\n"
+            else:
+                report += "Transformed Output: None\n" # Indicate no transformed output
+
+            # Only show comparison metrics if expected output exists
+            if self.task_pair.output is not None:
+                report += f"Match: {self.match}\n"
+                report += f"Pixels Off: {self.pixels_off}\n"
+                report += f"Size Correct: {self.size_correct}\n"
+                report += f"Color Palette Correct: {self.color_palette_correct}\n"
+                report += f"Color Count Correct: {self.color_count_correct}\n"
+                report += f"Score: {self.score}\n"
+            else:
+                report += "Comparison Metrics: N/A (No Expected Output)\n"
         return report

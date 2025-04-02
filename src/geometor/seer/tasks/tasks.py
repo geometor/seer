@@ -32,7 +32,7 @@ class TaskPair(dict):
     @property
     def size_change(self):
         if self.output is None:
-            return None
+            return None # No size change if there's no output grid
         return {
             "width": self.output.width - self.input.width,
             "height": self.output.height - self.input.height,
@@ -41,17 +41,21 @@ class TaskPair(dict):
 
     @property
     def colors(self):
-        return self.input.colors.union(self.output.colors if self.output else set())
+        # Returns colors from input and output (if output exists)
+        if self.output:
+            return self.input.colors.union(self.output.colors)
+        return self.input.colors # Only input colors if no output
 
     @property
     def color_changes(self):
         if self.output is None:
-            return None
+            return None # No color changes if there's no output grid
         input_counts = self.input.color_counts
         output_counts = self.output.color_counts
+        all_colors = self.input.colors.union(self.output.colors) # Use combined colors
         return {
             color: output_counts.get(color, 0) - input_counts.get(color, 0)
-            for color in self.colors
+            for color in all_colors
         }
 
 
@@ -147,9 +151,10 @@ class Task:
 
             output_row = []
             for i, pair in enumerate(task_set):
-                output_row.append(pair.output.to_image(add_text=False))
+                # Handle cases where output might be None (e.g., test pairs)
+                output_image = pair.output.to_image(add_text=False) if pair.output else None
+                output_row.append(output_image)
             images.append(output_row)
-
 
             if result_set and "trials" in result_set:
                 result_row = []
@@ -213,8 +218,13 @@ class Task:
             for row_id, row in enumerate(images):
                 x_offset = 0
                 for col_id, img in enumerate(row):
-                    if img:
-                        table_image.paste(img, (x_offset, y_offset))
+                    if img: # Check if img is not None before pasting
+                        # Center the image within its allocated cell space if needed
+                        # For simplicity, we'll just paste at the top-left for now.
+                        # Adjust paste position if centering or alignment is desired.
+                        paste_x = x_offset
+                        paste_y = y_offset
+                        table_image.paste(img, (paste_x, paste_y))
                     x_offset += col_widths[col_id] + col_spacing
                 y_offset += row_heights[row_id] + row_spacing
 
