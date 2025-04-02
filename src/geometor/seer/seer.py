@@ -39,8 +39,8 @@ class Seer:
         self.max_iterations = config["max_iterations"]
         self.use_images = config.get("use_images", False)
 
-    def run(self, tasks: Tasks, description: str): # ADD description parameter
-        session = Session(self.config, description) # PASS description to Session
+    def run(self, tasks: Tasks, output_dir: Path, description: str): # ADD description parameter
+        session = Session(self.config, output_dir, description) # PASS description to Session
 
         for task in tasks:
             self.solve(session, task)
@@ -68,13 +68,13 @@ class Seer:
         # STEP: dreamer *****************************
         title = "investigate • dreamer • all training" # Define title here for except block
         try:
-            prompt = []
+            content = []
             for i, pair in enumerate(task.train, 1):
-                prompt.extend(get_pair_prompt(f"train_{i}", pair, self.use_images))
+                content.extend(get_pair_prompt(f"train_{i}", pair, self.use_images))
 
             if self.use_images:
                 #  show full task image
-                prompt.append(task.to_image(show_test=False))
+                content.append(task.to_image(show_test=False))
 
             instructions = [self.instructions["investigate_dreamer"]]
 
@@ -83,12 +83,12 @@ class Seer:
                 "dreamer",
                 title,
                 history,
-                prompt,
+                content,
                 instructions,
                 tools="code_execution",
             )
 
-            history.extend(prompt)
+            history.extend(content)
             history.extend(task_step.response_parts)
 
             task_step.run_trials()
@@ -113,13 +113,13 @@ class Seer:
         title = "investigate • coder • all training" # Define title here for except block
         try:
             instructions = [self.instructions["investigate_coder"]]
-            prompt = [""] # Minimal prompt for coder based on history
+            content = [""] # Minimal content for coder based on history
             task_step = self._generate(
                 session_task,
                 "coder",
                 title,
                 history, # History includes dreamer prompt and response
-                prompt,
+                content,
                 instructions,
                 #  tools="code_execution", # Coder might not need tools initially
             )
@@ -221,7 +221,7 @@ class Seer:
         role_name: str,
         title: str,
         history: list,
-        prompt: list,
+        content: list,
         instructions: list,
         tools=None,
         functions=None,
@@ -231,7 +231,7 @@ class Seer:
         """
 
         # init step
-        task_step = session_task.add_step(title, history, prompt, instructions)
+        task_step = session_task.add_step(title, history, content, instructions)
 
         # --- Start of improved retry logic ---
         client = self.roles[role_name]
@@ -241,7 +241,7 @@ class Seer:
         valid_response_received = False # Flag to track success
 
         while task_step.attempts < max_retries:
-            total_prompt = history + prompt + instructions
+            total_prompt = history + content + instructions
 
             # If not the first attempt, wait before retrying
             if task_step.attempts > 0:
@@ -335,24 +335,24 @@ class Seer:
         # STEP: refine dreamer *****************************
         title = f"refine • {current_iteration} • dreamer" # Define title for except block
         try:
-            prompt = []
+            content = []
             instructions = [self.instructions["refine_dreamer"]]
 
-            prompt.append("\nPrevious Code:\n")
-            prompt.append(f"```python\n{code}\n```\n")
-            prompt.append(code_trial.generate_report())
+            content.append("\nPrevious Code:\n")
+            content.append(f"```python\n{code}\n```\n")
+            content.append(code_trial.generate_report())
 
             task_step = self._generate(
                 session_task,
                 "dreamer",
                 title,
                 current_history, # Pass the history up to this point
-                prompt,
+                content,
                 instructions,
                 tools="code_execution",
             )
             # Update history *within this refinement iteration*
-            current_history.extend(prompt)
+            current_history.extend(content)
             current_history.extend(task_step.response_parts)
 
             task_step.run_trials()
@@ -379,7 +379,7 @@ class Seer:
         # This step only runs if the dreamer step didn't succeed but also didn't fail critically.
         title = f"refine • {current_iteration} • coder" # Define title for except block
         try:
-            prompt = [""]  # Coder prompt might be minimal, relies on history
+            content = [""]  # Coder prompt might be minimal, relies on history
             instructions = [self.instructions["refine_coder"]]
 
             # Use the updated current_history (including dreamer output)
@@ -388,7 +388,7 @@ class Seer:
                 "coder",
                 title,
                 current_history, # Pass history including dreamer's output
-                prompt,
+                content,
                 instructions,
                 #  tools="code_execution" # Coder might not need tools
             )

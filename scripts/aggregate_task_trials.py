@@ -34,10 +34,10 @@ def find_task_ids_in_folder(folder_path: Path) -> set[str]:
 def main():
     # --- Hardcoded Configuration ---
     # Set these values directly before running the script
-    MATCH_FOLDER_PATH = Path("./sessions/24.197.1500-reference") # Folder with tasks to match
-    DESTINATION_FOLDER_PATH = Path("./aggregated_sessions") # Root folder for results
-    SEARCH_FOLDER_PATH = Path("./sessions") # Folder containing sessions to search
-    DRY_RUN = True # Set to False to actually move/copy files, True to simulate
+    MATCH_FOLDER_PATH = Path("/home/phi/PROJECTS/geometor/seer_sessions/sessions_ARCv2_eval/25.085.0644") # Folder with tasks to match
+    DESTINATION_FOLDER_PATH = Path("/home/phi/PROJECTS/geometor/seer_sessions/sessions_ARCv2_eval") # Root folder for results
+    SEARCH_FOLDER_PATH = Path("/home/phi/PROJECTS/geometor/seer_sessions/sessions") # Folder containing sessions to search
+    DRY_RUN = False # Set to False to actually move/copy files, True to simulate
     VERBOSE = True # Set to True for detailed logging
     # --- End Hardcoded Configuration ---
 

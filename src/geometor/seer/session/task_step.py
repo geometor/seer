@@ -22,7 +22,7 @@ class TaskStep(Level):
         self,
         title: str,
         history: list,
-        prompt: list,
+        content: list,
         instructions: list,
         session_task: SessionTask,
     ):
@@ -42,11 +42,11 @@ class TaskStep(Level):
         self.step_code_trials = StepCodeTrials(self)  # Use StepCodeTrials
 
         self.history = history
-        self.log_markdown("history", history)
-        self.prompt = prompt
-        self.log_markdown("prompt", prompt)
+        self.log_markdown("prompt_history", history)
+        self.content = content
+        self.log_markdown("prompt_content", content)
         self.instructions = instructions
-        self.log_markdown("instructions", instructions)
+        self.log_markdown("prompt_instructions", instructions)
 
         print(f"        {self.index} • {self.title}")
 

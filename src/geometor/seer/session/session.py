@@ -8,15 +8,16 @@ from geometor.seer.session.level import Level
 
 
 class Session(Level):
-    def __init__(self, config: dict, description: str): # ADD description parameter
+    def __init__(self, config: dict, output_dir: Path, description: str): # ADD description parameter
         self.config = config
         self.description = description # STORE description
         self.tasks = {}
 
-        output_dir = Path(config["output_dir"])
+        #  output_dir = Path(config["output_dir"])
+        output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now().strftime("%y.%j.%H%M")
-        super().__init__(None, str(output_dir / timestamp))
+        super().__init__(None, output_dir / timestamp)
 
         self._write_context_files()
 
