@@ -135,7 +135,7 @@ class SessionTask(Level):
         self._write_to_json("index.json", summary)
 
     def _summarize_trial_results(self, results):
-        """Helper function to summarize trial results (moved from TaskStep)."""
+        """Helper function to summarize trial results."""
         num_trials = len(results)
         num_passed = sum(1 for r in results if r.match)
         num_failed = num_trials - num_passed
@@ -147,10 +147,13 @@ class SessionTask(Level):
         }
         return summary
 
-    def add_step(self, title, history, prompt, instructions):
-        from geometor.seer.session import TaskStep
+    # Add model_name parameter with a default value for backward compatibility if needed
+    def add_step(self, title: str, history: list, content: list, instructions: list, model_name: str | None = None):
+        """Adds a new step to the task."""
+        from geometor.seer.session import TaskStep # Keep local import
 
-        task_step = TaskStep(title, history, prompt, instructions, self)
+        # Pass model_name to TaskStep constructor
+        task_step = TaskStep(title, history, content, instructions, self, model_name)
         self.steps.append(task_step)
         return task_step
 

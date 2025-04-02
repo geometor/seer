@@ -22,14 +22,16 @@ class TaskStep(Level):
         self,
         title: str,
         history: list,
-        content: list,
+        content: list, # Renamed from prompt in SessionTask.add_step call
         instructions: list,
         session_task: SessionTask,
+        model_name: str | None = None, # Add model_name parameter
     ):
         index = f"{len(session_task.steps):03d}"
         super().__init__(session_task, index)
 
         self.session_task = session_task  # parent
+        self.model_name = model_name # Store the model name
         self.title = title
         self.index = index
 
@@ -79,8 +81,10 @@ class TaskStep(Level):
             summary.update({
                 "title": self.title,
                 "index": self.index,
+                "model_name": self.model_name, # Add model_name to summary
                 "response": {
                     "response_time": self.response_time,
+                    # Token counts are added later if available
                 },
                 "trials": {},
                 "codes": {},
