@@ -320,10 +320,12 @@ class CodeTrial:
                         elif not isinstance(transformed_output[0], list):
                             # Case: Single row (list, but not list of lists)
                             transformed_output = [transformed_output]
-                    # Ensure it's a NumPy array
-                    #  if transformed_output is not None:
-                        #  transformed_output = np.array(transformed_output)
 
+                    # Ensure it's a NumPy array if not None
+                    if transformed_output is not None:
+                        transformed_output = np.array(transformed_output, dtype=int) # Assume int dtype
+
+                    # Create TaskPairTrial - it handles None transformed_output internally
                     trial = TaskPairTrial(
                         pair, transformed_output=transformed_output
                     )
