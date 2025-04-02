@@ -1,33 +1,56 @@
+# Standard library imports
 from __future__ import annotations
-
 from pathlib import Path
 import json
 from datetime import datetime
+import traceback # Import traceback for detailed error logging
 
+# Local application/library specific imports
+from geometor.seer.config import Config # Import the new Config class
 from geometor.seer.session.level import Level
+# Avoid circular import if SessionTask imports Session
+# from geometor.seer.session.session_task import SessionTask
 
 
 class Session(Level):
-    def __init__(self, config: dict, output_dir: Path, description: str): # ADD description parameter
-        self.config = config
-        self.description = description # STORE description
-        self.tasks = {}
+    # Change type hint from dict to Config
+    def __init__(self, config: Config, output_dir: Path, description: str):
+        """
+        Initializes a new session.
 
-        #  output_dir = Path(config["output_dir"])
+        Args:
+            config: The loaded Config object.
+            output_dir: The root directory where session data will be saved.
+            description: A user-provided description for this session.
+        """
+        self.config = config # Store the Config object
+        self.description = description
+        self.tasks = {} # Dictionary to hold SessionTask objects, keyed by task ID
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now().strftime("%y.%j.%H%M")
         super().__init__(None, output_dir / timestamp)
 
-        self._write_context_files()
+        try:
+            self._write_context_files()
+        except Exception as e:
+            # Log error during context file writing but continue session initialization
+            error_context = "Error during initial context file writing"
+            print(f"ERROR ({self.name}): {error_context} - {e}")
+            # Use traceback for detailed logging if available
+            detailed_error = f"{error_context}\n{traceback.format_exc()}"
+            # Assuming Level has log_error or similar
+            # self.log_error(e, detailed_error) # Log the detailed error
 
-        print(timestamp)
+        print(f"Session started: {timestamp}") # More informative message
 
     def summarize(self):
-        summary = super().summarize()
-        summary["description"] = self.description # ADD description to summary
-        summary["count"] = len(self.tasks)
-        summary["train_passed"] = self.train_passed_count  # Use count property
+        """Generates and saves a summary of the session."""
+        summary = super().summarize() # Get base summary (errors, duration)
+        summary["description"] = self.description
+        summary["task_count"] = len(self.tasks)
+        summary["train_passed_count"] = self.train_passed_count  # Use count property
+        summary["test_passed_count"] = self.test_passed_count    # Use count property
         summary["test_passed"] = self.test_passed_count    # Use count property
 
         # Aggregate trial counts and tokens from each SessionTask
@@ -103,42 +126,73 @@ class Session(Level):
         # --- END ADDED TOKENS TO SUMMARY ---
         summary["errors"]["count"] = total_error_count # Update with aggregated count
 
+        # Save the summary
         self._write_to_json("index.json", summary)
+        print(f"Session summary generated: {self.dir / 'index.json'}") # Confirmation message
 
     def add_task(self, task):
+        """Adds a new task to the session."""
+        # Import locally to prevent circular dependency issues at module level
         from geometor.seer.session.session_task import SessionTask
 
-        session_task = SessionTask(self, task)
+        session_task = SessionTask(self, task) # Pass self (Session instance) and task
         self.tasks[task.id] = session_task
         return session_task
 
     def _write_context_files(self):
-        """Writes system context files for each role and the task context."""
+        """
+        Writes copies of the configuration and context files used for this session
+        into the session directory for reference.
+        """
+        # Write system context for each role
         try:
-            for role_name, role_config in self.config["roles"].items():
-                system_context_file = role_config["system_context_file"]
-                with open(system_context_file, "r") as f:
-                    system_context = f.read().strip()
-                (self.dir / f"{role_name}_system_context.md").write_text(
-                    system_context
-                )
-        except (FileNotFoundError, IOError, PermissionError) as e:
-            print(f"Error writing context files: {e}")
-            self.log_error(f"Error writing context files: {e}")
+            # Access roles and their pre-loaded content via the Config object
+            for role_name, role_config in self.config.roles.items():
+                system_context_content = role_config.get("system_context_content")
+                if system_context_content is not None:
+                    file_path = self.dir / f"{role_name}_system_context.md"
+                    file_path.write_text(system_context_content, encoding='utf-8')
+                else:
+                    # Log warning if content is missing but expected
+                    print(f"Warning (Session {self.name}): No system context content found for role '{role_name}' to write.")
+        except (IOError, PermissionError, Exception) as e:
+            # Log error more robustly
+            error_context = "Error writing system context files"
+            print(f"ERROR ({self.name}): {error_context} - {e}")
+            # self.log_error(e, f"{error_context}\n{traceback.format_exc()}")
 
+
+        # Write the original config data (or a filtered version) as JSON
         try:
-            with open(self.dir / "config.json", "w") as f:
-                json.dump(self.config, f, indent=2)
-        except (IOError, PermissionError) as e:
-            print(f"Error writing config file: {e}")
-            self.log_error(f"Error writing config file: {e}")
+            config_data_to_write = self.config.data # Get the dictionary representation
+            file_path = self.dir / "config.json"
+            with open(file_path, "w", encoding='utf-8') as f:
+                # Use default=str to handle non-serializable types like Path
+                json.dump(config_data_to_write, f, indent=2, default=str)
+        except (IOError, PermissionError, TypeError, Exception) as e:
+            error_context = "Error writing config.json"
+            print(f"ERROR ({self.name}): {error_context} - {e}")
+            # self.log_error(e, f"{error_context}\n{traceback.format_exc()}")
 
-        with open(self.config["task_context_file"], "r") as f:
-            task_context = f.read().strip()
-        (self.dir / "task_context.md").write_text(task_context)
+
+        # Write the task context content
+        try:
+            # Access pre-loaded task context content
+            task_context_content = self.config.task_context
+            if task_context_content: # Only write if not empty
+                file_path = self.dir / "task_context.md"
+                file_path.write_text(task_context_content, encoding='utf-8')
+            else:
+                print(f"Warning (Session {self.name}): No task context content found to write.")
+        except (IOError, PermissionError, Exception) as e:
+            error_context = "Error writing task_context.md"
+            print(f"ERROR ({self.name}): {error_context} - {e}")
+            # self.log_error(e, f"{error_context}\n{traceback.format_exc()}")
+
 
     @property
     def train_passed(self):
+        """Checks if any task in the session passed the training set."""
         return any(task.train_passed for task in self.tasks.values())
 
     @property

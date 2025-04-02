@@ -5,12 +5,15 @@ It interacts with the Gemini model, manages the session, handles logging,
 and controls the flow of execution for analyzing examples and generating solutions.
 """
 
+# Standard library imports
 from __future__ import annotations
-from typing import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, List, Any
 from datetime import datetime
-import time  # Added for retry delay
+import time
+from pathlib import Path # Ensure Path is imported
 
+# Local application/library specific imports
+from geometor.seer.config import Config # Import the new Config class
 from geometor.seer.session import Session, SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
@@ -24,23 +27,57 @@ from geometor.seer.trials.code_trial import CodeTrial
 
 
 class Seer:
-    def __init__(self, config: dict):
-        self.config = config
+    # Change type hint from dict to Config
+    def __init__(self, config: Config):
+        """
+        Initializes the Seer orchestrator.
 
-        self.roles = {}
-        for role_name, role_config in config["roles"].items():
-            self.roles[role_name] = Client(self.config, role_name)
+        Args:
+            config: The loaded Config object containing all settings.
 
-        self.instructions = {}
-        for key, instruction_file in config["instructions"].items():
-            with open(instruction_file, "r") as f:
-                self.instructions[key] = f.read().strip()
+        Raises:
+            ValueError: If essential configuration is missing or invalid.
+            RuntimeError: If GeminiClient initialization fails.
+        """
+        self.config = config # Store the Config object
 
-        self.max_iterations = config["max_iterations"]
-        self.use_images = config.get("use_images", False)
+        # Initialize Gemini clients for each role defined in the config
+        self.roles: Dict[str, Client] = {}
+        try:
+            # Access roles via the Config object's property
+            for role_name in config.roles.keys():
+                # Pass the whole Config object and the role name to the client constructor
+                self.roles[role_name] = Client(config, role_name)
+        except Exception as e:
+            # Catch errors during client initialization (e.g., missing API key, model init failure)
+            raise RuntimeError(f"Failed to initialize Gemini clients: {e}") from e
 
-    def run(self, tasks: Tasks, output_dir: Path, description: str): # ADD description parameter
-        session = Session(self.config, output_dir, description) # PASS description to Session
+        # Instructions are now pre-loaded by the Config object
+        # Access instructions via the property (content is already loaded)
+        self.instructions: Dict[str, str] = config.instructions
+        if not self.instructions:
+             print("Warning: No instructions loaded from configuration.")
+
+        # Access other configuration parameters via properties
+        self.max_iterations = config.max_iterations
+        self.use_images = config.use_images
+
+        # Ensure essential roles are present
+        if "dreamer" not in self.roles or "coder" not in self.roles:
+            raise ValueError("Configuration must define at least 'dreamer' and 'coder' roles.")
+
+
+    def run(self, tasks: Tasks, output_dir: Path, description: str):
+        """
+        Runs the task-solving process for a collection of tasks.
+
+        Args:
+            tasks: A Tasks object containing the tasks to solve.
+            output_dir: The root directory for saving session output.
+            description: A description for this session run.
+        """
+        # Pass the Config object to the Session constructor
+        session = Session(self.config, output_dir, description)
 
         for task in tasks:
             self.solve(session, task)
@@ -76,7 +113,11 @@ class Seer:
                 #  show full task image
                 content.append(task.to_image(show_test=False))
 
-            instructions = [self.instructions["investigate_dreamer"]]
+            # Access instruction content directly from the pre-loaded dictionary
+            instruction_content = self.instructions.get("investigate_dreamer")
+            if not instruction_content:
+                raise ValueError("Missing instruction: 'investigate_dreamer'")
+            instructions = [instruction_content]
 
             task_step = self._generate(
                 session_task,
@@ -112,7 +153,12 @@ class Seer:
         # STEP: coder *********************************
         title = "investigate • coder • all training" # Define title here for except block
         try:
-            instructions = [self.instructions["investigate_coder"]]
+            # Access instruction content directly
+            instruction_content = self.instructions.get("investigate_coder")
+            if not instruction_content:
+                raise ValueError("Missing instruction: 'investigate_coder'")
+            instructions = [instruction_content]
+
             content = [""] # Minimal content for coder based on history
             task_step = self._generate(
                 session_task,
@@ -218,36 +264,48 @@ class Seer:
     def _generate(
         self,
         session_task: SessionTask,
-        role_name: str,
-        title: str,
-        history: list,
-        content: list,
-        instructions: list,
-        tools=None,
-        functions=None,
+        role_name: str, # e.g., "dreamer", "coder"
+        title: str,     # Title for the step being generated
+        history: List[Any], # Conversation history (text, images)
+        content: List[Any], # New content for this turn (text, images)
+        instructions: List[str], # Specific instructions for this turn
+        tools: Union[List[Callable], str, None] = None, # Tools (functions or "code_execution")
+        # functions argument seems redundant if tools handles function calling
+        # functions=None,
     ):
         """
         Generate content from the model, handling logging and retries.
         """
 
-        # init step
-        task_step = session_task.add_step(title, history, content, instructions)
+        # Ensure the role exists
+        client = self.roles.get(role_name)
+        if not client:
+            # Log error at session_task level? Or raise immediately?
+            # Raising immediately might be better to stop faulty execution flow.
+            raise ValueError(f"Invalid role name '{role_name}' provided to _generate.")
+
+        # init step - Pass the client's model name for potential logging/debugging
+        task_step = session_task.add_step(title, history, content, instructions, client.model_name)
 
         # --- Start of improved retry logic ---
-        client = self.roles[role_name]
-        max_retries = 2 # TODO: Make configurable?
+        # Get max_retries from config, fallback to default
+        max_retries = self.config.get("max_retries", 2)
         response = None
         start_time = datetime.now()  # Start timer before loop
         valid_response_received = False # Flag to track success
 
         while task_step.attempts < max_retries:
-            total_prompt = history + content + instructions
+            # Combine history, new content, and instructions for the prompt
+            # Ensure all parts are suitable for the API (e.g., strings, PIL Images)
+            # The GeminiClient expects a List[Any] where Any can be str or Image.
+            total_prompt: List[Any] = history + content + instructions
 
             # If not the first attempt, wait before retrying
             if task_step.attempts > 0:
-                timeout = 10 # TODO: Make configurable or use backoff?
-                print(f"            ...waiting {timeout} seconds before retry ({task_step.attempts + 1}/{max_retries})")
-                time.sleep(timeout)
+                # Get retry delay from config, fallback to default
+                retry_delay = self.config.get("retry_delay_seconds", 10)
+                print(f"            ...waiting {retry_delay} seconds before retry ({task_step.attempts + 1}/{max_retries})")
+                time.sleep(retry_delay)
 
             task_step.attempts += 1
             current_attempt = task_step.attempts # For logging clarity
@@ -336,7 +394,11 @@ class Seer:
         title = f"refine • {current_iteration} • dreamer" # Define title for except block
         try:
             content = []
-            instructions = [self.instructions["refine_dreamer"]]
+            # Access instruction content directly
+            instruction_content = self.instructions.get("refine_dreamer")
+            if not instruction_content:
+                raise ValueError("Missing instruction: 'refine_dreamer'")
+            instructions = [instruction_content]
 
             content.append("\nPrevious Code:\n")
             content.append(f"```python\n{code}\n```\n")
@@ -380,7 +442,11 @@ class Seer:
         title = f"refine • {current_iteration} • coder" # Define title for except block
         try:
             content = [""]  # Coder prompt might be minimal, relies on history
-            instructions = [self.instructions["refine_coder"]]
+            # Access instruction content directly
+            instruction_content = self.instructions.get("refine_coder")
+            if not instruction_content:
+                raise ValueError("Missing instruction: 'refine_coder'")
+            instructions = [instruction_content]
 
             # Use the updated current_history (including dreamer output)
             task_step = self._generate(
