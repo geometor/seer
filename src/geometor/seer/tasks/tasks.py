@@ -77,7 +77,8 @@ class Task:
 
     @property
     def weight(self):
-        return sum(pair.weight for pair in self.all_pairs)
+        #  return sum(pair.weight for pair in self.all_pairs)
+        return sum(pair.weight for pair in self.train)
 
     @property
     def colors(self):

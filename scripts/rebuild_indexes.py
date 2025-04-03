@@ -435,26 +435,26 @@ def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
 # --- Main Execution ---
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Rebuild index.json files for sessions, tasks, and steps."
-    )
-    parser.add_argument(
-        "sessions_root",
-        type=str,
-        nargs="?",
-        default="./sessions",
-        help="Path to the root directory containing session folders (default: ./sessions)",
-    )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable debug logging"
-    )
+    #  parser = argparse.ArgumentParser(
+        #  description="Rebuild index.json files for sessions, tasks, and steps."
+    #  )
+    #  parser.add_argument(
+        #  "sessions_root",
+        #  type=str,
+        #  nargs="?",
+        #  default="./sessions",
+        #  help="Path to the root directory containing session folders (default: ./sessions)",
+    #  )
+    #  parser.add_argument(
+        #  "-v", "--verbose", action="store_true", help="Enable debug logging"
+    #  )
 
-    args = parser.parse_args()
+    #  args = parser.parse_args()
 
-    if args.verbose:
-        logging.getLogger().setLevel(logging.DEBUG)
+    #  if args.verbose:
+        #  logging.getLogger().setLevel(logging.DEBUG)
 
-    sessions_root_path = Path(args.sessions_root)
+    sessions_root_path = Path("../../seer_sessions/session_002")
 
     if not sessions_root_path.is_dir():
         logging.error(f"Sessions root directory not found: {sessions_root_path}")
