@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, List, Any, Dict, Union, Callable
 from datetime import datetime
 import time
 from pathlib import Path # Ensure Path is imported
+import json # Add json import
 
 # Local application/library specific imports
 from geometor.seer.config import Config # Import the new Config class
