@@ -83,6 +83,7 @@ class Seer:
             self.solve(session, task)
 
         session.summarize()
+        self._generate_submission_file(session) # Add call to generate submission file
 
     def solve(self, session: Session, task: Task):
         session_task = session.add_task(task)
@@ -259,6 +260,86 @@ class Seer:
             current_iteration += 1
 
         print(f"            INFO: Reached max iterations ({self.max_iterations}) without solving task {task.id}.")
+
+
+    def _generate_submission_file(self, session: Session):
+        """
+        Generates the submission.json file based on the best test predictions
+        for tasks that passed training. Uses the specific Kaggle format provided.
+        """
+        submission_data = {}
+        print("\nGenerating submission file...")
+
+        for task_id, session_task in session.tasks.items():
+            best_task_trial: CodeTrial | None = None
+
+            # Find the best trial from the latest step that passed training
+            for step in reversed(session_task.steps): # Check latest steps first
+                if step.train_passed is True:
+                    # Assuming get_best_trial() gives the best trial *for that step*
+                    step_best_trial = step.step_code_trials.get_best_trial()
+                    if step_best_trial:
+                        best_task_trial = step_best_trial
+                        break # Found the best trial from the latest successful step
+
+            if not best_task_trial:
+                print(f"    Skipping task {task_id}: No successful training step found.")
+                continue
+
+            # Check if the best trial has test results and at least one trial
+            if (best_task_trial.test_results and
+                best_task_trial.test_results.get("trials") and
+                len(best_task_trial.test_results["trials"]) > 0):
+
+                first_test_pair_trial = best_task_trial.test_results["trials"][0]
+                predicted_grid_obj = first_test_pair_trial.transformed_output
+
+                if predicted_grid_obj and isinstance(predicted_grid_obj, Grid):
+                    try:
+                        # Convert grid to list of lists
+                        # Assuming Grid object stores data in .grid attribute which might be numpy array
+                        if hasattr(predicted_grid_obj.grid, 'tolist'):
+                            output_list = predicted_grid_obj.grid.tolist()
+                        elif isinstance(predicted_grid_obj.grid, list):
+                             output_list = predicted_grid_obj.grid
+                        else:
+                             raise TypeError("Grid data is not a list or numpy array.")
+
+                        # Add to submission data using the specified format
+                        submission_data[task_id] = [
+                            {
+                                "attempt_1": output_list,
+                                "attempt_2": None,  # Explicitly None (null in JSON)
+                            }
+                        ]
+                        print(f"    Added prediction for task {task_id}")
+
+                    except (AttributeError, TypeError, Exception) as e:
+                         print(f"    ERROR processing grid for task {task_id}: {e}")
+                         session_task.log_error(e, f"Error converting predicted grid for submission file for task {task_id}")
+                else:
+                    print(f"    Skipping task {task_id}: No valid predicted grid found for the first test pair in the best trial.")
+                    # Log this potentially unexpected situation
+                    if best_task_trial:
+                         session_task.log_warning(f"Best trial for task {task_id} found, but no valid predicted grid for first test pair.", "Submission Generation")
+
+            else:
+                print(f"    Skipping task {task_id}: Best trial found, but no test results available.")
+                # Log this potentially unexpected situation
+                if best_task_trial:
+                     session_task.log_warning(f"Best trial for task {task_id} found, but no test results available.", "Submission Generation")
+
+
+        # Write the submission file
+        submission_file_path = session.dir / "submission.json"
+        try:
+            with open(submission_file_path, "w") as f:
+                json.dump(submission_data, f, indent=2)
+            print(f"Submission file generated: {submission_file_path}")
+        except (IOError, TypeError) as e:
+            print(f"    ERROR writing submission file: {e}")
+            # Log error at the session level
+            session.log_error(e, "Failed to write submission.json")
 
 
     def _generate(

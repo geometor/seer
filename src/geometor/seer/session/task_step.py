@@ -439,6 +439,22 @@ class TaskStep(Level):
     def test_passed(self):
         return self.step_code_trials.any_test_passed  # Consistent with summarize
 
+
+    def log_warning(self, message: str, context: str = ""):
+        """Logs a warning message to the step's warnings.txt."""
+        # Delegate to parent (SessionTask) or implement directly if Level gets log_warning
+        # For now, let's delegate to SessionTask which has the method
+        if hasattr(self.session_task, 'log_warning'):
+             # Prepend step context
+             full_context = f"Step {self.index} ({self.title})"
+             if context:
+                 full_context += f" - {context}"
+             self.session_task.log_warning(message, full_context)
+        else:
+             # Fallback if parent doesn't have it (should not happen with current code)
+             print(f"        WARNING (Step {self.index}): {message}" + (f" (Context: {context})" if context else ""))
+
+
     @property
     def get_python(self) -> dict:
         """Safely returns the Python code dictionary or an empty dictionary."""

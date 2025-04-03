@@ -165,10 +165,10 @@ class SessionTask(Level):
     def test_passed(self):
         return any(step.test_passed is True for step in self.steps)  # Check for True
 
-    # --- Start of added method ---
+
     def log_warning(self, message: str, context: str = ""):
         """Logs a warning message to the task's warnings.txt."""
-        # This method might be better placed in the Level class if needed elsewhere
+        # This method is useful here, but could be moved to Level if needed more broadly
         # For now, keeping it here as requested by the context of the change.
         timestamp = datetime.now().isoformat()
         log_entry = f"[{timestamp}]"
