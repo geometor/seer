@@ -163,8 +163,11 @@ def analyze_step_trials(step_dir: Path) -> Dict[str, Any]:
 
 # --- Rebuild Functions ---
 
-def rebuild_step_summary(step_dir: Path) -> Optional[Dict[str, Any]]:
-    """Rebuilds the index.json for a single TaskStep directory."""
+def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
+    """
+    Rebuilds the index.json for a single TaskStep directory.
+    If dry_run is True, logs the intended action instead of writing the file.
+    """
     logging.debug(f"  Rebuilding Step: {step_dir.name}")
     summary = {}
     try:
@@ -236,11 +239,16 @@ def rebuild_step_summary(step_dir: Path) -> Optional[Dict[str, Any]]:
         existing_index = safe_load_json(step_dir / "index.json")
         summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
 
-        # Write the new index
+        # Write the new index or log if dry run
         output_path = step_dir / "index.json"
-        with open(output_path, "w") as f:
-            json.dump(summary, f, indent=2)
-        logging.debug(f"    -> Wrote {output_path}")
+        if dry_run:
+            logging.info(f"    DRY RUN: Would write index to {output_path}")
+            # Optionally log the summary content in dry run for debugging
+            # logging.debug(f"    DRY RUN Content:\n{json.dumps(summary, indent=2)}")
+        else:
+            with open(output_path, "w") as f:
+                json.dump(summary, f, indent=2)
+            logging.debug(f"    -> Wrote {output_path}")
         return summary
 
     except Exception as e:
@@ -249,8 +257,11 @@ def rebuild_step_summary(step_dir: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def rebuild_task_summary(task_dir: Path) -> Optional[Dict[str, Any]]:
-    """Rebuilds the index.json for a SessionTask directory."""
+def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
+    """
+    Rebuilds the index.json for a SessionTask directory.
+    If dry_run is True, logs the intended action instead of writing the file.
+    """
     logging.info(f" Rebuilding Task: {task_dir.name}")
     summary = {}
     step_summaries = []
@@ -258,7 +269,7 @@ def rebuild_task_summary(task_dir: Path) -> Optional[Dict[str, Any]]:
         # Find and rebuild step summaries first
         step_dirs = sorted([d for d in task_dir.iterdir() if d.is_dir() and d.name.isdigit()])
         for step_dir in step_dirs:
-            step_summary = rebuild_step_summary(step_dir)
+            step_summary = rebuild_step_summary(step_dir, dry_run=dry_run) # Pass dry_run down
             if step_summary:
                 step_summaries.append(step_summary)
 
@@ -328,11 +339,15 @@ def rebuild_task_summary(task_dir: Path) -> Optional[Dict[str, Any]]:
         summary["trials"] = {} # Placeholder
 
 
-        # Write the new index
+        # Write the new index or log if dry run
         output_path = task_dir / "index.json"
-        with open(output_path, "w") as f:
-            json.dump(summary, f, indent=2)
-        logging.info(f"   -> Wrote {output_path}")
+        if dry_run:
+            logging.info(f"    DRY RUN: Would write index to {output_path}")
+            # logging.debug(f"    DRY RUN Content:\n{json.dumps(summary, indent=2)}")
+        else:
+            with open(output_path, "w") as f:
+                json.dump(summary, f, indent=2)
+            logging.info(f"   -> Wrote {output_path}")
         return summary
 
     except Exception as e:
@@ -341,8 +356,11 @@ def rebuild_task_summary(task_dir: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
-    """Rebuilds the index.json for a Session directory."""
+def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
+    """
+    Rebuilds the index.json for a Session directory.
+    If dry_run is True, logs the intended action instead of writing the file.
+    """
     logging.info(f"Rebuilding Session: {session_dir.name}")
     summary = {}
     task_summaries = []
@@ -357,7 +375,7 @@ def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
         for task_dir in potential_task_dirs:
             # Simple check: does it contain step-like dirs?
             if any(sd.is_dir() and sd.name.isdigit() for sd in task_dir.iterdir()):
-                 task_summary = rebuild_task_summary(task_dir)
+                 task_summary = rebuild_task_summary(task_dir, dry_run=dry_run) # Pass dry_run down
                  if task_summary:
                      task_summaries.append(task_summary)
             else:
@@ -420,11 +438,15 @@ def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
         # summary["task_trials"] = {} # Placeholder or read from existing if needed
 
 
-        # Write the new index
+        # Write the new index or log if dry run
         output_path = session_dir / "index.json"
-        with open(output_path, "w") as f:
-            json.dump(summary, f, indent=2)
-        logging.info(f" -> Wrote {output_path}")
+        if dry_run:
+            logging.info(f"  DRY RUN: Would write index to {output_path}")
+            # logging.debug(f"  DRY RUN Content:\n{json.dumps(summary, indent=2)}")
+        else:
+            with open(output_path, "w") as f:
+                json.dump(summary, f, indent=2)
+            logging.info(f" -> Wrote {output_path}")
         return summary
 
     except Exception as e:
@@ -435,26 +457,32 @@ def rebuild_session_summary(session_dir: Path) -> Optional[Dict[str, Any]]:
 # --- Main Execution ---
 
 def main():
-    #  parser = argparse.ArgumentParser(
-        #  description="Rebuild index.json files for sessions, tasks, and steps."
-    #  )
-    #  parser.add_argument(
-        #  "sessions_root",
-        #  type=str,
-        #  nargs="?",
-        #  default="./sessions",
-        #  help="Path to the root directory containing session folders (default: ./sessions)",
-    #  )
-    #  parser.add_argument(
-        #  "-v", "--verbose", action="store_true", help="Enable debug logging"
-    #  )
+    parser = argparse.ArgumentParser(
+        description="Rebuild index.json files for sessions, tasks, and steps."
+    )
+    parser.add_argument(
+        "sessions_root",
+        type=str,
+        nargs="?",
+        default="./sessions",
+        help="Path to the root directory containing session folders (default: ./sessions)",
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable debug logging"
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform a dry run without writing any files.",
+    )
 
-    #  args = parser.parse_args()
+    args = parser.parse_args()
 
-    #  if args.verbose:
-        #  logging.getLogger().setLevel(logging.DEBUG)
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
 
-    sessions_root_path = Path("../../seer_sessions/session_002")
+    # sessions_root_path = Path("../../seer_sessions/session_002") # Use arg instead
+    sessions_root_path = Path(args.sessions_root)
 
     if not sessions_root_path.is_dir():
         logging.error(f"Sessions root directory not found: {sessions_root_path}")
@@ -469,9 +497,12 @@ def main():
         return
 
     for session_dir in session_dirs:
-        rebuild_session_summary(session_dir)
+        rebuild_session_summary(session_dir, dry_run=args.dry_run) # Pass dry_run flag
 
-    logging.info("Index rebuild process completed.")
+    if args.dry_run:
+        logging.info("DRY RUN completed. No files were modified.")
+    else:
+        logging.info("Index rebuild process completed.")
 
 
 if __name__ == "__main__":
