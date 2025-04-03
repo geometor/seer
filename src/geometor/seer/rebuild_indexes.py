@@ -464,7 +464,7 @@ def main():
         "sessions_root",
         type=str,
         nargs="?",
-        default="./sessions",
+        default=".",
         help="Path to the root directory containing session folders (default: ./sessions)",
     )
     parser.add_argument(
