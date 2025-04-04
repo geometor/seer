@@ -133,10 +133,11 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
 
         # Populate summary with analysis results
         summary["best_score"] = trial_analysis["best_score"]
-        if trial_analysis["any_train_passed"] is not None:
-             summary["train_passed"] = trial_analysis["any_train_passed"]
-        if trial_analysis["any_test_passed"] is not None:
-             summary["test_passed"] = trial_analysis["any_test_passed"]
+        # Directly assign the values returned by analyze_trial_data
+        # These keys might be missing or None if no trials were found,
+        # but should be True/False if trials were analyzed.
+        summary["train_passed"] = trial_analysis.get("any_train_passed") # Use .get() for safety
+        summary["test_passed"] = trial_analysis.get("any_test_passed") # Use .get() for safety
 
         # Add best trial metrics directly
         summary.update(trial_analysis["best_trial_metrics"])
