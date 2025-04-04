@@ -144,9 +144,9 @@ class StepCodeTrials:
         }
 
         if not code_trial_data_list:
-            # If no trials, set passed status to None explicitly and return defaults
-            results["any_train_passed"] = None
-            results["any_test_passed"] = None
+            # If no trials, set passed status to False explicitly and return defaults
+            results["any_train_passed"] = False # Return False if no trials found
+            results["any_test_passed"] = False # Return False if no trials found
             return results
 
         best_score = float('inf')
