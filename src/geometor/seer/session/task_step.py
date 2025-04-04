@@ -95,8 +95,18 @@ class TaskStep(Level):
             }
 
             # --- Analyze Trial Data using the static method ---
-            # Convert CodeTrial objects to dictionaries
-            trial_data_list = [ct.to_dict() for ct in self.step_code_trials.get_all_trials()]
+            # Convert CodeTrial objects to dictionaries, checking if method exists
+            # Note: This hasattr check is a workaround for the unexpected AttributeError.
+            # The root cause (why ct might not have to_dict) should ideally be investigated.
+            trial_data_list = [
+                ct.to_dict()
+                for ct in self.step_code_trials.get_all_trials()
+                if hasattr(ct, 'to_dict') # Check if the object has the method
+            ]
+            if not trial_data_list and self.step_code_trials.get_all_trials():
+                 # Log a warning if trials exist but none have to_dict
+                 self.log_warning("Found CodeTrial objects missing the 'to_dict' method during summarization.", "TaskStep Summarize")
+
             # Analyze the data
             trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
 
