@@ -86,10 +86,10 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         summary["index"] = existing_index.get("index", default_index)
         # summary["model_name"] = existing_index.get("model_name") # Removed model_name
 
-        # Error count
-        error_count = count_errors(step_dir) # Recalculate error count
-        summary["errors"] = {"count": error_count, "types": []} # Types not easily available from files
+        # Error flag (count is removed)
+        error_count = count_errors(step_dir) # Still need to count for the flag
         summary["has_errors"] = error_count > 0
+        # summary["errors"] = ... # Removed errors dict
 
         # Response info - Recalculate from response.json
         response_data = safe_load_json(step_dir / "response.json")
@@ -114,18 +114,10 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         summary["response"] = response_summary
         summary["attempts"] = attempts # Recalculated attempts
 
-        # Code info - Recalculate from files
-        codes = {}
-        code_files = list(step_dir.glob("code_*")) # Find code files
-        for cf in code_files:
-            file_type = cf.suffix[1:] # e.g., 'py'
-            if file_type not in codes:
-                codes[file_type] = {}
-            codes[file_type][cf.name] = "Content not loaded" # Don't need content for summary
-        summary["codes"] = {
-            "count": len(code_files),
-            "types": list(codes.keys()),
-        }
+        # Code info - Set 'py' boolean key
+        code_files = list(step_dir.glob("code_*.py")) # Specifically look for .py files
+        summary["py"] = len(code_files) > 0
+        # summary["codes"] = ... # Removed codes dict
 
         # --- Trial info - Use the unified analysis method ---
         trials_dir = step_dir / "trials"
@@ -149,12 +141,7 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         # Add best trial metrics directly
         summary.update(trial_analysis["best_trial_metrics"])
 
-        # Add overall trial summaries
-        summary["trials"] = {}
-        if trial_analysis["all_train_results_summary"]["total"] > 0:
-            summary["trials"]["train"] = trial_analysis["all_train_results_summary"]
-        if trial_analysis["all_test_results_summary"]["total"] > 0:
-            summary["trials"]["test"] = trial_analysis["all_test_results_summary"]
+        # Removed "trials" summary section
         # --- End Trial Info Update ---
 
         # Duration - cannot be accurately recalculated, keep if exists

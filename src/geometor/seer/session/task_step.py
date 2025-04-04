@@ -78,20 +78,21 @@ class TaskStep(Level):
             # Check if any errors were logged
             has_errors = bool(self.errors)
 
-            summary.update({
-                "title": self.title,
+            # Initialize summary with desired order
+            summary = {
                 "index": self.index,
-                # "model_name": self.model_name, # Removed model_name from summary
+                "title": self.title,
+                "duration_seconds": summary.get("duration_seconds"), # Keep duration from super()
+                "has_errors": has_errors,
+                "attempts": self.attempts,
                 "response": {
                     "response_time": self.response_time,
-                    # Token counts are added later if available
+                    # Token counts added later
                 },
-                # "trials": {}, # Trial summary is now added based on analysis result
-                "codes": {},
-                # "best_score": self.step_code_trials.best_score,  # Replaced by analysis result
-                "attempts": self.attempts, # ADDED retries count
-                "has_errors": has_errors, # ADDED error flag
-            })
+                "py": "py" in self.codes, # Add 'py' boolean key
+                # "codes": {}, # Replaced by 'py' key
+                # "errors" key removed
+            }
 
             # --- Analyze Trial Data using the static method ---
             # Convert CodeTrial objects to dictionaries
@@ -109,14 +110,10 @@ class TaskStep(Level):
             # Add best trial metrics directly
             summary.update(trial_analysis["best_trial_metrics"])
 
-            # Add overall trial summaries (optional, but useful for consistency)
-            summary["trials"] = {}
-            if trial_analysis["all_train_results_summary"]["total"] > 0:
-                summary["trials"]["train"] = trial_analysis["all_train_results_summary"]
-            if trial_analysis["all_test_results_summary"]["total"] > 0:
-                summary["trials"]["test"] = trial_analysis["all_test_results_summary"]
+            # Removed "trials" summary section
             # --- End Trial Analysis Integration ---
 
+            # Add token counts to the response dict
             if hasattr(self.response, "usage_metadata"):
                 summary["response"]["prompt_tokens"] = (
                     self.response.usage_metadata.prompt_token_count
@@ -132,11 +129,10 @@ class TaskStep(Level):
                 summary["response"]["candidates_tokens"] = None
                 summary["response"]["total_tokens"] = None
 
-            summary["codes"]["count"] = len(self.codes)
-            summary["codes"]["types"] = list(self.codes.keys())
+            # Removed "codes" summary section (replaced by "py" key earlier)
 
             # --- START: Add Best Trial Metrics Directly to Summary ---
-            # This section is now handled by the trial_analysis result above
+            # This section was already correctly handled by trial_analysis result above
             # best_trial = self.step_code_trials.get_best_trial()
             # # Initialize keys expected by TaskScreen with default None
             # summary["size_correct"] = None
