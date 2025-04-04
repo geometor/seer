@@ -110,6 +110,29 @@ class CodeTrial:
 
         self.task_step._write_to_json(json_file, results_json)
 
+
+    def to_dict(self) -> dict:
+        """Converts the CodeTrial results to a dictionary."""
+        # This structure should match the JSON saved and what analyze_trial_data expects
+        return {
+            "code_filename": self.code_filename, # Include filename for reference
+            "train": {
+                "trials": [t.to_dict() for t in self.train_results.get("trials", [])] if self.train_results else None,
+                "error": self.train_results.get("error") if self.train_results else None,
+            } if self.train_results else None,
+            "test": {
+                "trials": [t.to_dict() for t in self.test_results.get("trials", [])] if self.test_results else None,
+                "error": self.test_results.get("error") if self.test_results else None,
+            } if self.test_results else None,
+            "total_score": self.total_score,
+            "average_score": self.average_score,
+            # Add train_passed/test_passed status for completeness?
+            # analyze_trial_data recalculates these, so maybe not strictly needed here,
+            # but could be useful for debugging the dictionary representation.
+            # "train_passed": self.train_passed,
+            # "test_passed": self.test_passed,
+        }
+
     @property
     def train_passed(self) -> bool | None:
         """
