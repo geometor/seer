@@ -86,20 +86,36 @@ class TaskStep(Level):
                     "response_time": self.response_time,
                     # Token counts are added later if available
                 },
-                "trials": {},
+                # "trials": {}, # Trial summary is now added based on analysis result
                 "codes": {},
-                "best_score": self.step_code_trials.best_score,  # Add best score
+                # "best_score": self.step_code_trials.best_score,  # Replaced by analysis result
                 "attempts": self.attempts, # ADDED retries count
                 "has_errors": has_errors, # ADDED error flag
             })
 
-            # Conditionally add train_passed and test_passed
-            train_passed = self.step_code_trials.any_train_passed  # Get from StepCodeTrials
-            if train_passed is not None:  # Only add if not None
-                summary["train_passed"] = train_passed
-            test_passed = self.step_code_trials.any_test_passed  # Get from StepCodeTrials
-            if test_passed is not None:  # Only add if not None
-                summary["test_passed"] = test_passed
+            # --- Analyze Trial Data using the static method ---
+            # Convert CodeTrial objects to dictionaries
+            trial_data_list = [ct.to_dict() for ct in self.step_code_trials.get_all_trials()]
+            # Analyze the data
+            trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
+
+            # Add analysis results to the summary
+            summary["best_score"] = trial_analysis["best_score"]
+            if trial_analysis["any_train_passed"] is not None:
+                summary["train_passed"] = trial_analysis["any_train_passed"]
+            if trial_analysis["any_test_passed"] is not None:
+                summary["test_passed"] = trial_analysis["any_test_passed"]
+
+            # Add best trial metrics directly
+            summary.update(trial_analysis["best_trial_metrics"])
+
+            # Add overall trial summaries (optional, but useful for consistency)
+            summary["trials"] = {}
+            if trial_analysis["all_train_results_summary"]["total"] > 0:
+                summary["trials"]["train"] = trial_analysis["all_train_results_summary"]
+            if trial_analysis["all_test_results_summary"]["total"] > 0:
+                summary["trials"]["test"] = trial_analysis["all_test_results_summary"]
+            # --- End Trial Analysis Integration ---
 
             if hasattr(self.response, "usage_metadata"):
                 summary["response"]["prompt_tokens"] = (
@@ -120,37 +136,38 @@ class TaskStep(Level):
             summary["codes"]["types"] = list(self.codes.keys())
 
             # --- START: Add Best Trial Metrics Directly to Summary ---
-            best_trial = self.step_code_trials.get_best_trial()
-            # Initialize keys expected by TaskScreen with default None
-            summary["size_correct"] = None
-            summary["palette_correct"] = None
-            summary["colors_correct"] = None
-            summary["pixels_off"] = None
-            summary["percent_correct"] = None
-
-            if (
-                best_trial
-                and best_trial.train_results # Check if train_results exist
-                and best_trial.train_results.get("trials") # Check if 'trials' key exists within train_results
-            ):
-                train_trials = best_trial.train_results["trials"]
-                if train_trials: # Ensure there are trials to process
-                    # Calculate metrics based on train_trials (list of TaskPairTrial)
-                    size_correct_list = [t.size_correct for t in train_trials]
-                    palette_correct_list = [t.color_palette_correct for t in train_trials]
-                    color_count_correct_list = [t.color_count_correct for t in train_trials]
-                    pixels_off_list = [t.pixels_off for t in train_trials if t.pixels_off is not None]
-                    percent_correct_list = [t.percent_correct for t in train_trials if t.percent_correct is not None]
-                    total_pixels_off = sum(pixels_off_list) if pixels_off_list else None
-
-                    # Add calculated metrics directly to summary using expected keys
-                    # Note: The keys here ('size_correct', 'palette_correct', etc.) should match
-                    # the keys expected by the TaskScreen DataTable.
-                    summary["size_correct"] = all(size_correct_list)
-                    summary["palette_correct"] = all(palette_correct_list)
-                    summary["colors_correct"] = all(color_count_correct_list)
-                    summary["pixels_off"] = total_pixels_off # Use total pixels off for the PIXELS column
-                    summary["percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None # Use average for % column
+            # This section is now handled by the trial_analysis result above
+            # best_trial = self.step_code_trials.get_best_trial()
+            # # Initialize keys expected by TaskScreen with default None
+            # summary["size_correct"] = None
+            # summary["palette_correct"] = None
+            # summary["colors_correct"] = None
+            # summary["pixels_off"] = None
+            # summary["percent_correct"] = None
+            #
+            # if (
+            #     best_trial
+            #     and best_trial.train_results # Check if train_results exist
+            #     and best_trial.train_results.get("trials") # Check if 'trials' key exists within train_results
+            # ):
+            #     train_trials = best_trial.train_results["trials"]
+            #     if train_trials: # Ensure there are trials to process
+            #         # Calculate metrics based on train_trials (list of TaskPairTrial)
+            #         size_correct_list = [t.size_correct for t in train_trials]
+            #         palette_correct_list = [t.color_palette_correct for t in train_trials]
+            #         color_count_correct_list = [t.color_count_correct for t in train_trials]
+            #         pixels_off_list = [t.pixels_off for t in train_trials if t.pixels_off is not None]
+            #         percent_correct_list = [t.percent_correct for t in train_trials if t.percent_correct is not None]
+            #         total_pixels_off = sum(pixels_off_list) if pixels_off_list else None
+            #
+            #         # Add calculated metrics directly to summary using expected keys
+            #         # Note: The keys here ('size_correct', 'palette_correct', etc.) should match
+            #         # the keys expected by the TaskScreen DataTable.
+            #         summary["size_correct"] = all(size_correct_list)
+            #         summary["palette_correct"] = all(palette_correct_list)
+            #         summary["colors_correct"] = all(color_count_correct_list)
+            #         summary["pixels_off"] = total_pixels_off # Use total pixels off for the PIXELS column
+            #         summary["percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None # Use average for % column
 
             # Note: best_score, train_passed, test_passed, attempts, has_errors, response_time, tokens are already added above
 

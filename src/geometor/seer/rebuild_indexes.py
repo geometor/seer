@@ -6,6 +6,9 @@ import traceback
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+# Import the class containing the static analysis method
+from geometor.seer.trials.step_code_trials import StepCodeTrials
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -171,20 +174,26 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
     logging.debug(f"  Rebuilding Step: {step_dir.name}")
     summary = {}
     try:
-        # Basic info
-        title, index = get_step_title_index(step_dir)
-        summary["title"] = title
-        summary["index"] = index
+        # --- Prioritize existing metadata ---
+        existing_index = safe_load_json(step_dir / "index.json")
+        if existing_index is None:
+            existing_index = {} # Ensure it's a dict to avoid errors on .get()
+
+        # Basic info - Prefer existing, fallback to derived
+        title, default_index = get_step_title_index(step_dir) # Get defaults
+        summary["title"] = existing_index.get("title", title)
+        summary["index"] = existing_index.get("index", default_index)
+        summary["model_name"] = existing_index.get("model_name") # Get existing model name
 
         # Error count
-        error_count = count_errors(step_dir)
-        summary["errors"] = {"count": error_count, "types": []} # Types not easily available
+        error_count = count_errors(step_dir) # Recalculate error count
+        summary["errors"] = {"count": error_count, "types": []} # Types not easily available from files
         summary["has_errors"] = error_count > 0
 
-        # Response info
+        # Response info - Recalculate from response.json
         response_data = safe_load_json(step_dir / "response.json")
         response_summary = {
-            "response_time": None,
+            "response_time": None, # Will be overwritten if found
             "prompt_tokens": None,
             "candidates_tokens": None,
             "total_tokens": None,
@@ -202,11 +211,11 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
             attempts = response_data.get("retries", 0) + 1 # Retries + initial attempt
 
         summary["response"] = response_summary
-        summary["attempts"] = attempts
+        summary["attempts"] = attempts # Recalculated attempts
 
-        # Code info
+        # Code info - Recalculate from files
         codes = {}
-        code_files = list(step_dir.glob("code_*"))
+        code_files = list(step_dir.glob("code_*")) # Find code files
         for cf in code_files:
             file_type = cf.suffix[1:] # e.g., 'py'
             if file_type not in codes:
@@ -217,8 +226,19 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
             "types": list(codes.keys()),
         }
 
-        # Trial info
-        trial_analysis = analyze_step_trials(step_dir)
+        # --- Trial info - Use the unified analysis method ---
+        trials_dir = step_dir / "trials"
+        trial_data_list = []
+        if trials_dir.is_dir():
+            for trial_file in trials_dir.glob("*.json"):
+                code_trial_data = safe_load_json(trial_file)
+                if code_trial_data:
+                    trial_data_list.append(code_trial_data)
+
+        # Call the static analysis method from StepCodeTrials
+        trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
+
+        # Populate summary with analysis results
         summary["best_score"] = trial_analysis["best_score"]
         if trial_analysis["any_train_passed"] is not None:
              summary["train_passed"] = trial_analysis["any_train_passed"]
@@ -228,16 +248,17 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         # Add best trial metrics directly
         summary.update(trial_analysis["best_trial_metrics"])
 
-        # Add overall trial summaries (optional, but useful)
+        # Add overall trial summaries
         summary["trials"] = {}
         if trial_analysis["all_train_results_summary"]["total"] > 0:
             summary["trials"]["train"] = trial_analysis["all_train_results_summary"]
         if trial_analysis["all_test_results_summary"]["total"] > 0:
             summary["trials"]["test"] = trial_analysis["all_test_results_summary"]
+        # --- End Trial Info Update ---
 
-        # Duration - cannot be accurately recalculated, keep if exists?
-        existing_index = safe_load_json(step_dir / "index.json")
-        summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
+        # Duration - cannot be accurately recalculated, keep if exists
+        # Already handled by reading existing_index at the start
+        summary["duration_seconds"] = existing_index.get("duration_seconds")
 
         # Write the new index or log if dry run
         output_path = step_dir / "index.json"
