@@ -293,11 +293,13 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
             total_steps += task_summary.get("steps", 0)
 
             # Aggregate task errors
-            total_task_error_count += task_summary.get("errors", {}).get("count", 0)
+            # Aggregate task errors (check if task itself has errors flag)
+            if task_summary.get("has_errors"):
+                 total_task_error_count += 1 # Increment if task summary indicates errors
 
         summary["count"] = len(task_summaries)
-        summary["train_passed"] = session_train_passed_count
-        summary["test_passed"] = session_test_passed_count
+        summary["train_passed"] = session_train_passed_count # Matches Session.summarize key
+        summary["test_passed"] = session_test_passed_count # Matches Session.summarize key
         summary["total_steps"] = total_steps
         summary["tokens"] = {
             "prompt_tokens": total_prompt_tokens,
@@ -305,10 +307,14 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
             "total_tokens": total_tokens_all_tasks,
         }
 
-        # Session-level errors + aggregated task errors
+        # Session-level errors + aggregated task errors flag
         session_error_count = count_errors(session_dir)
-        total_error_count = session_error_count + total_task_error_count
-        summary["errors"] = {"count": total_error_count, "types": []} # Types not easily available
+        # Note: total_task_error_count now reflects tasks marked with has_errors=True
+        # This might differ slightly from summing error counts if a task had errors but wasn't marked.
+        # Sticking to the has_errors flag aggregation for consistency with task rebuild logic.
+        # If precise error file count is needed, revert the aggregation loop above.
+        total_error_count = session_error_count + total_task_error_count # Sum of session files + tasks with errors
+        summary["errors"] = {"count": total_error_count} # Only include count
 
         # Description - keep if exists
         summary["description"] = get_level_description(session_dir)
@@ -317,8 +323,8 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
         existing_index = safe_load_json(session_dir / "index.json")
         summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
 
-        # Task trials - Removed as per request
-        # summary["task_trials"] = {} # Placeholder or read from existing if needed
+        # Task trials - Removed
+        # summary["task_trials"] = {}
 
 
         # Write the new index or log if dry run

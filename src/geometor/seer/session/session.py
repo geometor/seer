@@ -46,12 +46,12 @@ class Session(Level):
 
     def summarize(self):
         """Generates and saves a summary of the session."""
-        summary = super().summarize() # Get base summary (errors, duration)
+        summary = super().summarize() # Get base summary (errors, duration_seconds)
         summary["description"] = self.description
-        summary["task_count"] = len(self.tasks)
-        summary["train_passed_count"] = self.train_passed_count  # Use count property
-        summary["test_passed_count"] = self.test_passed_count    # Use count property
-        summary["test_passed"] = self.test_passed_count    # Use count property
+        summary["count"] = len(self.tasks) # Renamed from task_count
+        summary["train_passed"] = self.train_passed_count  # Renamed from train_passed_count
+        summary["test_passed"] = self.test_passed_count    # Renamed from test_passed_count
+        # Removed redundant test_passed assignment
 
         # Aggregate trial counts and tokens from each SessionTask
         # task_trials = {} # REMOVED
@@ -124,7 +124,8 @@ class Session(Level):
             "total_tokens": total_tokens_all_tasks,
         }
         # --- END ADDED TOKENS TO SUMMARY ---
-        summary["errors"]["count"] = total_error_count # Update with aggregated count
+        # Update errors dict to only contain count
+        summary["errors"] = {"count": total_error_count}
 
         # Save the summary
         self._write_to_json("index.json", summary)
