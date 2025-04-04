@@ -123,7 +123,8 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         trials_dir = step_dir / "trials"
         trial_data_list = []
         if trials_dir.is_dir():
-            for trial_file in trials_dir.glob("*.json"):
+            # Specifically glob for files ending in '.trial.json'
+            for trial_file in trials_dir.glob("*.trial.json"):
                 code_trial_data = safe_load_json(trial_file)
                 if code_trial_data:
                     trial_data_list.append(code_trial_data)
