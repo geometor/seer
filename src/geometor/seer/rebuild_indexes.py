@@ -84,7 +84,7 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         title, default_index = get_step_title_index(step_dir) # Get defaults
         summary["title"] = existing_index.get("title", title)
         summary["index"] = existing_index.get("index", default_index)
-        summary["model_name"] = existing_index.get("model_name") # Get existing model name
+        # summary["model_name"] = existing_index.get("model_name") # Removed model_name
 
         # Error count
         error_count = count_errors(step_dir) # Recalculate error count

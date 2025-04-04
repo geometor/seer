@@ -81,7 +81,7 @@ class TaskStep(Level):
             summary.update({
                 "title": self.title,
                 "index": self.index,
-                "model_name": self.model_name, # Add model_name to summary
+                # "model_name": self.model_name, # Removed model_name from summary
                 "response": {
                     "response_time": self.response_time,
                     # Token counts are added later if available
