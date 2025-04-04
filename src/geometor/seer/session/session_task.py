@@ -32,105 +32,47 @@ class SessionTask(Level):
         print(f"    {task.id}")
 
     def summarize(self):
+        # Get base summary (errors, duration)
         summary = super().summarize()
+        # Check if any errors were logged at this level
+        has_errors = bool(self.errors)
 
-        # Aggregate trial results from all steps
-        all_train_results = []
-        all_test_results = []
-        # --- START ADDED TOKEN COUNTERS ---
-        total_prompt_tokens = 0
-        total_candidates_tokens = 0
-        total_tokens_all_steps = 0
-        # --- END ADDED TOKEN COUNTERS ---
-
+        # --- Analyze Step Summaries ---
+        step_summaries = []
         for step in self.steps:
-            # Access step_code_trials directly
-            for code_trial in step.step_code_trials.get_all_trials():
-                if code_trial.train_results:
-                    all_train_results.extend(code_trial.train_results.get("trials", []))
-                if code_trial.test_results:
-                    all_test_results.extend(code_trial.test_results.get("trials", []))
-
-            # --- START ADDED TOKEN AGGREGATION ---
-            # Ensure step summary is generated first if needed, or read directly
-            # Let's read from the step's index.json for robustness
+            # Ensure step summary exists (it should have been created by step.summarize())
             step_summary_path = step.dir / "index.json"
-            try:
-                # Ensure the step summary exists before trying to read it
-                # This assumes step.summarize() is called before task.summarize()
-                if step_summary_path.exists():
+            if step_summary_path.exists():
+                try:
                     with open(step_summary_path, "r") as f:
                         step_summary = json.load(f)
+                        step_summaries.append(step_summary)
+                        # Aggregate step errors into task errors
+                        if step_summary.get("has_errors"):
+                             has_errors = True # Mark task as having errors if any step has errors
+                except (json.JSONDecodeError, TypeError, Exception) as e:
+                    self.log_error(e, f"Error reading step summary for task aggregation: {step.dir.name}")
+            else:
+                self.log_warning(f"Step summary file not found for task aggregation: {step_summary_path}", "SessionTask Summarize")
 
-                    prompt_tokens = step_summary.get("response", {}).get("prompt_tokens")
-                    candidates_tokens = step_summary.get("response", {}).get("candidates_tokens")
-                    total_tokens = step_summary.get("response", {}).get("total_tokens")
+        # Call the static analysis method
+        analysis_results = SessionTask.analyze_step_summaries(step_summaries)
 
-                    if prompt_tokens is not None:
-                        total_prompt_tokens += prompt_tokens
-                    if candidates_tokens is not None:
-                        total_candidates_tokens += candidates_tokens
-                    if total_tokens is not None:
-                        total_tokens_all_steps += total_tokens
-                else:
-                    # Log a warning if the step summary is missing
-                    self.log_warning(f"Step summary file not found for token aggregation: {step_summary_path}", "SessionTask Summarize")
-
-            except (json.JSONDecodeError, TypeError) as e:
-                 # Log or handle error if step summary isn't valid JSON or structure is wrong
-                 self.log_error(e, f"Error reading step summary for token aggregation: {step.dir.name}")
-            except Exception as e:
-                 # Catch any other unexpected errors during file reading
-                 self.log_error(e, f"Unexpected error reading step summary for token aggregation: {step.dir.name}")
-            # --- END ADDED TOKEN AGGREGATION ---
-
-
-        # Calculate best_score across all steps
-        # Only calculate if there are steps
-        best_score = None # Initialize outside the loop
-        if self.steps:
-            valid_scores = [
-                step.step_code_trials.best_score
-                for step in self.steps
-                if step.step_code_trials.best_score is not None
-            ]
-            if valid_scores:
-                best_score = min(valid_scores)
-
-
-        # Correct train_passed and test_passed logic using any() and explicit True check
-        train_passed = any(step.train_passed is True for step in self.steps)
-        test_passed = any(step.test_passed is True for step in self.steps)
-
-
-        summary.update(
-            {
-                "steps": len(self.steps),
-                # "matches": None,  # REMOVED - Filled in by TaskStep but not used here
-                "train_passed": train_passed,  # Use calculated values
-                "test_passed": test_passed,  # Use calculated values
-                # --- START ADDED TOKENS TO SUMMARY ---
-                "tokens": {
-                    "prompt_tokens": total_prompt_tokens,
-                    "candidates_tokens": total_candidates_tokens,
-                    "total_tokens": total_tokens_all_steps,
-                }
-                # --- END ADDED TOKENS TO SUMMARY ---
-            }
-        )
+        # --- Update Task Summary ---
+        summary["has_errors"] = has_errors # Set based on own errors + step errors
+        summary["steps"] = analysis_results["steps"]
+        summary["train_passed"] = analysis_results["train_passed"]
+        summary["test_passed"] = analysis_results["test_passed"]
+        summary["tokens"] = analysis_results["tokens"]
 
         # Conditionally add best_score
-        if best_score is not None: # Check if best_score was calculated
-            summary["best_score"] = best_score
+        if analysis_results["best_score"] is not None:
+            summary["best_score"] = analysis_results["best_score"]
 
-        # Conditionally add trials
-        if all_train_results or all_test_results:
-            self.trials = {}  # Initialize here if needed
-            if all_train_results:
-                self.trials["train"] = self._summarize_trial_results(all_train_results)
-            if all_test_results:
-                self.trials["test"] = self._summarize_trial_results(all_test_results)
-            summary["trials"] = self.trials
+        # Remove detailed errors dict and trials dict as per step refactor
+        if "errors" in summary:
+             del summary["errors"]
+        # summary["trials"] = {} # Removed trials summary
 
         self._write_to_json("index.json", summary)
 
@@ -156,6 +98,68 @@ class SessionTask(Level):
         task_step = TaskStep(title, history, content, instructions, self, model_name)
         self.steps.append(task_step)
         return task_step
+
+    @staticmethod
+    def analyze_step_summaries(step_summary_list: List[Dict]) -> Dict:
+        """
+        Analyzes a list of step summary dictionaries and returns aggregated task-level metrics.
+
+        Args:
+            step_summary_list: A list of dictionaries, where each dictionary is a
+                               TaskStep summary (loaded from index.json or generated).
+
+        Returns:
+            A dictionary containing aggregated task-level results:
+            - train_passed: True if any step passed training, else False.
+            - test_passed: True if any step passed testing, else False.
+            - best_score: The lowest best_score found across all steps (float or None).
+            - tokens: Dictionary containing aggregated token counts.
+            - steps: The total number of steps analyzed.
+        """
+        results = {
+            "train_passed": False,
+            "test_passed": False,
+            "best_score": None,
+            "tokens": {
+                "prompt_tokens": 0,
+                "candidates_tokens": 0,
+                "total_tokens": 0,
+            },
+            "steps": len(step_summary_list),
+        }
+
+        best_score = float('inf')
+        found_valid_score = False
+
+        for step_summary in step_summary_list:
+            # Aggregate tokens
+            tokens = step_summary.get("response", {})
+            prompt_tokens = tokens.get("prompt_tokens")
+            candidates_tokens = tokens.get("candidates_tokens")
+            total_tokens = tokens.get("total_tokens")
+
+            if prompt_tokens is not None:
+                results["tokens"]["prompt_tokens"] += prompt_tokens
+            if candidates_tokens is not None:
+                results["tokens"]["candidates_tokens"] += candidates_tokens
+            if total_tokens is not None:
+                results["tokens"]["total_tokens"] += total_tokens
+
+            # Aggregate passed status
+            if step_summary.get("train_passed") is True:
+                results["train_passed"] = True
+            if step_summary.get("test_passed") is True:
+                results["test_passed"] = True
+
+            # Find overall best score
+            step_best_score = step_summary.get("best_score")
+            if step_best_score is not None and step_best_score < best_score:
+                best_score = step_best_score
+                found_valid_score = True
+
+        results["best_score"] = best_score if found_valid_score else None
+        return results
+
 
     @property
     def train_passed(self):

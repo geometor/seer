@@ -173,79 +173,53 @@ def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Dict
     """
     logging.info(f" Rebuilding Task: {task_dir.name}")
     summary = {}
-    step_summaries = []
+    step_summaries = [] # Store loaded/rebuilt step summaries
+    has_errors = False # Track if task or any step has errors
     try:
-        # Find and rebuild step summaries first
+        # --- Prioritize existing metadata ---
+        existing_index = safe_load_json(task_dir / "index.json")
+        if existing_index is None:
+            existing_index = {}
+
+        # --- Find and rebuild/load step summaries ---
         step_dirs = sorted([d for d in task_dir.iterdir() if d.is_dir() and d.name.isdigit()])
         for step_dir in step_dirs:
-            step_summary = rebuild_step_summary(step_dir, dry_run=dry_run) # Pass dry_run down
+            # Rebuild step summary first to ensure consistency
+            step_summary = rebuild_step_summary(step_dir, dry_run=dry_run)
             if step_summary:
                 step_summaries.append(step_summary)
-
-        # Aggregate from step summaries
-        total_prompt_tokens = 0
-        total_candidates_tokens = 0
-        total_tokens_all_steps = 0
-        task_train_passed = False
-        task_test_passed = False
-        best_score = float('inf')
-        found_valid_score = False
-        all_train_results = []
-        all_test_results = []
-
-        for step_summary in step_summaries:
-            # Aggregate tokens
-            tokens = step_summary.get("response", {})
-            if tokens.get("prompt_tokens") is not None:
-                total_prompt_tokens += tokens["prompt_tokens"]
-            if tokens.get("candidates_tokens") is not None:
-                total_candidates_tokens += tokens["candidates_tokens"]
-            if tokens.get("total_tokens") is not None:
-                total_tokens_all_steps += tokens["total_tokens"]
-
-            # Aggregate passed status
-            if step_summary.get("train_passed") is True:
-                task_train_passed = True
-            if step_summary.get("test_passed") is True:
-                task_test_passed = True
-
-            # Find overall best score
-            step_best_score = step_summary.get("best_score")
-            if step_best_score is not None and step_best_score < best_score:
-                best_score = step_best_score
-                found_valid_score = True
-
-            # Aggregate trial summaries (if needed for task level)
-            # Note: SessionTask.summarize aggregates raw trials, let's mimic that
-            # This requires analyze_step_trials to return more detail or re-parsing
-            # For simplicity now, we'll just use the step-level summaries
-            # If you need the detailed trial aggregation at the task level,
-            # analyze_step_trials would need modification.
+                if step_summary.get("has_errors"):
+                    has_errors = True # Mark task if step has errors
+            else:
+                # If step rebuild failed, mark task as having errors
+                has_errors = True
+                logging.warning(f"  Skipping failed step rebuild for task aggregation: {step_dir.name}")
 
 
-        summary["steps"] = len(step_summaries)
-        summary["train_passed"] = task_train_passed
-        summary["test_passed"] = task_test_passed
-        summary["best_score"] = best_score if found_valid_score else None
-        summary["tokens"] = {
-            "prompt_tokens": total_prompt_tokens,
-            "candidates_tokens": total_candidates_tokens,
-            "total_tokens": total_tokens_all_steps,
-        }
+        # --- Analyze Step Summaries using static method ---
+        # Import SessionTask locally if not already imported globally
+        from geometor.seer.session.session_task import SessionTask
+        analysis_results = SessionTask.analyze_step_summaries(step_summaries)
 
-        # Task-level errors
-        error_count = count_errors(task_dir)
-        summary["errors"] = {"count": error_count, "types": []} # Types not easily available
+        # --- Populate Task Summary ---
+        summary["steps"] = analysis_results["steps"]
+        summary["train_passed"] = analysis_results["train_passed"]
+        summary["test_passed"] = analysis_results["test_passed"]
+        summary["tokens"] = analysis_results["tokens"]
 
-        # Duration - keep if exists?
-        existing_index = safe_load_json(task_dir / "index.json")
-        summary["duration_seconds"] = existing_index.get("duration_seconds") if existing_index else None
-        # Matches - Removed as per request
-        # summary["matches"] = None # Or read from existing if needed
+        # Conditionally add best_score
+        if analysis_results["best_score"] is not None:
+            summary["best_score"] = analysis_results["best_score"]
 
-        # Trials - Re-aggregate if needed, or use step summaries
-        # For now, leave it empty or use step summaries if sufficient
-        summary["trials"] = {} # Placeholder
+        # Task-level errors + aggregated step errors
+        task_error_count = count_errors(task_dir)
+        summary["has_errors"] = has_errors or (task_error_count > 0)
+        # summary["errors"] = ... # Removed detailed errors dict
+
+        # Duration - keep if exists
+        summary["duration_seconds"] = existing_index.get("duration_seconds")
+
+        # summary["trials"] = {} # Removed trials summary
 
 
         # Write the new index or log if dry run
