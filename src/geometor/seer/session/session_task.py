@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Dict
 
 from geometor.seer.session.level import Level
 import json # Added for reading step summary
