@@ -162,9 +162,11 @@ class StepCodeTrials:
         # --- Pass 1: Iterate through CodeTrial data ---
         for ct_data in code_trial_data_list:
             score = ct_data.get(SCORE_KEY)
-            train_results_data = ct_data.get(TRAIN_RESULTS_KEY, {})
-            test_results_data = ct_data.get(TEST_RESULTS_KEY, {})
+            # Ensure results data are dicts, defaulting to empty if None or missing
+            train_results_data = ct_data.get(TRAIN_RESULTS_KEY) or {}
+            test_results_data = ct_data.get(TEST_RESULTS_KEY) or {}
 
+            # Now safely get the trials lists
             train_pair_trials = train_results_data.get(TRIALS_LIST_KEY, [])
             test_pair_trials = test_results_data.get(TRIALS_LIST_KEY, [])
 
@@ -180,26 +182,29 @@ class StepCodeTrials:
 
             # --- CORRECTED LOGIC ---
             # Calculate pass status by inspecting the nested structure from trial.json
-            train_results = ct_data.get("train", {}) # Re-getting, could optimize but ok
-            test_results = ct_data.get("test", {})   # Re-getting, could optimize but ok
+            # Use the already fetched and validated train_results_data and test_results_data
+            # train_results = ct_data.get("train", {}) # No longer needed, use train_results_data
+            # test_results = ct_data.get("test", {})   # No longer needed, use test_results_data
 
             # Check train pass status: No error and all pairs match
-            train_error = train_results.get("error")
-            train_trials = train_results.get("trials", [])
+            train_error = train_results_data.get("error")
+            # Use the already fetched train_pair_trials
+            # train_trials = train_results_data.get("trials", []) # No longer needed
             # Ensure trials list is not empty before checking 'all'
-            trial_train_passed = train_error is None and bool(train_trials) and all(t.get("match") for t in train_trials)
+            trial_train_passed = train_error is None and bool(train_pair_trials) and all(t.get("match") for t in train_pair_trials)
 
             # Check test pass status: No error, expected outputs exist, and all pairs match
-            test_error = test_results.get("error")
-            test_trials = test_results.get("trials", [])
+            test_error = test_results_data.get("error")
+            # Use the already fetched test_pair_trials
+            # test_trials = test_results_data.get("trials", []) # No longer needed
             # Check if *any* test trial has an 'expected_output' to determine if test set is relevant
-            has_expected_test_output = any(t.get("expected_output") is not None for t in test_trials)
+            has_expected_test_output = any(t.get("expected_output") is not None for t in test_pair_trials)
 
             trial_test_passed = False # Default to False
             if has_expected_test_output:
                  # Only evaluate pass/fail if there are expected outputs
                  # Ensure trials list is not empty before checking 'all'
-                 trial_test_passed = test_error is None and bool(test_trials) and all(t.get("match") for t in test_trials)
+                 trial_test_passed = test_error is None and bool(test_pair_trials) and all(t.get("match") for t in test_pair_trials)
             # else: trial_test_passed remains False if no expected output exists for any test pair
 
             # --- END CORRECTED LOGIC ---
