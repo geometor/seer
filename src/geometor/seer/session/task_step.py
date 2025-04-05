@@ -93,34 +93,40 @@ class TaskStep(Level):
                 # "errors" key removed
             }
 
-            # --- Analyze Trial Data using the static method ---
-            # Convert CodeTrial objects to dictionaries, checking if method exists
-            # Note: This hasattr check is a workaround for the unexpected AttributeError.
-            # The root cause (why ct might not have to_dict) should ideally be investigated.
-            trial_data_list = [
-                ct.to_dict()
-                for ct in self.step_code_trials.get_all_trials()
-                if hasattr(ct, 'to_dict') # Check if the object has the method
-            ]
-            if not trial_data_list and self.step_code_trials.get_all_trials():
-                 # Log a warning if trials exist but none have to_dict
-                 self.log_warning("Found CodeTrial objects missing the 'to_dict' method during summarization.", "TaskStep Summarize")
+            # --- Analyze Trial Data only if trials exist ---
+            all_trials = self.step_code_trials.get_all_trials()
+            if all_trials: # Check if there are any CodeTrial objects
+                # Convert CodeTrial objects to dictionaries
+                # Note: Keeping the hasattr check as a safeguard for now.
+                trial_data_list = [
+                    ct.to_dict()
+                    for ct in all_trials
+                    if hasattr(ct, 'to_dict') # Check if the object has the method
+                ]
+                if not trial_data_list and all_trials:
+                     # Log a warning if trials exist but none have to_dict
+                     self.log_warning("Found CodeTrial objects missing the 'to_dict' method during summarization.", "TaskStep Summarize")
 
-            # Analyze the data
-            trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
+                # Only analyze and add trial results if we have data dictionaries
+                if trial_data_list:
+                    # Analyze the data
+                    trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
 
-            # Add analysis results to the step_summary
-            step_summary["best_score"] = trial_analysis["best_score"]
-            if trial_analysis["any_train_passed"] is not None:
-                step_summary["train_passed"] = trial_analysis["any_train_passed"]
-            if trial_analysis["any_test_passed"] is not None:
-                step_summary["test_passed"] = trial_analysis["any_test_passed"]
+                    # Add analysis results to the step_summary
+                    # Only add keys if they have meaningful values from the analysis
+                    if trial_analysis["best_score"] is not None:
+                        step_summary["best_score"] = trial_analysis["best_score"]
+                    if trial_analysis["any_train_passed"] is not None:
+                        step_summary["train_passed"] = trial_analysis["any_train_passed"]
+                    if trial_analysis["any_test_passed"] is not None:
+                        step_summary["test_passed"] = trial_analysis["any_test_passed"]
 
-            # Add best trial metrics directly
-            step_summary.update(trial_analysis["best_trial_metrics"])
+                    # Add best trial metrics directly only if they are not all None
+                    best_metrics = trial_analysis["best_trial_metrics"]
+                    if any(v is not None for v in best_metrics.values()):
+                        step_summary.update(best_metrics)
 
-            # Removed "trials" summary section
-            # --- End Trial Analysis Integration ---
+            # --- End Conditional Trial Analysis Integration ---
 
             # Add token counts to the response dict within step_summary
             if hasattr(self.response, "usage_metadata"):
