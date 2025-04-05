@@ -132,23 +132,28 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
             if code_trial_data:
                 trial_data_list.append(code_trial_data)
 
-        # Call the static analysis method from StepCodeTrials
-        trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
-        #  breakpoint()
+        # --- Conditionally Analyze and Add Trial Info ---
+        if trial_data_list: # Only analyze if trial files were found
+            # Call the static analysis method from StepCodeTrials
+            trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
 
-        # Populate summary with analysis results
-        summary["best_score"] = trial_analysis["best_score"]
-        # Directly assign the values returned by analyze_trial_data
-        # These keys might be missing or None if no trials were found,
-        # but should be True/False if trials were analyzed.
-        summary["train_passed"] = trial_analysis.get("any_train_passed") # Use .get() for safety
-        summary["test_passed"] = trial_analysis.get("any_test_passed") # Use .get() for safety
+            # Populate summary with analysis results
+            # Only add keys if they have meaningful values from the analysis
+            if trial_analysis["best_score"] is not None:
+                summary["best_score"] = trial_analysis["best_score"]
+            if trial_analysis.get("any_train_passed") is not None:
+                summary["train_passed"] = trial_analysis["any_train_passed"]
+            if trial_analysis.get("any_test_passed") is not None:
+                summary["test_passed"] = trial_analysis["any_test_passed"]
 
-        # Add best trial metrics directly
-        summary.update(trial_analysis["best_trial_metrics"])
+            # Add best trial metrics directly only if they are not all None
+            best_metrics = trial_analysis["best_trial_metrics"]
+            if any(v is not None for v in best_metrics.values()):
+                summary.update(best_metrics)
+        # else: If no trial_data_list, trial keys are simply not added to the summary
 
         # Removed "trials" summary section
-        # --- End Trial Info Update ---
+        # --- End Conditional Trial Info Update ---
 
         # Duration - cannot be accurately recalculated, keep if exists
         # Already handled by reading existing_index at the start
