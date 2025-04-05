@@ -358,31 +358,70 @@ class CodeTrial:
                     # Make a copy to prevent modification by the transform function
                     input_grid_copy = np.copy(input_grid)
                     transformed_output = transform_function(input_grid_copy)
+                    error_message = None # Initialize error message
 
                     # --- Validation and Repair Logic ---
-                    if not isinstance(transformed_output, np.ndarray):
-                        if not isinstance(transformed_output, list):
-                            # Case: Single element (not a list)
-                            transformed_output = [[transformed_output]]
-                        elif not isinstance(transformed_output[0], list):
-                            # Case: Single row (list, but not list of lists)
-                            transformed_output = [transformed_output]
+                    if transformed_output is None:
+                        # Handle None output directly
+                        pass # TaskPairTrial handles None transformed_output
+                    else:
+                        # Attempt to convert/normalize to a NumPy array of integers
+                        try:
+                            # Apply list wrapping if necessary (only if not already ndarray)
+                            if not isinstance(transformed_output, np.ndarray):
+                                if not isinstance(transformed_output, list):
+                                    transformed_output = [[transformed_output]] # Wrap single value
+                                elif not transformed_output: # Handle empty list
+                                     transformed_output = np.empty((0,0), dtype=int) # Represent as empty array
+                                elif not isinstance(transformed_output[0], list):
+                                     # Check if it's a list of numbers (potential flat list)
+                                     if all(isinstance(x, (int, float, np.number)) for x in transformed_output):
+                                         transformed_output = [transformed_output] # Wrap flat list as single row
+                                     # else: leave as is, np.array below might handle or fail
 
-                    # Ensure it's a NumPy array if not None
-                    if transformed_output is not None:
-                        transformed_output = np.array(transformed_output, dtype=int) # Assume int dtype
+                            # Convert to NumPy array, explicitly requesting int dtype
+                            # This might raise ValueError/TypeError if conversion is impossible
+                            transformed_output = np.array(transformed_output, dtype=int)
 
-                    # Create TaskPairTrial - it handles None transformed_output internally
-                    trial = TaskPairTrial(
-                        pair, transformed_output=transformed_output
-                    )
+                            # --- ADDED CHECK: Verify dtype and dimensionality ---
+                            if not np.issubdtype(transformed_output.dtype, np.integer):
+                                error_message = f"Validation Error: Transformed output could not be fully converted to integer type (dtype is {transformed_output.dtype})."
+                                # Set output to None to prevent passing bad data, error handled below
+                                transformed_output = None
+                            elif transformed_output.ndim != 2:
+                                 error_message = f"Validation Error: Transformed output must be a 2D grid (shape is {transformed_output.shape})."
+                                 transformed_output = None # Set output to None
+
+                        except (ValueError, TypeError) as conversion_error:
+                            # Catch errors during np.array() conversion
+                            error_message = f"Validation Error: Failed to convert transformed output to integer grid. Detail: {conversion_error}"
+                            transformed_output = None # Set output to None
+
+                    # Create TaskPairTrial
+                    if error_message:
+                        # If validation failed, create trial with error
+                        trial = TaskPairTrial(
+                            pair, error=error_message, function_output=output_capture.getvalue()
+                        )
+                    else:
+                        # If validation passed (or output was None initially), create trial normally
+                        trial = TaskPairTrial(
+                            pair, transformed_output=transformed_output # Pass the validated ndarray or None
+                        )
+
 
                 except Exception as e:
+                    # Catch errors from transform_function execution itself
                     trial = TaskPairTrial(
-                        pair, error=str(e), function_output=output_capture.getvalue()
+                        pair, error=f"Execution Error: {e}", function_output=output_capture.getvalue()
                     )
 
                 trials.append(trial)
 
         results["trials"] = trials  # Store TaskPairTrial objects directly
+                        if not isinstance(transformed_output, list):
+                            # Case: Single element (not a list)
+                            transformed_output = [[transformed_output]]
+                        elif not isinstance(transformed_output[0], list):
+                            # Case: Single row (list, but not list of lists)
         return results
