@@ -174,32 +174,44 @@ class StepCodeTrials:
                 found_valid_score = True
                 best_code_trial_data = ct_data # Keep track of the best one
 
-            # Check if this CodeTrial passed train/test
-            # A CodeTrial passes if its execution didn't error AND all its TaskPairTrials match
-            train_error = train_results_data.get(ERROR_KEY)
-            test_error = test_results_data.get(ERROR_KEY)
+            # --- CORRECTED LOGIC ---
+            # Calculate pass status by inspecting the nested structure from trial.json
+            train_results = ct_data.get("train", {}) # Re-getting, could optimize but ok
+            test_results = ct_data.get("test", {})   # Re-getting, could optimize but ok
 
-            # Check train pass status for this CodeTrial
-            if not train_error and train_pair_trials:
-                # Check if all individual pairs passed (match=True and no error)
-                if all(tpt.get(MATCH_KEY, False) and not tpt.get(ERROR_KEY) for tpt in train_pair_trials):
-                    results["any_train_passed"] = True # Set to True if any CodeTrial passes
+            # Check train pass status: No error and all pairs match
+            train_error = train_results.get("error")
+            train_trials = train_results.get("trials", [])
+            # Ensure trials list is not empty before checking 'all'
+            trial_train_passed = train_error is None and bool(train_trials) and all(t.get("match") for t in train_trials)
 
-            # Check test pass status for this CodeTrial
-            if not test_error and test_pair_trials:
-                # Check if all individual pairs passed (match=True and no error)
-                if all(tpt.get(MATCH_KEY, False) and not tpt.get(ERROR_KEY) for tpt in test_pair_trials):
-                    results["any_test_passed"] = True # Set to True if any CodeTrial passes
+            # Check test pass status: No error, expected outputs exist, and all pairs match
+            test_error = test_results.get("error")
+            test_trials = test_results.get("trials", [])
+            # Check if *any* test trial has an 'expected_output' to determine if test set is relevant
+            has_expected_test_output = any(t.get("expected_output") is not None for t in test_trials)
 
+            trial_test_passed = False # Default to False
+            if has_expected_test_output:
+                 # Only evaluate pass/fail if there are expected outputs
+                 # Ensure trials list is not empty before checking 'all'
+                 trial_test_passed = test_error is None and bool(test_trials) and all(t.get("match") for t in test_trials)
+            # else: trial_test_passed remains False if no expected output exists for any test pair
+
+            # --- END CORRECTED LOGIC ---
+
+            # Aggregate overall pass status for the step
+            if trial_train_passed:
+                any_train_passed = True # Set flag if *any* trial passed train
+            if trial_test_passed:
+                any_test_passed = True # Set flag if *any* trial passed test
 
         # --- Post Pass 1: Finalize results ---
         results["best_score"] = best_score if found_valid_score else None
 
-        # If passed status is still None after checking all trials, set to False
-        if results["any_train_passed"] is None:
-             results["any_train_passed"] = False
-        if results["any_test_passed"] is None:
-             results["any_test_passed"] = False
+        # Assign the aggregated pass status
+        results["any_train_passed"] = any_train_passed
+        results["any_test_passed"] = any_test_passed
 
 
         # --- Pass 2: Calculate overall TaskPairTrial summaries ---
