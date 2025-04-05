@@ -46,7 +46,9 @@ class Session(Level):
 
     def summarize(self):
         """Generates and saves a summary of the session."""
-        summary = super().summarize() # Get base summary (errors, duration_seconds)
+        summary = super().summarize() # Get base summary (has_errors, duration_seconds)
+        # Extract the session's own error status from the base summary
+        session_has_errors = summary.get("has_errors", False)
         summary["description"] = self.description
         summary["count"] = len(self.tasks) # Renamed from task_count
         summary["train_passed"] = self.train_passed_count  # Renamed from train_passed_count
