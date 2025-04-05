@@ -419,9 +419,4 @@ class CodeTrial:
                 trials.append(trial)
 
         results["trials"] = trials  # Store TaskPairTrial objects directly
-                        if not isinstance(transformed_output, list):
-                            # Case: Single element (not a list)
-                            transformed_output = [[transformed_output]]
-                        elif not isinstance(transformed_output[0], list):
-                            # Case: Single row (list, but not list of lists)
         return results
