@@ -127,10 +127,11 @@ ERROR
         #     else None
         # )
 
+        # --- CHANGE START ---
+        # Return has_errors boolean instead of the errors dict
         summary = {
-            "errors": {},
-            "duration_seconds": self.duration_seconds,  # Add duration in seconds
+            "has_errors": bool(self.errors), # True if any errors were logged
+            "duration_seconds": self.duration_seconds,
         }
-        summary["errors"]["count"] = len(self.errors)
-        summary["errors"]["types"] = list(self.errors.keys())
+        # --- CHANGE END ---
         return summary

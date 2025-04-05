@@ -73,17 +73,16 @@ class TaskStep(Level):
 
     def summarize(self):
         try:
+            # Get base summary (now includes 'has_errors' and 'duration_seconds')
             summary = super().summarize()
+            # has_errors is now directly obtained from super().summarize()
 
-            # Check if any errors were logged
-            has_errors = bool(self.errors)
-
-            # Initialize summary with desired order
-            summary = {
+            # Initialize summary structure, incorporating base summary values
+            step_summary = {
                 "index": self.index,
                 "title": self.title,
-                "duration_seconds": summary.get("duration_seconds"), # Keep duration from super()
-                "has_errors": has_errors,
+                "duration_seconds": summary.get("duration_seconds"),
+                "has_errors": summary.get("has_errors", False), # Use value from super()
                 "attempts": self.attempts,
                 "response": {
                     "response_time": self.response_time,
@@ -110,34 +109,34 @@ class TaskStep(Level):
             # Analyze the data
             trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
 
-            # Add analysis results to the summary
-            summary["best_score"] = trial_analysis["best_score"]
+            # Add analysis results to the step_summary
+            step_summary["best_score"] = trial_analysis["best_score"]
             if trial_analysis["any_train_passed"] is not None:
-                summary["train_passed"] = trial_analysis["any_train_passed"]
+                step_summary["train_passed"] = trial_analysis["any_train_passed"]
             if trial_analysis["any_test_passed"] is not None:
-                summary["test_passed"] = trial_analysis["any_test_passed"]
+                step_summary["test_passed"] = trial_analysis["any_test_passed"]
 
             # Add best trial metrics directly
-            summary.update(trial_analysis["best_trial_metrics"])
+            step_summary.update(trial_analysis["best_trial_metrics"])
 
             # Removed "trials" summary section
             # --- End Trial Analysis Integration ---
 
-            # Add token counts to the response dict
+            # Add token counts to the response dict within step_summary
             if hasattr(self.response, "usage_metadata"):
-                summary["response"]["prompt_tokens"] = (
+                step_summary["response"]["prompt_tokens"] = (
                     self.response.usage_metadata.prompt_token_count
                 )
-                summary["response"]["candidates_tokens"] = (
+                step_summary["response"]["candidates_tokens"] = (
                     self.response.usage_metadata.candidates_token_count
                 )
-                summary["response"]["total_tokens"] = (
+                step_summary["response"]["total_tokens"] = (
                     self.response.usage_metadata.total_token_count
                 )
             else:
-                summary["response"]["prompt_tokens"] = None
-                summary["response"]["candidates_tokens"] = None
-                summary["response"]["total_tokens"] = None
+                step_summary["response"]["prompt_tokens"] = None
+                step_summary["response"]["candidates_tokens"] = None
+                step_summary["response"]["total_tokens"] = None
 
             # Removed "codes" summary section (replaced by "py" key earlier)
 
@@ -175,19 +174,24 @@ class TaskStep(Level):
             #         summary["pixels_off"] = total_pixels_off # Use total pixels off for the PIXELS column
             #         summary["percent_correct"] = sum(percent_correct_list) / len(percent_correct_list) if percent_correct_list else None # Use average for % column
 
-            # Note: best_score, train_passed, test_passed, attempts, has_errors, response_time, tokens are already added above
+            # Note: best_score, train_passed, test_passed, attempts, has_errors, response_time, tokens are already added to step_summary above
 
             # --- END: Add Best Trial Metrics Directly to Summary ---
 
-            self._write_to_json("index.json", summary)
-            return summary  # Ensure summary is returned
+            self._write_to_json("index.json", step_summary) # Write the final step_summary
+            return step_summary  # Ensure summary is returned
 
         except Exception as e:
             self.log_error(e, f"Error during summarization of TaskStep: {self.title}")
             # Ensure has_errors is set even if summarization fails later
-            summary = super().summarize() # Get base summary again
-            summary["has_errors"] = True # Mark as having errors
-            self._write_to_json("index.json", summary) # Try to save minimal summary
+            summary = super().summarize() # Get base summary again (contains has_errors=True now)
+            minimal_summary = {
+                 "index": self.index,
+                 "title": self.title,
+                 "duration_seconds": summary.get("duration_seconds"),
+                 "has_errors": True, # Mark as having errors explicitly
+            }
+            self._write_to_json("index.json", minimal_summary) # Try to save minimal summary
             return None  # Return None on error
 
     def _summarize_trial_results(self, results):

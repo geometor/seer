@@ -56,15 +56,15 @@ class Session(Level):
         # Aggregate trial counts and tokens from each SessionTask
         # task_trials = {} # REMOVED
         total_steps = 0  # Initialize total steps
-        # --- START ADDED TOKEN COUNTERS ---
+        total_steps = 0
         total_prompt_tokens = 0
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
-        # --- END ADDED TOKEN COUNTERS ---
-        total_error_count = summary["errors"]["count"] # Start with session's own errors
+        # --- REMOVED: total_error_count initialization ---
+        any_task_has_errors = False # Flag to track errors from tasks
+        tasks_with_errors_count = 0 # Counter for tasks with errors
 
         for task_id, session_task in self.tasks.items():
-            # Access summary information directly from session_task
             total_steps += len(session_task.steps)  # Use len(steps)
             # REMOVED task_trials aggregation
             # task_trials[task_id] = {
@@ -96,36 +96,41 @@ class Session(Level):
                 else:
                     # Log a warning if the task summary is missing
                     # TODO: Implement self.log_warning or use a proper logger
-                    print(f"    WARNING (Session {self.name}): Task summary file not found for token aggregation: {task_summary_path}")
-
-                # --- START ADDED ERROR AGGREGATION ---
-                task_errors_data = task_summary.get("errors", {}) # Get errors dict, default empty
-                total_error_count += task_errors_data.get("count", 0) # Add task's error count
-                # --- END ADDED ERROR AGGREGATION ---
+                    # --- CHANGE: Check task's has_errors flag and count ---
+                    if task_summary.get("has_errors"):
+                        any_task_has_errors = True
+                        tasks_with_errors_count += 1 # Increment count
+                else:
+                    print(f"    WARNING (Session {self.name}): Task summary file not found for aggregation: {task_summary_path}")
+                    any_task_has_errors = True # Treat missing summary as error
+                    tasks_with_errors_count += 1 # Count missing task summary as error
 
             except (json.JSONDecodeError, TypeError) as e:
                  # Log or handle error if task summary isn't valid JSON or structure is wrong
-                 # TODO: Implement self.log_error or use a proper logger
-                 print(f"    ERROR (Session {self.name}): Error reading task summary for token aggregation: {session_task.name} - {e}")
+                 print(f"    ERROR (Session {self.name}): Error reading task summary for aggregation: {session_task.name} - {e}")
+                 any_task_has_errors = True # Treat read error as error
+                 tasks_with_errors_count += 1 # Count read error as error
             except Exception as e:
                  # Catch any other unexpected errors during file reading
-                 # TODO: Implement self.log_error or use a proper logger
-                 print(f"    ERROR (Session {self.name}): Unexpected error reading task summary for token aggregation: {session_task.name} - {e}")
-            # --- END ADDED TOKEN AGGREGATION ---
+                 print(f"    ERROR (Session {self.name}): Unexpected error reading task summary for aggregation: {session_task.name} - {e}")
+                 any_task_has_errors = True # Treat other errors as error
+                 tasks_with_errors_count += 1 # Count other errors as error
 
 
-        # summary["task_trials"] = task_trials # REMOVED
-        summary["total_steps"] = total_steps  # Add total_steps to the summary
-
-        # --- START ADDED TOKENS TO SUMMARY ---
+        summary["total_steps"] = total_steps
         summary["tokens"] = {
             "prompt_tokens": total_prompt_tokens,
             "candidates_tokens": total_candidates_tokens,
             "total_tokens": total_tokens_all_tasks,
         }
-        # --- END ADDED TOKENS TO SUMMARY ---
-        # Update errors dict to only contain count
-        summary["errors"] = {"count": total_error_count}
+
+        # --- CHANGE: Set has_errors based on own errors OR task errors ---
+        summary["has_errors"] = session_has_errors or any_task_has_errors
+        # --- ADDED: Count of tasks with errors ---
+        summary["tasks_with_errors_count"] = tasks_with_errors_count
+        # --- REMOVED: errors dict manipulation ---
+        if "errors" in summary:
+             del summary["errors"] # Remove base class dict if present
 
         # Save the summary
         self._write_to_json("index.json", summary)

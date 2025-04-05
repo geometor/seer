@@ -67,14 +67,14 @@ def get_step_title_index(step_dir: Path) -> Tuple[str, str]:
 
 # --- Rebuild Functions ---
 
-def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Tuple[Dict[str, Any], int]]:
+# --- CHANGE: Return type signature ---
+def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
     """
     Rebuilds the index.json for a single TaskStep directory.
     If dry_run is True, logs the intended action instead of writing the file.
 
     Returns:
-        A tuple containing the summary dictionary and the count of error files,
-        or (None, 0) if rebuilding failed.
+        The summary dictionary, or None if rebuilding failed.
     """
     logging.debug(f"  Rebuilding Step: {step_dir.name}")
     summary = {}
@@ -90,10 +90,10 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Tupl
         summary["index"] = existing_index.get("index", default_index)
         # summary["model_name"] = existing_index.get("model_name") # Removed model_name
 
-        # Error flag (count is removed)
-        error_count = count_errors(step_dir) # Still need to count for the flag
+        # --- CHANGE: Calculate and store has_errors boolean ---
+        error_count = count_errors(step_dir)
         summary["has_errors"] = error_count > 0
-        # summary["errors"] = ... # Removed errors dict
+        # --- REMOVED: errors dict ---
 
         # Response info - Recalculate from response.json
         response_data = safe_load_json(step_dir / "response.json")
@@ -164,27 +164,30 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Tupl
             with open(output_path, "w") as f:
                 json.dump(summary, f, indent=2)
             logging.debug(f"    -> Wrote {output_path}")
-        return summary, error_count # Return summary and error count
+        # --- CHANGE: Return only summary ---
+        return summary
 
     except Exception as e:
         logging.error(f"  Failed to rebuild step {step_dir.name}: {e}")
         logging.error(traceback.format_exc())
-        return None, 0 # Return None and 0 errors on failure
+        # --- CHANGE: Return None ---
+        return None
 
 
-def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Tuple[Dict[str, Any], int]]:
+# --- CHANGE: Return type signature ---
+def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
     """
     Rebuilds the index.json for a SessionTask directory.
     If dry_run is True, logs the intended action instead of writing the file.
 
     Returns:
-        A tuple containing the summary dictionary and the total count of error files
-        within this task and its steps, or (None, 0) if rebuilding failed.
+        The summary dictionary, or None if rebuilding failed.
     """
     logging.info(f" Rebuilding Task: {task_dir.name}")
     summary = {}
     step_summaries = [] # Store loaded/rebuilt step summaries
-    total_step_errors = 0 # Accumulate errors from steps
+    # --- REMOVED: total_step_errors ---
+    any_step_has_errors = False # Flag for step errors
     try:
         # --- Prioritize existing metadata ---
         existing_index = safe_load_json(task_dir / "index.json")
@@ -194,14 +197,17 @@ def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Tupl
         # --- Find and rebuild/load step summaries ---
         step_dirs = sorted([d for d in task_dir.iterdir() if d.is_dir() and d.name.isdigit()])
         for step_dir in step_dirs:
-            # Rebuild step summary first to ensure consistency
-            step_summary, step_error_count = rebuild_step_summary(step_dir, dry_run=dry_run)
-            total_step_errors += step_error_count # Accumulate errors from this step
+            # --- CHANGE: Get only summary from rebuild_step_summary ---
+            step_summary = rebuild_step_summary(step_dir, dry_run=dry_run)
+            # --- REMOVED: step_error_count accumulation ---
             if step_summary:
                 step_summaries.append(step_summary)
-                # No need to track has_errors separately, will use total count later
+                # --- CHANGE: Check has_errors flag from step summary ---
+                if step_summary.get("has_errors"):
+                    any_step_has_errors = True
             else:
-                # If step rebuild failed, its error count is already added (likely 0, but handles edge cases)
+                # Treat failed step rebuild as an error condition for the task
+                any_step_has_errors = True
                 logging.warning(f"  Skipping failed step rebuild for task aggregation: {step_dir.name}")
 
 
@@ -220,11 +226,10 @@ def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Tupl
         if analysis_results["best_score"] is not None:
             summary["best_score"] = analysis_results["best_score"]
 
-        # Task-level errors + aggregated step errors
+        # --- CHANGE: Calculate and store has_errors boolean ---
         task_level_error_count = count_errors(task_dir)
-        total_task_errors = task_level_error_count + total_step_errors
-        summary["has_errors"] = total_task_errors > 0 # Set flag based on total count
-        # summary["errors"] = ... # Removed detailed errors dict
+        summary["has_errors"] = (task_level_error_count > 0) or any_step_has_errors
+        # --- REMOVED: errors dict ---
 
         # Duration - keep if exists
         summary["duration_seconds"] = existing_index.get("duration_seconds")
@@ -241,15 +246,14 @@ def rebuild_task_summary(task_dir: Path, dry_run: bool = False) -> Optional[Tupl
             with open(output_path, "w") as f:
                 json.dump(summary, f, indent=2)
             logging.info(f"   -> Wrote {output_path}")
-        return summary, total_task_errors # Return summary and total error count
+        # --- CHANGE: Return only summary ---
+        return summary
 
     except Exception as e:
         logging.error(f" Failed to rebuild task {task_dir.name}: {e}")
         logging.error(traceback.format_exc())
-        # Return None summary, but try to return counted errors so far if possible
-        # If error happened before counting, task_level_error_count might not exist
-        task_level_error_count = count_errors(task_dir) # Recount just in case
-        return None, task_level_error_count + total_step_errors
+        # --- CHANGE: Return None ---
+        return None
 
 
 def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optional[Dict[str, Any]]:
@@ -263,7 +267,9 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
     logging.info(f"Rebuilding Session: {session_dir.name}")
     summary = {}
     task_summaries = []
-    total_errors_from_tasks = 0 # Accumulate errors from tasks
+    # --- REMOVED: total_errors_from_tasks ---
+    any_task_has_errors = False # Flag for task errors
+    tasks_with_errors_count = 0 # Counter for tasks with errors
     try:
         # Find and rebuild task summaries first
         # Assume task dirs are subdirs that are not step-like (not just digits)
@@ -275,11 +281,19 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
         for task_dir in potential_task_dirs:
             # Simple check: does it contain step-like dirs?
             if any(sd.is_dir() and sd.name.isdigit() for sd in task_dir.iterdir()):
-                 task_summary, task_error_count = rebuild_task_summary(task_dir, dry_run=dry_run) # Pass dry_run down
-                 total_errors_from_tasks += task_error_count # Accumulate errors from this task
+                 # --- CHANGE: Get only summary from rebuild_task_summary ---
+                 task_summary = rebuild_task_summary(task_dir, dry_run=dry_run)
+                 # --- REMOVED: task_error_count accumulation ---
                  if task_summary:
                      task_summaries.append(task_summary)
-                 # else: If task rebuild failed, its error count is already added
+                     # --- CHANGE: Check has_errors flag from task summary and count ---
+                     if task_summary.get("has_errors"):
+                         any_task_has_errors = True
+                         tasks_with_errors_count += 1 # Increment count
+                 else:
+                     # Treat failed task rebuild as an error condition for the session
+                     any_task_has_errors = True
+                     tasks_with_errors_count += 1 # Count failed rebuild as error task
             else:
                 logging.debug(f" Skipping non-task directory: {task_dir.name}")
 
@@ -291,10 +305,10 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
         total_candidates_tokens = 0
         total_tokens_all_tasks = 0
         total_steps = 0
-        # total_task_error_count = 0 # Removed: Now using total_errors_from_tasks
+        # Error counting/aggregation happens during the task rebuild loop above
 
         for task_summary in task_summaries:
-            # Aggregate pass counts, tokens, steps (error count is already aggregated)
+            # Aggregate pass counts, tokens, steps (error status handled above)
             if task_summary.get("train_passed") is True:
                 session_train_passed_count += 1
             if task_summary.get("test_passed") is True:
@@ -312,7 +326,7 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
             # Aggregate steps
             total_steps += task_summary.get("steps", 0)
 
-            # Removed task error aggregation here, it's done via total_errors_from_tasks
+            # Error aggregation removed here
 
         summary["count"] = len(task_summaries)
         summary["train_passed"] = session_train_passed_count # Matches Session.summarize key
@@ -324,10 +338,11 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
             "total_tokens": total_tokens_all_tasks,
         }
 
-        # Session-level errors + aggregated task errors
+        # --- CHANGE: Calculate and store has_errors boolean AND task error count ---
         session_level_error_count = count_errors(session_dir)
-        total_session_errors = session_level_error_count + total_errors_from_tasks # Sum of session files + all errors from tasks/steps
-        summary["errors"] = {"count": total_session_errors} # Store the total count
+        summary["has_errors"] = (session_level_error_count > 0) or any_task_has_errors
+        summary["tasks_with_errors_count"] = tasks_with_errors_count # Store the count
+        # --- REMOVED: errors dict ---
 
         # Description - keep if exists
         summary["description"] = get_level_description(session_dir)

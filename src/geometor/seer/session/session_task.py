@@ -32,13 +32,14 @@ class SessionTask(Level):
         print(f"    {task.id}")
 
     def summarize(self):
-        # Get base summary (errors, duration)
+        # Get base summary (now includes 'has_errors' and 'duration_seconds')
         summary = super().summarize()
-        # Check if any errors were logged at this level
-        has_errors = bool(self.errors)
+        # Initialize task_has_errors with the status from the base Level (task's own errors)
+        task_has_errors = summary.get("has_errors", False)
 
         # --- Analyze Step Summaries ---
         step_summaries = []
+        any_step_has_errors = False # Flag to track errors from steps
         for step in self.steps:
             # Ensure step summary exists (it should have been created by step.summarize())
             step_summary_path = step.dir / "index.json"
@@ -47,19 +48,22 @@ class SessionTask(Level):
                     with open(step_summary_path, "r") as f:
                         step_summary = json.load(f)
                         step_summaries.append(step_summary)
-                        # Aggregate step errors into task errors
+                        # --- CHANGE: Check step's has_errors flag ---
                         if step_summary.get("has_errors"):
-                             has_errors = True # Mark task as having errors if any step has errors
+                             any_step_has_errors = True
                 except (json.JSONDecodeError, TypeError, Exception) as e:
                     self.log_error(e, f"Error reading step summary for task aggregation: {step.dir.name}")
+                    any_step_has_errors = True # Treat read error as an error condition
             else:
                 self.log_warning(f"Step summary file not found for task aggregation: {step_summary_path}", "SessionTask Summarize")
+                any_step_has_errors = True # Treat missing summary as an error condition
 
-        # Call the static analysis method
+        # Call the static analysis method (unchanged)
         analysis_results = SessionTask.analyze_step_summaries(step_summaries)
 
         # --- Update Task Summary ---
-        summary["has_errors"] = has_errors # Set based on own errors + step errors
+        # --- CHANGE: Set has_errors based on own errors OR step errors ---
+        summary["has_errors"] = task_has_errors or any_step_has_errors
         summary["steps"] = analysis_results["steps"]
         summary["train_passed"] = analysis_results["train_passed"]
         summary["test_passed"] = analysis_results["test_passed"]
@@ -69,10 +73,9 @@ class SessionTask(Level):
         if analysis_results["best_score"] is not None:
             summary["best_score"] = analysis_results["best_score"]
 
-        # Remove detailed errors dict and trials dict as per step refactor
+        # Remove detailed errors dict if it somehow lingered from super() - defensive
         if "errors" in summary:
              del summary["errors"]
-        # summary["trials"] = {} # Removed trials summary
 
         self._write_to_json("index.json", summary)
 
