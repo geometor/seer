@@ -93,14 +93,14 @@ class Session(Level):
                         total_candidates_tokens += candidates_tokens
                     if total_tokens is not None:
                         total_tokens_all_tasks += total_tokens
-                else:
-                    # Log a warning if the task summary is missing
-                    # TODO: Implement self.log_warning or use a proper logger
-                    # --- CHANGE: Check task's has_errors flag and count ---
+
+                    # --- Check task's has_errors flag (inside the 'if exists' block) ---
                     if task_summary.get("has_errors"):
                         any_task_has_errors = True
                         tasks_with_errors_count += 1 # Increment count
-                else:
+
+                else: # This 'else' corresponds to 'if task_summary_path.exists()'
+                    # Log a warning if the task summary is missing
                     print(f"    WARNING (Session {self.name}): Task summary file not found for aggregation: {task_summary_path}")
                     any_task_has_errors = True # Treat missing summary as error
                     tasks_with_errors_count += 1 # Count missing task summary as error
