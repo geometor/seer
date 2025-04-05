@@ -39,39 +39,55 @@ class CodeTrial:
         self.task = task
         self.task_step = task_step  # store
 
-        # Run train trials
+        # --- MODIFICATION START ---
+
+        # Initialize test_results to None
+        self.test_results = None
+
+        # Run train trials first
         self.train_results = self.test_code_with_timeout(code, task.train)
 
-        # Run test trials (always run, even if train didn't pass perfectly,
-        # as partial train success might still yield test results)
-        # Note: test_code_with_timeout handles pairs where pair.output is None
-        self.test_results = self.test_code_with_timeout(code, task.test)
+        # Check if training passed *after* running train trials
+        # Use the train_passed property which checks for errors and matching
+        if self.train_passed is True:
+            # Only run test trials if all train trials passed successfully
+            self.test_results = self.test_code_with_timeout(code, task.test)
+        # else: self.test_results remains None
+
+        # --- MODIFICATION END ---
+
 
         # Calculate total and average scores, handling potential None scores
         train_scores = [
             trial.score
             for trial in self.train_results.get("trials", [])
             if trial.score is not None
-        ]  # Access score directly
-        test_scores = [
-            trial.score
-            for trial in self.test_results.get("trials", [])
-            if trial.score is not None
-        ] if self.test_results and "trials" in self.test_results else [] # More robust check
+        ]
+
+        # --- Simplified test_scores extraction ---
+        test_scores = []
+        if self.test_results: # Check if test_results is not None (i.e., tests were run)
+            test_scores = [
+                trial.score
+                for trial in self.test_results.get("trials", []) # Safely get trials or empty list
+                if trial.score is not None
+            ]
+        # --- End Simplified test_scores extraction ---
+
 
         # Initialize to None
         self.total_score = None
         self.average_score = None
 
-        # Only calculate scores if there were no execution errors in either set
-        # and if there are scores to aggregate
+        # Only calculate scores if there were no execution errors in the train set
+        # (Test set errors are implicitly handled because test_results would be None if train failed)
         train_error = self.train_results.get("error")
-        test_error = self.test_results.get("error") if self.test_results else None
+        # test_error = self.test_results.get("error") if self.test_results else None # No longer needed here
 
-        if not train_error and not test_error:
+        if not train_error: # Only need to check train error now
             all_scores = train_scores + test_scores
-            valid_scores = [s for s in all_scores if s is not None] # Filter out None scores
-            if valid_scores: # Check if there are any valid scores
+            valid_scores = [s for s in all_scores if s is not None]
+            if valid_scores:
                 self.total_score = sum(valid_scores)
                 self.average_score = self.total_score / len(valid_scores)
             else:
@@ -83,6 +99,7 @@ class CodeTrial:
 
 
         # --- Conditional Image Generation ---
+        # The logic here remains mostly the same, show_test will be False if test_results is None
         if self.has_valid_transformed_output:
             show_test = bool(self.test_results)
             results_image = self.task.to_image(
@@ -95,6 +112,7 @@ class CodeTrial:
 
         json_file = self.code_filename + ".trial.json"
         # Convert TaskPairTrial objects to dicts before serialization
+        # The existing serialization logic correctly handles self.test_results being None
         results_json = {
             "train": {
                 "trials": [t.to_dict() for t in self.train_results.get("trials", [])] if self.train_results else None,
@@ -103,7 +121,7 @@ class CodeTrial:
             "test": {
                 "trials": [t.to_dict() for t in self.test_results.get("trials", [])] if self.test_results else None,
                 "error": self.test_results.get("error") if self.test_results else None,
-            } if self.test_results else None,
+            } if self.test_results else None, # This correctly outputs null for "test" if it's None
             "total_score": self.total_score,
             "average_score": self.average_score,
         }
@@ -164,16 +182,22 @@ class CodeTrial:
         Checks if the test trials passed.
 
         Returns:
-            bool | None: True if all test trials passed, False if some
-            failed (but no errors occurred), and None if any error occurred
-            during the trials (either in the overall execution or in
-            individual trials).
+            bool | None: True if test trials were run AND all relevant ones passed.
+                         False if test trials were run AND some relevant ones failed.
+                         None if test trials were NOT run (because train failed)
+                         OR if an error occurred during test execution.
         """
-        if not self.test_results or self.test_results.get("error"):
-            return None # Error in overall execution or no results
+        # If test_results is None, tests were not run or failed catastrophically before pair evaluation
+        if not self.test_results:
+            return None
+        # If there was an overall error during test execution
+        if self.test_results.get("error"):
+            return None
         trials = self.test_results.get("trials", [])
-        if not trials: # Handle case with no trials
-             return None # Or True/False depending on definition? None seems safest.
+        if not trials:
+             # No test trials executed (e.g., test set was empty, but train passed)
+             # Return True as no required tests failed? Or None? Let's stick with None for ambiguity.
+             return None
         if any(trial.error for trial in trials):
             return None # Error in any individual trial
 
