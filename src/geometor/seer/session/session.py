@@ -47,8 +47,8 @@ class Session(Level):
     def summarize(self):
         """Generates and saves a summary of the session."""
         summary = super().summarize() # Get base summary (has_errors, duration_seconds)
-        # Extract the session's own error status from the base summary
-        session_has_errors = summary.get("has_errors", False)
+        # Note: base summary['has_errors'] reflects errors logged directly at the Session level
+        session_level_has_errors = summary.get("has_errors", False)
         summary["description"] = self.description
         summary["count"] = len(self.tasks) # Renamed from task_count
         summary["train_passed"] = self.train_passed_count  # Renamed from train_passed_count
@@ -126,13 +126,17 @@ class Session(Level):
             "total_tokens": total_tokens_all_tasks,
         }
 
-        # --- CHANGE: Set has_errors based on own errors OR task errors ---
-        summary["has_errors"] = session_has_errors or any_task_has_errors
-        # --- ADDED: Count of tasks with errors ---
+        # --- Store the count of tasks with errors ---
+        # Note: This count includes tasks with errors logged at the task level,
+        # missing summaries, or summary read errors. It does *not* directly
+        # include errors logged only at the session level itself.
         summary["tasks_with_errors_count"] = tasks_with_errors_count
+        # --- REMOVED: has_errors key ---
         # --- REMOVED: errors dict manipulation ---
         if "errors" in summary:
-             del summary["errors"] # Remove base class dict if present
+             del summary["errors"] # Remove base class dict if present (now redundant)
+        if "has_errors" in summary:
+             del summary["has_errors"] # Remove base class boolean if present
 
         # Save the summary
         self._write_to_json("index.json", summary)

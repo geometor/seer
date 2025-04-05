@@ -338,10 +338,11 @@ def rebuild_session_summary(session_dir: Path, dry_run: bool = False) -> Optiona
             "total_tokens": total_tokens_all_tasks,
         }
 
-        # --- CHANGE: Calculate and store has_errors boolean AND task error count ---
-        session_level_error_count = count_errors(session_dir)
-        summary["has_errors"] = (session_level_error_count > 0) or any_task_has_errors
-        summary["tasks_with_errors_count"] = tasks_with_errors_count # Store the count
+        # --- Store the count of tasks with errors ---
+        # This count includes tasks with errors logged at the task level,
+        # failed step rebuilds, or failed task rebuilds.
+        summary["tasks_with_errors_count"] = tasks_with_errors_count
+        # --- REMOVED: has_errors key ---
         # --- REMOVED: errors dict ---
 
         # Description - keep if exists
