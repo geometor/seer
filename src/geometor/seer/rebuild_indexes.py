@@ -120,17 +120,17 @@ def rebuild_step_summary(step_dir: Path, dry_run: bool = False) -> Optional[Dict
         # summary["codes"] = ... # Removed codes dict
 
         # --- Trial info - Use the unified analysis method ---
-        trials_dir = step_dir / "trials"
         trial_data_list = []
-        if trials_dir.is_dir():
-            # Specifically glob for files ending in '.trial.json'
-            for trial_file in trials_dir.glob("*.trial.json"):
-                code_trial_data = safe_load_json(trial_file)
-                if code_trial_data:
-                    trial_data_list.append(code_trial_data)
+
+        # Specifically glob for files ending in '.trial.json'
+        for trial_file in step_dir.glob("*.trial.json"):
+            code_trial_data = safe_load_json(trial_file)
+            if code_trial_data:
+                trial_data_list.append(code_trial_data)
 
         # Call the static analysis method from StepCodeTrials
         trial_analysis = StepCodeTrials.analyze_trial_data(trial_data_list)
+        #  breakpoint()
 
         # Populate summary with analysis results
         summary["best_score"] = trial_analysis["best_score"]
