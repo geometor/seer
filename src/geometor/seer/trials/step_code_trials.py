@@ -155,6 +155,10 @@ class StepCodeTrials:
         all_test_pair_trials_data = []
         best_code_trial_data = None # Store the data dict of the best CodeTrial
 
+        # Initialize pass flags before the loop
+        any_train_passed = False
+        any_test_passed = False
+
         # --- Pass 1: Iterate through CodeTrial data ---
         for ct_data in code_trial_data_list:
             score = ct_data.get(SCORE_KEY)
