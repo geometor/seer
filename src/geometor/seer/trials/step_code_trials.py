@@ -198,10 +198,10 @@ class StepCodeTrials:
             # Use the already fetched test_pair_trials
             # test_trials = test_results_data.get("trials", []) # No longer needed
             # Check if *any* test trial has an 'expected_output' to determine if test set is relevant
-            has_expected_test_output = any(t.get("expected_output") is not None for t in test_pair_trials)
+            has_transformed_test_output = any(t.get("transformed_output") is not None for t in test_pair_trials)
 
             trial_test_passed = False # Default to False
-            if has_expected_test_output:
+            if has_transformed_test_output:
                  # Only evaluate pass/fail if there are expected outputs
                  # Ensure trials list is not empty before checking 'all'
                  trial_test_passed = test_error is None and bool(test_pair_trials) and all(t.get("match") for t in test_pair_trials)

@@ -355,9 +355,7 @@ class CodeTrial:
                 expected_output_grid = pair.output.grid if pair.output else None
 
                 try:
-                    # Make a copy to prevent modification by the transform function
-                    input_grid_copy = np.copy(input_grid)
-                    transformed_output = transform_function(input_grid_copy)
+                    transformed_output = transform_function(input_grid.tolist())
                     error_message = None # Initialize error message
 
                     # --- Validation and Repair Logic ---
