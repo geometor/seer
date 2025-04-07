@@ -8,4 +8,4 @@
 - It should remind the AI of its role as an expert software developer assistant collaborating on these tasks.
 - Consider where this configuration/instruction file should live (e.g., in the project root, a dedicated config folder).
 
-**Status:** To Do
+**Status:** Done
