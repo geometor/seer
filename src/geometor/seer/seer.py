@@ -10,11 +10,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Any, Dict, Union, Callable
 from datetime import datetime
 import time
-from pathlib import Path # Ensure Path is imported
-import json # Add json import
+from pathlib import Path
+import json
 
 # Local application/library specific imports
-from geometor.seer.config import Config # Import the new Config class
+from geometor.seer.config import Config
 from geometor.seer.session import Session, SessionTask
 
 from geometor.seer.tasks.tasks import Tasks, Task
@@ -25,10 +25,7 @@ from geometor.seer.prompts import get_pair_prompt
 from geometor.seer.gemini_client import GeminiClient as Client
 
 from geometor.seer.trials.code_trial import CodeTrial
-
-
 class Seer:
-    # Change type hint from dict to Config
     def __init__(self, config: Config):
         """
         Initializes the Seer orchestrator.
