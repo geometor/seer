@@ -6,6 +6,6 @@
 - The instructions should outline the to-do management system (using markdown files in the `todos` directory).
 - It should specify how the user will interact (e.g., voice commands) to create, update, and manage tasks.
 - It should remind the AI of its role as an expert software developer assistant collaborating on these tasks.
-- Consider where this configuration/instruction file should live (e.g., in the project root, a dedicated config folder).
+- The configuration/instruction file is named `.todos_agent.md` and located in the project root.
 
 **Status:** Done
