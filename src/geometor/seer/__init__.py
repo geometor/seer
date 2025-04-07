@@ -6,8 +6,6 @@ __maintainer__ = "PHOTON platform"
 __email__ = "github@phiarchitect.com"
 __version__ = "0.0.1"
 __licence__ = "MIT"
-"""
-Seer package.
-"""
+
 from geometor.seer.seer import Seer
 from geometor.seer.tasks.tasks import Tasks

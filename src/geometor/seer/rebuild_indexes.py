@@ -1,3 +1,4 @@
+"""Script to rebuild summary index.json files for sessions, tasks, and steps."""
 
 import argparse
 import json

@@ -1,3 +1,4 @@
+"""Defines the Grid class for representing and manipulating ARC task grids."""
 import numpy as np
 
 #  from geometor.model import Model

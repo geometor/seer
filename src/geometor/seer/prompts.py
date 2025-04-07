@@ -1,6 +1,4 @@
-"""
-prompt utils
-"""
+"""Utility functions for generating specific prompt sections for the Gemini model."""
 def get_pair_prompt(title, task_pair, include_images=True):
     prompt = [
         f"\n## {title}\n",

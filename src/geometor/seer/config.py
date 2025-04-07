@@ -1,3 +1,4 @@
+"""Handles loading and accessing application configuration from YAML files."""
 from __future__ import annotations
 
 from pathlib import Path

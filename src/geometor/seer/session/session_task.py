@@ -1,3 +1,4 @@
+"""Defines the SessionTask class, managing the steps for solving a single task within a Session."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Dict
 

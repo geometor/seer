@@ -1,3 +1,4 @@
+"""Subpackage for session management components (Session, SessionTask, TaskStep, Level)."""
 from __future__ import annotations
 
 # Local application/library specific imports

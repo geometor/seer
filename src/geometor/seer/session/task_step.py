@@ -1,3 +1,4 @@
+"""Defines the TaskStep class, representing a single step within a SessionTask."""
 from __future__ import annotations
 from typing import TYPE_CHECKING
 

@@ -1,3 +1,4 @@
+"""Defines the Session class for managing a Seer run over multiple tasks."""
 # Standard library imports
 from __future__ import annotations
 from pathlib import Path

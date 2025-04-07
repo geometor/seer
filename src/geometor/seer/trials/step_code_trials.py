@@ -1,3 +1,4 @@
+"""Manages the execution and analysis of multiple CodeTrials for a single TaskStep."""
 import ast
 import contextlib
 import io

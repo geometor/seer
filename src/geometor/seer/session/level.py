@@ -1,3 +1,4 @@
+"""Defines the base Level class for hierarchical session logging and output."""
 from __future__ import annotations
 from typing import TYPE_CHECKING
 

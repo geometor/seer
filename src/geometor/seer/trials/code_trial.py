@@ -1,3 +1,4 @@
+"""Represents a single trial of executing generated code against all pairs of a task."""
 import ast
 import contextlib
 import io

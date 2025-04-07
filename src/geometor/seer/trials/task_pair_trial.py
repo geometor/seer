@@ -1,3 +1,4 @@
+"""Represents the result of executing generated code against a single task input/output pair."""
 from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
