@@ -1,0 +1,50 @@
+output_dir: "./sessions"
+
+roles:  
+  dreamer:
+    model_name: gemini-2.0-flash-thinking-exp-01-21
+    generation_config:
+      temperature: 1.0
+      top_p: 0.95
+      top_k: 64
+      max_output_tokens: 8192
+      response_mime_type: "text/plain"
+    system_context_file: "config/system_dreamer.md"
+
+  coder:
+    model_name: gemini-2.0-pro-exp-02-05
+    generation_config:
+      temperature: 1.0
+      top_p: 0.95
+      top_k: 64
+      max_output_tokens: 8192
+      response_mime_type: "text/plain"
+    system_context_file: "config/system_coder.md"
+
+  oracle:  
+    model_name: gemini-2.0-pro-exp-02-05  # Or a different model if desired
+    generation_config:
+      temperature: 1.0
+      top_p: 0.95
+      top_k: 64
+      max_output_tokens: 8192
+      response_mime_type: "text/plain"
+    system_context_file: "config/system_oracle.md" # New context file
+
+task_context_file: "config/task_context.md"
+instructions:
+  investigate_dreamer: "config/investigate_dreamer.md"
+  investigate_coder: "config/investigate_coder.md"
+  refine_dreamer: "config/refine_dreamer.md"
+  refine_coder: "config/refine_coder.md"
+
+max_iterations: 1
+
+
+templates:
+  dreamer_prompt: "config/templates/dreamer_prompt.j2"
+  coder_prompt: "config/templates/coder_prompt.j2"
+  refine_dreamer_prompt: "config/templates/refine_dreamer_prompt.j2"
+  refine_coder_prompt: "config/templates/refine_coder_prompt.j2"
+  total_prompt: "config/templates/total_prompt.j2"
+
