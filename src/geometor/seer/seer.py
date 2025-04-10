@@ -24,7 +24,7 @@ from geometor.seer.session import (
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
 
-# Import the default workflow
+# Import the default workflow from its new package location
 from geometor.seer.workflows.default import DefaultWorkflow
 
 from geometor.seer.prompts import get_pair_prompt

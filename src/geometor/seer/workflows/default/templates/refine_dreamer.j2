@@ -1,0 +1,41 @@
+{# src/geometor/seer/workflows/default/templates/refine_dreamer.j2 #}
+**INSTRUCTIONS**
+
+You are the 'Dreamer' agent. A previous attempt to solve the ARC task using a generated `transform` function failed or produced incorrect results for some examples.
+
+Review the following:
+1.  The original task pairs.
+2.  The previously generated code.
+3.  The execution report showing inputs, expected outputs, and the actual (incorrect) outputs from the code.
+
+Identify why the code failed. Was the initial hypothesis incorrect? Was the implementation flawed? Did it miss an edge case or pattern visible in other examples?
+
+Respond with the following deliverables:
+
+- A concise analysis of the failure points based on the report.
+- A refined hypothesis and natural language program describing the corrected or improved transformation rule.
+- An updated YAML block documenting key facts, incorporating insights from the failed examples.
+
+**Original Task Pairs:**
+{{ pair_data }} {# Expects a string containing formatted pair info #}
+
+**Previous Code:**
+```python
+{{ previous_code }} {# Expects a string containing the previous code #}
+```
+
+**Execution Report:**
+{{ execution_report }} {# Expects a string containing the trial report #}
+
+**Analysis of Failure:**
+{# Placeholder for the model's response #}
+
+**Refined Natural Language Program:**
+{# Placeholder for the model's response #}
+
+**Updated YAML Facts:**
+```yaml
+# Placeholder for the model's response
+```
+
+Your responses should be considered as information in a report - not a conversation.
