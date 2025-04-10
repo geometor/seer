@@ -14,15 +14,15 @@ self as we converge on the solution
 
 ```python
 """
-< natural language description of the transformation rule >
+{{ natural language description of the transformation rule }}
 """
 
-< imports >
+{{ imports }}
 
-def transform(input_grid: list[list[int]]) -> list[list[int]]:  
+def transform(input_grid):
     # initialize output_grid
 
-    # perform transformations
+    # change output pixels 
 
     return output_grid
 

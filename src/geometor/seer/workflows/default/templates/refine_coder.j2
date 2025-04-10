@@ -1,54 +1,29 @@
-{# src/geometor/seer/workflows/default/templates/refine_coder.j2 #}
 **INSTRUCTIONS**
 
-You are the 'Coder' agent. The 'Dreamer' has analyzed a failed trial and provided a refined natural language program.
+- generate a Python module to represent the natural language program 
+- follow the template below
+- all common math and science libraries are available
+- create docstring only at top - but comment the workflow in the function
+- use helper functions for common operations like finding objects, counting,
+  measuring, moving, etc. 
 
-Your task is to generate an improved Python `transform` function based on the Dreamer's *refined* program.
-
-- Review the refined natural language program and the context of the previous failure.
-- Follow the template provided below exactly.
-- Implement the logic described in the *refined* natural language program.
-- Address the specific failure points identified in the previous steps.
-- Use standard Python lists for grid representation. Avoid complex dependencies unless essential.
-- Add comments within the function to explain the steps.
-- Ensure the function signature matches `def transform(input_grid: list[list[int]]) -> list[list[int]]:`.
-- Output *only* the complete Python code block.
-
-**Context (Previous Failure Analysis and Refined Program):**
-{{ history_context }} {# Expects a string containing relevant history including Dreamer's refinement #}
+remember - we are working iteratively - so this code will inform your future
+self as we converge on the solution
 
 *template:*
+
 ```python
 """
-{{ natural_language_program }} {# Extract refined NLP from history_context #}
+< natural language description of the transformation rule >
 """
-import math
-import copy # Example imports
 
-def transform(input_grid: list[list[int]]) -> list[list[int]]:
-    """
-    Transforms the input grid based on the refined hypothesized rule.
-    """
-    # Deep copy input_grid to avoid modifying the original object,
-    # especially if the transformation is in-place or based on the input size.
-    # Adjust initialization based on whether the output size changes.
-    height = len(input_grid)
-    if height == 0:
-        return []
-    width = len(input_grid[0])
-    if width == 0:
-        return [[] for _ in range(height)]
+< imports >
 
-    # Example: Initialize output grid as a copy or with a new size/fill value
-    # output_grid = copy.deepcopy(input_grid)
-    # or output_grid = [[0 for _ in range(new_width)] for _ in range(new_height)]
+def transform(input_grid: list[list[int]]) -> list[list[int]]:  
+    # initialize output_grid
 
-    # --- Implement refined transformation logic here ---
-
-    # Placeholder: return empty grid of same size if logic not filled
-    output_grid = [[0 for _ in range(width)] for _ in range(height)]
-
-    # --- End refined transformation logic ---
+    # perform transformations
 
     return output_grid
+
 ```
