@@ -25,3 +25,13 @@ changelog
   first
 
 - actions
+0.0.2
+-----
+
+:init: 2025.100 
+:merge:
+:pub:
+
+  modularize workflow
+
+- actions
