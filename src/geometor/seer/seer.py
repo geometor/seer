@@ -15,7 +15,11 @@ import json
 
 # Local application/library specific imports
 from geometor.seer.config import Config
-from geometor.seer.session import Session, SessionTask, TaskStep # Add TaskStep import if needed by _generate
+from geometor.seer.session import (
+    Session,
+    SessionTask,
+    TaskStep,
+)  # Add TaskStep import if needed by _generate
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
@@ -94,7 +98,7 @@ class Seer:
         session_task = session.add_task(task)
         # TODO: Get workflow name from config, providing a default
         # workflow_name = self.config.get("workflow", "default")
-        workflow_name = "default" # Hardcode for now
+        workflow_name = "default"  # Hardcode for now
 
         try:
             # TODO: Implement _get_workflow factory method later
@@ -103,20 +107,24 @@ class Seer:
                 workflow = DefaultWorkflow()
             else:
                 # Fallback or error
-                print(f"Warning: Unknown workflow '{workflow_name}', falling back to 'default'.")
-                workflow = DefaultWorkflow()
-                # Alternatively: raise ValueError(f"Unknown workflow: {workflow_name}")
+                print(
+                    f"Warning: Unknown workflow '{workflow_name}', falling back to 'default'."
+                )
+                #  workflow = DefaultWorkflow()
+                raise ValueError(f"Unknown workflow: {workflow_name}")
 
-            print(f"    Using workflow: {workflow_name} for task {task.id}")
+            print(f"        workflow: {workflow_name}")
             # Pass self (Seer instance) to the workflow's execute method
             workflow.execute(session_task, task, self)
         except Exception as e:
             # Catch top-level errors during workflow instantiation or execution
-            error_msg = f"Workflow '{workflow_name}' failed for task {task.id}: {e}"
-            print(f"      ERROR: {error_msg}")
+            error_msg = f"         Workflow '{workflow_name}' failed for task {task.id}: {e}"
+            print(f"          ERROR: {error_msg}")
             # Ensure error is logged even if it happened during workflow execution
             # Check if the specific error message is already in the log
-            if not session_task.errors or str(e) not in str(session_task.errors.values()):
+            if not session_task.errors or str(e) not in str(
+                session_task.errors.values()
+            ):
                 session_task.log_error(e, error_msg)
             # Potentially log traceback for detailed debugging
             # import traceback
@@ -228,11 +236,11 @@ class Seer:
     def _generate(
         self,
         session_task: SessionTask,
-        role_name: str,  
-        title: str,  
-        history: List[Any],  
-        content: List[Any],  
-        instructions: List[str],  
+        role_name: str,
+        title: str,
+        history: List[Any],
+        content: List[Any],
+        instructions: List[str],
         tools: Union[
             List[Callable], str, None
         ] = None,  # Tools (functions or "code_execution")
