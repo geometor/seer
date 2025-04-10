@@ -15,10 +15,13 @@ import json
 
 # Local application/library specific imports
 from geometor.seer.config import Config
-from geometor.seer.session import Session, SessionTask
+from geometor.seer.session import Session, SessionTask, TaskStep # Add TaskStep import if needed by _generate
 
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
+
+# Import the default workflow
+from geometor.seer.workflows.default import DefaultWorkflow
 
 from geometor.seer.prompts import get_pair_prompt
 
