@@ -19,7 +19,7 @@ class DefaultWorkflow(WorkflowBase):
         self, session_task: "SessionTask", task: "Task", seer_instance: "Seer"
     ) -> None:
         """Orchestrates the default dreamer -> coder -> refine process."""
-        print(f"      Executing DefaultWorkflow for task {task.id}")
+        # print(f"      Executing DefaultWorkflow for task {task.id}") # Removed redundant print
         history: List[Any] = []
         task_step: TaskStep | None = None  # Keep track of the last step
 
