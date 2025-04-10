@@ -14,3 +14,14 @@ changelog
 
 - initalize project
 
+
+0.0.1
+-----
+
+:init: 2025.100 
+:merge:
+:pub:
+
+  first
+
+- actions
