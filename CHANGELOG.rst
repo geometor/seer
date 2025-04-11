@@ -45,3 +45,13 @@ changelog
   create new workflow
 
 - actions
+0.0.4
+-----
+
+:init: 2025.101 
+:merge:
+:pub:
+
+  add comparing test input
+
+- actions
