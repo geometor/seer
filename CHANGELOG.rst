@@ -35,3 +35,13 @@ changelog
   modularize workflow
 
 - actions
+0.0.3
+-----
+
+:init: 2025.100 
+:merge:
+:pub:
+
+  create new workflow
+
+- actions
