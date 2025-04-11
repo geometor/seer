@@ -24,27 +24,10 @@ class IncrementalWorkflow(WorkflowBase):
     """
 
     def __init__(self):
-        """Initializes the workflow and sets up the Jinja2 environment."""
-        super().__init__()
-        # Set up Jinja2 environment to load templates from the 'templates' subdirectory
-        # within *this* package (incremental)
-        self.jinja_env = jinja2.Environment(
-            # Changed package path
-            loader=jinja2.PackageLoader("geometor.seer.workflows.incremental", "templates"),
-            autoescape=False,  # We are generating text/code, not HTML
-        )
-        # print("      IncrementalWorkflow initialized with Jinja2 PackageLoader.") # Optional debug print
-
-    def _render_template(self, template_name: str, context: Dict[str, Any]) -> str:
-        """Loads and renders a Jinja2 template."""
-        try:
-            template = self.jinja_env.get_template(template_name)
-            return template.render(context)
-        except jinja2.TemplateNotFound:
-            # Use the correct template directory name in the error
-            raise FileNotFoundError(f"Workflow template not found in 'incremental' workflow: {template_name}")
-        except Exception as e:
-            raise RuntimeError(f"Error rendering template {template_name}: {e}")
+        """Initializes the workflow."""
+        # Pass the package name to the base class constructor
+        super().__init__(package_name="geometor.seer.workflows.incremental")
+        # Jinja env is now initialized in the base class
 
     def execute(
         self, session_task: "SessionTask", task: "Task", seer_instance: "Seer"
@@ -312,31 +295,4 @@ class IncrementalWorkflow(WorkflowBase):
             print(f"            ERROR in step '{title}': {e}")
             raise
 
-    # This method is identical to the one in DefaultWorkflow
-    def _check_success_and_log(self, task_step: TaskStep, step_name: str) -> bool:
-        """Checks if a step was successful and logs appropriately."""
-        # Check if *any* trial within this step passed train
-        train_passed = task_step.any_trials_successful("train")
-
-        # Handle the case where trials might not have run or produced results
-        if train_passed is None:
-            # print(f"            Step '{step_name}': train status unknown (no successful trials or trials not run).")
-            return False # Treat unknown as not passed for success checking
-
-        elif train_passed:
-            print(f"            train: passed")
-            # Check test pass status only if train passed
-            test_passed = task_step.any_trials_successful("test")
-            if test_passed is None:
-                # print(f"            Step '{step_name}': test status unknown.")
-                pass # Don't log anything specific for unknown test status
-            elif test_passed:
-                print(f"            test: passed")
-            else:
-                # print(f"            Step '{step_name}': test failed")
-                pass # Don't log test failed if train passed, focus is on train success
-            return True  # Training passed, signal success for this step check
-
-        else: # train_passed is False
-            #  print(f"            Step '{step_name}': train failed")
-            return False
+    # _check_success_and_log is now inherited from WorkflowBase
