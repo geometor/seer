@@ -9,4 +9,4 @@
 - Ensure the existing workflow logic is encapsulated within a default Workflow Engine implementation.
 - Refer to the write-up in the `research/` folder regarding alternate workflow designs.
 
-**Status:** To Do
+**Status:** In Progress
