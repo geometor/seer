@@ -24,8 +24,9 @@ from geometor.seer.session import (
 from geometor.seer.tasks.tasks import Tasks, Task
 from geometor.seer.tasks.grid import Grid
 
-# Import the default workflow from its new package location
+# Import workflows
 from geometor.seer.workflows.default import DefaultWorkflow
+from geometor.seer.workflows.incremental import IncrementalWorkflow # Add import
 
 from geometor.seer.prompts import get_pair_prompt
 
@@ -98,13 +99,15 @@ class Seer:
         session_task = session.add_task(task)
         # TODO: Get workflow name from config, providing a default
         # workflow_name = self.config.get("workflow", "default")
-        workflow_name = "default"  # Hardcode for now
+        workflow_name = "incremental"  # Hardcode to incremental for testing
 
         try:
             # TODO: Implement _get_workflow factory method later
             # workflow = self._get_workflow(workflow_name)
             if workflow_name == "default":
                 workflow = DefaultWorkflow()
+            elif workflow_name == "incremental": # Add case for incremental
+                workflow = IncrementalWorkflow()
             else:
                 # Fallback or error
                 print(
