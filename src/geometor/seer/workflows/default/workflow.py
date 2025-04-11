@@ -160,7 +160,8 @@ class DefaultWorkflow(WorkflowBase):
                 history,      # Pass existing history
                 content,      # Pass task data as content
                 instructions, # Pass rendered template as instructions
-                tools="code_execution",
+                #  tools="code_execution",
+                tools="",
             )
             task_step.run_trials()
             task_step.summarize()
