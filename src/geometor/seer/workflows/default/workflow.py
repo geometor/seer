@@ -294,17 +294,19 @@ class DefaultWorkflow(WorkflowBase):
         """Checks if a step was successful and logs appropriately."""
         train_passed = task_step.any_trials_successful("train")
         if train_passed is None:
-            print(f"            Step '{step_name}': train status unknown.")
+            #  print(f"            Step '{step_name}': train status unknown.")
             return False
         elif train_passed:
             print(f"            Step '{step_name}': train passed")
             test_passed = task_step.any_trials_successful("test")
             if test_passed is None:
-                print(f"            Step '{step_name}': test status unknown.")
+                #  print(f"            Step '{step_name}': test status unknown.")
+                pass
             elif test_passed:
                 print(f"            Step '{step_name}': test passed")
             else:
-                print(f"            Step '{step_name}': test failed")
+                #  print(f"            Step '{step_name}': test failed")
+                pass
             return True  # Training passed
         else:
             print(f"            Step '{step_name}': train failed")
