@@ -7,7 +7,7 @@ from ..base import WorkflowBase
 from geometor.seer.prompts import get_pair_prompt
 from geometor.seer.session.task_step import TaskStep
 from geometor.seer.trials.code_trial import CodeTrial
-from geometor.seer.tasks import TaskPair # Import TaskPair
+from geometor.seer.tasks.tasks import TaskPair # Import TaskPair from tasks.py
 
 if TYPE_CHECKING:
     from geometor.seer.seer import Seer
