@@ -42,15 +42,22 @@ class GeminiClient:
         if not self.model_name:
             raise ConfigError(f"Missing 'model_name' for role '{role}' in configuration.")
 
-        # Access the pre-loaded system context content from the Config object
-        # The Config class loads this into 'system_context_content'
-        system_context = role_config.get("system_context_content")
-        if system_context is None: # Check for None, empty string might be valid
-            # Provide a default empty string if missing, or raise an error if required
-            print(f"Warning: 'system_context_content' not found for role '{role}'. Using empty system instruction.")
-            system_context = ""
-            # Alternatively, raise an error if system context is mandatory:
-            # raise ConfigError(f"Missing 'system_context_content' for role '{role}' in configuration.")
+        # Access the pre-loaded system context content for the specific role
+        role_system_context = role_config.get("system_context_content", "") # Default to empty string
+        if not role_system_context:
+            print(f"Warning: Role-specific 'system_context_content' not found or empty for role '{role}'.")
+
+        # Access the pre-loaded general task context content from the Config object
+        general_task_context = config.task_context # Access via property, defaults to ""
+        if not general_task_context:
+             print(f"Warning: General 'task_context_content' not found or empty in config.")
+
+        # Combine role-specific system context and general task context
+        # Add a separator for clarity if both exist
+        combined_system_instruction = role_system_context
+        if role_system_context and general_task_context:
+            combined_system_instruction += "\n\n---\n\n" # Add a separator
+        combined_system_instruction += general_task_context
 
         # Access generation_config
         generation_config = role_config.get("generation_config")
@@ -69,7 +76,7 @@ class GeminiClient:
             self.model = genai.GenerativeModel(
                 model_name=self.model_name,
                 generation_config=generation_config, # Pass the loaded generation config
-                system_instruction=system_context,
+                system_instruction=combined_system_instruction, # Pass the combined context
                 # safety_settings=... # Add safety_settings from config if defined
             )
         except Exception as e:
