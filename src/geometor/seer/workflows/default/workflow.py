@@ -55,10 +55,9 @@ class DefaultWorkflow(WorkflowBase):
                 session_task, task, seer_instance, history
             )
             # Update history *after* successful step execution
-            # History now includes the rendered prompt + response
-            history.extend(task_step.content)  # Rendered prompt content
-            # history.extend(task_step.instructions) # Instructions are part of rendered content now
-            history.extend(task_step.response_parts)  # Add response to history
+            # Add the content (pair data) and the response to history
+            history.extend(task_step.content)
+            history.extend(task_step.response_parts)
 
             if self._check_success_and_log(task_step, "investigate_dreamer"):
                 return  # Task solved
@@ -68,8 +67,7 @@ class DefaultWorkflow(WorkflowBase):
                 session_task, task, seer_instance, history
             )
             # Update history *after* successful step execution
-            history.extend(task_step.content)
-            # history.extend(task_step.instructions) # Part of rendered content
+            # Add only the response to history (content was empty)
             history.extend(task_step.response_parts)
 
             if self._check_success_and_log(task_step, "investigate_coder"):
@@ -133,43 +131,38 @@ class DefaultWorkflow(WorkflowBase):
         seer_instance: "Seer",
         history: List[Any],  # History is read-only here
     ) -> TaskStep:
-        """Handles the 'investigate dreamer' step using templates."""
+        """Handles the 'investigate dreamer' step, separating content and instructions."""
         title = "investigate • dreamer • all training"
 
-        # Prepare context for the template
-        pair_data_str = ""
+        # Prepare content (task data)
+        content = []
         for i, pair in enumerate(task.train, 1):
-            # Use get_pair_prompt but only take the string parts for the template
-            pair_prompt_parts = get_pair_prompt(
-                f"train_{i}", pair, include_images=False
-            )  # Don't include images in text prompt
-            pair_data_str += "".join(
-                part for part in pair_prompt_parts if isinstance(part, str)
+            content.extend(
+                get_pair_prompt(
+                    f"train_{i}", pair, include_images=seer_instance.use_images
+                )
             )
-        # Add full task image separately if needed (though template doesn't explicitly ask)
-        # if seer_instance.use_images:
-        #     pair_data_str += "\n## Full Task (Train)\n"
-        #     # How to represent image in template? Maybe not needed for dreamer text analysis
 
-        context = {"pair_data": pair_data_str}
-        rendered_prompt = self._render_template("investigate_dreamer.j2", context)
+        if seer_instance.use_images:
+            # show full task image
+            content.append(task.to_image(show_test=False))
 
-        # Content for _generate is the rendered prompt
-        # Instructions are now part of the rendered prompt
-        content = [rendered_prompt]
-        instructions = []  # No separate instructions needed
+        # Prepare instructions (rendered template)
+        # The template investigate_dreamer.j2 is static text
+        instruction_text = self._render_template("investigate_dreamer.j2", {})
+        instructions = [instruction_text]
 
         try:
             task_step = seer_instance._generate(
                 session_task,
                 "dreamer",
                 title,
-                history,  # Pass existing history
-                content,  # Pass rendered prompt as content
-                instructions,  # Empty list
-                tools="code_execution",  # Dreamer might still use tools for analysis
+                history,      # Pass existing history
+                content,      # Pass task data as content
+                instructions, # Pass rendered template as instructions
+                tools="code_execution",
             )
-            task_step.run_trials()  # Dreamer might generate initial code to test hypothesis
+            task_step.run_trials()
             task_step.summarize()
             return task_step
         except Exception as e:
@@ -183,37 +176,26 @@ class DefaultWorkflow(WorkflowBase):
         seer_instance: "Seer",
         history: List[Any],  # History contains dreamer's output
     ) -> TaskStep:
-        """Handles the 'investigate coder' step using templates."""
+        """Handles the 'investigate coder' step, separating content and instructions."""
         title = "investigate • coder • all training"
 
-        # Prepare context for the template
-        # Extract relevant parts from history (e.g., dreamer's NLP)
-        # This might need refinement based on how dreamer structures its response
-        history_context_str = "\n".join(
-            str(part) for part in history[-2:] if isinstance(part, str)
-        )  # Example: take last 2 text parts
-        natural_language_program = (
-            "Extracted NLP from Dreamer's response"  # TODO: Implement robust extraction
-        )
+        # Content is empty for this step; coder works from history + instructions
+        content = [""]
 
-        context = {
-            "history_context": history_context_str,
-            "natural_language_program": natural_language_program,
-        }
-        rendered_prompt = self._render_template("investigate_coder.j2", context)
-
-        content = [rendered_prompt]
-        instructions = []
+        # Prepare instructions (rendered template)
+        # The template investigate_coder.j2 is static text
+        instruction_text = self._render_template("investigate_coder.j2", {})
+        instructions = [instruction_text]
 
         try:
             task_step = seer_instance._generate(
                 session_task,
                 "coder",
                 title,
-                history,  # Pass history (includes dreamer's output)
-                content,  # Pass rendered prompt
-                instructions,
-                # No tools needed for coder by default?
+                history,      # Pass history (includes dreamer's output)
+                content,      # Pass empty content
+                instructions, # Pass rendered template as instructions
+                # No tools needed for coder by default
             )
             task_step.run_trials()
             task_step.summarize()
@@ -235,84 +217,74 @@ class DefaultWorkflow(WorkflowBase):
         task_step: TaskStep | None = None
 
         # --- Refine Dreamer ---
+        task_step: TaskStep | None = None
+
+        # --- Refine Dreamer ---
         title = f"refine • {iteration} • dreamer"
         try:
-            # Prepare context
-            pair_data_str = ""
-            for i, pair in enumerate(task.train, 1):  # Include train pairs for context
-                pair_prompt_parts = get_pair_prompt(
-                    f"train_{i}", pair, include_images=False
-                )
-                pair_data_str += "".join(
-                    part for part in pair_prompt_parts if isinstance(part, str)
-                )
-            # Add test pairs too? Maybe just the failing ones from the report?
+            # Prepare content (code + report)
+            content = []
+            content.append("\nPrevious Code:\n")
+            content.append(f"```python\n{code_trial.code}\n```\n")
+            content.append(code_trial.generate_report())
 
-            context = {
-                "pair_data": pair_data_str,
-                "previous_code": code_trial.code,
-                "execution_report": code_trial.generate_report(),
-            }
-            rendered_prompt = self._render_template("refine_dreamer.j2", context)
-            content = [rendered_prompt]
-            instructions = []
+            # Prepare instructions (rendered template)
+            # The template refine_dreamer.j2 is static text
+            instruction_text = self._render_template("refine_dreamer.j2", {})
+            instructions = [instruction_text]
 
             task_step = seer_instance._generate(
                 session_task,
                 "dreamer",
                 title,
-                history,  # Pass current history state
-                content,
-                instructions,
-                tools="code_execution",  # Dreamer might use tools for analysis
+                history,      # Pass current history state
+                content,      # Pass code+report as content
+                instructions, # Pass rendered template as instructions
+                tools="code_execution",
             )
             # Update history *after* successful generation
-            history.extend(content)
-            history.extend(task_step.response_parts)
+            history.extend(content) # Add the code/report content
+            history.extend(task_step.response_parts) # Add the response
 
-            task_step.run_trials()  # Dreamer refinement might produce testable code
+            task_step.run_trials()
             task_step.summarize()
             if self._check_success_and_log(task_step, title):
-                return task_step  # Solved by dreamer refinement
+                return task_step # Solved by dreamer refinement
 
         except Exception as e:
             print(f"            ERROR in step '{title}': {e}")
             raise
 
         # --- Refine Coder ---
+        # --- Refine Coder ---
+        # This runs only if dreamer refinement didn't solve the task
         title = f"refine • {iteration} • coder"
         try:
-            # Prepare context - history already includes dreamer's refinement output
-            history_context_str = "\n".join(
-                str(part) for part in history[-4:] if isinstance(part, str)
-            )  # Example: take last few parts
-            natural_language_program = "Extracted refined NLP from Dreamer's response"  # TODO: Implement robust extraction
+            # Content is empty for this step
+            content = [""]
 
-            context = {
-                "history_context": history_context_str,
-                "natural_language_program": natural_language_program,
-            }
-            rendered_prompt = self._render_template("refine_coder.j2", context)
-            content = [rendered_prompt]
-            instructions = []
+            # Prepare instructions (rendered template)
+            # The template refine_coder.j2 is static text
+            instruction_text = self._render_template("refine_coder.j2", {})
+            instructions = [instruction_text]
 
             # Use the history updated by the dreamer step above
             task_step = seer_instance._generate(
                 session_task,
                 "coder",
                 title,
-                history,  # Pass history including dreamer's output
-                content,
-                instructions,
-                # No tools needed?
+                history,      # Pass history including dreamer's output
+                content,      # Pass empty content
+                instructions, # Pass rendered template as instructions
+                # No tools needed for coder by default
             )
             # Update history *after* successful generation
-            history.extend(content)
+            # Add only the response to history (content was empty)
             history.extend(task_step.response_parts)
 
             task_step.run_trials()
             task_step.summarize()
-            return task_step  # Return coder step; outer loop checks success
+            return task_step # Return coder step; outer loop checks success
 
         except Exception as e:
             print(f"            ERROR in step '{title}': {e}")
