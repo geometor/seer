@@ -248,9 +248,8 @@ class Seer:
         # functions=None,
     ):
         """
-        Generate content from the model, handling logging and retries.
+        Generate content from the model, handling logging and retries with clearer output.
         """
-
         # Ensure the role exists
         client = self.roles.get(role_name)
         if not client:
@@ -263,114 +262,94 @@ class Seer:
             title, history, content, instructions, client.model_name
         )
 
-        # --- Start of improved retry logic ---
-        # Get max_retries from config, fallback to default
-        max_retries = self.config.get("max_retries", 2)
-        response = None
-        start_time = datetime.now()  # Start timer before loop
-        valid_response_received = False  # Flag to track success
+        # --- Start of improved retry logic with clearer logging ---
+        # Get max_attempts from config (using max_retries key for now), fallback to default
+        # Let's interpret max_retries as total attempts for clarity in logging
+        max_attempts = self.config.get("max_retries", 2) # e.g., 2 means try up to 2 times
+        if max_attempts < 1: # Ensure at least one attempt
+            max_attempts = 1
 
-        while task_step.attempts < max_retries:
-            # Combine history, new content, and instructions for the prompt
-            # Ensure all parts are suitable for the API (e.g., strings, PIL Images)
-            # The GeminiClient expects a List[Any] where Any can be str or Image.
-            total_prompt: List[Any] = history + content + instructions
+        response = None
+        start_time = datetime.now()
+        valid_response_received = False
+        last_concise_error = "Unknown failure" # Store the last concise error message
+
+        # Loop from attempt 1 up to max_attempts
+        for current_attempt in range(1, max_attempts + 1):
+            task_step.attempts = current_attempt # Update step's attempt count
 
             # If not the first attempt, wait before retrying
-            if task_step.attempts > 0:
-                # Get retry delay from config, fallback to default
+            if current_attempt > 1:
                 retry_delay = self.config.get("retry_delay_seconds", 10)
-                print(
-                    f"            ...waiting {retry_delay} seconds before retry ({task_step.attempts + 1}/{max_retries})"
-                )
+                # No separate print for waiting, just sleep
                 time.sleep(retry_delay)
 
-            task_step.attempts += 1
-            current_attempt = task_step.attempts  # For logging clarity
+            total_prompt: List[Any] = history + content + instructions
+            concise_error = None # Reset error for this attempt
 
             try:
                 response = client.generate_content(total_prompt, tools=tools)
 
-                # Check for valid response: Must have candidates,
-                # finish_reason=STOP, and accessible text if
-                # response.candidates and response.candidates[0].finish_reason
-                # == 1: # STOP
+                # Check for valid response
                 if response.candidates:
                     try:
-                        _ = response.text  # Attempt access
-                        # Valid response received!
+                        _ = response.text # Attempt access, raises ValueError if not usable
+                        # If we got here, the response is likely valid
                         valid_response_received = True
-                        break  # Exit the retry loop successfully
+                        break # Exit the loop successfully
                     except ValueError as ve:
-                        # Finish reason is STOP, but text is not accessible (e.g., safety)
-                        finish_reason_str = getattr(
-                            response.candidates[0].finish_reason, "name", "STOP"
-                        )
-                        print(
-                            f"            retry {current_attempt}/{max_retries} - Response finished ({finish_reason_str}), but text not accessible: {ve}"
-                        )
-                        task_step.log_error(
-                            ve,
-                            f"Response STOP but text inaccessible on attempt {current_attempt}/{max_retries}",
-                        )
-                        # Continue loop if retries remain
+                        # Text not accessible (e.g., safety, other finish reasons)
+                        finish_reason_str = "UNKNOWN"
+                        if response.candidates[0].finish_reason:
+                             finish_reason_str = getattr(response.candidates[0].finish_reason, "name", str(response.candidates[0].finish_reason))
+                        concise_error = f"Response text inaccessible (finish reason: {finish_reason_str})"
+                        # Log the detailed error internally
+                        task_step.log_error(ve, f"Response text inaccessible on attempt {current_attempt}/{max_attempts}")
+
                 else:
-                    # Handle cases with no candidates or non-STOP finish reasons
-                    finish_reason = (
-                        response.candidates[0].finish_reason
-                        if response.candidates
-                        else "NO_CANDIDATES"
-                    )
-                    finish_reason_str = getattr(
-                        finish_reason, "name", str(finish_reason)
-                    )
-                    print(
-                        f"            RETRY: {current_attempt}/{max_retries} - Invalid response or finish reason: {finish_reason_str}"
-                    )
-                    task_step.log_error(
-                        Exception(
-                            f"Invalid response/finish reason ({finish_reason_str})"
-                        ),
-                        f"Attempt {current_attempt}/{max_retries}",
-                    )
-                    # Continue loop if retries remain
+                    # Handle cases with no candidates
+                    concise_error = "No response candidates received"
+                    task_step.log_error(Exception(concise_error), f"Attempt {current_attempt}/{max_attempts}")
 
             except Exception as e:
                 # Catch errors during the API call itself
-                print(
-                    f"            RETRY: {current_attempt}/{max_retries} - API Call ERROR: {e}"
-                )
-                task_step.log_error(
-                    e, f"API call failed on attempt {current_attempt}/{max_retries}"
-                )
-                # Ensure response is None if API call failed, important for check after loop
-                response = None
-                # Continue loop if retries remain
+                concise_error = f"API call failed ({type(e).__name__})"
+                # Log the detailed error internally
+                task_step.log_error(e, f"API call failed on attempt {current_attempt}/{max_attempts}")
+                # Optionally log traceback for debugging internal errors:
+                # task_step.log_error(traceback.format_exc(), f"Traceback on attempt {current_attempt}/{max_attempts}")
+                response = None # Ensure response is None if API call failed
 
-        # --- After the while loop ---
+            # If this attempt failed (concise_error is set)
+            if concise_error:
+                print(f"            attempt {current_attempt}/{max_attempts} failed: {concise_error}")
+                last_concise_error = concise_error # Store for final error message
+
+        # --- After the loop ---
         end_time = datetime.now()
         response_time = (end_time - start_time).total_seconds()
 
         # Check if the loop completed without getting a valid response
         if not valid_response_received:
-            error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} retries."
+            # Use the last recorded concise error message
+            error_msg = f"ERROR: Failed to get a valid response after {task_step.attempts} attempts. Last error: {last_concise_error}"
             print(f"            {error_msg}")
 
-            # Log the final response received (even if invalid or None) before raising
+            # Log the final response received (even if invalid or None)
             # Pass the actual number of attempts made
             task_step.log_response(response, response_time, retries=task_step.attempts)
 
-            # Log a final summary error indicating failure after all retries
-            exc = Exception(error_msg)
-            task_step.log_error(exc, "Final Generate Failure after all retries")
-            raise exc  # Raise the exception to be caught by the caller (_investigate or refine)
+            # Log a final summary error indicating failure after all attempts
+            exc = Exception(error_msg) # Use the summary message for the exception
+            task_step.log_error(exc, "Final Generate Failure after all attempts")
+            raise exc # Raise the exception to be caught by the caller
 
         # --- If we reach here, it means loop broke successfully with a valid response ---
         # Log the successful response, including the number of attempts it took
         task_step.log_response(response, response_time, retries=task_step.attempts)
 
         # Process the valid response
-        reponse_parts = task_step.process_response(response)
+        response_parts = task_step.process_response(response)
         return task_step
         # --- End of improved retry logic ---
 
