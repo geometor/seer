@@ -160,8 +160,7 @@ class DefaultWorkflow(WorkflowBase):
                 history,      # Pass existing history
                 content,      # Pass task data as content
                 instructions, # Pass rendered template as instructions
-                #  tools="code_execution",
-                tools="",
+                tools="code_execution",
             )
             task_step.run_trials()
             task_step.summarize()
@@ -298,17 +297,17 @@ class DefaultWorkflow(WorkflowBase):
             #  print(f"            Step '{step_name}': train status unknown.")
             return False
         elif train_passed:
-            print(f"            Step '{step_name}': train passed")
+            print(f"            train: passed")
             test_passed = task_step.any_trials_successful("test")
             if test_passed is None:
                 #  print(f"            Step '{step_name}': test status unknown.")
                 pass
             elif test_passed:
-                print(f"            Step '{step_name}': test passed")
+                print(f"            test: passed")
             else:
                 #  print(f"            Step '{step_name}': test failed")
                 pass
             return True  # Training passed
         else:
-            print(f"            Step '{step_name}': train failed")
+            #  print(f"            Step '{step_name}': train failed")
             return False

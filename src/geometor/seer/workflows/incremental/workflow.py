@@ -324,19 +324,19 @@ class IncrementalWorkflow(WorkflowBase):
             return False # Treat unknown as not passed for success checking
 
         elif train_passed:
-            print(f"            Step '{step_name}': train passed")
+            print(f"            train: passed")
             # Check test pass status only if train passed
             test_passed = task_step.any_trials_successful("test")
             if test_passed is None:
                 # print(f"            Step '{step_name}': test status unknown.")
                 pass # Don't log anything specific for unknown test status
             elif test_passed:
-                print(f"            Step '{step_name}': test passed")
+                print(f"            test: passed")
             else:
                 # print(f"            Step '{step_name}': test failed")
                 pass # Don't log test failed if train passed, focus is on train success
             return True  # Training passed, signal success for this step check
 
         else: # train_passed is False
-            print(f"            Step '{step_name}': train failed")
+            #  print(f"            Step '{step_name}': train failed")
             return False

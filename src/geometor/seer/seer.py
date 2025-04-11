@@ -99,7 +99,8 @@ class Seer:
         session_task = session.add_task(task)
         # TODO: Get workflow name from config, providing a default
         # workflow_name = self.config.get("workflow", "default")
-        workflow_name = "incremental"  # Hardcode to incremental for testing
+        #  workflow_name = "incremental"  # Hardcode to incremental for testing
+        workflow_name = "default"  # Hardcode to incremental for testing
 
         try:
             # TODO: Implement _get_workflow factory method later
