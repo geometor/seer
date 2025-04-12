@@ -4,7 +4,7 @@ from datetime import datetime
 
 from geometor.seer.config import Config, ConfigError
 from geometor.seer import Seer, Tasks
-from geometor.seer.tasks.tasks import get_unsolved_tasks
+from geometor.seer.tasks.tasks import get_unsolved_tasks, get_partially_solved_tasks
 
 
 def run():
@@ -31,10 +31,10 @@ def run():
     output_dir = Path("../sessions_ConceptARC/")
 
     #  tasks = Tasks("../tasks/ConceptARC_minimal")
-    tasks = get_unsolved_tasks(output_dir)
-    tasks = tasks.get_ordered_tasks()
+    tasks = get_partially_solved_tasks(output_dir)
+    #  tasks = tasks.get_ordered_tasks()
 
-    seer.run(tasks, output_dir, "unsolved")
+    seer.run(tasks[0:1], output_dir, "previous partial")
 
     #  parent_path = Path("../tasks/ConceptARC")
     #  for set_dir in parent_path.iterdir():
