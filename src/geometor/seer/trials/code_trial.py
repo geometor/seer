@@ -4,8 +4,11 @@ import contextlib
 import io
 import numpy as np
 import multiprocessing
+from typing import Any, Dict, List, Optional, Tuple, Callable, TYPE_CHECKING # Add Callable and TYPE_CHECKING
 
-from geometor.seer.tasks.tasks import Task
+# Use TYPE_CHECKING to avoid circular import at runtime
+if TYPE_CHECKING:
+    from geometor.seer.tasks.tasks import Task
 from geometor.seer.tasks.grid import Grid
 
 from geometor.seer.trials.task_pair_trial import TaskPairTrial
@@ -24,7 +27,7 @@ class CodeTrial:
         task_step,
         code_filename: str,
         code,
-        task: Task,
+        task: 'Task', # Use string literal for type hint
     ):
         """
         Initializes a CodeTrial.
