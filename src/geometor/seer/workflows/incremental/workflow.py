@@ -192,18 +192,6 @@ class IncrementalWorkflow(WorkflowBase):
             # import traceback
             # session_task.log_error(traceback.format_exc(), f"Traceback for {error_context}")
 
-
-    # Renamed from _investigate_dreamer and modified significantly
-    def _investigate_dreamer_step(
-                f"      ERROR during IncrementalWorkflow execution for task {task.id}: {e}"
-            )
-            if not session_task.errors or str(e) not in str(
-                session_task.errors.values()
-            ):
-                session_task.log_error(
-                    e, f"IncrementalWorkflow execution failed for task {task.id}"
-                )
-
     # Renamed from _investigate_dreamer and modified significantly
     def _investigate_dreamer_step(
         self,
