@@ -176,18 +176,6 @@ class DefaultWorkflow(WorkflowBase):
             # import traceback
             # session_task.log_error(traceback.format_exc(), f"Traceback for {error_context}")
 
-
-    def _investigate_dreamer(
-        self,
-                f"      ERROR during DefaultWorkflow execution for task {task.id}: {e}"
-            )
-            if not session_task.errors or str(e) not in str(
-                session_task.errors.values()
-            ):
-                session_task.log_error(
-                    e, f"DefaultWorkflow execution failed for task {task.id}"
-                )
-
     def _investigate_dreamer(
         self,
         session_task: "SessionTask",
