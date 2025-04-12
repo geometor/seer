@@ -420,26 +420,27 @@ def load_tasks_from_kaggle_json(file_path: Path) -> 'Tasks':
     return tasks_obj
 
 
-def get_unsolved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
+def get_unsolved_tasks(sessions_root: Path) -> Tasks:
     """
     Scans session summaries to find all unique tasks present across sessions
     that have never passed the test phase. Loads these tasks from their
-    original task JSON files.
+    task.json files within the session folders.
 
     Args:
         sessions_root: The root directory containing session folders.
-        tasks_root: The root directory containing the original task JSON files.
 
     Returns:
         A new Tasks object containing only the unsolved tasks found across all
         sessions. Returns an empty Tasks object if sessions_root is invalid,
         no tasks are found, or scanning fails.
     """
-    solved_task_ids: Set[str] = set()
-    attempted_task_ids: Set[str] = set() # Keep track of all tasks seen
+    solved_task_ids = set()
+    tasks_in_sessions = {} # Store task_id -> path to a task.json
 
-    # Create an empty Tasks object upfront
-    unsolved_tasks_obj = Tasks.create_empty()
+    # Create an empty Tasks object upfront for potential error returns and final result
+    # Use __new__ and clear() as per the provided code
+    unsolved_tasks_obj = Tasks.__new__(Tasks)
+    unsolved_tasks_obj.clear() # Initialize the list manually
 
     try:
         if not sessions_root.is_dir():
@@ -454,46 +455,50 @@ def get_unsolved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
                     # Use the helper function to check if it's a task directory
                     if is_task_directory(task_dir):
                         task_id = task_dir.name
-                        attempted_task_ids.add(task_id) # Mark as attempted
+                        # Store a path to task.json if we haven't seen this task yet
+                        # or if the current one exists (prefer existing ones)
+                        task_json_path = task_dir / "task.json"
+                        if task_id not in tasks_in_sessions or task_json_path.exists():
+                             if task_json_path.exists(): # Only store if task.json actually exists
+                                tasks_in_sessions[task_id] = task_json_path
 
-                        # Check solved status from index.json (using safe_load_json)
-                        summary_path = task_dir / "index.json" # Check index.json
-                        summary = safe_load_json(summary_path)
-                        if summary:
-                            if summary.get("test_passed") is True:
+                        # Check solved status from index.json
+                        summary_path = task_dir / "index.json"
+                        if summary_path.exists():
+                            # Use safe_load_json for robustness
+                            summary = safe_load_json(summary_path)
+                            if summary and summary.get("test_passed") is True:
                                 solved_task_ids.add(task_id)
-                        # else: If no summary, assume not solved or handle as needed
+                            # else: If no summary or test_passed not True, it's not solved
 
     except Exception as e:
         print(f"Error scanning sessions directory {sessions_root}: {e}")
         return unsolved_tasks_obj # Return empty Tasks
 
     # Determine unsolved task IDs
-    unsolved_task_ids = attempted_task_ids - solved_task_ids
+    unsolved_task_ids = set(tasks_in_sessions.keys()) - solved_task_ids
     print(f"Found {len(unsolved_task_ids)} unique unsolved task IDs.")
 
     # Load Task objects for unsolved tasks
-    if not tasks_root.is_dir():
-        print(f"Error: Tasks root directory not found: {tasks_root}")
-        return unsolved_tasks_obj # Return empty list
-
     unsolved_tasks_list = []
     for task_id in sorted(list(unsolved_task_ids)): # Sort for consistent order
-        task_json_path = tasks_root / f"{task_id}.json"
-        if task_json_path.exists():
-            try:
-                with open(task_json_path, "r") as f:
-                    task_data = json.load(f)
+        task_json_path = tasks_in_sessions.get(task_id)
+        if task_json_path and task_json_path.exists():
+            task_data = safe_load_json(task_json_path)
+            if task_data:
                 # Basic validation before creating Task object
                 if isinstance(task_data, dict) and "train" in task_data and "test" in task_data:
-                    task_obj = Task(task_id, task_data)
-                    unsolved_tasks_list.append(task_obj)
+                    try:
+                        task_obj = Task(task_id, task_data)
+                        unsolved_tasks_list.append(task_obj)
+                    except Exception as e: # Catch potential errors during Task creation
+                         print(f"Error creating Task object for {task_id} from {task_json_path}: {e}")
                 else:
                     print(f"Warning: Skipping task file {task_json_path} due to unexpected structure.")
-            except (json.JSONDecodeError, Exception) as e:
-                print(f"Error loading task.json for unsolved task {task_id} from {task_json_path}: {e}")
+            # else: safe_load_json already prints warnings for load errors
         else:
-             print(f"Warning: Could not find task.json for unsolved task {task_id} (expected at {task_json_path})")
+             print(f"Warning: Could not find or access task.json for unsolved task {task_id} (expected at {task_json_path})")
+
 
     # Populate the final Tasks object
     unsolved_tasks_obj.extend(unsolved_tasks_list)
@@ -501,22 +506,22 @@ def get_unsolved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
     return unsolved_tasks_obj
 
 
-# --- NEW FUNCTION ---
-def get_partially_solved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
+# --- UPDATED FUNCTION ---
+def get_partially_solved_tasks(sessions_root: Path) -> Tasks:
     """
     Finds unique tasks across all sessions that have passed the training set
     but failed the test set in at least one recorded attempt (based on index.json).
+    Loads tasks from their task.json files within the session folders.
 
     Args:
         sessions_root: The root directory containing session data (e.g., './sessions').
-        tasks_root: The root directory containing the original task JSON files
-                    (e.g., './tasks/ARC/training').
 
     Returns:
         A Tasks object containing the unique partially solved tasks found.
     """
     partially_solved_task_ids: Set[str] = set()
     fully_solved_task_ids: Set[str] = set() # Track tasks that were fully solved at least once
+    tasks_in_sessions: Dict[str, Path] = {} # Store task_id -> path to a task.json
 
     # Create an empty Tasks object upfront
     partially_solved_tasks_obj = Tasks.create_empty()
@@ -537,6 +542,12 @@ def get_partially_solved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
 
                 task_id = task_dir.name
                 summary_path = task_dir / "index.json" # Check index.json
+                task_json_path = task_dir / "task.json" # Path to task data
+
+                # Store path to task.json if we haven't seen it or if this one exists
+                if task_id not in tasks_in_sessions or task_json_path.exists():
+                    if task_json_path.exists():
+                        tasks_in_sessions[task_id] = task_json_path
 
                 task_summary = safe_load_json(summary_path)
 
@@ -564,28 +575,26 @@ def get_partially_solved_tasks(sessions_root: Path, tasks_root: Path) -> Tasks:
 
     print(f"Found {len(final_partially_solved_ids)} unique partially solved task IDs (never fully solved).")
 
-    # Load the actual Task objects for the identified IDs
-    if not tasks_root.is_dir():
-        print(f"Error: Tasks root directory not found: {tasks_root}")
-        return partially_solved_tasks_obj # Return empty list
-
+    # Load the actual Task objects for the identified IDs using paths from tasks_in_sessions
     partially_solved_tasks_list = []
     for task_id in sorted(list(final_partially_solved_ids)): # Sort for consistency
-        task_file = tasks_root / f"{task_id}.json"
-        if task_file.is_file():
-            try:
-                with open(task_file, "r") as f:
-                    task_data = json.load(f)
+        task_json_path = tasks_in_sessions.get(task_id)
+        if task_json_path and task_json_path.exists():
+            task_data = safe_load_json(task_json_path)
+            if task_data:
                 # Basic validation before creating Task object
                 if isinstance(task_data, dict) and "train" in task_data and "test" in task_data:
-                    task_object = Task(task_id, task_data)
-                    partially_solved_tasks_list.append(task_object) # Add the Task object to the list
+                    try:
+                        task_object = Task(task_id, task_data)
+                        partially_solved_tasks_list.append(task_object) # Add the Task object to the list
+                    except Exception as e: # Catch potential errors during Task creation
+                         print(f"Error creating Task object for {task_id} from {task_json_path}: {e}")
                 else:
-                    print(f"Warning: Skipping task file {task_file} due to unexpected structure.")
-            except (json.JSONDecodeError, Exception) as e:
-                print(f"Warning: Failed to load task {task_id} from {task_file}: {e}")
+                    print(f"Warning: Skipping task file {task_json_path} due to unexpected structure.")
+            # else: safe_load_json already prints warnings
         else:
-            print(f"Warning: Task file not found for partially solved task ID: {task_file}")
+            print(f"Warning: Task file not found for partially solved task ID: {task_id} (expected at {task_json_path})")
+
 
     # Populate the final Tasks object
     partially_solved_tasks_obj.extend(partially_solved_tasks_list)
