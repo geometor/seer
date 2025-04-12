@@ -3,12 +3,14 @@ import ast
 import contextlib
 import io
 import multiprocessing
-from typing import Dict, List, Any # Added List, Any
+from typing import Dict, List, Any, TYPE_CHECKING # Added List, Any, TYPE_CHECKING
 
 import numpy as np
 
 from geometor.seer.trials.code_trial import CodeTrial
-from geometor.seer.trials.task_pair_trial import TaskPairTrial
+# Use TYPE_CHECKING to avoid circular import at runtime
+if TYPE_CHECKING:
+    from geometor.seer.trials.task_pair_trial import TaskPairTrial
 from geometor.seer.tasks.grid import Grid
 
 
