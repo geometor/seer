@@ -1,0 +1,57 @@
+{# src/geometor/seer/workflows/default/templates/review_test_inputs.j2 #}
+**INSTRUCTIONS**
+
+The provided Python code successfully transforms all TRAINING inputs to their corresponding outputs based on the natural language program in its docstring. However, it may fail on the TEST inputs due to variations not seen in training.
+
+Your task is to:
+1.  Analyze the provided TRAINING input grids.
+2.  Analyze the provided TEST input grids.
+3.  Identify key differences between the test inputs and training inputs (e.g., grid dimensions, color palettes, object counts, spatial arrangements, new patterns, edge cases).
+4.  Review the "Previous Natural Language Program" (extracted from the code's docstring).
+5.  Evaluate if the program, as written, implicitly or explicitly handles the differences found in the test inputs.
+6.  Provide an "Analysis of Differences" section detailing your findings.
+7.  Provide an "Updated Natural Language Program" section containing the refined program text. This refined text should explicitly account for the variations observed in the test inputs while remaining consistent with the training examples.
+
+**Provided Information:**
+
+**Previous Python Code:**
+```python
+{{ code }}
+```
+
+**(Implied) Previous Natural Language Program (Docstring from above code):**
+```
+{{ natural_language_program }}
+```
+
+**Training Inputs:**
+{% for i, pair in enumerate(train_pairs, 1) %}
+**Training Input {{ i }}:**
+```
+{{ pair.input.to_string() }}
+```
+{% if use_images %}
+{{ pair.input.to_image() }}
+{% endif %}
+{% endfor %}
+
+**Test Inputs:**
+{% for i, pair in enumerate(test_pairs, 1) %}
+**Test Input {{ i }}:**
+```
+{{ pair.input.to_string() }}
+```
+{% if use_images %}
+{{ pair.input.to_image() }}
+{% endif %}
+{% endfor %}
+
+**Deliverables:**
+
+Respond *only* with the following sections in markdown format:
+
+**Analysis of Differences:**
+<Your detailed analysis comparing train and test inputs and evaluating the program's robustness>
+
+**Updated Natural Language Program:**
+<Your refined natural language program text only>

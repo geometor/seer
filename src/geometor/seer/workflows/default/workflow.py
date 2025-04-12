@@ -94,12 +94,91 @@ class DefaultWorkflow(WorkflowBase):
 
                 current_iteration += 1
 
-            print(
-                f"            INFO: Reached max iterations ({max_iterations}) without solving task {task.id}."
-            )
+            # --- Conditional Test Input Review Phase ---
+            # Check if the last step passed training but not testing (or test unknown)
+            # Also ensure a task_step exists and we haven't already solved it
+            if task_step and task_step.train_passed and not task_step.test_passed and not session_task.test_passed:
+                print(f"            INFO: Training passed, test failed/unknown for task {task.id}. Initiating test input review...")
+                review_step = None # Initialize review_step
+                try:
+                    # Get the best code trial from the last successful step
+                    # Use get_best_trial which considers score if multiple trials exist
+                    code_trial = task_step.step_code_trials.get_best_trial()
+                    if not code_trial or not code_trial.code:
+                        session_task.log_warning("Cannot review test inputs: No valid code trial found in the last successful step.", "Test Review")
+                        raise Exception("No valid code trial found for review.") # Stop review phase
+
+                    # --- Oracle Review Step ---
+                    review_step = self._review_test_inputs(
+                        session_task,
+                        task,
+                        seer_instance,
+                        history, # Pass current history
+                        code_trial, # Pass the best trial object
+                    )
+                    # Update history with the oracle's input and output
+                    history.extend(review_step.content)
+                    history.extend(review_step.response_parts)
+
+                    # --- Final Coder Step ---
+                    # Generate code based on the oracle's refined NL program (in history)
+                    final_code_step = self._generate_final_code(
+                        session_task,
+                        task,
+                        seer_instance,
+                        history # History now includes oracle's review
+                    )
+                    # Update history with the coder's output
+                    history.extend(final_code_step.response_parts)
+
+                    # --- Final Trials ---
+                    print(f"            Running trials on final code after test review...")
+                    final_code_step.run_trials()
+                    final_code_step.summarize()
+
+                    # Update the main task_step to this final one for submission generation etc.
+                    task_step = final_code_step
+                    # Log final success/failure after review
+                    self._check_success_and_log(task_step, "final_code_after_review")
+
+
+                except Exception as review_err:
+                    print(f"            ERROR during test input review phase for task {task.id}: {review_err}")
+                    # Log the error at the session_task level
+                    if not session_task.errors or str(review_err) not in str(session_task.errors.values()):
+                         session_task.log_error(review_err, f"Test Input Review Phase Failed for task {task.id}")
+                    # The task remains in its pre-review state (train passed, test failed/unknown)
+
+            # --- End Conditional Test Input Review Phase ---
+
+            # Final check if task wasn't solved after all steps (including potential review)
+            # Check the overall task status which might have been updated by the review step
+            if not session_task.test_passed:
+                 # Check if max iterations were hit *before* review might have started
+                 if current_iteration >= max_iterations and 'review_step' not in locals():
+                     print(f"            INFO: Reached max iterations ({max_iterations}) for task {task.id} before test review.")
+                 # Add a log if review was attempted but still failed
+                 elif 'review_step' in locals() and review_step: # Check if review step was attempted
+                     print(f"            INFO: Test input review completed, but task {task.id} still not solved.")
+                 elif not (task_step and task_step.train_passed): # If train didn't even pass
+                     print(f"            INFO: Task {task.id} failed to pass training.")
+                 # else: Train passed, test failed, but review wasn't triggered or failed early
+
 
         except Exception as e:
-            print(
+            # Log the exception at the session_task level for summary
+            error_context = f"DefaultWorkflow execution failed for task {task.id}"
+            print(f"      ERROR: {error_context}: {e}")
+            # Ensure error is logged even if it happened during workflow execution
+            if not session_task.errors or str(e) not in str(session_task.errors.values()):
+                session_task.log_error(e, error_context)
+            # Optionally log traceback for detailed debugging
+            # import traceback
+            # session_task.log_error(traceback.format_exc(), f"Traceback for {error_context}")
+
+
+    def _investigate_dreamer(
+        self,
                 f"      ERROR during DefaultWorkflow execution for task {task.id}: {e}"
             )
             if not session_task.errors or str(e) not in str(

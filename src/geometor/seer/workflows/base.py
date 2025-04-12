@@ -1,3 +1,4 @@
+import ast
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, List, Any, Dict
 import jinja2
@@ -6,9 +7,11 @@ from pathlib import Path
 # Local application/library specific imports
 # Need TaskStep for type hinting in _check_success_and_log
 from geometor.seer.session.task_step import TaskStep
+from geometor.seer.trials.code_trial import CodeTrial # Import CodeTrial
 
 if TYPE_CHECKING:
     from geometor.seer.seer import Seer
+    from geometor.seer.session import SessionTask # Import SessionTask
     from geometor.seer.session import SessionTask
     from geometor.seer.tasks import Task
 
