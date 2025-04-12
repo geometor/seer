@@ -14,99 +14,229 @@ and code execution (like Gemini). Key goals include understanding the nature
 of problems, describing the problem-solving process in natural language, and
 converting those descriptions into executable code.
 
+# Seer
+
+![seer](./seer_resized.png)
+
+## Perception and Discernment for Abstraction and Reasoning Challenges
+
+Seer is an AI-driven framework for solving geometric reasoning puzzles from the Abstraction and Reasoning Corpus (ARC) challenge. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
+
+### Key Features
+
+- **Multi-role AI Collaboration**: Utilizes specialized roles ("dreamer" and "coder") to analyze problems and generate solutions
+- **Structured Workflows**: Supports different problem-solving approaches (default and incremental)
+- **Comprehensive Logging**: Records every step of the reasoning and solution process
+- **Visualized Outputs**: Generates rich visual representations of puzzles and solutions
+- **Code Generation**: Transforms natural language reasoning into executable Python code
+- **Extensible Architecture**: Easily adaptable to different models and reasoning styles
+
+## Architecture
+
+Seer is built around a collaborative AI system where different roles analyze and solve puzzles:
+
+1. **Dreamer**: Analyzes puzzle examples, identifies patterns, and describes transformations in natural language
+2. **Coder**: Converts the dreamer's insights into executable code that solves the puzzles
+3. **Workflows**: Orchestrate the interaction between roles (e.g., analyze all examples at once or incrementally)
+4. **Session Management**: Records all interactions, solutions, and results for analysis
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│     Tasks       │     │      Seer       │     │     Session     │
+│  (ARC Puzzles)  │────▶│  Orchestrator   │────▶│    Recording    │
+└─────────────────┘     └────────┬────────┘     └─────────────────┘
+                               ┌─┴─┐                      ▲
+                               │   │                      │
+                 ┌─────────────┘   └──────────┐          │
+                 ▼                            ▼          │
+        ┌─────────────────┐          ┌─────────────────┐ │
+        │    Dreamer      │          │     Coder       │ │
+        │ (Pattern Analysis) ◀───────▶ (Code Generation)│ │
+        └─────────────────┘          └─────────────────┘ │
+                 │                            │          │
+                 └────────────────────────────┘          │
+                               │                         │
+                               ▼                         │
+                  ┌─────────────────────────┐           │
+                  │    Solution Testing     │───────────┘
+                  │ (Verification & Scoring)│
+                  └─────────────────────────┘
+```
 
 ## Installation
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/geometor/seer.git
-    cd seer
-    ```
+### Prerequisites
 
-2.  **Install the package:**
-    It's recommended to install the package in a virtual environment.
-    ```bash
-    # Create and activate a virtual environment (example using venv)
-    python -m venv .venv
-    source .venv/bin/activate # On Windows use `.venv\Scripts\activate`
+- Python 3.7+
+- Google API key for Gemini model access
 
-    # Install the package and its dependencies
-    pip install .
-    ```
-    For development, you might prefer an editable install:
-    ```bash
-    pip install -e .
-    ```
+### Standard Installation
 
-## Dependencies
+```bash
+# Clone the repository
+git clone https://github.com/geometor/seer.git
+cd seer
 
-**seer** requires Python 3.7+ and the following packages:
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
 
-*   google-genai
-*   google-api-core
-*   google-generativeai
-*   numpy
-*   scipy
-*   scikit-learn
-*   pillow
-*   rich
-*   jinja2
+# Install the package
+pip install .
+```
 
-These dependencies will be installed automatically when you install `geometor-seer` using pip.
+### Development Installation
+
+```bash
+# For development with editable install
+pip install -e .
+```
+
+## Configuration
+
+Seer requires a configuration directory with an `index.yaml` file that defines:
+
+1. **API Keys**: Authentication for the AI models
+2. **Roles**: Instructions and parameters for each AI role
+3. **Workflows**: Settings for different problem-solving approaches
+4. **Task Context**: Background information about the ARC challenge
+
+Example configuration structure:
+```
+config/
+├── index.yaml           # Main configuration file
+├── instructions/        # Role-specific instructions
+│   ├── dreamer.md
+│   └── coder.md
+└── context/             # Background information
+    └── arc_context.md
+```
+
+Sample `index.yaml`:
+```yaml
+api_key: "your_gemini_api_key_here"
+roles:
+  dreamer:
+    model: "gemini-1.5-pro"
+    temperature: 0.2
+    instructions: "instructions/dreamer.md"
+  coder:
+    model: "gemini-1.5-pro"
+    temperature: 0.1
+    instructions: "instructions/coder.md"
+workflow: "default"  # or "incremental"
+task_context: "context/arc_context.md"
+max_iterations: 3
+use_images: true
+```
 
 ## Usage
 
-**seer** relies on a configuration directory that defines roles, instructions, and context for the AI models. See the `Config` class (`src/geometor/seer/config.py`) for details on the expected structure (e.g., an `index.yaml` file).
-
-### Rebuilding Indexes (Command-Line)
-
-The repository includes a script to rebuild summary indexes for session outputs:
-
-```bash
-seer_rebuild_indexes --session_dir path/to/your/session/output
-```
-Use `seer_rebuild_indexes --help` for more options.
-
-### Running the Seer (Library Usage - Example)
-
-While a primary command-line interface is under development, the core `Seer` orchestrator can be used as a library. Here's a basic conceptual example:
+### Running with the Library API
 
 ```python
 from pathlib import Path
 from geometor.seer import Seer
 from geometor.seer.config import Config
-from geometor.seer.tasks import Tasks # Or however tasks are loaded
+from geometor.seer.tasks import Tasks
 
-# 1. Load Configuration
-config_dir = Path("path/to/your/config")
+# Load configuration
+config_dir = Path("./config")
 config = Config(config_dir)
 
-# 2. Load Tasks (Replace with actual task loading mechanism)
-# Example: tasks = Tasks.load_from_some_source("path/to/tasks")
-tasks_to_run = Tasks(...) # Load specific tasks you want to process
-
-# 3. Initialize Seer
+# Initialize Seer
 seer_instance = Seer(config)
 
-# 4. Define Output Directory and Description
-output_dir = Path("path/to/session/output")
-session_description = "My first seer run"
+# Load tasks
+tasks = Tasks("./tasks/ARCv2/training")
+ordered_tasks = tasks.get_ordered_tasks()
 
-# 5. Run the Seer process
+# Run Seer on selected tasks
+output_dir = Path("./seer_sessions/")
 seer_instance.run(
-    tasks=tasks_to_run,
+    tasks=ordered_tasks[0:10],  # First 10 tasks
     output_dir=output_dir,
-    description=session_description
+    description="ARC Training Tasks 0-10"
 )
-
-print(f"Seer session finished. Output saved to: {output_dir}")
 ```
-*(Note: You will need to adapt task loading and configuration paths based on your specific setup.)*
+
+### Command-line Tools
+
+Rebuild session indexes:
+```bash
+seer_rebuild_indexes --session_dir path/to/your/session/output
+```
+
+## Workflows
+
+Seer supports multiple problem-solving approaches:
+
+### Default Workflow
+
+Analyzes all training examples simultaneously, then generates a solution.
+
+### Incremental Workflow
+
+Examines one example at a time, building up understanding progressively.
+
+## Output Structure
+
+Seer creates structured session outputs with detailed tracking of each step:
+```
+seer_sessions/
+└── 25.101.1306/                           # Session directory (date-based)
+    ├── index.json                         # Session metadata
+    ├── 13e47133/                          # Task ID
+    │   ├── index.json                     # Task metadata
+    │   ├── task.png                       # Visual representation of the task
+    │   ├── task.json                      # Task definition and metadata
+    │   ├── 000/                           # Numbered step
+    │   │   ├── code_00.yaml               # Code from this step
+    │   │   ├── index.json                 # Step metadata
+    │   │   ├── prompt_content.md          # Main prompt content
+    │   │   ├── prompt_history.md          # Conversation history
+    │   │   ├── prompt_instructions.md     # Instructions for the model
+    │   │   ├── response.json              # Raw model response
+    │   │   └── response.md                # Formatted model response
+    │   ├── 001/
+    │   │   ├── code_00.py                 # Generated Python code
+    │   │   ├── code_00.py.trial.json      # Code trial results (JSON)
+    │   │   ├── code_00.py.trial.png       # Visualization of trial
+    │   │   ├── index.json                 # Step metadata
+    │   │   ├── prompt_content.md
+    │   │   ├── prompt_history.md
+    │   │   ├── prompt_instructions.md
+    │   │   ├── response.json
+    │   │   └── response.md
+    │   ├── 002/
+    │   │   └── ...
+    ├── summary.md                         # Task summary
+    └── submission.json                    # Solutions for submissio
+```
+
+## Results Analysis
+
+Session directories contain summarized results and metrics, including:
+- Success rates by task
+- Code performance analysis
+- Visual comparisons of expected vs. generated outputs
 
 ## Contributing
 
 Contributions are welcome! Please see our [GitHub issues](https://github.com/geometor/seer/issues) for ways to contribute.
 
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## License
 
-**seer** is licensed under the MIT License. See the `LICENSE` file for more details.
+Seer is licensed under the MIT License. See the `LICENSE` file for more details.
+
+## Acknowledgments
+
+- [Abstraction and Reasoning Corpus (ARC)](https://github.com/fchollet/ARC)
+- [Google Gemini API](https://ai.google.dev/)
+- [Geometor Project](https://geometor.github.io/)
