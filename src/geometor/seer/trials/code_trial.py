@@ -9,9 +9,10 @@ from typing import Any, Dict, List, Optional, Tuple, Callable, TYPE_CHECKING # A
 # Use TYPE_CHECKING to avoid circular import at runtime
 if TYPE_CHECKING:
     from geometor.seer.tasks.tasks import Task
+    from geometor.seer.trials.task_pair_trial import TaskPairTrial # Move import here
 from geometor.seer.tasks.grid import Grid
 
-from geometor.seer.trials.task_pair_trial import TaskPairTrial
+# Remove the import from here
 
 
 class CodeTrial:
