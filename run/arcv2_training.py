@@ -8,33 +8,22 @@ from geometor.seer.tasks.tasks import get_unsolved_tasks
 
 
 def run():
-    config_dir = Path("./config") 
+    config_dir = Path("./config")
 
-    try:
-        config = Config(config_dir)
-        print(f"Configuration loaded successfully from: {config_dir}")
-    except (FileNotFoundError, ConfigError) as e:
-        print(f"FATAL: Failed to load configuration from {config_dir}: {e}")
-        sys.exit(1) 
+    config = Config(config_dir)
+    seer = Seer(config)
 
-    try:
-        seer = Seer(config)
-    except (ValueError, RuntimeError) as e:
-        print(f"FATAL: Failed to initialize Seer: {e}")
-        sys.exit(1)
+    output_dir = Path("../../seer_sessions/sessions_ARCv2_train/")
 
-    output_dir = Path("../sessions_ARCv2_train/")
-
-    #  tasks = Tasks("../tasks/ARCv2/training")
-    tasks = get_unsolved_tasks(output_dir)
+    # read tasks from json files in folder
+    tasks = Tasks("../tasks/ARCv2/training")
+    # sort the tasks by "weight" - total pixels in train
     tasks = tasks.get_ordered_tasks()
 
-    #  seer.run(tasks[0:100], output_dir, "ARCv2 training 000:100")
-    seer.run(tasks, output_dir, "unsolved")
-    
+    seer.run(tasks[0:100], output_dir, "ARCv2 training 000:100")
 
-
-
+    #  tasks = get_unsolved_tasks(output_dir)
+    #  seer.run(tasks, output_dir, "unsolved")
 
 
 if __name__ == "__main__":

@@ -28,13 +28,14 @@ def run():
         print(f"FATAL: Failed to initialize Seer: {e}")
         sys.exit(1)
 
-    output_dir = Path("../sessions_ConceptARC/")
+    output_dir = Path("../../seer_sessions/sessions_ConceptARC/")
 
     #  tasks = Tasks("../tasks/ConceptARC_minimal")
     tasks = get_unsolved_tasks(output_dir)
     tasks = tasks.get_ordered_tasks()
 
-    seer.run(tasks, output_dir, "unsolved")
+    print(len(tasks))
+    #  seer.run(tasks, output_dir, "unsolved")
 
     #  parent_path = Path("../tasks/ConceptARC")
     #  for set_dir in parent_path.iterdir():
