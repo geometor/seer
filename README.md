@@ -1,26 +1,12 @@
-# seer
+# SEER
 
-The next generation of ARC challenge investigations.
-
-![seer](./seer_resized.png)
-
-**seer** is an artificial intelligence entity focused on perception and
-discernment, building upon our previous work with the Abstraction and Reasoning
-Corpus (ARC) challenge. 
-
-It aims to provide a flexible and extensible framework for exploring geometric
-reasoning and problem-solving, using multi-modal models capable of reasoning
-and code execution (like Gemini). Key goals include understanding the nature
-of problems, describing the problem-solving process in natural language, and
-converting those descriptions into executable code.
-
-# Seer
-
-![seer](./seer_resized.png)
+![SEER](./seer_resized.png)
 
 ## Perception and Discernment for Abstraction and Reasoning Challenges
 
-Seer is an AI-driven framework for solving geometric reasoning puzzles from the Abstraction and Reasoning Corpus (ARC) challenge. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
+sEER is an AI-driven framework for finding functions to transform inputs to outputs from a set of training datra. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
+
+
 
 ### Key Features
 
@@ -33,7 +19,7 @@ Seer is an AI-driven framework for solving geometric reasoning puzzles from the 
 
 ## Architecture
 
-Seer is built around a collaborative AI system where different roles analyze and solve puzzles:
+sEER is built around a collaborative AI system where different roles analyze and solve puzzles:
 
 1. **Dreamer**: Analyzes puzzle examples, identifies patterns, and describes transformations in natural language
 2. **Coder**: Converts the dreamer's insights into executable code that solves the puzzles
@@ -42,7 +28,7 @@ Seer is built around a collaborative AI system where different roles analyze and
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     Tasks       │     │      Seer       │     │     Session     │
+│     Tasks       │     │      sEER       │     │     Session     │
 │  (ARC Puzzles)  │────▶│  Orchestrator   │────▶│    Recording    │
 └─────────────────┘     └────────┬────────┘     └─────────────────┘
                                ┌─┴─┐                      ▲
@@ -94,7 +80,7 @@ pip install -e .
 
 ## Configuration
 
-Seer requires a configuration directory with an `index.yaml` file that defines:
+sEER requires a configuration directory with an `index.yaml` file that defines:
 
 1. **API Keys**: Authentication for the AI models
 2. **Roles**: Instructions and parameters for each AI role
@@ -169,7 +155,7 @@ seer_rebuild_indexes --session_dir path/to/your/session/output
 
 ## Workflows
 
-Seer supports multiple problem-solving approaches:
+sEER supports multiple problem-solving approaches:
 
 ### Default Workflow
 
@@ -181,7 +167,7 @@ Examines one example at a time, building up understanding progressively.
 
 ## Output Structure
 
-Seer creates structured session outputs with detailed tracking of each step:
+SEER creates structured session outputs with detailed tracking of each step:
 ```
 seer_sessions/
 └── 25.101.1306/                           # Session directory (date-based)
@@ -233,7 +219,7 @@ Contributions are welcome! Please see our [GitHub issues](https://github.com/geo
 
 ## License
 
-Seer is licensed under the MIT License. See the `LICENSE` file for more details.
+SEER is licensed under the MIT License. See the `LICENSE` file for more details.
 
 ## Acknowledgments
 
