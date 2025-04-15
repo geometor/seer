@@ -4,7 +4,7 @@
 
 ## Perception and Discernment for Abstraction and Reasoning Challenges
 
-sEER is an AI-driven framework for finding functions to transform inputs to outputs from a set of training datra. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
+SEER is an AI-driven framework for finding functions to transform inputs to outputs from a set of training datra. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
 
 
 
@@ -19,7 +19,7 @@ sEER is an AI-driven framework for finding functions to transform inputs to outp
 
 ## Architecture
 
-sEER is built around a collaborative AI system where different roles analyze and solve puzzles:
+SEER is built around a collaborative AI system where different roles analyze and solve puzzles:
 
 1. **Dreamer**: Analyzes puzzle examples, identifies patterns, and describes transformations in natural language
 2. **Coder**: Converts the dreamer's insights into executable code that solves the puzzles
@@ -28,7 +28,7 @@ sEER is built around a collaborative AI system where different roles analyze and
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     Tasks       │     │      sEER       │     │     Session     │
+│     Tasks       │     │      SEER       │     │     Session     │
 │  (ARC Puzzles)  │────▶│  Orchestrator   │────▶│    Recording    │
 └─────────────────┘     └────────┬────────┘     └─────────────────┘
                                ┌─┴─┐                      ▲
@@ -80,7 +80,7 @@ pip install -e .
 
 ## Configuration
 
-sEER requires a configuration directory with an `index.yaml` file that defines:
+SEER requires a configuration directory with an `index.yaml` file that defines:
 
 1. **API Keys**: Authentication for the AI models
 2. **Roles**: Instructions and parameters for each AI role
@@ -155,7 +155,7 @@ seer_rebuild_indexes --session_dir path/to/your/session/output
 
 ## Workflows
 
-sEER supports multiple problem-solving approaches:
+SEER supports multiple problem-solving approaches:
 
 ### Default Workflow
 
