@@ -9,13 +9,7 @@ from pathlib import Path
 from collections import Counter
 from PIL import Image, ImageDraw
 import numpy as np
-
-try:
-    from moviepy.editor import ImageSequenceClip
-    MOVIEPY_AVAILABLE_TASKS = True
-except ImportError:
-    MOVIEPY_AVAILABLE_TASKS = False
-    ImageSequenceClip = None # Placeholder
+from moviepy.editor import ImageSequenceClip
 
 from geometor.seer.tasks.grid import Grid, string_to_grid
 #  from geometor.seer.trials import verifier
@@ -66,69 +60,33 @@ class TaskPair(dict):
             for color in all_colors
         }
 
-    def get_video(self, output_path="task_pair_video.mp4", include_diff_frame=False,
-                  actual_output_grid_pil: Image.Image = None,
-                  expected_output_grid_pil: Image.Image = None):
-        """
-        Generates a video sequence.
-        If actual_output_grid_pil is provided, it generates a sequence:
-        Input -> Actual Output -> (Optional Diff: Actual vs Expected) -> Expected Output.
-        Otherwise, it generates the original sequence:
-        Input -> (Optional Diff: Input vs Self.Output) -> Self.Output.
-        """
+    def get_video(self, output_path="task_pair_video.mp4", include_diff_frame=False):
+        """Generates a video from the input, (optionally) diff, and output grids."""
         images = []
+        # Ensure images are in RGB format for moviepy
+        input_image_pil = self.input.to_image().convert("RGB")
+        images.append(np.array(input_image_pil))
 
-        # Frame 1: Always input grid image
-        input_pil = self.input.to_image().convert("RGB")
-        images.append(np.array(input_pil))
+        if self.output:
+            if include_diff_frame:
+                diff_frame_pil = self.get_diff_frame()
+                if diff_frame_pil:
+                    # get_diff_frame should already return an RGB PIL Image
+                    images.append(np.array(diff_frame_pil)) # .convert("RGB") is redundant if get_diff_frame guarantees RGB
+            
+            output_image_pil = self.output.to_image().convert("RGB")
+            images.append(np.array(output_image_pil))
+        elif include_diff_frame:
+            # If no output, there's no diff frame to add.
+            # print("Warning: include_diff_frame is True, but no output grid exists to create a diff.")
+            pass # No action needed, images list will only contain input
 
-        if actual_output_grid_pil:
-            # New behavior for refinement reports
-            images.append(np.array(actual_output_grid_pil.convert("RGB")))
-
-            if include_diff_frame and expected_output_grid_pil:
-                # Diff between actual_output_grid_pil and expected_output_grid_pil
-                diff_actual_vs_expected = TaskPair._generate_diff_image(
-                    actual_output_grid_pil, expected_output_grid_pil
-                )
-                if diff_actual_vs_expected:
-                    images.append(np.array(diff_actual_vs_expected.convert("RGB"))) # Already RGB from _generate_diff_image
-
-            if expected_output_grid_pil:
-                images.append(np.array(expected_output_grid_pil.convert("RGB")))
-
-        else:
-            # Original behavior
-            if self.output:
-                if include_diff_frame:
-                    # Diff between self.input and self.output
-                    diff_input_vs_output = self.get_diff_frame() # This uses self.input and self.output
-                    if diff_input_vs_output:
-                        # get_diff_frame should already return an RGB PIL Image
-                        images.append(np.array(diff_input_vs_output)) 
-                
-                output_pil = self.output.to_image().convert("RGB")
-                images.append(np.array(output_pil))
-            elif include_diff_frame:
-                # No self.output, so no diff frame to add even if requested.
-                pass
-
-        if not images: # Should ideally not happen as input is always added
-            return None
-
-        if not MOVIEPY_AVAILABLE_TASKS or ImageSequenceClip is None:
-            print("Warning: moviepy.editor.ImageSequenceClip could not be imported. Video generation skipped.")
-            # Optionally, create an empty file at output_path or return an error indicator
-            # For now, just returning None to indicate failure to generate video.
+        if not images: # Should not happen if input is always present
             return None
 
         # Create video clip
-        try:
-            clip = ImageSequenceClip(images, fps=1)
-            clip.write_videofile(output_path, codec="libx264") # Specify codec for .mp4
-        except Exception as e:
-            print(f"Error during video generation with moviepy: {e}")
-            return None # Indicate failure
+        clip = ImageSequenceClip(images, fps=1)
+        clip.write_videofile(output_path, codec="libx264") # Specify codec for .mp4
 
         return output_path
 
@@ -169,57 +127,6 @@ class TaskPair(dict):
         # Convert numpy array to PIL Image
         diff_image = Image.fromarray(diff_array, "RGB")
         return diff_image
-
-    @staticmethod
-    def _generate_diff_image(pil_image1: Image.Image, pil_image2: Image.Image) -> Image.Image:
-        """
-        Generates a PIL Image representing the difference between two PIL images.
-        Assumes images are RGB.
-        """
-        if pil_image1 is None or pil_image2 is None:
-            return None
-
-        # Convert PIL images to numpy arrays
-        # Ensure they are in RGB format before converting to array
-        array1 = np.array(pil_image1.convert("RGB"))
-        array2 = np.array(pil_image2.convert("RGB"))
-
-        h1, w1, _ = array1.shape
-        h2, w2, _ = array2.shape
-
-        # Define colors for diff (RGB tuples) - consistent with get_diff_frame
-        ADDED_COLOR = np.array([0, 255, 0], dtype=np.uint8)  # Green (present in image2, not in image1)
-        REMOVED_COLOR = np.array([255, 0, 0], dtype=np.uint8)  # Red (present in image1, not in image2)
-        CHANGED_COLOR = np.array([255, 255, 0], dtype=np.uint8)  # Yellow
-        SAME_COLOR = np.array([192, 192, 192], dtype=np.uint8)  # Light Grey
-        BACKGROUND_COLOR = np.array([0, 0, 0], dtype=np.uint8) # Black
-
-        max_height = max(h1, h2)
-        max_width = max(w1, w2)
-
-        diff_array = np.full((max_height, max_width, 3), BACKGROUND_COLOR, dtype=np.uint8)
-
-        for r in range(max_height):
-            for c in range(max_width):
-                in_img1 = r < h1 and c < w1
-                in_img2 = r < h2 and c < w2
-
-                pixel1 = array1[r, c] if in_img1 else None
-                pixel2 = array2[r, c] if in_img2 else None
-
-                if in_img2 and not in_img1:
-                    diff_array[r, c] = ADDED_COLOR
-                elif in_img1 and not in_img2:
-                    diff_array[r, c] = REMOVED_COLOR
-                elif in_img1 and in_img2: # Both pixels exist
-                    if not np.array_equal(pixel1, pixel2):
-                        diff_array[r, c] = CHANGED_COLOR
-                    else:
-                        diff_array[r, c] = SAME_COLOR
-                # else: cell remains BACKGROUND_COLOR (implicitly, already set)
-
-        return Image.fromarray(diff_array, "RGB")
-
 
 class Task:
     def __init__(self, id, data):
