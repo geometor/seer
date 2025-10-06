@@ -23,7 +23,7 @@ def run():
     tasks = get_unsolved_tasks(output_dir)
     tasks = tasks.get_ordered_tasks()
 
-    seer.run(tasks, output_dir, "unsolved")
+   # seer.run(tasks, output_dir, "unsolved")
 
 
 
