@@ -1,5 +1,4 @@
-#  from ablog.conf import *
-from photon_platform.sphinxilator.global_conf import *
+from photon_platform.publish.global_conf import *
 import geometor.seer as module
 
 version = module.__version__
