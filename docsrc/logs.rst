@@ -1,3 +1,6 @@
+:navigation: header
+:order: 4
+
 logs
 ====
 
@@ -8,6 +11,7 @@ logs
 :ref:`blog-posts`
 :ref:`blog-feed`
 
-.. postlist::
-   :excerpts:
-   :expand: more
+.. collection::
+   :type: log
+   :sort: date
+   :reverse:

@@ -1,3 +1,6 @@
+:navigation: footer
+:order: 3
+
 glossary
 ========
 
