@@ -2,7 +2,7 @@
 
 ![SEER](./seer_resized.png)
 
-## Perception and Discernment for Abstraction and Reasoning Challenges
+## An AI-driven framework for solving abstraction and reasoning challenges.
 
 SEER is an AI-driven framework for finding functions to transform inputs to outputs from a set of training datra. It combines natural language understanding, visual reasoning, and code generation to identify patterns and develop algorithmic solutions.
 

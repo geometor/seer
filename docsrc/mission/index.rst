@@ -4,17 +4,10 @@
 mission
 =======
 
-.. contents::
-   :local:
-   :backlinks: none
-
-
-.. todo:: complete mission statement
+    facilitate collaborative problem-solving between AI agents to address abstract reasoning challenges
 
 goals
 -----
 
-.. .. postlist:: 
-   :category: GOALS
-   :excerpts:
-
+.. collection::
+   :sort: order

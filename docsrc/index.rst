@@ -1,6 +1,8 @@
 seer
 ====
 
+An AI-driven framework for solving abstraction and reasoning challenges.
+
 .. include:: intro.rst
 
 recent logs
