@@ -14,3 +14,47 @@ SEER uses a collaborative multi-agent system to transform problem descriptions i
 -   `prompts.py`: Manages the prompts used to interact with the AI models.
 -   `session/`: Handles the management and recording of problem-solving sessions.
 -   `gemini_client.py`: Client for interacting with the Gemini API.
+
+## Getting Started
+
+### Installation
+
+```bash
+git clone https://github.com/geometor/seer.git
+cd seer
+pip install -e .
+```
+
+### Usage
+
+```bash
+# Run the seer REPL or script
+python -m geometor.seer
+```
+
+## Resources
+
+-   **Source Code**: https://github.com/geometor/seer
+-   **Issues**: https://github.com/geometor/seer/issues
+
+## Getting Started
+
+### Installation
+
+```bash
+git clone https://github.com/geometor/seer.git
+cd seer
+pip install -e .
+```
+
+### Usage
+
+```bash
+# Run the seer REPL or script
+python -m geometor.seer
+```
+
+## Resources
+
+-   **Source Code**: https://github.com/geometor/seer
+-   **Issues**: https://github.com/geometor/seer/issues
