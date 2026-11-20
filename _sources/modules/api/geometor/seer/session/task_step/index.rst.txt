@@ -1,0 +1,129 @@
+geometor.seer.session.task_step
+===============================
+
+.. py:module:: geometor.seer.session.task_step
+
+.. autoapi-nested-parse::
+
+   Defines the TaskStep class, representing a single step within a SessionTask.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.session.task_step.TaskStep
+
+
+Module Contents
+---------------
+
+.. py:class:: TaskStep(title: str, history: list, content: list, instructions: list, session_task: geometor.seer.session.session_task.SessionTask, model_name: str | None = None)
+
+   Bases: :py:obj:`geometor.seer.session.level.Level`
+
+
+   .. py:attribute:: session_task
+
+
+   .. py:attribute:: model_name
+      :value: None
+
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: index
+
+
+   .. py:attribute:: attempts
+      :value: 0
+
+
+
+   .. py:attribute:: response
+
+
+   .. py:attribute:: response_parts
+      :value: []
+
+
+
+   .. py:attribute:: response_time
+      :value: None
+
+
+
+   .. py:attribute:: codes
+
+
+   .. py:attribute:: function_calls
+
+
+   .. py:attribute:: step_code_trials
+
+
+   .. py:attribute:: history
+
+
+   .. py:attribute:: content
+
+
+   .. py:attribute:: instructions
+
+
+   .. py:method:: log_warning(message: str, context: str = '')
+
+      Logs a warning message to warnings.txt.
+
+
+
+   .. py:method:: summarize()
+
+
+   .. py:method:: log_response(response: google.generativeai.types.GenerateContentResponse, response_time: float, retries: int | None = None)
+
+
+   .. py:method:: process_response(response: google.generativeai.types.GenerateContentResponse)
+
+      Processes the response from the Gemini model.
+
+
+
+   .. py:method:: run_functions(functions)
+
+
+   .. py:method:: run_trials()
+
+      Executes trials for all available code.
+
+
+
+   .. py:method:: get_first_code_trial() -> geometor.seer.trials.code_trial.CodeTrial | None
+
+      Retrieves the first CodeTrial object, if any.
+
+
+
+   .. py:method:: any_trials_successful(set_type='train')
+
+      Checks if any trials of the given type were successful.
+
+
+
+   .. py:property:: train_passed
+
+
+   .. py:property:: test_passed
+
+
+   .. py:property:: get_python
+      :type: dict
+
+
+      Safely returns the Python code dictionary or an empty dictionary.
+
+

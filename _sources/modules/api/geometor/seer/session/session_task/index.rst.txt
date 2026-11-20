@@ -1,0 +1,82 @@
+geometor.seer.session.session_task
+==================================
+
+.. py:module:: geometor.seer.session.session_task
+
+.. autoapi-nested-parse::
+
+   Defines the SessionTask class, managing the steps for solving a single task within a Session.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.session.session_task.SessionTask
+
+
+Module Contents
+---------------
+
+.. py:class:: SessionTask(session: geometor.seer.session.Session, task: geometor.seer.tasks.tasks.Task)
+
+   Bases: :py:obj:`geometor.seer.session.level.Level`
+
+
+   .. py:attribute:: session
+
+
+   .. py:attribute:: task
+
+
+   .. py:attribute:: steps
+      :value: []
+
+
+
+   .. py:attribute:: trials
+
+
+   .. py:method:: summarize()
+
+
+   .. py:method:: add_step(title: str, history: list, content: list, instructions: list, model_name: str | None = None)
+
+      Adds a new step to the task.
+
+
+
+   .. py:method:: analyze_step_summaries(step_summary_list: List[Dict]) -> Dict
+      :staticmethod:
+
+
+      Analyzes a list of step summary dictionaries and returns aggregated task-level metrics.
+
+      :param step_summary_list: A list of dictionaries, where each dictionary is a
+                                TaskStep summary (loaded from index.json or generated).
+
+      :returns:
+
+                - train_passed: True if any step passed training, else False.
+                - test_passed: True if any step passed testing, else False.
+                - best_score: The lowest best_score found across all steps (float or None).
+                - tokens: Dictionary containing aggregated token counts.
+                - steps: The total number of steps analyzed.
+      :rtype: A dictionary containing aggregated task-level results
+
+
+
+   .. py:property:: train_passed
+
+
+   .. py:property:: test_passed
+
+
+   .. py:method:: log_warning(message: str, context: str = '')
+
+      Logs a warning message to the task's warnings.txt.
+
+
+

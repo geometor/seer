@@ -1,0 +1,112 @@
+geometor.seer.rebuild_indexes
+=============================
+
+.. py:module:: geometor.seer.rebuild_indexes
+
+.. autoapi-nested-parse::
+
+   Script to rebuild summary index.json files for sessions, tasks, and steps.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   geometor.seer.rebuild_indexes.SIZE_CORRECT_KEY
+   geometor.seer.rebuild_indexes.PALETTE_CORRECT_KEY
+   geometor.seer.rebuild_indexes.COLOR_COUNT_CORRECT_KEY
+   geometor.seer.rebuild_indexes.PIXELS_OFF_KEY
+   geometor.seer.rebuild_indexes.PERCENT_CORRECT_KEY
+   geometor.seer.rebuild_indexes.MATCH_KEY
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   geometor.seer.rebuild_indexes.safe_load_json
+   geometor.seer.rebuild_indexes.count_errors
+   geometor.seer.rebuild_indexes.get_level_description
+   geometor.seer.rebuild_indexes.get_step_title_index
+   geometor.seer.rebuild_indexes.rebuild_step_summary
+   geometor.seer.rebuild_indexes.rebuild_task_summary
+   geometor.seer.rebuild_indexes.rebuild_session_summary
+   geometor.seer.rebuild_indexes.main
+
+
+Module Contents
+---------------
+
+.. py:data:: SIZE_CORRECT_KEY
+   :value: 'size_correct'
+
+
+.. py:data:: PALETTE_CORRECT_KEY
+   :value: 'color_palette_correct'
+
+
+.. py:data:: COLOR_COUNT_CORRECT_KEY
+   :value: 'color_count_correct'
+
+
+.. py:data:: PIXELS_OFF_KEY
+   :value: 'pixels_off'
+
+
+.. py:data:: PERCENT_CORRECT_KEY
+   :value: 'percent_correct'
+
+
+.. py:data:: MATCH_KEY
+   :value: 'match'
+
+
+.. py:function:: safe_load_json(file_path: pathlib.Path) -> Optional[Dict[str, Any]]
+
+   Safely loads a JSON file, returning None on error.
+
+
+.. py:function:: count_errors(level_dir: pathlib.Path) -> int
+
+   Counts error files (error_*.json) in a directory.
+
+
+.. py:function:: get_level_description(level_dir: pathlib.Path) -> Optional[str]
+
+   Attempts to read description from existing index.json.
+
+
+.. py:function:: get_step_title_index(step_dir: pathlib.Path) -> Tuple[str, str]
+
+   Attempts to read title and index from existing index.json or derive index.
+
+
+.. py:function:: rebuild_step_summary(step_dir: pathlib.Path, dry_run: bool = False) -> Optional[Dict[str, Any]]
+
+   Rebuilds the index.json for a single TaskStep directory.
+   If dry_run is True, logs the intended action instead of writing the file.
+
+   :returns: The summary dictionary, or None if rebuilding failed.
+
+
+.. py:function:: rebuild_task_summary(task_dir: pathlib.Path, dry_run: bool = False) -> Optional[Dict[str, Any]]
+
+   Rebuilds the index.json for a SessionTask directory.
+   If dry_run is True, logs the intended action instead of writing the file.
+
+   :returns: The summary dictionary, or None if rebuilding failed.
+
+
+.. py:function:: rebuild_session_summary(session_dir: pathlib.Path, dry_run: bool = False) -> Optional[Dict[str, Any]]
+
+   Rebuilds the index.json for a Session directory.
+   If dry_run is True, logs the intended action instead of writing the file.
+
+   :returns: The summary dictionary, or None if rebuilding failed.
+
+
+.. py:function:: main()
+

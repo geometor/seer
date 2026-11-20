@@ -1,0 +1,137 @@
+geometor.seer.tasks.grid
+========================
+
+.. py:module:: geometor.seer.tasks.grid
+
+.. autoapi-nested-parse::
+
+   Defines the Grid class for representing and manipulating ARC task grids.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.grid.COLOR_MAP
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.grid.Grid
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.grid.string_to_grid
+
+
+Module Contents
+---------------
+
+.. py:data:: COLOR_MAP
+
+.. py:function:: string_to_grid(grid_string, row_delimiter='\n', cell_delimiter=' ')
+
+   Converts a grid string back to a list of lists for Grid
+
+
+.. py:class:: Grid(grid, puzzle_id='', set_type='', index='', io_type='')
+
+   .. py:attribute:: grid
+
+
+   .. py:attribute:: puzzle_id
+      :value: ''
+
+
+
+   .. py:attribute:: set_type
+      :value: ''
+
+
+
+   .. py:attribute:: index
+      :value: ''
+
+
+
+   .. py:attribute:: io_type
+      :value: ''
+
+
+
+   .. py:property:: name
+
+
+   .. py:property:: height
+
+
+   .. py:property:: width
+
+
+   .. py:property:: size
+
+
+   .. py:property:: colors
+
+
+   .. py:property:: color_counts
+
+
+   .. py:method:: rotate(k=1)
+
+      Rotate the grid by 90 degrees k times.
+      Positive k means clockwise rotation, negative k means counter-clockwise.
+
+      returns copy of Grid
+
+
+
+   .. py:method:: flip(axis=0)
+
+      Flip the grid along the specified axis.
+      axis=0 flips vertically, axis=1 flips horizontally.
+
+      returns copy of Grid
+
+
+
+   .. py:method:: set_pixel(row: int, column: int, color: int) -> str
+
+      Set grid value at a specific coordinate.
+
+
+
+   .. py:method:: set_range(row1: int, column1: int, row2: int, column2: int, color: int) -> str
+
+      Set grid values for a range of pixels.
+
+
+
+   .. py:method:: set_floodfill(row: int, column: int, color: int) -> str
+
+      Flood-fill algorithm to set all contiguous cells connected to (row, column)
+      with the same initial color to the new color.
+
+
+
+   .. py:method:: to_string(row_delimiter='\n', cell_delimiter=' ')
+
+
+   .. py:method:: to_image(cell_size=64, add_text=True)
+
+
+   .. py:method:: to_python_string(indent_level=1)
+
+      Returns a string representation of the grid as a Python list of lists.
+
+
+

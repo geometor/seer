@@ -1,0 +1,149 @@
+geometor.seer.trials.code_trial
+===============================
+
+.. py:module:: geometor.seer.trials.code_trial
+
+.. autoapi-nested-parse::
+
+   Represents a single trial of executing generated code against all pairs of a task.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.trials.code_trial.CodeTrial
+
+
+Module Contents
+---------------
+
+.. py:class:: CodeTrial(task_step, code_filename: str, code, task: geometor.seer.tasks.tasks.Task)
+
+   Represents a single trial of running a piece of code against a task.
+
+   This class encapsulates the execution of the code, the comparison of the
+   output with the expected output, and the calculation of a score.
+
+
+   .. py:attribute:: code_filename
+
+
+   .. py:attribute:: code
+
+
+   .. py:attribute:: task
+
+
+   .. py:attribute:: task_step
+
+
+   .. py:attribute:: test_results
+      :value: None
+
+
+
+   .. py:attribute:: train_results
+
+
+   .. py:attribute:: total_score
+      :value: None
+
+
+
+   .. py:attribute:: average_score
+      :value: None
+
+
+
+   .. py:method:: to_dict() -> dict
+
+      Converts the CodeTrial results to a dictionary.
+
+
+
+   .. py:property:: train_passed
+      :type: bool | None
+
+
+      Checks if the training trials passed.
+
+      :returns: True if all training trials passed, False if some
+                failed (but no errors occurred), and None if any error occurred
+                during the trials (either in the overall execution or in
+                individual trials).
+      :rtype: bool | None
+
+
+   .. py:property:: test_passed
+      :type: bool | None
+
+
+      Checks if the test trials passed.
+
+      :returns:
+
+                True if test trials were run AND all relevant ones passed.
+                             False if test trials were run AND some relevant ones failed.
+                             None if test trials were NOT run (because train failed)
+                             OR if an error occurred during test execution.
+      :rtype: bool | None
+
+
+   .. py:property:: has_valid_transformed_output
+      :type: bool
+
+
+      Checks for at least one valid transformed output in train or test.
+
+
+   .. py:method:: generate_report() -> str
+
+      Generates a textual report of the trial results.
+
+
+
+   .. py:method:: get_transform_function(code)
+      :staticmethod:
+
+
+      Parses the code, finds the 'transform' function, and returns it.
+
+
+
+   .. py:method:: test_code_with_timeout(code, task_pairs, timeout=10) -> dict
+
+      Executes and validates the generated code with a timeout.
+
+      :param code: The Python code to execute.
+      :param task_pairs: A list of TaskPair objects to test the code against.
+      :param timeout: The maximum execution time in seconds.
+
+      :returns:
+
+                A dictionary containing the results of the code execution.
+                    If an error occurs, the dictionary will contain an "error" key
+                    with a description of the error.  Otherwise, it contains a
+                    "trials" key, with a list of trial results.
+      :rtype: dict
+
+
+
+   .. py:method:: test_code(code, task_pairs) -> dict
+
+      Executes and validates the generated code.
+
+      :param code: The Python code to execute.
+      :param task_pairs: A list of TaskPair objects to test the code against.
+
+      :returns: A dictionary containing the results of the code execution.  If
+                an error occurs during parsing or execution, the dictionary will
+                contain an "error" key with a description of the error.  Otherwise,
+                it contains a "trials" key, with a list of per-pair trial results,
+                which are now TaskPairTrial objects.
+      :rtype: dict
+
+
+

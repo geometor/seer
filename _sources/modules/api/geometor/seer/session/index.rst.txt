@@ -1,0 +1,280 @@
+geometor.seer.session
+=====================
+
+.. py:module:: geometor.seer.session
+
+.. autoapi-nested-parse::
+
+   Subpackage for session management components (Session, SessionTask, TaskStep, Level).
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /modules/api/geometor/seer/session/level/index
+   /modules/api/geometor/seer/session/session/index
+   /modules/api/geometor/seer/session/session_task/index
+   /modules/api/geometor/seer/session/task_step/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.session.Level
+   geometor.seer.session.Session
+   geometor.seer.session.SessionTask
+   geometor.seer.session.TaskStep
+
+
+Package Contents
+----------------
+
+.. py:class:: Level(parent: Level | None, name: str)
+
+   .. py:attribute:: parent
+
+
+   .. py:attribute:: name
+
+
+   .. py:attribute:: dir
+
+
+   .. py:attribute:: errors
+
+
+   .. py:attribute:: start_time
+
+
+   .. py:attribute:: end_time
+      :value: None
+
+
+
+   .. py:attribute:: duration_seconds
+      :value: None
+
+
+
+   .. py:method:: log_error(e: Exception, context: str = '')
+
+
+   .. py:method:: log_markdown(name: str, content: list)
+
+
+   .. py:method:: summarize()
+
+
+.. py:class:: Session(config: geometor.seer.config.Config, output_dir: pathlib.Path, description: str)
+
+   Bases: :py:obj:`geometor.seer.session.level.Level`
+
+
+   .. py:attribute:: config
+
+
+   .. py:attribute:: description
+
+
+   .. py:attribute:: tasks
+
+
+   .. py:method:: summarize()
+
+      Generates and saves a summary of the session.
+
+
+
+   .. py:method:: add_task(task)
+
+      Adds a new task to the session.
+
+
+
+   .. py:property:: train_passed
+
+      Checks if any task in the session passed the training set.
+
+
+   .. py:property:: test_passed
+
+
+   .. py:property:: train_passed_count
+
+
+   .. py:property:: test_passed_count
+
+
+.. py:class:: SessionTask(session: geometor.seer.session.Session, task: geometor.seer.tasks.tasks.Task)
+
+   Bases: :py:obj:`geometor.seer.session.level.Level`
+
+
+   .. py:attribute:: session
+
+
+   .. py:attribute:: task
+
+
+   .. py:attribute:: steps
+      :value: []
+
+
+
+   .. py:attribute:: trials
+
+
+   .. py:method:: summarize()
+
+
+   .. py:method:: add_step(title: str, history: list, content: list, instructions: list, model_name: str | None = None)
+
+      Adds a new step to the task.
+
+
+
+   .. py:method:: analyze_step_summaries(step_summary_list: List[Dict]) -> Dict
+      :staticmethod:
+
+
+      Analyzes a list of step summary dictionaries and returns aggregated task-level metrics.
+
+      :param step_summary_list: A list of dictionaries, where each dictionary is a
+                                TaskStep summary (loaded from index.json or generated).
+
+      :returns:
+
+                - train_passed: True if any step passed training, else False.
+                - test_passed: True if any step passed testing, else False.
+                - best_score: The lowest best_score found across all steps (float or None).
+                - tokens: Dictionary containing aggregated token counts.
+                - steps: The total number of steps analyzed.
+      :rtype: A dictionary containing aggregated task-level results
+
+
+
+   .. py:property:: train_passed
+
+
+   .. py:property:: test_passed
+
+
+   .. py:method:: log_warning(message: str, context: str = '')
+
+      Logs a warning message to the task's warnings.txt.
+
+
+
+.. py:class:: TaskStep(title: str, history: list, content: list, instructions: list, session_task: geometor.seer.session.session_task.SessionTask, model_name: str | None = None)
+
+   Bases: :py:obj:`geometor.seer.session.level.Level`
+
+
+   .. py:attribute:: session_task
+
+
+   .. py:attribute:: model_name
+      :value: None
+
+
+
+   .. py:attribute:: title
+
+
+   .. py:attribute:: index
+
+
+   .. py:attribute:: attempts
+      :value: 0
+
+
+
+   .. py:attribute:: response
+
+
+   .. py:attribute:: response_parts
+      :value: []
+
+
+
+   .. py:attribute:: response_time
+      :value: None
+
+
+
+   .. py:attribute:: codes
+
+
+   .. py:attribute:: function_calls
+
+
+   .. py:attribute:: step_code_trials
+
+
+   .. py:attribute:: history
+
+
+   .. py:attribute:: content
+
+
+   .. py:attribute:: instructions
+
+
+   .. py:method:: log_warning(message: str, context: str = '')
+
+      Logs a warning message to warnings.txt.
+
+
+
+   .. py:method:: summarize()
+
+
+   .. py:method:: log_response(response: google.generativeai.types.GenerateContentResponse, response_time: float, retries: int | None = None)
+
+
+   .. py:method:: process_response(response: google.generativeai.types.GenerateContentResponse)
+
+      Processes the response from the Gemini model.
+
+
+
+   .. py:method:: run_functions(functions)
+
+
+   .. py:method:: run_trials()
+
+      Executes trials for all available code.
+
+
+
+   .. py:method:: get_first_code_trial() -> geometor.seer.trials.code_trial.CodeTrial | None
+
+      Retrieves the first CodeTrial object, if any.
+
+
+
+   .. py:method:: any_trials_successful(set_type='train')
+
+      Checks if any trials of the given type were successful.
+
+
+
+   .. py:property:: train_passed
+
+
+   .. py:property:: test_passed
+
+
+   .. py:property:: get_python
+      :type: dict
+
+
+      Safely returns the Python code dictionary or an empty dictionary.
+
+

@@ -1,0 +1,60 @@
+geometor.seer.seer
+==================
+
+.. py:module:: geometor.seer.seer
+
+.. autoapi-nested-parse::
+
+   The Seer class orchestrates the process of solving tasks.
+
+   It interacts with the Gemini model, manages the session, handles logging,
+   and controls the flow of execution for analyzing examples and generating solutions.
+
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.seer.Seer
+
+
+Module Contents
+---------------
+
+.. py:class:: Seer(config: geometor.seer.config.Config)
+
+   .. py:attribute:: config
+
+
+   .. py:attribute:: roles
+      :type:  Dict[str, geometor.seer.gemini_client.GeminiClient]
+
+
+   .. py:attribute:: instructions
+      :type:  Dict[str, str]
+
+
+   .. py:attribute:: max_iterations
+
+
+   .. py:attribute:: use_images
+
+
+   .. py:method:: run(tasks: geometor.seer.tasks.tasks.Tasks, output_dir: pathlib.Path, description: str)
+
+      Runs the task-solving process for a collection of tasks.
+
+      :param tasks: A Tasks object containing the tasks to solve.
+      :param output_dir: The root directory for saving session output.
+      :param description: A description for this session run.
+
+
+
+   .. py:method:: solve(session: geometor.seer.session.Session, task: geometor.seer.tasks.tasks.Task)
+
+      Sets up the SessionTask and delegates solving to the configured workflow.
+
+
+

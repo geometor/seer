@@ -1,0 +1,38 @@
+geometor.seer.workflows.base
+============================
+
+.. py:module:: geometor.seer.workflows.base
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.workflows.base.WorkflowBase
+
+
+Module Contents
+---------------
+
+.. py:class:: WorkflowBase(package_name: str, template_dir: str = 'templates')
+
+   Bases: :py:obj:`abc.ABC`
+
+
+   Abstract base class for different task-solving workflows.
+
+
+   .. py:method:: execute(session_task: geometor.seer.session.SessionTask, task: geometor.seer.tasks.Task, seer_instance: geometor.seer.seer.Seer) -> None
+      :abstractmethod:
+
+
+      Executes the specific workflow to solve the given task.
+
+      :param session_task: The session task object for logging and context.
+      :param task: The task data.
+      :param seer_instance: The main Seer instance to access shared resources
+                            (e.g., _generate, config, roles, instructions).
+
+
+

@@ -1,0 +1,67 @@
+//OBSOLETE
+/* elements/a-tooltip *****************************/
+a[data-tooltip] {
+  position: absolute;
+  text-decoration: none;
+  display: inline-block;/*bug fix*/
+
+  &:after {
+    content: attr(data-tooltip);
+
+    position: absolute;
+    bottom: 130%;
+    left: 20%;
+    padding: 5px 15px;
+
+    color: black;
+    background: var(--color-tooltip);
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+
+    white-space: nowrap;
+    opacity: 0;
+
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+  }
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 90%;
+    left: 30%;
+    width: 0;
+    height: 0;
+
+    border-top: 20px solid var(--color-tooltip);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -ms-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+
+    opacity: 0;
+  }
+  &:hover {
+    &:after {
+      bottom: 100%;
+    }
+    &:before {
+      bottom: 70%;
+    }
+    &:after,
+    &:before {
+      opacity: 1;
+    }
+
+  }
+}

@@ -1,0 +1,3307 @@
+/* =========================================================================
+   Geometor Interactive Diagrams & Classical Scriptorium Monograph Theme
+   Typography: Classical Roman Serif (EB Garamond)
+   Palette: Nocturnal warm parchment / soft charcoal (low-glare scholarly theme)
+   Layout: Centered reading column limited on large viewports (46rem)
+   ========================================================================= */
+
+/* -------------------------------------------------------------------------
+   1. Book Codex Variables & Container Layout ("Website in a Website")
+   ------------------------------------------------------------------------- */
+@keyframes book-target-fade {
+  0%, 40% {
+    background-color: rgba(212, 175, 55, 0.08);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+:root {
+  --geom-font-sans: 'Fira Sans Condensed', 'Fira Sans', sans-serif;
+  --geom-fg: #18181b;
+  --geom-bg: #ffffff;
+  --geom-muted: #71717a;
+  --geom-point-stroke: #ffffff;
+  --geom-poly-fill: #000000;
+  --geom-accent: #c88a1e;
+  --geom-accent-bg: rgba(200, 138, 30, 0.12);
+  --geom-accent-border: rgba(200, 138, 30, 0.55);
+  --geom-assert: #16a34a;
+  --geom-assert-bg: rgba(22, 163, 74, 0.10);
+  --geom-assert-border: rgba(22, 163, 74, 0.50);
+  --geom-hyper: #2563eb;
+  --geom-rose: #be123c;
+  --geom-coincide: #0891b2;
+  --geom-coincide-bg: rgba(8, 145, 178, 0.12);
+  --geom-coincide-border: rgba(8, 145, 178, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --geom-fg: #d6cfc5;
+    --geom-bg: transparent;
+    --geom-muted: #a1a1aa;
+    --geom-point-stroke: #1e1e20;
+    --geom-poly-fill: #d6cfc5;
+    --geom-accent: #e8b85a;
+    --geom-accent-bg: rgba(232, 184, 90, 0.12);
+    --geom-accent-border: rgba(232, 184, 90, 0.55);
+    --geom-assert: #5ec27e;
+    --geom-assert-bg: rgba(94, 194, 126, 0.12);
+    --geom-assert-border: rgba(94, 194, 126, 0.55);
+    --geom-hyper: #60a5fa;
+    --geom-rose: #fb7185;
+    --geom-coincide: #38bdf8;
+    --geom-coincide-bg: rgba(56, 189, 248, 0.14);
+    --geom-coincide-border: rgba(56, 189, 248, 0.60);
+  }
+}
+
+:root,
+body.is-book-page,
+article.book-layout,
+article.book-reading-pane {
+  --book-bg: #1e1e20;
+  --book-bg-alpha: rgba(30, 30, 32, 0.94);
+  --book-surface: #272629;
+  --book-surface-alt: #313035;
+
+  --book-text: #d6cfc5;
+  --book-text-muted: #9c958a;
+  --book-text-dim: #787268;
+
+  --book-border: #3d3934;
+  --book-border-dark: #544f47;
+  --book-border-light: #2c2b2e;
+
+  --book-link: #de836e;
+  --book-link-hover: #f5a492;
+  --book-link-visited: #c97864;
+
+  --book-quote-bg: rgba(255, 255, 255, 0.04);
+  --book-quote-border: #4d4841;
+
+  --book-code-bg: #29282b;
+  --book-code-text: #d6cfc5;
+
+  --book-max-width: 46rem; /* ~736px, optimal 65-75 characters per line */
+  --book-scroll-offset: 8.5rem;
+
+  --book-font-serif: 'EB Garamond', Garamond, 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
+  --book-font-display: 'EB Garamond', Garamond, 'Georgia', serif;
+  --book-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --geom-font-sans: 'Fira Sans Condensed', 'Fira Sans', sans-serif;
+
+  /* Geometric SVG Palette (Light lines matching text on dark codex background) */
+  --geom-fg: var(--book-text, #d6cfc5);
+  --geom-bg: transparent;
+  --geom-muted: #a1a1aa;
+  --geom-point-stroke: var(--book-bg, #1e1e20);
+  --geom-poly-fill: var(--book-text, #d6cfc5);
+  --geom-accent: #e8b85a;
+  --geom-accent-bg: rgba(232, 184, 90, 0.12);
+  --geom-accent-border: rgba(232, 184, 90, 0.55);
+  --geom-assert: #5ec27e;
+  --geom-assert-bg: rgba(94, 194, 126, 0.12);
+  --geom-assert-border: rgba(94, 194, 126, 0.55);
+  --geom-hyper: #60a5fa;
+  --geom-rose: #fb7185;
+  --geom-coincide: #38bdf8;
+  --geom-coincide-bg: rgba(56, 189, 248, 0.14);
+  --geom-coincide-border: rgba(56, 189, 248, 0.60);
+}
+
+body.light-mode,
+[data-theme="light"] {
+  --geom-fg: #18181b;
+  --geom-bg: #ffffff;
+  --geom-muted: #71717a;
+  --geom-point-stroke: #ffffff;
+  --geom-poly-fill: #000000;
+  --geom-accent: #c88a1e;
+  --geom-accent-bg: rgba(200, 138, 30, 0.12);
+  --geom-accent-border: rgba(200, 138, 30, 0.55);
+  --geom-assert: #16a34a;
+  --geom-assert-bg: rgba(22, 163, 74, 0.10);
+  --geom-assert-border: rgba(22, 163, 74, 0.50);
+  --geom-hyper: #2563eb;
+  --geom-rose: #be123c;
+  --geom-coincide: #0891b2;
+  --geom-coincide-bg: rgba(8, 145, 178, 0.12);
+  --geom-coincide-border: rgba(8, 145, 178, 0.55);
+}
+
+@media print {
+  body.is-book-page,
+  article.book-layout,
+  article.book-reading-pane,
+  :root {
+    --geom-fg: #000000;
+    --geom-bg: #ffffff;
+    --geom-muted: #52525b;
+    --geom-point-stroke: #ffffff;
+    --geom-poly-fill: #000000;
+    --geom-accent: #b47814;
+    --geom-assert: #15803d;
+    --geom-hyper: #1d4ed8;
+    --geom-rose: #9f1239;
+    --geom-coincide: #0e7490;
+  }
+}
+
+main.book-main {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+}
+
+/* Fix inline-size container collapse and keep book reading pane a clean single column */
+article.book-layout,
+article.book-reading-pane {
+  width: 100% !important;
+  max-width: var(--book-max-width) !important;
+  margin: 0 auto !important;
+  padding: 0 1.75rem 3.5rem !important;
+  box-sizing: border-box;
+  display: flex !important;
+  flex-flow: column nowrap !important;
+  color: var(--book-text);
+  font-family: var(--book-font-serif);
+  font-feature-settings: "locl" 0, "kern" 1, "liga" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  > header,
+  > .content,
+  > footer {
+    width: 100% !important;
+    flex: 0 0 auto !important;
+    order: unset !important;
+    padding: 0 !important;
+    margin: 0;
+  }
+
+  @container article (min-width: 60em) {
+    flex-flow: column nowrap !important;
+
+    > .content,
+    > header,
+    > footer {
+      flex: 0 0 auto !important;
+      width: 100% !important;
+      order: unset !important;
+    }
+  }
+
+  @container article (min-width: 80em) {
+    > .content {
+      flex: 0 0 auto !important;
+      width: 100% !important;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  article.book-layout,
+  article.book-reading-pane {
+    padding: 0 1rem 2.5rem !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   2. Sticky Book Codex Masthead (header.book-header)
+   ------------------------------------------------------------------------- */
+header.book-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  background-color: var(--book-bg-alpha);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--book-border);
+  padding: 0.45rem 0.65rem 0.4rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+  box-sizing: border-box;
+}
+
+.book-header-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem 0.7rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.book-breadcrumbs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.38rem;
+}
+
+.book-section-home-link {
+  font-family: var(--book-font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--book-text) !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--book-link) !important;
+  }
+}
+
+.book-crumb-link {
+  font-family: var(--book-font-display);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--book-text-muted) !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--book-link-hover) !important;
+  }
+}
+
+.book-crumb-current {
+  font-family: var(--book-font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--book-text);
+
+  &.is-section-root {
+    font-size: 0.92rem;
+    letter-spacing: 0.1em;
+  }
+}
+
+.book-crumb-sep {
+  color: var(--book-border-dark);
+  font-size: 0.78rem;
+  user-select: none;
+}
+
+.book-provenance-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.book-badge {
+  font-family: var(--book-font-mono);
+  font-size: 0.7rem;
+  padding: 0.08rem 0.42rem;
+  border-radius: 4px;
+  border: 1px solid var(--book-border);
+  background: var(--book-surface);
+  color: var(--book-text-muted);
+  text-decoration: none !important;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: var(--book-link-hover) !important;
+    border-color: var(--book-border-dark);
+  }
+
+  &.canonical-badge {
+    font-weight: 700;
+    color: var(--book-text);
+  }
+}
+
+/* Home Page Overline ('the works of') & Companion Track Pills on Collection Cards */
+.author-overline {
+  text-align: center !important;
+  margin: 0.85rem auto 0.1rem !important;
+
+  p {
+    font-family: var(--book-font-serif);
+    font-style: italic;
+    font-size: 1.08rem !important;
+    letter-spacing: 0.04em;
+    color: var(--book-text-muted);
+    text-align: center !important;
+    text-indent: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+.is-home-page {
+  padding-top: 0.5rem !important;
+
+  .author-overline + section > h1,
+  > section > h1:first-child {
+    text-align: center !important;
+    margin-top: 0.15rem !important;
+  }
+}
+
+.excerpt-tracks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.32rem;
+  margin-top: 0.45rem;
+  font-family: var(--book-font-display);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  .excerpt-track-sep {
+    color: var(--book-border-dark);
+    user-select: none;
+  }
+
+  .excerpt-track-link {
+    color: var(--book-text-muted) !important;
+    text-decoration: none !important;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link-hover) !important;
+      background-color: var(--book-surface-alt);
+    }
+  }
+}
+
+.collection-outline-list {
+  list-style: none !important;
+  margin: 0.75rem 0 1.5rem !important;
+  padding: 0 !important;
+  border-top: 1px solid var(--book-border-light);
+
+  .collection-outline-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1rem;
+    padding: 0.45rem 0.35rem;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--book-border-light);
+
+    .collection-outline-title {
+      font-family: var(--book-font-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--book-text) !important;
+      text-decoration: none !important;
+
+      &:hover {
+        color: var(--book-link) !important;
+      }
+    }
+
+    .excerpt-tracks {
+      margin-top: 0;
+    }
+  }
+}
+
+/* Second Row of Book Header: [← Prev] | Chapter Title + Track Switcher | [Next →] */
+.book-header-nav {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 1fr) auto minmax(4.5rem, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.28rem;
+  border-top: 1px solid var(--book-border-light);
+}
+
+.book-nav-prev {
+  text-align: left;
+}
+
+.book-nav-next {
+  text-align: right;
+}
+
+.book-nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  text-align: center;
+}
+
+.book-doc-title {
+  text-align: center;
+  font-family: var(--book-font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--book-text);
+  line-height: 1.2;
+}
+
+.book-nav-btn {
+  font-family: var(--book-font-serif);
+  font-size: 0.84rem;
+  color: var(--book-link) !important;
+  text-decoration: none !important;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  background-color: var(--book-surface);
+  border: 1px solid var(--book-border);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  line-height: 1.25;
+
+  &:hover {
+    background-color: var(--book-surface-alt);
+    color: var(--book-link-hover) !important;
+    border-color: var(--book-border-dark);
+    text-decoration: none !important;
+  }
+}
+
+article.book-layout nav,
+.book-tracks-nav {
+  display: flex !important;
+  flex-flow: row wrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.3rem;
+  font-family: var(--book-font-serif);
+  font-size: 0.84rem;
+  line-height: 1.2;
+
+  a {
+    display: inline-flex !important;
+    flex-basis: auto !important;
+    width: auto !important;
+
+    &::before,
+    &::after {
+      content: none !important;
+      display: none !important;
+      width: 0 !important;
+      flex: none !important;
+    }
+  }
+}
+
+.book-track-item {
+  color: var(--book-link) !important;
+  text-decoration: none !important;
+  padding: 0.06rem 0.4rem !important;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  font-weight: 400;
+  line-height: 1.2;
+
+  &:hover {
+    color: var(--book-link-hover) !important;
+    background-color: var(--book-surface);
+    text-decoration: none !important;
+  }
+
+  &.is-active {
+    color: var(--book-text) !important;
+    font-weight: 600;
+    background-color: var(--book-surface);
+    border: 1px solid var(--book-border);
+    cursor: default;
+  }
+}
+
+.book-track-sep {
+  color: var(--book-border-dark);
+  font-size: 0.75rem;
+  user-select: none;
+}
+
+/* -------------------------------------------------------------------------
+   3. Scholarly Monograph Typography (.book-reading-pane .book-content)
+   ------------------------------------------------------------------------- */
+.book-reading-pane .book-content,
+.folio-book-page {
+  font-family: var(--book-font-serif);
+  font-size: 1.16rem;
+  line-height: 1.72;
+  color: var(--book-text);
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "locl" 0, "kern" 1, "liga" 1;
+
+  p, div, li, dd, dt, th, td {
+    font-feature-settings: "locl" 0, "kern" 1, "liga" 1;
+  }
+
+  /* Anchor scroll margin for sticky header */
+  h1, h2, h3, h4, h5, h6,
+  section[id],
+  span[id],
+  aside.footnote[id] {
+    scroll-margin-top: var(--book-scroll-offset);
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--book-font-serif) !important;
+    color: var(--book-text) !important;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    text-indent: 0 !important;
+    border-bottom: none !important;
+    clear: both;
+
+    a.headerlink {
+      font-size: 0.72em;
+      color: var(--book-text-dim) !important;
+      text-decoration: none !important;
+      opacity: 0;
+      padding-left: 0.4em;
+      transition: opacity 0.15s ease;
+    }
+
+    &:hover a.headerlink {
+      opacity: 0.65;
+    }
+  }
+
+  h1 {
+    font-size: 2.15rem !important;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-align: center;
+    margin-top: 1.75rem !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  /* Chapter Subtitle Rubric (.. rubric::) */
+  p.rubric {
+    font-family: var(--book-font-serif);
+    font-size: 1.22rem;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: var(--book-text-muted);
+    text-align: center !important;
+    text-indent: 0 !important;
+    margin-top: -0.35rem !important;
+    margin-bottom: 1.4rem !important;
+    line-height: 1.35;
+  }
+
+  h2 {
+    font-size: 1.48rem !important;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    text-align: center;
+    margin-top: 2.1rem !important;
+    margin-bottom: 0.9rem !important;
+  }
+
+  h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.35;
+    text-align: left;
+    margin-top: 1.75rem !important;
+    margin-bottom: 0.45rem !important;
+
+    em {
+      font-weight: 400;
+      font-style: italic;
+    }
+  }
+
+  h4 {
+    font-size: 1.12rem !important;
+    font-style: italic;
+    text-align: left;
+    margin-top: 1.25rem !important;
+    margin-bottom: 0.45rem !important;
+  }
+
+  h5, h6 {
+    font-size: 1.05rem !important;
+    font-style: italic;
+    text-align: left;
+    margin-top: 1rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  /* Paragraphs & Classical 2em First-Line Indentation (for folio-book-page) */
+  p {
+    text-indent: 2em;
+    margin-top: 0 !important;
+    margin-bottom: 0.45em !important;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  &:not(.folio-book-page) p {
+    text-indent: 0 !important;
+    margin-bottom: 0.85em !important;
+    text-align: left;
+  }
+
+  /* Explicit resets where first-line paragraph indentation is NOT desired */
+  blockquote p,
+  li p,
+  table p,
+  th p,
+  td p,
+  aside.footnote p,
+  .footnote-list p,
+  .footnotes p,
+  p.rubric,
+  figcaption p,
+  img.folio-initial-cap + p,
+  .no-indent,
+  .title-page p,
+  .work-toc p,
+  .chapter-toc p,
+  .admonition p,
+  .note p,
+  p:has(> strong:first-child) {
+    text-indent: 0 !important;
+  }
+
+  /* Line Blocks (e.g. mathematical arrays, verse, or title blocks) */
+  .line-block {
+    margin: 0.85em 0 0.85em 2em !important;
+    line-height: 1.55;
+
+    .line {
+      text-indent: 0 !important;
+    }
+
+    .line-block {
+      margin: 0 0 0 1.5em !important;
+    }
+  }
+
+  /* Blockquotes (Smaller-type set-off passages & quotations) */
+  blockquote {
+    margin: 1.25em 0 !important;
+    padding: 0.75em 1.4em !important;
+    border: none !important;
+    border-left: 3px solid var(--book-quote-border) !important;
+    background-color: var(--book-quote-bg) !important;
+    color: var(--book-text) !important;
+    font-size: 0.95em !important;
+    font-style: normal;
+    line-height: 1.65;
+    border-radius: 0 4px 4px 0;
+
+    p {
+      text-indent: 0 !important;
+      margin: 0.35em 0 !important;
+      text-align: justify;
+
+      &:first-child {
+        margin-top: 0 !important;
+      }
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  /* Links inside Book Content */
+  a {
+    color: var(--book-link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link-hover);
+      text-decoration-thickness: 1.5px;
+    }
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 0.85rem 0 1.15rem !important;
+    padding-left: 1.75rem;
+  }
+
+  ol.arabic.simple {
+    margin: 0.35rem 0 !important;
+  }
+
+  li {
+    margin: 0.3rem 0;
+    line-height: 1.65;
+
+    &::marker {
+      color: var(--book-text-muted);
+    }
+  }
+
+  /* Horizontal Rules / Section Dividers */
+  hr,
+  hr.docutils {
+    border: 0 !important;
+    height: 1px;
+    background: var(--book-border);
+    margin: 2.25rem auto !important;
+    width: 50%;
+  }
+
+  /* Tables (Translation Notes, Comparative Apparatus, Scan Inventory) */
+  table,
+  table.docutils {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.75rem 0 !important;
+    font-size: 0.94rem;
+
+    th, td {
+      padding: 0.6rem 0.8rem;
+      border-bottom: 1px solid var(--book-border);
+      text-align: left !important;
+      vertical-align: top;
+    }
+
+    th {
+      font-family: var(--book-font-serif);
+      font-size: 0.88rem;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      text-transform: uppercase;
+      background-color: var(--book-surface);
+      border-bottom: 2px solid var(--book-border-dark);
+      color: var(--book-text);
+    }
+
+    tr:hover td {
+      background-color: var(--book-surface);
+    }
+  }
+
+  /* Chapter Table of Contents (.. contents:: / Conspectus Capitis) */
+  .chapter-toc,
+  nav.contents.local,
+  nav.contents {
+    margin: 2rem 0 2.5rem !important;
+    background-color: var(--book-surface);
+    border: 1px solid var(--book-border);
+    border-left: 3px solid var(--book-border-dark);
+    border-radius: 5px;
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+
+    p {
+      margin: 0 !important;
+      text-indent: 0 !important;
+      text-align: left !important;
+    }
+
+    p.topic-title {
+      font-family: var(--book-font-display);
+      font-weight: 600;
+      font-size: 0.92rem !important;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--book-text);
+      margin: 0.25rem 0 0.65rem 0 !important;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--book-border);
+      text-align: left !important;
+    }
+
+    > ul,
+    .chapter-toc-list {
+      list-style: none !important;
+      margin: 0.65rem 0 0.25rem !important;
+      padding: 0 !important;
+      column-count: 2;
+      column-gap: 2.2rem;
+
+      @media (max-width: 720px) {
+        column-count: 1;
+      }
+
+      > li {
+        margin: 0 0 0.85rem 0 !important;
+        line-height: 1.45;
+        list-style: none !important;
+
+        > p > a,
+        > a,
+        .toc-parent-link {
+          font-family: var(--book-font-serif);
+          font-weight: 600;
+          font-size: 0.94rem;
+          color: var(--book-text);
+          text-decoration: none !important;
+          display: block;
+          padding: 0.15rem 0.35rem;
+          border-radius: 3px;
+          transition: all 0.12s ease;
+
+          &:hover {
+            color: var(--book-link);
+            background-color: var(--book-surface-alt);
+            text-decoration: none !important;
+          }
+        }
+
+        > ul,
+        .chapter-toc-sublist {
+          list-style: none !important;
+          margin: 0.3rem 0 0.45rem 0.55rem !important;
+          padding: 0 0 0 0.7rem !important;
+          border-left: 1px solid var(--book-border);
+
+          > li {
+            margin: 0.2rem 0 !important;
+            line-height: 1.4;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            list-style: none !important;
+
+            > p > a,
+            > a,
+            .toc-sub-link {
+              font-family: var(--book-font-serif);
+              font-size: 0.86rem;
+              color: var(--book-text-muted);
+              text-decoration: none !important;
+              display: block;
+              padding: 0.12rem 0.3rem;
+              border-radius: 3px;
+              transition: all 0.12s ease;
+
+              &:hover {
+                color: var(--book-link);
+                background-color: var(--book-surface-alt);
+                text-decoration: none !important;
+              }
+            }
+
+            > ul {
+              list-style: none !important;
+              margin: 0.15rem 0 0.25rem 0 !important;
+              padding: 0 0 0 0.75rem !important;
+              border-left: none;
+
+              > li {
+                margin: 0.15rem 0 !important;
+                line-height: 1.38;
+                break-inside: avoid;
+                page-break-inside: avoid;
+                list-style: none !important;
+
+                > p > a,
+                > a {
+                  font-family: var(--book-font-serif);
+                  font-size: 0.82rem;
+                  color: var(--book-text-muted);
+                  opacity: 0.9;
+                  text-decoration: none !important;
+                  display: block;
+                  padding: 0.1rem 0.3rem;
+                  border-radius: 3px;
+                  transition: all 0.12s ease;
+
+                  &:hover {
+                    color: var(--book-link);
+                    background-color: var(--book-surface-alt);
+                    text-decoration: none !important;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .chapter-toc-details summary {
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    .chapter-toc-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.25rem 0;
+    }
+
+    .chapter-toc-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--book-font-display);
+      font-weight: 600;
+      font-size: 0.92rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--book-text);
+
+      .toc-icon {
+        color: var(--book-link);
+        font-size: 1.05rem;
+        font-weight: 700;
+      }
+    }
+
+    .chapter-toc-badge {
+      font-size: 0.78rem;
+      color: var(--book-text-muted);
+      background-color: var(--book-surface-alt);
+      border: 1px solid var(--book-border);
+      padding: 0.15rem 0.55rem;
+      border-radius: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chapter-toc-list {
+      padding-top: 0.75rem !important;
+      border-top: 1px solid var(--book-border);
+    }
+  }
+
+  /* Front Matter / 1954 Monograph Title Page Reconstruction (.title-page) */
+  .title-page {
+    max-width: 42rem;
+    margin: 1.5rem auto 2.75rem !important;
+    padding: 1.5rem 1.25rem;
+    text-align: center;
+    border-top: 1px solid var(--book-border);
+    border-bottom: 1px solid var(--book-border);
+    background-color: rgba(255, 255, 255, 0.015);
+    border-radius: 4px;
+
+    .line-block {
+      margin: 0 auto !important;
+      text-align: center !important;
+      letter-spacing: 0.08em;
+      line-height: 1.85;
+      font-size: 0.98rem;
+      color: var(--book-text-muted);
+    }
+
+    a {
+      color: var(--book-text) !important;
+      font-weight: 600;
+      text-decoration: none !important;
+      border-bottom: 1px dotted var(--book-border-dark);
+
+      &:hover {
+        color: var(--book-link-hover) !important;
+        border-bottom-color: var(--book-link-hover);
+      }
+    }
+  }
+
+  /* Book Index Table of Contents (English & Latin Hoenen Exemplar) */
+  section#table-of-contents,
+  section#contents,
+  section#conspectus-totius-operis,
+  section.book-toc {
+    margin: 1.5rem auto 2.5rem !important;
+
+    > h2 {
+      text-align: center !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    > h3 {
+      max-width: 42rem;
+      margin: 2rem auto 0.2rem !important;
+      text-align: center !important;
+      font-size: 1.22rem !important;
+      letter-spacing: 0.04em;
+    }
+
+    > p {
+      max-width: 42rem;
+      margin: 0 auto 0.35rem !important;
+      text-align: center !important;
+      text-indent: 0 !important;
+
+      em {
+        color: var(--book-text-muted);
+        font-size: 1.02rem;
+      }
+
+      a {
+        text-decoration: none !important;
+        padding: 0.1rem 0.45rem;
+        border-radius: 3px;
+
+        &:hover {
+          background-color: var(--book-surface);
+        }
+      }
+    }
+
+    > dl {
+      max-width: 44rem;
+      margin: 1rem auto 1.5rem !important;
+      text-align: center;
+
+      > dt {
+        font-weight: 600;
+        margin-top: 1.15rem;
+      }
+
+      > dd {
+        margin-left: 0 !important;
+        margin-bottom: 0.4rem;
+      }
+    }
+
+    > ul {
+      max-width: 44rem;
+      margin: 1rem auto 1.5rem !important;
+    }
+  }
+
+  /* Scroll offset for sticky book header and :target highlights */
+  section[id],
+  h1[id],
+  h2[id],
+  h3[id],
+  h4[id],
+  ol[id],
+  li[id],
+  p[id],
+  aside.footnote[id],
+  span[id],
+  a[id] {
+    scroll-margin-top: 6.5rem;
+  }
+
+  section:target,
+  ol[id]:target,
+  li[id]:target,
+  p[id]:target,
+  aside.footnote:target {
+    background-color: transparent;
+    border-radius: 4px;
+    animation: book-target-fade 2.4s ease-out forwards;
+  }
+
+  span[id]:target + h2,
+  span[id]:target + h3,
+  span[id]:target + h4,
+  span[id]:target + ol,
+  span[id]:target + p,
+  span[id]:target + ul > li:first-child {
+    background-color: transparent;
+    border-radius: 4px;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+    animation: book-target-fade 2.4s ease-out forwards;
+  }
+
+  /* Semantic Apparatus Links & Spans (:cite:, :term:, :person:) */
+  a.citation-ref,
+  .citation-ref {
+    color: var(--book-text) !important;
+    text-decoration: none !important;
+    border-bottom: 1px dotted rgba(222, 131, 110, 0.55);
+    cursor: pointer;
+    padding: 0 0.08em;
+    border-radius: 2px;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link-hover) !important;
+      border-bottom: 1px solid var(--book-link);
+      background-color: rgba(222, 131, 110, 0.12);
+      text-decoration: none !important;
+    }
+
+    &:target {
+      background-color: rgba(222, 131, 110, 0.24);
+      border-bottom: 1px solid var(--book-link);
+      outline: 1px solid rgba(222, 131, 110, 0.45);
+    }
+  }
+
+  a.term-ref,
+  .term-ref,
+  .glossary-term {
+    color: var(--book-text) !important;
+    text-decoration: none !important;
+    border-bottom: 1px dotted rgba(212, 175, 55, 0.5);
+    cursor: pointer;
+    padding: 0 0.08em;
+    border-radius: 2px;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: #f3d478 !important;
+      border-bottom: 1px solid var(--book-accent-gold);
+      background-color: rgba(212, 175, 55, 0.12);
+      text-decoration: none !important;
+    }
+
+    &:target {
+      background-color: rgba(212, 175, 55, 0.24);
+      border-bottom: 1px solid var(--book-accent-gold);
+      outline: 1px solid rgba(212, 175, 55, 0.45);
+    }
+  }
+
+  a.person-ref,
+  .person-ref {
+    color: var(--book-text) !important;
+    text-decoration: none !important;
+    font-variant: small-caps;
+    letter-spacing: 0.03em;
+    border-bottom: 1px dotted rgba(156, 149, 138, 0.5);
+    cursor: pointer;
+    padding: 0 0.08em;
+    border-radius: 2px;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link-hover) !important;
+      border-bottom: 1px solid var(--book-link);
+      background-color: rgba(222, 131, 110, 0.1);
+      text-decoration: none !important;
+    }
+
+    &:target {
+      background-color: rgba(222, 131, 110, 0.22);
+      border-bottom: 1px solid var(--book-link);
+      outline: 1px solid rgba(222, 131, 110, 0.45);
+    }
+  }
+
+  /* Footnotes (Docutils HTML5 aside.footnote & inline a.footnote-reference) */
+  a.footnote-reference {
+    font-size: 0.78em;
+    vertical-align: super;
+    line-height: 0;
+    text-decoration: none !important;
+    color: var(--book-link) !important;
+    padding: 0 0.12em;
+    font-weight: 600;
+
+    &:hover {
+      color: var(--book-link-hover) !important;
+      text-decoration: underline !important;
+    }
+  }
+
+  aside.footnote-list {
+    margin-top: 2.75rem !important;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--book-border);
+  }
+
+  aside.footnote {
+    display: grid;
+    grid-template-columns: 2.6rem 1fr;
+    gap: 0.4rem;
+    align-items: baseline;
+    font-size: 0.92rem;
+    line-height: 1.58;
+    color: var(--book-text-muted);
+    margin: 0.5rem 0 !important;
+
+    &:first-of-type {
+      margin-top: 2.25rem !important;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--book-border);
+    }
+
+    aside.footnote-list & {
+      &:first-of-type {
+        margin-top: 0.5rem !important;
+        padding-top: 0;
+        border-top: none;
+      }
+    }
+
+    > .label {
+      font-family: var(--book-font-serif);
+      font-weight: 600;
+      color: var(--book-link);
+      text-align: right;
+      padding-right: 0.25rem;
+      white-space: nowrap;
+
+      a {
+        text-decoration: none !important;
+        color: var(--book-link) !important;
+      }
+    }
+
+    > p {
+      grid-column: 2;
+      text-indent: 0 !important;
+      margin: 0 0 0.3rem 0 !important;
+      text-align: justify;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .book-header-nav {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.25rem;
+  }
+
+  .book-nav-btn .nav-label {
+    display: none;
+  }
+
+  .book-reading-pane .book-content {
+    font-size: 1.08rem;
+
+    h1 {
+      font-size: 1.75rem !important;
+    }
+
+    h2 {
+      font-size: 1.32rem !important;
+    }
+
+    p {
+      text-align: left;
+      text-indent: 1.5em;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   4. Book Codex Footer (footer.book-footer)
+   ------------------------------------------------------------------------- */
+footer.book-footer {
+  margin-top: 3rem !important;
+  padding-top: 1.5rem !important;
+  border-top: 1px solid var(--book-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem 1.25rem;
+    font-family: var(--book-font-mono);
+    font-size: 0.78rem;
+    color: var(--book-text-muted);
+    text-align: center;
+
+    span.category,
+    span.tags {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    a {
+      color: var(--book-text-muted) !important;
+      text-decoration: none !important;
+      background: var(--book-surface);
+      border: 1px solid var(--book-border);
+      border-radius: 3px;
+      padding: 0.08rem 0.4rem;
+      transition: all 0.15s ease;
+
+      &:hover {
+        color: var(--book-link-hover) !important;
+        border-color: var(--book-border-dark);
+        background: var(--book-surface-alt);
+      }
+    }
+  }
+}
+
+.book-footer-ornament {
+  font-size: 1.15rem;
+  color: var(--book-border-dark);
+  line-height: 1;
+  user-select: none;
+}
+
+.book-footer-nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 1fr) auto minmax(4.5rem, 1fr);
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.book-toc-link {
+  font-family: var(--book-font-display);
+  font-size: 0.88rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--book-text-muted) !important;
+  text-decoration: none !important;
+
+  &:hover {
+    color: var(--book-link-hover) !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   5. Classical Proposition & Proof Structural Blocks (Euclid / Pacioli)
+   ------------------------------------------------------------------------- */
+.enunciation {
+  font-style: italic;
+  text-indent: 0 !important;
+  margin-top: 0.5em;
+  margin-bottom: 1.15em;
+  text-align: center !important;
+  hyphens: none;
+  -webkit-hyphens: none;
+
+  p {
+    text-indent: 0 !important;
+    text-align: center !important;
+    hyphens: none;
+    -webkit-hyphens: none;
+  }
+}
+
+.assertion {
+  text-align: center !important;
+  text-indent: 0 !important;
+  margin-top: 0.35em;
+  margin-bottom: 0.35em;
+  clear: both;
+}
+
+.sub-clause {
+  text-indent: 3.5em !important;
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+  text-align: left;
+}
+
+.justification {
+  float: right;
+  text-indent: 0 !important;
+  font-style: normal;
+  font-size: 0.95em;
+  letter-spacing: 0.02em;
+}
+
+a.justification,
+a.justification-link {
+  color: var(--book-link, #de836e) !important;
+  text-decoration: none !important;
+  border-bottom: 1px dotted rgba(222, 131, 110, 0.55);
+  border-radius: 2px;
+  padding: 0 2px;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+  &:hover {
+    color: var(--book-link-hover, #f5a492) !important;
+    border-bottom: 1px solid var(--book-link, #de836e);
+    background-color: rgba(222, 131, 110, 0.12);
+    text-decoration: none !important;
+  }
+}
+
+.qed {
+  text-align: right;
+  text-indent: 0 !important;
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+  padding-right: 1.5em;
+  font-style: normal;
+}
+
+.porism,
+.lemma,
+.scholium {
+  margin: 0.75em 0;
+  padding-left: 1em;
+  border-left: 2px solid rgba(113, 113, 122, 0.35);
+}
+
+.porism-title,
+.lemma-title,
+.scholium-title {
+  font-weight: 700;
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25em;
+}
+
+.folio-anchor {
+  display: inline;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.folio-milestone {
+  float: right;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  color: var(--book-text-muted);
+  opacity: 0.65;
+  font-family: var(--book-font-mono);
+  margin: 0.15rem 0 0.15rem 0.85rem;
+  padding: 0.04rem 0.3rem;
+  border-radius: 3px;
+  user-select: none;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  a.folio-link {
+    color: inherit !important;
+    text-decoration: none !important;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link, #d4a038) !important;
+    }
+  }
+}
+
+img.folio-initial-cap {
+  float: left;
+  width: 4.5rem;
+  height: auto;
+  margin: 0.18rem 0.95rem 0.35rem 0;
+  padding: 3px;
+  background-color: #ffffff;
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+}
+
+.book-reading-pane .book-content figure:not(.photon-svg) {
+  margin: 1.35rem auto;
+  text-align: center;
+  clear: both;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--book-border, #3d3934);
+    border-radius: 6px;
+    padding: 4px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  }
+
+  figcaption {
+    margin-top: 0.45rem;
+    font-size: 0.94rem;
+    font-style: italic;
+    color: var(--book-text-muted, #9c958a);
+    text-align: center;
+
+    p {
+      text-indent: 0 !important;
+      text-align: center !important;
+      margin: 0.15rem 0 !important;
+    }
+  }
+}
+
+sup.line-num {
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.4em;
+  color: #71717a;
+  margin-right: 0.15em;
+}
+
+/* Responsive Side-by-Side / Floating Diagram Layouts */
+figure.photon-svg {
+  background: var(--geom-bg, transparent);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.16);
+  user-select: none;
+  margin: 0.75em auto;
+  width: fit-content;
+  max-width: 100%;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+
+    &:not([width]) {
+      width: 42rem;
+    }
+  }
+}
+
+figure.photon-picture.diagram-right,
+figure.photon-svg.diagram-right {
+  float: right;
+  clear: right;
+  margin: 0.25em 0 1.25em 1.5em;
+  max-width: 50%;
+}
+
+@media (max-width: 640px) {
+  figure.photon-picture.diagram-right,
+  figure.photon-svg.diagram-right,
+  .euclid-figure-container {
+    float: none;
+    max-width: 100%;
+    margin: 0.75em auto;
+  }
+}
+
+/* Global Base Styles for Inlined Geometric SVGs (Light/Dark Mode via --geom-* vars) */
+svg.euclid-graphic {
+  font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+  font-style: normal;
+  font-weight: 700;
+  background-color: var(--geom-bg, transparent);
+
+  &.euclid-thumbnail {
+    pointer-events: none;
+  }
+
+  .geom-line,
+  .line,
+  .element,
+  .graphic-seg,
+  :where(.geom-segment, .struct-segment, .Line, .Segment, .construct, .line-primary) {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-bold {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-circle,
+  .geom-curve,
+  .geom-ellipse,
+  :where(.Circle, .Curve, .conic-curve, .conic-locus) {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-arc {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-dashed,
+  .geom-line-dashed,
+  .geom-arc-dashed,
+  .geom-aux,
+  .geom-Auxiliary,
+  .geom-construction,
+  :where(.aux-line, .aux-segment, .aux-circle, .auxiliary, .extension, .guide, .guide-line, .line-guide) {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.5;
+    stroke-dasharray: 4, 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  :where(.geom-faint, .geom-muted, .geom-grid, .grid-seg) {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0.55;
+  }
+
+  :where(.geom-accent-line, .geom-accent, .accent-line, .line-accent, .golden-segment, .golden-seg, .golden-major, .golden-minor, .geom-circle-accent) {
+    stroke: var(--geom-accent, #e8b85a);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  :where(.geom-assert-line, .geom-assert, .line-result, .geom-circle-assert) {
+    stroke: var(--geom-assert, #5ec27e);
+    stroke-width: 2.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  :where(.geom-hyper-line, .geom-hyper, .geom-circle-hyper) {
+    stroke: var(--geom-hyper, #60a5fa);
+    stroke-width: 2.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  :where(.geom-rose-line, .geom-rose, .geom-circle-rose) {
+    stroke: var(--geom-rose, #fb7185);
+    stroke-width: 2.0;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+  }
+
+  .geom-arc-dotted {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.5;
+    stroke-dasharray: 2.5, 2.5;
+    stroke-linecap: round;
+    fill: none;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-ray {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0.85;
+    transition: stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-tick {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  .grid-line {
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 0.9;
+    stroke-linecap: round;
+    fill: none;
+    opacity: 0.65;
+  }
+
+  .geom-polygon,
+  .poly,
+  .graphic-poly,
+  :where(.Polygon) {
+    fill: var(--geom-poly-fill, #d6cfc5);
+    fill-opacity: 0.04;
+    stroke: none;
+    transition: fill-opacity 0.15s ease, fill 0.15s ease, stroke 0.15s ease;
+  }
+
+  :where(.geom-polygon-accent, .golden-poly) {
+    fill: var(--geom-accent, #e8b85a);
+    fill-opacity: 0.12;
+    stroke: var(--geom-accent, #e8b85a);
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+
+  :where(.geom-polygon-assert, .geom-poly-ok) {
+    fill: var(--geom-assert, #5ec27e);
+    fill-opacity: 0.12;
+    stroke: var(--geom-assert, #5ec27e);
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+
+  :where(.geom-polygon-hyper) {
+    fill: var(--geom-hyper, #60a5fa);
+    fill-opacity: 0.12;
+    stroke: var(--geom-hyper, #60a5fa);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  :where(.geom-polygon-rose) {
+    fill: var(--geom-rose, #fb7185);
+    fill-opacity: 0.12;
+    stroke: var(--geom-rose, #fb7185);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+
+  .geom-polygon-bordered,
+  .geom-polygon-stroked,
+  .geom-space {
+    fill: var(--geom-poly-fill, #d6cfc5);
+    fill-opacity: 0.04;
+    stroke: var(--geom-fg, #d6cfc5);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: fill-opacity 0.15s ease, stroke 0.15s ease, stroke-width 0.15s ease;
+  }
+
+  .geom-polygon-gnomon {
+    fill: var(--geom-poly-fill, #d6cfc5);
+    fill-opacity: 0.14;
+    stroke: none;
+    transition: fill-opacity 0.15s ease, stroke 0.15s ease;
+  }
+
+  .wedge,
+  .angle,
+  .graphic-wedge {
+    fill: var(--geom-accent, #e8b85a);
+    fill-opacity: 0.24;
+    stroke: var(--geom-accent, #e8b85a);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    transition: opacity 0.12s ease, fill-opacity 0.12s ease;
+  }
+
+  .geom-ang-arc {
+    fill: none !important;
+    stroke: var(--geom-assert, #5ec27e);
+    stroke-width: 2;
+    stroke-linecap: round;
+    pointer-events: none;
+  }
+
+  .geom-tick-mark {
+    stroke: var(--geom-assert, #5ec27e);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    fill: none;
+  }
+
+  .geom-point,
+  .point,
+  :where(.Point, .pt, .pt-given) {
+    fill: var(--geom-fg, #d6cfc5);
+    stroke: var(--geom-point-stroke, #1e1e20);
+    stroke-width: 1;
+    transition: fill 0.15s ease, r 0.15s ease;
+  }
+
+  :where(.geom-point-accent, .pt-accent, .golden-point) {
+    fill: var(--geom-accent, #e8b85a);
+    stroke: var(--geom-point-stroke, #1e1e20);
+    stroke-width: 1.2;
+  }
+
+  :where(.geom-point-assert, .pt-emerald) {
+    fill: var(--geom-assert, #5ec27e);
+    stroke: var(--geom-point-stroke, #1e1e20);
+    stroke-width: 1.2;
+  }
+
+  :where(.geom-point-hyper) {
+    fill: var(--geom-hyper, #60a5fa);
+    stroke: var(--geom-point-stroke, #1e1e20);
+    stroke-width: 1.2;
+  }
+
+  :where(.geom-point-rose) {
+    fill: var(--geom-rose, #fb7185);
+    stroke: var(--geom-point-stroke, #1e1e20);
+    stroke-width: 1.2;
+  }
+
+  .geom-dot {
+    fill: var(--geom-fg, #d6cfc5);
+    stroke: none;
+    transition: fill 0.15s ease, r 0.15s ease;
+  }
+
+  .geom-label,
+  .label,
+  .lbl {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 14.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-fg, #d6cfc5);
+    stroke: none;
+    user-select: none;
+  }
+
+  .geom-label-roman {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 14.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-fg, #d6cfc5);
+    stroke: none;
+    user-select: none;
+  }
+
+  .geom-label-sm {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 11.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-muted, #a1a1aa);
+    stroke: none;
+    user-select: none;
+  }
+
+  .geom-label-sub {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 700;
+    fill: var(--geom-fg, #d6cfc5);
+    stroke: none;
+  }
+
+  :where(.geom-label-accent) {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-accent, #e8b85a);
+    stroke: none;
+    user-select: none;
+  }
+
+  :where(.geom-label-assert) {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-assert, #5ec27e);
+    stroke: none;
+    user-select: none;
+  }
+
+  :where(.geom-label-hyper) {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-hyper, #60a5fa);
+    stroke: none;
+    user-select: none;
+  }
+
+  :where(.geom-label-rose) {
+    font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+    font-size: 12.5px;
+    font-weight: 700;
+    font-style: normal;
+    fill: var(--geom-rose, #fb7185);
+    stroke: none;
+    user-select: none;
+  }
+
+  /* Frontispiece Manuscript Overlay (0003.g1) */
+  &[data-graphic-id="0003.g1"] {
+    --geom-fg: #000000;
+    --geom-point-stroke: #ffffff;
+
+    .facsimile-frame {
+      stroke: var(--book-border, #3d3934);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .geom-line,
+    .geom-circle {
+      opacity: 0.25;
+    }
+
+    .geom-point {
+      opacity: 0.35;
+    }
+
+    .geom-label {
+      opacity: 0;
+    }
+  }
+}
+
+/* Interactive Geometric Text References (Gold) */
+.geom-ref,
+.geom-interactive-ref,
+.katex.geom-interactive-ref {
+  font-family: var(--geom-font-sans, 'Fira Sans Condensed', 'Fira Sans', sans-serif);
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+  border-bottom: 1.5px dotted var(--geom-accent-border, rgba(232, 184, 90, 0.55));
+  border-radius: 2px;
+  padding: 0 1px;
+  transition: all 0.15s ease-in-out;
+
+  sub,
+  sup {
+    font-size: 0.75em;
+    line-height: 0;
+  }
+}
+
+.geom-ref:hover,
+.geom-interactive-ref:hover,
+.katex.geom-interactive-ref:hover {
+  border-bottom: 1.5px solid var(--geom-accent, #e8b85a) !important;
+}
+
+/* Active Element Highlight: Turning text GOLD without glow */
+.geom-highlight-text,
+.geom-highlight-text *,
+.katex.geom-highlight-text,
+.katex.geom-highlight-text * {
+  color: var(--geom-accent, #e8b85a) !important;
+  background-color: var(--geom-accent-bg, rgba(232, 184, 90, 0.12)) !important;
+  border-radius: 3px;
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+/* Interactive Assertion / Equality References (Green) & Coincidence References (Cyan) */
+.geom-eq-ref {
+  cursor: pointer;
+  position: relative;
+  border-bottom: 1.5px dotted var(--geom-assert-border, rgba(94, 194, 126, 0.55));
+  border-radius: 2px;
+  padding: 0 1px;
+  transition: all 0.15s ease-in-out;
+}
+
+.geom-eq-ref:hover {
+  border-bottom: 1.5px solid var(--geom-assert, #5ec27e) !important;
+}
+
+.geom-coincide-ref {
+  border-bottom: 1.5px dashed var(--geom-coincide-border, rgba(56, 189, 248, 0.60));
+}
+
+.geom-coincide-ref:hover {
+  border-bottom: 1.5px solid var(--geom-coincide, #38bdf8) !important;
+}
+
+.geom-assert-block {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.geom-assert-block-active {
+  background-color: var(--geom-assert-bg, rgba(94, 194, 126, 0.12));
+}
+
+.geom-coincide-block-active {
+  background-color: var(--geom-coincide-bg, rgba(56, 189, 248, 0.14)) !important;
+}
+
+.geom-assert-text,
+.geom-assert-text *,
+.katex.geom-assert-text,
+.katex.geom-assert-text * {
+  color: var(--geom-assert, #5ec27e) !important;
+  background-color: var(--geom-assert-bg, rgba(94, 194, 126, 0.12)) !important;
+  border-bottom-color: var(--geom-assert, #5ec27e) !important;
+  border-radius: 3px;
+  transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+}
+
+.geom-coincide-text,
+.geom-coincide-text *,
+.katex.geom-coincide-text,
+.katex.geom-coincide-text * {
+  color: var(--geom-coincide, #38bdf8) !important;
+  background-color: var(--geom-coincide-bg, rgba(56, 189, 248, 0.14)) !important;
+  border-bottom-color: var(--geom-coincide, #38bdf8) !important;
+}
+
+/* Hidden/Toggleable Semantic Overlay Elements in SVG */
+svg.euclid-graphic .geom-overlay,
+svg.euclid-graphic #highlights > * {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease, stroke 0.12s ease, fill-opacity 0.12s ease;
+}
+
+/* Active Element Highlight in SVG: GOLD */
+svg.euclid-graphic [data-ref]:hover,
+svg.euclid-graphic .highlight,
+svg.euclid-graphic .geom-highlight-active {
+  opacity: 1 !important;
+  stroke: var(--geom-accent, #e8b85a) !important;
+  stroke-opacity: 1 !important;
+  filter: none !important;
+  cursor: pointer;
+  transition: opacity 0.1s ease, stroke 0.1s ease;
+}
+
+svg.euclid-graphic polygon:hover,
+svg.euclid-graphic polygon.highlight,
+svg.euclid-graphic polygon.geom-highlight-active,
+svg.euclid-graphic path.polygon.geom-highlight-active,
+svg.euclid-graphic path.geom-polygon.geom-highlight-active,
+svg.euclid-graphic path.wedge.geom-highlight-active,
+svg.euclid-graphic path.angle.geom-highlight-active {
+  opacity: 1 !important;
+  fill: var(--geom-accent, #e8b85a) !important;
+  fill-opacity: 0.22 !important;
+  stroke: var(--geom-accent, #e8b85a) !important;
+  stroke-opacity: 1 !important;
+  stroke-width: 1.5px !important;
+  filter: none !important;
+}
+
+svg.euclid-graphic circle.geom-point:hover,
+svg.euclid-graphic circle.point:hover,
+svg.euclid-graphic #points circle:hover,
+svg.euclid-graphic circle.geom-point.geom-highlight-active,
+svg.euclid-graphic circle.point.geom-highlight-active,
+svg.euclid-graphic #points circle.geom-highlight-active {
+  opacity: 1 !important;
+  fill: var(--geom-accent, #e8b85a) !important;
+  fill-opacity: 1 !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+svg.euclid-graphic text:hover,
+svg.euclid-graphic text.highlight,
+svg.euclid-graphic text.geom-highlight-active,
+svg.euclid-graphic text.geom-highlight-active *,
+svg.euclid-graphic text.geom-highlight-active tspan,
+svg.euclid-graphic text.geom-label.geom-highlight-active,
+svg.euclid-graphic text.label.geom-highlight-active {
+  opacity: 1 !important;
+  fill: var(--geom-accent, #e8b85a) !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+/* Secondary highlight for endpoints/labels when a segment, angle, or polygon is hovered (GOLD) */
+svg.euclid-graphic .geom-highlight-secondary {
+  opacity: 1 !important;
+  stroke: var(--geom-accent, #e8b85a) !important;
+  filter: none !important;
+  transition: opacity 0.1s ease, stroke 0.1s ease, fill 0.1s ease;
+}
+
+svg.euclid-graphic text.geom-highlight-secondary,
+svg.euclid-graphic text.geom-highlight-secondary tspan,
+svg.euclid-graphic tspan.geom-highlight-secondary {
+  opacity: 1 !important;
+  fill: var(--geom-accent, #e8b85a) !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+svg.euclid-graphic circle.geom-point.geom-highlight-secondary,
+svg.euclid-graphic circle.point.geom-highlight-secondary,
+svg.euclid-graphic #points circle.geom-highlight-secondary {
+  opacity: 1 !important;
+  fill: var(--geom-accent, #e8b85a) !important;
+  fill-opacity: 1 !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+/* Active Assertion / Equality Highlight in SVG: GREEN + Center Tick Markers */
+svg.euclid-graphic .geom-assert-active {
+  opacity: 1 !important;
+  stroke: var(--geom-assert, #5ec27e) !important;
+  stroke-opacity: 1 !important;
+  filter: none !important;
+  transition: opacity 0.1s ease, stroke 0.1s ease;
+}
+
+svg.euclid-graphic polygon.geom-assert-active,
+svg.euclid-graphic path.polygon.geom-assert-active,
+svg.euclid-graphic path.geom-polygon.geom-assert-active,
+svg.euclid-graphic path.wedge.geom-assert-active,
+svg.euclid-graphic path.angle.geom-assert-active {
+  opacity: 1 !important;
+  fill: var(--geom-assert, #5ec27e) !important;
+  fill-opacity: 0.22 !important;
+  stroke: var(--geom-assert, #5ec27e) !important;
+  stroke-opacity: 1 !important;
+  stroke-width: 1.5px !important;
+  filter: none !important;
+}
+
+svg.euclid-graphic path.geom-ang-arc.geom-assert-active {
+  opacity: 1 !important;
+  fill: none !important;
+  stroke: var(--geom-assert, #5ec27e) !important;
+  stroke-width: 1.8px !important;
+}
+
+svg.euclid-graphic path.geom-assert-active.geom-tick-1 {
+  marker-mid: url(#geom-tick-1) !important;
+}
+
+svg.euclid-graphic path.geom-assert-active.geom-tick-2 {
+  marker-mid: url(#geom-tick-2) !important;
+}
+
+svg.euclid-graphic path.geom-assert-active.geom-tick-3 {
+  marker-mid: url(#geom-tick-3) !important;
+}
+
+svg.euclid-graphic circle.geom-point.geom-assert-active,
+svg.euclid-graphic circle.point.geom-assert-active,
+svg.euclid-graphic #points circle.geom-assert-active,
+svg.euclid-graphic circle.geom-point.geom-assert-secondary,
+svg.euclid-graphic circle.point.geom-assert-secondary,
+svg.euclid-graphic #points circle.geom-assert-secondary {
+  opacity: 1 !important;
+  fill: var(--geom-assert, #5ec27e) !important;
+  fill-opacity: 1 !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+svg.euclid-graphic text.geom-assert-active,
+svg.euclid-graphic text.geom-assert-active *,
+svg.euclid-graphic text.geom-assert-active tspan,
+svg.euclid-graphic text.geom-assert-secondary,
+svg.euclid-graphic text.geom-assert-secondary *,
+svg.euclid-graphic text.geom-assert-secondary tspan {
+  opacity: 1 !important;
+  fill: var(--geom-assert, #5ec27e) !important;
+  stroke: none !important;
+  stroke-width: 0 !important;
+  filter: none !important;
+}
+
+/* Active Coincidence / Superposition Highlight in SVG: CYAN + Concentric Target Rings */
+svg.euclid-graphic .geom-coincide-active {
+  opacity: 1 !important;
+  stroke: var(--geom-coincide, #38bdf8) !important;
+  stroke-width: 2.4px !important;
+  stroke-opacity: 1 !important;
+}
+
+svg.euclid-graphic polygon.geom-coincide-active,
+svg.euclid-graphic path.polygon.geom-coincide-active,
+svg.euclid-graphic path.geom-polygon.geom-coincide-active,
+svg.euclid-graphic path.wedge.geom-coincide-active,
+svg.euclid-graphic path.angle.geom-coincide-active {
+  opacity: 1 !important;
+  fill: var(--geom-coincide, #38bdf8) !important;
+  fill-opacity: 0.24 !important;
+  stroke: var(--geom-coincide, #38bdf8) !important;
+  stroke-dasharray: 5, 2.5 !important;
+  stroke-width: 1.8px !important;
+}
+
+svg.euclid-graphic circle.geom-point.geom-coincide-active,
+svg.euclid-graphic circle.point.geom-coincide-active,
+svg.euclid-graphic #points circle.geom-coincide-active,
+svg.euclid-graphic circle.geom-point.geom-coincide-secondary,
+svg.euclid-graphic circle.point.geom-coincide-secondary,
+svg.euclid-graphic #points circle.geom-coincide-secondary {
+  opacity: 1 !important;
+  fill: var(--geom-coincide, #38bdf8) !important;
+  fill-opacity: 1 !important;
+}
+
+svg.euclid-graphic text.geom-coincide-active,
+svg.euclid-graphic text.geom-coincide-active *,
+svg.euclid-graphic text.geom-coincide-active tspan,
+svg.euclid-graphic text.geom-coincide-secondary,
+svg.euclid-graphic text.geom-coincide-secondary *,
+svg.euclid-graphic text.geom-coincide-secondary tspan {
+  opacity: 1 !important;
+  fill: var(--geom-coincide, #38bdf8) !important;
+}
+
+svg.euclid-graphic circle.geom-coincide-ring {
+  fill: none !important;
+  stroke: var(--geom-coincide, #38bdf8) !important;
+  pointer-events: none !important;
+  opacity: 0.92 !important;
+}
+
+svg.euclid-graphic circle.geom-coincide-ring-inner {
+  stroke-width: 1.5px !important;
+}
+
+svg.euclid-graphic circle.geom-coincide-ring-outer {
+  stroke-width: 1.1px !important;
+  stroke-dasharray: 2.5, 2.5 !important;
+  opacity: 0.72 !important;
+}
+
+/* Inline Figure Wrapper in Book Page */
+.euclid-figure-container {
+  float: right;
+  clear: right;
+  margin: 0.25em 0 1.25em 1.5em;
+  max-width: 52%;
+  background: var(--geom-bg, transparent);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.16);
+  user-select: none;
+  transition: max-width 0.2s ease, border-color 0.15s ease;
+}
+
+.euclid-figure-container:hover {
+  border-color: var(--book-border-dark, #544f47);
+}
+
+.euclid-figure-container .figure-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--book-border, #3d3934);
+}
+
+.euclid-figure-container .figure-btn {
+  font-size: 10px;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--book-text-muted, #9c958a);
+  background: transparent;
+  transition: all 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.euclid-figure-container .figure-btn:hover {
+  color: var(--book-text, #d6cfc5);
+  background: var(--book-surface, #272629);
+}
+
+.euclid-figure-container .figure-btn.active {
+  color: var(--book-link, #de836e);
+  background: var(--book-surface-alt, #313035);
+  font-weight: 600;
+}
+
+.euclid-figure-container.python-mode {
+  min-width: 340px;
+  max-width: 62%;
+}
+
+.euclid-figure-container .figure-svg-wrapper svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.euclid-figure-container .figure-python-wrapper {
+  background: #09090b;
+  color: #e4e4e7;
+  border-radius: 6px;
+  border: 1px solid #27272a;
+  padding: 8px 10px;
+  max-height: 300px;
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10.5px;
+  line-height: 1.5;
+  text-align: left;
+  user-select: text;
+}
+
+.euclid-figure-container .figure-caption {
+  font-size: 11px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  color: var(--book-text-muted, #9c958a);
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* -------------------------------------------------------------------------
+   6. Book Codex Collections (Propositions & Chapters Gallery)
+   ------------------------------------------------------------------------- */
+.book-reading-pane .book-content .collection {
+  margin-top: 1.25rem;
+  font-size: 1rem;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+
+  > * {
+    background: transparent;
+    padding: 0;
+  }
+
+  .collection-controls {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+    padding: 0;
+    background: transparent;
+
+    button.layout-btn {
+      background: var(--book-surface);
+      border: 1px solid var(--book-border);
+      color: var(--book-text-muted);
+      padding: 0.3rem 0.45rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover,
+      &.active {
+        background: var(--book-surface-alt);
+        color: var(--book-link-hover);
+        border-color: var(--book-border-dark);
+      }
+    }
+  }
+
+  > article.excerpt {
+    background: var(--book-surface);
+    border: 1px solid var(--book-border);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 0;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      border-color: var(--book-border-dark);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+
+    > .content {
+      margin-bottom: 0;
+      gap: 0.75rem;
+
+      > figure {
+        background: var(--book-bg, #1e1e20);
+        border: 1px solid var(--book-border, #3d3934);
+        border-radius: 6px;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        max-width: none;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        a {
+          display: flex;
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          justify-content: center;
+        }
+
+        img,
+        svg {
+          max-width: 100%;
+          max-height: 100%;
+          width: auto;
+          height: auto;
+          object-fit: contain;
+          border-radius: 2px;
+          background-color: transparent !important;
+          border: none !important;
+          padding: 0 !important;
+          box-shadow: none !important;
+        }
+      }
+
+      > section {
+        min-width: 0;
+        background: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
+        h2 {
+          font-family: var(--book-font-display) !important;
+          font-size: 1.18rem !important;
+          font-weight: 600;
+          line-height: 1.3 !important;
+          margin: 0 0 0.4rem 0 !important;
+          text-indent: 0 !important;
+
+          a {
+            color: var(--book-link) !important;
+            text-decoration: none !important;
+
+            &:hover {
+              color: var(--book-link-hover) !important;
+              text-decoration: underline !important;
+            }
+          }
+        }
+
+        .enunciation,
+        p {
+          text-indent: 0 !important;
+          font-style: italic;
+          font-size: 1.02rem;
+          line-height: 1.5;
+          color: var(--book-text);
+          margin: 0 !important;
+          text-align: left !important;
+          hyphens: auto;
+        }
+
+        .enunciation p {
+          margin-bottom: 0.25rem !important;
+
+          &:last-child {
+            margin-bottom: 0 !important;
+          }
+        }
+      }
+    }
+
+    > footer {
+      display: none !important;
+    }
+  }
+
+  &.layout-cards {
+    grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+    gap: 1rem;
+
+    > article.excerpt > .content {
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      align-items: center !important;
+      text-align: center !important;
+
+      > figure {
+        width: 100%;
+        height: 11.5rem;
+        margin: 0 auto 0.25rem auto;
+      }
+
+      > section {
+        width: 100%;
+
+        h2,
+        .enunciation,
+        p {
+          text-align: center !important;
+          hyphens: none;
+        }
+      }
+    }
+  }
+
+  &.layout-banners {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+
+    > article.excerpt > .content {
+      flex-direction: row !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      gap: 1.15rem;
+
+      > figure {
+        width: 9.5rem;
+        height: 8rem;
+        margin: 0;
+      }
+
+      > section {
+        flex: 1;
+
+        h2 {
+          text-align: left !important;
+        }
+      }
+
+      @media (max-width: 560px) {
+        flex-direction: column !important;
+
+        > figure {
+          width: 100%;
+          height: 10rem;
+        }
+      }
+    }
+  }
+
+  &.layout-list {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+
+    > article.excerpt {
+      padding: 0.6rem 0.85rem;
+      border-bottom: 1px solid var(--book-border);
+
+      > .content {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 0.9rem;
+
+        > figure {
+          width: 4.5rem;
+          height: 4.5rem;
+          padding: 0.25rem;
+          margin: 0;
+        }
+
+        > section {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.15rem;
+
+          h2 {
+            font-size: 1.05rem !important;
+            margin: 0 !important;
+            text-align: left !important;
+            white-space: normal;
+            overflow: visible;
+          }
+
+          .enunciation,
+          p {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: var(--book-text-muted);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   16. Graphviz Dependency Diagrams (.graphviz)
+   ------------------------------------------------------------------------- */
+div.graphviz {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 1.25rem 0;
+  padding: 0.75rem;
+  background-color: var(--book-surface, rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--book-border, rgba(255, 255, 255, 0.1));
+  border-radius: 6px;
+  overflow-x: auto;
+
+  object.graphviz,
+  svg.graphviz {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   17. Pseudocode Construction Steps (.geom-step) & Step-by-Step SVG Player
+   ------------------------------------------------------------------------- */
+.geom-steps-viewport {
+  max-height: clamp(14rem, 36vh, 22rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0.35rem 0 1.5rem;
+  padding: 0.45rem 0.55rem;
+  background-color: rgba(0, 0, 0, 0.16);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.22);
+  scrollbar-width: thin;
+  scrollbar-color: var(--book-border-dark, #544f47) transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: 1px solid rgba(232, 184, 90, 0.45);
+    border-color: var(--book-border-dark, #544f47);
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--book-border-dark, #544f47);
+    border-radius: 3px;
+  }
+}
+
+figure.photon-svg:has(+ .geom-steps-viewport) {
+  margin-bottom: 0.35rem !important;
+}
+
+.geom-step {
+  position: relative;
+  text-indent: 0 !important;
+  text-align: left !important;
+  padding: 0.28rem 0.55rem 0.28rem 5.4rem;
+  margin: 0.22rem 0;
+  border-radius: 4px;
+  border-left: 2.5px solid var(--book-border, #3d3934);
+  background-color: rgba(255, 255, 255, 0.015);
+  cursor: pointer;
+  line-height: 1.55;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+
+  p {
+    text-indent: 0 !important;
+    text-align: left !important;
+    margin: 0.15rem 0 !important;
+  }
+
+  &:hover {
+    background-color: var(--book-surface, rgba(255, 255, 255, 0.04));
+    border-left-color: var(--book-border-dark, #544f47);
+  }
+
+  &.geom-step-active {
+    background-color: rgba(232, 184, 90, 0.11);
+    border-left-color: var(--geom-accent, #e8b85a);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  }
+
+  &.geom-step-assert.geom-step-active,
+  &.geom-step-conclude.geom-step-active {
+    background-color: rgba(94, 194, 126, 0.11);
+    border-left-color: var(--geom-assert, #5ec27e);
+  }
+
+  &.geom-step-future {
+    opacity: 0.52;
+  }
+}
+
+.geom-step-badge {
+  display: inline-block;
+  width: 4.5rem;
+  margin-left: -4.85rem;
+  margin-right: 0.35rem;
+  font-family: var(--book-font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-align: right;
+  color: var(--book-text-muted, #9c958a);
+  user-select: none;
+  vertical-align: baseline;
+
+  &.geom-badge-given,
+  &.geom-badge-let {
+    color: #93c5fd;
+  }
+
+  &.geom-badge-construct {
+    color: var(--geom-accent, #e8b85a);
+  }
+
+  &.geom-badge-intersect {
+    color: #f9a8d4;
+  }
+
+  &.geom-badge-assert {
+    color: var(--geom-assert, #5ec27e);
+  }
+
+  &.geom-badge-conclude,
+  &.geom-badge-qed,
+  &.geom-badge-qef {
+    color: #c4b5fd;
+  }
+}
+
+.geom-step-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--book-border, #3d3934);
+  font-family: var(--book-font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--book-text-muted, #9c958a);
+  user-select: none;
+
+  .geom-step-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .geom-step-btn {
+    background: var(--book-surface, #272629);
+    border: 1px solid var(--book-border, #3d3934);
+    color: var(--book-text, #d6cfc5);
+    border-radius: 3px;
+    padding: 0.12rem 0.42rem;
+    font-family: var(--book-font-mono, monospace);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.12s ease;
+
+    &:hover {
+      background: var(--book-surface-alt, #313035);
+      border-color: var(--book-border-dark, #544f47);
+      color: var(--geom-accent, #e8b85a);
+    }
+
+    &.is-active {
+      background: rgba(232, 184, 90, 0.16);
+      border-color: var(--geom-accent, #e8b85a);
+      color: var(--geom-accent, #e8b85a);
+      font-weight: 600;
+    }
+  }
+
+  .geom-step-status {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    padding: 0 0.25rem;
+  }
+}
+
+svg.euclid-graphic .geom-step-hidden:not(.geom-highlight-active):not(.geom-highlight-secondary):not(.geom-assert-active):not(.geom-assert-secondary) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* -------------------------------------------------------------------------
+   18. Formal Proposition Signatures (.geom-signature) & Function Calls (.geom-fn)
+   ------------------------------------------------------------------------- */
+.geom-signature {
+  margin: 0.55rem 0 0.75rem;
+  padding: 0.55rem 0.85rem;
+  background-color: var(--book-surface, #272629);
+  border: 1px solid var(--book-border, #3d3934);
+  border-left: 3px solid var(--geom-accent, #e8b85a);
+  border-radius: 5px;
+  font-family: var(--book-font-mono, monospace);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--book-text, #d6cfc5);
+  text-indent: 0 !important;
+  text-align: left !important;
+
+  &.geom-signature-theorem,
+  &.geom-signature-cn,
+  &.geom-signature-def,
+  &.geom-signature-rule {
+    border-left-color: var(--geom-assert, #5ec27e);
+  }
+
+  p,
+  .line-block,
+  .line {
+    text-indent: 0 !important;
+    text-align: left !important;
+    margin: 0.12rem 0 !important;
+  }
+
+  .line-block {
+    margin: 0 !important;
+  }
+}
+
+.geom-fn,
+a.geom-fn {
+  font-family: var(--book-font-mono, monospace);
+  font-size: 0.88em;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--book-link, #de836e) !important;
+  background-color: rgba(222, 131, 110, 0.10);
+  border: 1px solid rgba(222, 131, 110, 0.34);
+  border-radius: 3px;
+  padding: 0.04rem 0.34rem;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: color 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+
+  &:hover {
+    color: var(--book-link-hover, #f5a492) !important;
+    background-color: rgba(222, 131, 110, 0.22);
+    border-color: var(--book-link, #de836e);
+    text-decoration: none !important;
+  }
+
+  &.geom-fn-def {
+    color: var(--geom-accent, #e8b85a) !important;
+    background-color: rgba(232, 184, 90, 0.12);
+    border-color: rgba(232, 184, 90, 0.42);
+  }
+}
+
+.geom-rule-just {
+  float: right;
+  text-indent: 0 !important;
+  font-family: var(--book-font-mono, monospace);
+  font-size: 0.78rem;
+  font-style: normal;
+  letter-spacing: 0.01em;
+  color: var(--book-text-muted, #9c958a);
+  margin-left: 0.65rem;
+
+  .geom-because {
+    color: var(--geom-assert, #5ec27e);
+    font-weight: 700;
+    margin-right: 0.1rem;
+  }
+
+  a.geom-rule,
+  span.geom-rule {
+    font-family: var(--book-font-mono, monospace);
+    font-size: 0.78rem;
+    color: var(--book-link, #de836e) !important;
+    text-decoration: none !important;
+    border-bottom: 1px dotted rgba(222, 131, 110, 0.55);
+    border-radius: 2px;
+    padding: 0 2px;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+
+    &:hover {
+      color: var(--book-link-hover, #f5a492) !important;
+      border-bottom: 1px solid var(--book-link, #de836e);
+      background-color: rgba(222, 131, 110, 0.12);
+      text-decoration: none !important;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------
+   19. Collapsible Scholarly Apparatus Blocks (details.book-collapse) & Notes (.note-item)
+   ------------------------------------------------------------------------- */
+details.book-collapse {
+  margin: 0.75rem 0 1.25rem;
+  background-color: var(--book-surface, #272629);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--book-border-dark, #544f47);
+  }
+
+  > summary.book-collapse-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.9rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background-color 0.15s ease;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background-color: var(--book-surface-alt, #313035);
+    }
+  }
+
+  .book-collapse-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--book-font-display, 'Cormorant Garamond', Georgia, serif);
+    font-weight: 600;
+    font-size: 0.96rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--book-text, #d6cfc5);
+
+    .collapse-icon {
+      display: inline-block;
+      color: var(--book-link, #de836e);
+      font-size: 0.95rem;
+      line-height: 1;
+      transition: transform 0.15s ease;
+    }
+  }
+
+  .book-collapse-badge {
+    font-family: var(--book-font-mono, monospace);
+    font-size: 0.75rem;
+    color: var(--book-text-muted, #9c958a);
+    background-color: var(--book-surface-alt, #313035);
+    border: 1px solid var(--book-border, #3d3934);
+    padding: 0.12rem 0.55rem;
+    border-radius: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &[open] {
+    > summary.book-collapse-summary {
+      border-bottom: 1px solid var(--book-border, #3d3934);
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .collapse-icon {
+      transform: rotate(90deg);
+    }
+  }
+
+  .book-collapse-body {
+    padding: 0.75rem 1rem;
+    font-size: 0.98rem;
+    line-height: 1.6;
+
+    p {
+      text-indent: 0 !important;
+      text-align: left !important;
+      margin: 0.3rem 0 !important;
+    }
+
+    ul,
+    ol {
+      margin: 0.2rem 0 !important;
+      padding-left: 1.25rem;
+    }
+
+    li {
+      margin-bottom: 0.32rem;
+      line-height: 1.55;
+
+      p {
+        margin: 0 !important;
+      }
+    }
+
+    &.line-catalog p,
+    .line-catalog p {
+      font-family: var(--book-font-mono, monospace);
+      font-size: 0.86rem;
+      line-height: 1.75;
+      color: var(--book-text, #d6cfc5);
+    }
+  }
+}
+
+.book-reading-pane .book-content .note-item {
+  margin: 0.65rem 0;
+  padding: 0.35rem 0.85rem;
+  border-left: 2px solid var(--book-border-dark, #544f47);
+  background-color: rgba(255, 255, 255, 0.015);
+  border-radius: 0 4px 4px 0;
+
+  p {
+    text-indent: 0 !important;
+    text-align: left !important;
+    margin: 0.25rem 0 !important;
+  }
+}
+
+/* ==========================================================================
+   Directory Directives (people-directory, reference-directory)
+   ========================================================================== */
+.directory-section,
+.collection-directory {
+  display: block;
+}
+.directory-section .collection-directory-controls,
+.collection-directory .collection-directory-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 1.1rem 0 0.85rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--book-border, rgba(148, 163, 184, 0.25));
+  border-radius: 8px;
+  background: var(--book-surface, rgba(148, 163, 184, 0.05));
+}
+.directory-section .collection-directory-row,
+.collection-directory .collection-directory-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+.directory-section .collection-directory-search,
+.collection-directory .collection-directory-search {
+  flex: 1 1 200px;
+  width: auto;
+  min-width: 180px;
+  padding: 0.42rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--book-border-dark, rgba(148, 163, 184, 0.35));
+  background: var(--book-bg, #141417);
+  color: var(--book-text, inherit);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.directory-section .collection-directory-search:focus,
+.collection-directory .collection-directory-search:focus {
+  border-color: var(--book-accent, #e8b85a);
+}
+.directory-section select.collection-directory-sort,
+.collection-directory select.collection-directory-sort {
+  appearance: none;
+  -webkit-appearance: none;
+  color-scheme: dark;
+  padding: 0.42rem 2rem 0.42rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--book-border-dark, rgba(148, 163, 184, 0.35));
+  background-color: var(--book-bg, #141417);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 0.65rem;
+  color: var(--book-text, inherit);
+  font-family: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.directory-section select.collection-directory-sort option,
+.collection-directory select.collection-directory-sort option {
+  background-color: var(--book-bg, #141417);
+  color: var(--book-text, #e4e4e7);
+}
+body.light-mode .directory-section select.collection-directory-sort,
+body.light-mode .collection-directory select.collection-directory-sort {
+  color-scheme: light;
+}
+.directory-section .collection-directory-count,
+.collection-directory .collection-directory-count {
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--book-border, rgba(148, 163, 184, 0.25));
+  background: var(--book-bg, rgba(148, 163, 184, 0.06));
+  color: var(--book-muted, inherit);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.directory-section .collection-directory-filters,
+.collection-directory .collection-directory-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.directory-section .collection-directory-pills,
+.collection-directory .collection-directory-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+.directory-section .collection-directory-label,
+.collection-directory .collection-directory-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--book-muted, inherit);
+  margin-right: 0.2rem;
+  min-width: 4.5rem;
+}
+.directory-section button.collection-directory-pill,
+.collection-directory button.collection-directory-pill {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.16rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--book-border-dark, rgba(148, 163, 184, 0.35));
+  background: var(--book-bg, #141417);
+  color: var(--book-muted, #a1a1aa);
+  font-family: var(--book-font-sans, "Fira Sans Condensed", "Fira Sans", sans-serif);
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.directory-section button.collection-directory-pill:hover,
+.collection-directory button.collection-directory-pill:hover {
+  border-color: var(--book-accent, #e8b85a);
+  color: var(--book-text, #f4f4f5);
+}
+.directory-section button.collection-directory-pill.is-active,
+.collection-directory button.collection-directory-pill.is-active {
+  background: var(--book-accent, #e8b85a);
+  border-color: var(--book-accent, #e8b85a);
+  color: #141417;
+  font-weight: 600;
+}
+.collection-directory-grid {
+  margin-top: 0.5rem;
+}
+.collection-directory-grid > article.excerpt > .content > figure {
+  overflow: hidden;
+}
+.collection-directory-grid > article.excerpt > .content > figure svg {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+.collection-directory-native {
+  font-size: 0.84rem;
+  color: var(--book-text-muted, inherit);
+  margin: 0.15rem 0 0.25rem;
+}
+.collection-directory-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  color: var(--book-text-muted, inherit);
+  margin: 0.25rem 0;
+}
+.collection-directory-grid.layout-banners .collection-directory-meta,
+.collection-directory-grid.layout-list .collection-directory-meta {
+  justify-content: flex-start;
+}
+.collection-directory-excerpt {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0.2rem 0 0.35rem;
+}
+.collection-directory-excerpt p {
+  margin: 0;
+}
+.collection-directory-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem;
+  margin: 0.35rem 0 0.25rem;
+}
+.collection-directory-grid.layout-banners .collection-directory-tags,
+.collection-directory-grid.layout-list .collection-directory-tags {
+  justify-content: flex-start;
+}
+.collection-directory-tag {
+  font-size: 0.72rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid var(--book-border, rgba(148, 163, 184, 0.28));
+}
+.collection-directory-links {
+  justify-content: center;
+  margin-top: 0.45rem;
+}
+.collection-directory-grid.layout-banners .collection-directory-links,
+.collection-directory-grid.layout-list .collection-directory-links {
+  justify-content: flex-start;
+}
+
+.collection-directory-grid > article.excerpt > .content > figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.45rem;
+  box-sizing: border-box;
+  display: block;
+}
+.collection-directory-grid > article.excerpt > .content > figure svg.medallion-coin {
+  width: 100%;
+  height: 100%;
+  padding: 0.45rem;
+  box-sizing: border-box;
+  display: block;
+}
+.repo-medallion-hero,
+.book-reading-pane .book-content img.repo-medallion-hero,
+.book-reading-pane .book-content svg.repo-medallion-hero,
+.is-home-page img.repo-medallion-hero,
+.is-home-page svg.repo-medallion-hero {
+  display: block;
+  width: 11rem;
+  height: 11rem;
+  max-width: 11rem;
+  margin: 0.65rem auto 1.35rem;
+  border-radius: 50%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.38));
+}
+a.image-reference:has(> .repo-medallion-hero) {
+  display: block;
+  width: fit-content;
+  margin: 0.65rem auto 1.35rem;
+}
+a.image-reference:has(> .repo-medallion-hero) > .repo-medallion-hero {
+  margin: 0 auto;
+}
+body.light-mode .repo-medallion-hero,
+body.light-mode .book-reading-pane .book-content img.repo-medallion-hero {
+  filter: drop-shadow(0 4px 14px rgba(24, 28, 36, 0.18));
+}

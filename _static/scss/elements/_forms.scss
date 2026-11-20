@@ -1,0 +1,139 @@
+/* elements/forms *****************************/
+// Trimmed to only what is used in the themes
+
+button,
+input {
+  font-family: var(--font-primary);
+  font-size: 100%;
+  line-height: 1.15;
+  overflow: visible;
+}
+
+button {
+  text-transform: none;
+}
+
+[type="checkbox"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+[type="search"] {
+  outline-offset: -2px;
+}
+
+[hidden] {
+  display: none;
+}
+
+// Basic text and search input styling
+input[type=text],
+input[type=search] {
+  display: block;
+  box-sizing: border-box;
+  padding: 0.45em 0.75em;
+  outline: 0 none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: none;
+
+  text-align: left;
+  color: var(--text-color);
+  background: var(--bg-alt-color);
+  appearance: none;
+  font-family: var(--font-primary);
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  width: 100%;
+  max-width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+
+  &:hover {
+    border-color: color-mix(in oklch, var(--border-color), var(--text-color) 30%);
+  }
+
+  &:focus {
+    color: var(--heading-color);
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 2px color-mix(in oklch, var(--link-color), transparent 75%);
+    outline: none;
+  }
+}
+
+// Checkboxes and Radios
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+  --color: var(--color-key-dark);
+}
+
+// Form groups
+.form-group {
+  margin-bottom: 1rem;
+}
+
+// Submit button
+input[type=submit] {
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0 none;
+  border-radius: .5em;
+
+  color: var(--color-key-lighter);
+  background: var(--color-key);
+  padding: .5em;
+  margin: .5em 0;
+  text-decoration: none;
+  &:hover {
+    background: var(--link-hover-color);
+  }
+}
+
+// Labels
+label {
+  display: block;
+  font-weight: bold;
+  font-family: var(--font-primary);
+  margin-bottom: 0.5rem;
+  color: var(--color-key-lighter);
+  background: var(--link-color);
+}
+
+button {
+  border: 0 none;
+  border-radius: .5em;
+
+  color: var(--color-key-lighter);
+  background: var(--color-key);
+  padding: .5em;
+  margin: .5em;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--color-key-light);
+    text-decoration: none;
+  }
+}
+
+// Button styles (if form related)
+button[type="submit"] {
+  color: var(--color-key-lighter);
+  background: var(--link-color);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--color-key-light);
+  }
+}

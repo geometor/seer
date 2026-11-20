@@ -1,0 +1,183 @@
+geometor.seer.tasks.tasks
+=========================
+
+.. py:module:: geometor.seer.tasks.tasks
+
+.. autoapi-nested-parse::
+
+   tools to parse and render tasks json files
+
+   task has two sets of data for training and testing
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.tasks.MOVIEPY_AVAILABLE_TASKS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.tasks.TaskPair
+   geometor.seer.tasks.tasks.Task
+   geometor.seer.tasks.tasks.Tasks
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   geometor.seer.tasks.tasks.load_tasks_from_kaggle_json
+   geometor.seer.tasks.tasks.get_unsolved_tasks
+
+
+Module Contents
+---------------
+
+.. py:data:: MOVIEPY_AVAILABLE_TASKS
+   :value: True
+
+
+.. py:class:: TaskPair(puzzle_id, set_type, index, input_grid, output_grid=None)
+
+   Bases: :py:obj:`dict`
+
+
+   dict() -> new empty dictionary
+   dict(mapping) -> new dictionary initialized from a mapping object's
+       (key, value) pairs
+   dict(iterable) -> new dictionary initialized as if via:
+       d = {}
+       for k, v in iterable:
+           d[k] = v
+   dict(**kwargs) -> new dictionary initialized with the name=value pairs
+       in the keyword argument list.  For example:  dict(one=1, two=2)
+
+
+   .. py:attribute:: input
+
+
+   .. py:attribute:: output
+
+
+   .. py:property:: weight
+
+
+   .. py:property:: size_change
+
+
+   .. py:property:: colors
+
+
+   .. py:property:: color_changes
+
+
+   .. py:method:: get_video(output_path='task_pair_video.mp4', include_diff_frame=False, actual_output_grid_pil: PIL.Image.Image = None, expected_output_grid_pil: PIL.Image.Image = None)
+
+      Generates a video sequence.
+      If actual_output_grid_pil is provided, it generates a sequence:
+      Input -> Actual Output -> (Optional Diff: Actual vs Expected) -> Expected Output.
+      Otherwise, it generates the original sequence:
+      Input -> (Optional Diff: Input vs Self.Output) -> Self.Output.
+
+
+
+   .. py:method:: get_diff_frame()
+
+      Generates a PIL Image representing the difference between input and output grids.
+
+
+
+.. py:class:: Task(id, data)
+
+   .. py:attribute:: id
+
+
+   .. py:attribute:: train
+
+
+   .. py:attribute:: test
+
+
+   .. py:property:: all_pairs
+
+
+   .. py:property:: weight
+
+
+   .. py:property:: colors
+
+
+   .. py:method:: nice_json_layout()
+
+
+   .. py:method:: to_image(train_results: list = None, test_results: list = None, show_test=True, outer_border=32, col_spacing=32, row_spacing=16)
+
+      Creates a combined image for all train and test pairs in the task.
+      Adds spacing between grids.
+      Optionally includes result grids.
+
+
+
+   .. py:method:: rotate(k=1)
+
+      Rotates all grids in the task by 90 degrees clockwise k times.
+      Returns a new Task object with the rotated grids.
+
+
+
+.. py:class:: Tasks(folder_path='.')
+
+   Bases: :py:obj:`list`
+
+
+   Built-in mutable sequence.
+
+   If no argument is given, the constructor creates a new empty list.
+   The argument must be an iterable if specified.
+
+
+   .. py:method:: get_ordered_tasks(key='weight', reverse=False)
+
+
+   .. py:method:: get_tasks_by_color_count(count)
+
+
+   .. py:method:: get_tasks_by_size_change(change_type='total', value=0)
+
+
+   .. py:method:: get_ordered_by_train_count(reverse=False)
+
+
+.. py:function:: load_tasks_from_kaggle_json(file_path: pathlib.Path) -> Tasks
+
+   Loads tasks from a single JSON file where the top level is a dictionary
+   mapping task IDs to task data (containing 'train' and 'test' lists).
+
+   :param file_path: The path to the JSON file.
+
+   :returns: A Tasks object containing the loaded tasks. Returns an empty Tasks
+             object if the file is not found, is invalid JSON, or has an
+             unexpected structure.
+
+
+.. py:function:: get_unsolved_tasks(sessions_root: pathlib.Path) -> Tasks
+
+   Scans session summaries to find all unique tasks present across sessions
+   that have never passed the test phase. Loads these tasks from their
+   task.json files.
+
+   :param sessions_root: The root directory containing session folders.
+
+   :returns: A new Tasks object containing only the unsolved tasks found across all
+             sessions. Returns an empty Tasks object if sessions_root is invalid,
+             no tasks are found, or scanning fails.
+
+

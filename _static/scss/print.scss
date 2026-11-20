@@ -1,0 +1,71 @@
+/* Print Styles */
+
+@media print {
+  @page {
+    size: auto;
+    margin: 1in;
+  }
+
+  html, body {
+    background: white;
+    color: black;
+    font-size: 12pt;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide non-essential elements */
+  header,
+  footer,
+  .asides,
+  nav,
+  .btn,
+  .admonition-todo {
+    display: none !important;
+  }
+
+  /* Ensure main content is visible and takes full width */
+  main {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  article {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+  }
+
+  /* Improve readability for print */
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
+  /* Show URL after links (optional, but good for print) */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.9em;
+  }
+
+  /* Ensure images don't overflow */
+  img {
+    max-width: 100% !important;
+    height: auto;
+  }
+
+  /* Avoid page breaks inside elements */
+  pre, blockquote {
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+}

@@ -1,14 +1,7 @@
+:navigation: header
+:order: 3
 
-.. automodule:: geometor.seer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+modules
 =======
 
-.. automodule:: geometor.seer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
+.. include:: api/index.rst

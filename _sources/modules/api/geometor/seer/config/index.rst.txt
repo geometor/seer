@@ -1,0 +1,114 @@
+geometor.seer.config
+====================
+
+.. py:module:: geometor.seer.config
+
+.. autoapi-nested-parse::
+
+   Handles loading and accessing application configuration from YAML files.
+
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   geometor.seer.config.ConfigError
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   geometor.seer.config.Config
+
+
+Module Contents
+---------------
+
+.. py:exception:: ConfigError
+
+   Bases: :py:obj:`Exception`
+
+
+   Custom exception for configuration loading errors.
+
+
+.. py:class:: Config(config_dir: pathlib.Path | str)
+
+   Handles loading and accessing configuration from a specified directory.
+
+   Expects an 'index.yaml' file in the root of the config_dir.
+   Referenced files (instructions, context files) within index.yaml
+   are expected to be relative to config_dir and their content
+   will be loaded into the configuration data.
+
+
+   .. py:attribute:: config_dir
+
+
+   .. py:attribute:: index_file
+
+
+   .. py:property:: data
+      :type: Dict[str, Any]
+
+
+      Returns the raw loaded configuration data dictionary.
+
+
+   .. py:property:: roles
+      :type: Dict[str, Dict[str, Any]]
+
+
+      Returns the roles configuration dictionary.
+
+
+   .. py:property:: instructions
+      :type: Dict[str, str]
+
+
+      Returns the instructions dictionary (keys mapped to content).
+
+
+   .. py:property:: task_context
+      :type: str
+
+
+      Returns the loaded task context content.
+
+
+   .. py:property:: max_iterations
+      :type: int
+
+
+      Returns the max_iterations value.
+
+
+   .. py:property:: use_images
+      :type: bool
+
+
+      Returns the use_images flag.
+
+
+   .. py:method:: get(key: str, default: Optional[Any] = None) -> Any
+
+      Provides dictionary-like get access to the top-level config.
+
+
+
+   .. py:method:: __getitem__(key: str) -> Any
+
+      Provides dictionary-like access to the top-level config.
+
+
+
+   .. py:method:: __contains__(key: str) -> bool
+
+      Allows checking for key existence using 'in'.
+
+
+
