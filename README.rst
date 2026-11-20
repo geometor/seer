@@ -1,11 +1,11 @@
-GEOMETOR • SEER
-===============
-
 .. image:: docsrc/_static/logo.png
    :alt: GEOMETOR • seer Medallion
    :target: https://geometor.github.io/seer/
-   :width: 180px
-   :align: center
+   :width: 150px
+   :align: right
+
+GEOMETOR • SEER
+===============
 
 .. image:: https://img.shields.io/github/license/geometor/seer.svg
    :target: https://github.com/geometor/seer/blob/main/LICENSE
