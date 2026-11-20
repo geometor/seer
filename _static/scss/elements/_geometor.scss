@@ -86,6 +86,7 @@ article.book-reading-pane {
   --book-code-text: #d6cfc5;
 
   --book-max-width: 46rem; /* ~736px, optimal 65-75 characters per line */
+  --collection-max-width: 96rem; /* expanded width for multi-column collections */
   --book-scroll-offset: 8.5rem;
 
   --book-font-serif: 'EB Garamond', Garamond, 'Palatino Linotype', Palatino, 'Georgia', 'Times New Roman', serif;
@@ -207,6 +208,37 @@ article.book-reading-pane {
   article.book-layout,
   article.book-reading-pane {
     padding: 0 1rem 2.5rem !important;
+  }
+}
+
+article.book-reading-pane:has(.collection) {
+  max-width: var(--collection-max-width) !important;
+
+  .book-content {
+    .author-overline,
+    > section > h1,
+    > section > h2,
+    > section > h3,
+    > section > h4,
+    > section > p,
+    > section > ul,
+    > section > ol,
+    > section > blockquote,
+    > section > .admonition,
+    > section > .rubric,
+    > section > .toctree-wrapper,
+    > section > hr,
+    > h1,
+    > h2,
+    > p,
+    > ul,
+    > ol,
+    > .admonition,
+    > .rubric {
+      max-width: var(--book-max-width);
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }
 
@@ -1474,17 +1506,20 @@ a.justification-link {
 }
 
 .folio-milestone {
-  float: right;
-  font-size: 0.68rem;
-  line-height: 1.2;
-  color: var(--book-text-muted);
-  opacity: 0.65;
+  display: block;
+  float: none;
+  clear: both;
+  text-align: right;
+  font-size: 0.66rem;
+  line-height: 1.25;
+  color: var(--book-text-dim, #787268);
+  opacity: 0.55;
   font-family: var(--book-font-mono);
-  margin: 0.15rem 0 0.15rem 0.85rem;
-  padding: 0.04rem 0.3rem;
-  border-radius: 3px;
+  margin: 0.35rem 0 0.1rem;
+  padding: 0;
+  white-space: nowrap;
   user-select: none;
-  transition: opacity 0.15s ease;
+  transition: opacity 0.15s ease, color 0.15s ease;
 
   &:hover {
     opacity: 1;
@@ -1498,6 +1533,20 @@ a.justification-link {
     &:hover {
       color: var(--book-link, #d4a038) !important;
     }
+  }
+}
+
+@media (min-width: 98em) {
+  .book-reading-pane .book-content .folio-milestone {
+    display: inline-block;
+    float: right;
+    clear: right;
+    margin: 0.28rem -8.75rem 0.1rem 0;
+    width: 7.75rem;
+    max-width: 7.75rem;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -2383,7 +2432,8 @@ svg.euclid-graphic circle.geom-coincide-ring-outer {
   margin-top: 1.25rem;
   font-size: 1rem;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(#{"min(100%, 16rem)"}, 21rem));
+  justify-content: center;
 
   > * {
     background: transparent;
@@ -2522,7 +2572,8 @@ svg.euclid-graphic circle.geom-coincide-ring-outer {
   }
 
   &.layout-cards {
-    grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(#{"min(100%, 16rem)"}, 21rem));
+  justify-content: center;
     gap: 1rem;
 
     > article.excerpt > .content {
@@ -2552,6 +2603,9 @@ svg.euclid-graphic circle.geom-coincide-ring-outer {
 
   &.layout-banners {
     grid-template-columns: 1fr;
+    max-width: 58rem;
+    margin-left: auto;
+    margin-right: auto;
     gap: 0.85rem;
 
     > article.excerpt > .content {
@@ -2587,6 +2641,9 @@ svg.euclid-graphic circle.geom-coincide-ring-outer {
 
   &.layout-list {
     grid-template-columns: 1fr;
+    max-width: 58rem;
+    margin-left: auto;
+    margin-right: auto;
     gap: 0.45rem;
 
     > article.excerpt {
@@ -3076,7 +3133,8 @@ details.book-collapse {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  margin: 1.1rem 0 0.85rem;
+  max-width: 72rem;
+  margin: 1.1rem auto 0.85rem;
   padding: 0.85rem 1rem;
   border: 1px solid var(--book-border, rgba(148, 163, 184, 0.25));
   border-radius: 8px;
@@ -3305,3 +3363,192 @@ body.light-mode .repo-medallion-hero,
 body.light-mode .book-reading-pane .book-content img.repo-medallion-hero {
   filter: drop-shadow(0 4px 14px rgba(24, 28, 36, 0.18));
 }
+
+/* ==========================================================================
+   Bespoke Editorial Home Page Showcase (.home-book-hero, .home-feature-grid)
+   ========================================================================== */
+.home-book-hero {
+  display: grid;
+  grid-template-columns: minmax(175px, 235px) minmax(0, 1fr);
+  gap: 1.35rem;
+  align-items: center;
+  margin: 1rem 0 1.35rem 0;
+  padding: 1.15rem 1.35rem;
+  background: var(--book-surface, #272629);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.home-book-hero.no-thumb {
+  grid-template-columns: 1fr;
+}
+
+.home-book-thumb {
+  background: #141416;
+  border: 1px solid rgba(232, 184, 90, 0.28);
+  border-radius: 5px;
+  overflow: hidden;
+  transition: border-color 0.16s ease, transform 0.16s ease;
+}
+
+.home-book-thumb.plate-light {
+  background: #f7f4ee;
+  padding: 0.35rem;
+}
+
+.home-book-thumb:hover {
+  border-color: var(--geom-accent, #e8b85a);
+  transform: translateY(-1px);
+}
+
+.home-book-thumb a {
+  display: block;
+  border-bottom: none !important;
+}
+
+.home-book-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 250px;
+  object-fit: contain;
+  margin: 0 !important;
+}
+
+.home-book-body p.rubric {
+  text-align: left !important;
+  font-family: var(--geom-font-sans, "Fira Sans Condensed", system-ui, sans-serif);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--geom-accent, #e8b85a) !important;
+  margin: 0 0 0.35rem 0 !important;
+}
+
+.home-book-body > p {
+  text-indent: 0 !important;
+  text-align: left !important;
+  margin: 0 0 0.75rem 0 !important;
+  line-height: 1.56;
+}
+
+.home-actions ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.6rem;
+  list-style: none !important;
+  margin: 0.25rem 0 0 0 !important;
+  padding: 0 !important;
+}
+
+.home-actions li {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.home-actions li::before {
+  display: none !important;
+}
+
+.home-actions a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.32rem 0.76rem;
+  border-radius: 4px;
+  border: 1px solid rgba(232, 184, 90, 0.42);
+  background: rgba(232, 184, 90, 0.1);
+  color: var(--geom-accent, #e8b85a) !important;
+  font-family: var(--geom-font-sans, "Fira Sans Condensed", system-ui, sans-serif);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.home-actions a:hover {
+  background: rgba(232, 184, 90, 0.22);
+  border-color: var(--geom-accent, #e8b85a);
+}
+
+.home-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.95rem;
+  margin: 0.85rem 0 1.5rem 0;
+}
+
+.home-feature-card {
+  padding: 0.95rem 1.05rem;
+  background: var(--book-surface, #272629);
+  border: 1px solid var(--book-border, #3d3934);
+  border-radius: 6px;
+}
+
+.home-feature-card p {
+  text-indent: 0 !important;
+  text-align: left !important;
+  margin: 0 0 0.45rem 0 !important;
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.home-feature-card p:last-child {
+  margin-bottom: 0 !important;
+  color: var(--book-text-muted, #9c958a);
+  font-size: 0.9rem;
+}
+
+.home-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 2rem;
+  margin-top: 0.65rem;
+}
+
+.home-col p.rubric {
+  text-align: left !important;
+  font-family: var(--geom-font-sans, "Fira Sans Condensed", system-ui, sans-serif);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--geom-accent, #e8b85a) !important;
+  margin: 0 0 0.5rem 0 !important;
+  padding-bottom: 0.28rem !important;
+  border-bottom: 1px solid var(--book-border, #3d3934);
+}
+
+.home-col ul {
+  margin: 0 !important;
+  padding-left: 1.15rem !important;
+}
+
+.home-col li {
+  margin-bottom: 0.45rem !important;
+  line-height: 1.48;
+}
+
+body.light-mode .home-book-hero,
+body.light-mode .home-feature-card {
+  background: var(--book-surface, #f5f2eb);
+  box-shadow: 0 2px 10px rgba(24, 28, 36, 0.06);
+}
+
+body.light-mode .home-actions a {
+  border-color: rgba(160, 100, 24, 0.4);
+  background: rgba(160, 100, 24, 0.08);
+  color: var(--book-link, #9b4832) !important;
+}
+
+body.light-mode .home-actions a:hover {
+  background: rgba(160, 100, 24, 0.16);
+  border-color: var(--book-link, #9b4832);
+}
+
+@media (max-width: 760px) {
+  .home-book-hero,
+  .home-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
