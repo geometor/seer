@@ -1,6 +1,10 @@
 seer
 ====
 
+.. image:: _static/medallion.svg
+   :alt: Seer Medallion
+   :class: repo-medallion-hero
+
 An AI-driven framework for solving abstraction and reasoning challenges.
 
 .. include:: intro.rst
